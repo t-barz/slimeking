@@ -1,37 +1,78 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Required for the new Input System
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// Controls the player's movement and visual state based on direction
+/// Controls the player's movement and visual state based on direction using the new Input System
 /// </summary>
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Input")]
+    [SerializeField] private InputActionReference movementAction; // Reference to the movement input action
+
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f; // Controls how fast the player moves
 
     [Header("Visual Components")]
-    // Arrays to store different visual states of the character
     [SerializeField] private GameObject[] frontObjects;  // Objects shown when facing front/down
     [SerializeField] private GameObject[] backObjects;   // Objects shown when facing back/up
     [SerializeField] private GameObject[] sideObjects;   // Objects shown when facing left/right
 
-    // Movement input from the Input System
-    private Vector2 moveInput;
-    // Reference to the Rigidbody2D component for physics-based movement
-    private Rigidbody2D rb;
-    // Tracks whether the character is facing left (for horizontal flipping)
-    private bool isFacingLeft = false;
+    private Vector2 moveInput;           // Stores the current movement input vector
+    private Rigidbody2D rb;             // Reference to the Rigidbody2D component
+    private Animator animator;           // Reference to the Animator component
+    private bool isFacingLeft = false;   // Tracks whether the character is facing left
 
     private void Awake()
     {
-        // Get the Rigidbody2D component at startup
+        // Get required components at startup
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     private void Start()
     {
         // Set initial visual state to face front/down
         UpdateVisualState(Vector2.down);
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to input action events when the component is enabled
+        movementAction.action.performed += OnMovementPerformed;
+        movementAction.action.canceled += OnMovementCanceled;
+        movementAction.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe from input action events when the component is disabled
+        movementAction.action.performed -= OnMovementPerformed;
+        movementAction.action.canceled -= OnMovementCanceled;
+        movementAction.action.Disable();
+    }
+
+    /// <summary>
+    /// Called when movement input is performed
+    /// </summary>
+    private void OnMovementPerformed(InputAction.CallbackContext context)
+    {
+        // Get the input vector and update visual state if there's movement
+        moveInput = context.ReadValue<Vector2>();
+        if (moveInput != Vector2.zero)
+        {
+            UpdateVisualState(moveInput);
+            animator.SetBool("isWalking", true); // Set walking animation state
+        }
+    }
+
+    /// <summary>
+    /// Called when movement input is canceled (released)
+    /// </summary>
+    private void OnMovementCanceled(InputAction.CallbackContext context)
+    {
+        // Reset movement input when no keys are pressed
+        moveInput = Vector2.zero;
+        animator.SetBool("isWalking", false); // Stop walking animation
     }
 
     private void FixedUpdate()
@@ -41,23 +82,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by the Input System when movement input changes
-    /// </summary>
-    public void OnMove(InputValue value)
-    {
-        // Get the current input vector (x,y between -1 and 1)
-        moveInput = value.Get<Vector2>();
-        
-        // Only update visuals if there's actual movement
-        if (moveInput != Vector2.zero)
-        {
-            UpdateVisualState(moveInput);
-        }
-    }
-
-    /// <summary>
     /// Updates which visual objects are shown based on movement direction
     /// </summary>
+    /// <param name="direction">The movement direction vector</param>
     private void UpdateVisualState(Vector2 direction)
     {
         // Compare absolute values to determine if movement is more horizontal or vertical
@@ -66,12 +93,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (absX > absY)
         {
-            // If X movement is greater, character is moving horizontally
+            // Horizontal movement is dominant
             SetActiveObjects(sideObjects, true);
             SetActiveObjects(frontObjects, false);
             SetActiveObjects(backObjects, false);
 
-            // Determine if character should face left or right
+            // Update facing direction if needed
             bool shouldFaceLeft = direction.x < 0;
             if (shouldFaceLeft != isFacingLeft)
             {
@@ -81,17 +108,17 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // If Y movement is greater or equal, character is moving vertically
+            // Vertical movement is dominant
             if (direction.y > 0)
             {
-                // Moving upward
+                // Moving up
                 SetActiveObjects(backObjects, true);
                 SetActiveObjects(frontObjects, false);
                 SetActiveObjects(sideObjects, false);
             }
             else
             {
-                // Moving downward or idle
+                // Moving down
                 SetActiveObjects(frontObjects, true);
                 SetActiveObjects(backObjects, false);
                 SetActiveObjects(sideObjects, false);
@@ -102,6 +129,8 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>
     /// Helper method to enable/disable arrays of GameObjects
     /// </summary>
+    /// <param name="objects">Array of GameObjects to modify</param>
+    /// <param name="active">Whether the objects should be active or not</param>
     private void SetActiveObjects(GameObject[] objects, bool active)
     {
         foreach (var obj in objects)
@@ -114,6 +143,7 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>
     /// Flips the side-view objects horizontally when facing left
     /// </summary>
+    /// <param name="faceLeft">Whether the character should face left</param>
     private void FlipSideObjects(bool faceLeft)
     {
         foreach (var obj in sideObjects)
