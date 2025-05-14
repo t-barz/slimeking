@@ -159,7 +159,9 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator SlideCoroutine(Vector3 destination)
     {
         isSliding = true;
-        const float MOVE_DURATION = 1f;
+        const float MOVE_DURATION = 0.75f;
+        Vector3 startPosition = transform.position;
+        float elapsedTime = 0f;
         
         // Disable colliders during slide
         foreach (var collider in playerColliders)
@@ -168,32 +170,22 @@ public class PlayerMovement : MonoBehaviour
         }
         
         animator.SetTrigger("Shrink");
-        Vector3 startPosition = transform.position;
-        float startTime = Time.time;
         
-        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") && 
-               !animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+                
+        while (elapsedTime < MOVE_DURATION)
         {
-            float elapsedTime = Time.time - startTime;
-            float remainingTime = Mathf.Max(MOVE_DURATION - elapsedTime, Time.deltaTime);
-            
-            Vector3 currentPosition = transform.position;
-            Vector3 toDestination = destination - currentPosition;
-            
-            if (toDestination.magnitude > 0.01f)
-            {
-                float speed = toDestination.magnitude / remainingTime;
-                transform.position = Vector3.MoveTowards(
-                    currentPosition,
-                    destination,
-                    speed * Time.deltaTime
-                );
-            }
-            
-            yield return null;
+            // Calcula a fração do tempo decorrido
+            float t = elapsedTime / MOVE_DURATION;
+            // Interpola a posição entre o início e o destino
+            transform.position = Vector3.Lerp(startPosition, destination, t);
+
+            elapsedTime += Time.deltaTime;
+            yield return null; // espera o próximo frame
         }
+
+        // Garante que a posição final seja exatamente o destino
+        //transform.position = destination;
         
-        transform.position = destination;
         
         // Re-enable colliders
         foreach (var collider in playerColliders)
