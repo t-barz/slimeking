@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 /// <summary>
 /// Controls the player's movement and visual state based on direction using the new Input System
@@ -7,25 +8,35 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Input")]
-    [SerializeField] private InputActionReference movementAction; // Reference to the movement input action
-
+    [SerializeField] private InputActionReference movementAction;    // Reference to the movement input action
+    
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f; // Controls how fast the player moves
+    [SerializeField] private float moveSpeed = 5f;                  // Controls how fast the player moves
+    [SerializeField] private float jumpHeight = 2f;                 // Controls the height of the jump arc
 
-    private GameObject[] frontObjects;  // Objects with "front" in their name
-    private GameObject[] backObjects;   // Objects with "back" in their name
-    private GameObject[] sideObjects;   // Objects with "side" in their name
+    // References to different visual states of the player
+    private GameObject[] frontObjects;    // Objects with "front" in their name
+    private GameObject[] backObjects;     // Objects with "back" in their name
+    private GameObject[] sideObjects;     // Objects with "side" in their name
+    private Collider2D[] playerColliders; // Array to store all player colliders
 
-    private Vector2 moveInput;           // Stores the current movement input vector
-    private Rigidbody2D rb;             // Reference to the Rigidbody2D component
-    private Animator animator;           // Reference to the Animator component
-    private bool isFacingLeft = false;   // Tracks whether the character is facing left
+    // Movement and state variables
+    private Vector2 moveInput;            // Stores the current movement input vector
+    private Rigidbody2D rb;              // Reference to the Rigidbody2D component
+    private Animator animator;            // Reference to the Animator component
+    private bool isFacingLeft = false;    // Tracks whether the character is facing left
+    private bool isSliding = false;       // Tracks if the player is currently sliding
+    private bool isJumping = false;       // Tracks if the player is currently jumping
 
+    /// <summary>
+    /// Initialize components and gather child objects on startup
+    /// </summary>
     private void Awake()
     {
         // Get required components
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        playerColliders = GetComponents<Collider2D>();
 
         // Initialize visual objects arrays by searching child objects by name
         frontObjects = GetObjectsByNameContains("front");
@@ -66,66 +77,208 @@ public class PlayerMovement : MonoBehaviour
         return matchingObjects;
     }
 
+    /// <summary>
+    /// Set initial visual state
+    /// </summary>
     private void Start()
     {
-        // Set initial visual state to face front/down
-        UpdateVisualState(Vector2.down);
+        UpdateVisualState(Vector2.down); // Set initial visual state to face front/down
     }
 
+    /// <summary>
+    /// Subscribe to input events when enabled
+    /// </summary>
     private void OnEnable()
     {
-        // Subscribe to input action events when the component is enabled
-        movementAction.action.performed += OnMovementPerformed;
-        movementAction.action.canceled += OnMovementCanceled;
-        movementAction.action.Enable();
+        if (movementAction != null)
+        {
+            movementAction.action.performed += OnMovementPerformed;
+            movementAction.action.canceled += OnMovementCanceled;
+            movementAction.action.Enable();
+        }
     }
 
+    /// <summary>
+    /// Unsubscribe from input events when disabled
+    /// </summary>
     private void OnDisable()
     {
-        // Unsubscribe from input action events when the component is disabled
-        movementAction.action.performed -= OnMovementPerformed;
-        movementAction.action.canceled -= OnMovementCanceled;
-        movementAction.action.Disable();
+        if (movementAction != null)
+        {
+            movementAction.action.performed -= OnMovementPerformed;
+            movementAction.action.canceled -= OnMovementCanceled;
+            movementAction.action.Disable();
+        }
     }
 
+    /// <summary>
+    /// Handles movement input when keys are pressed
+    /// </summary>
     private void OnMovementPerformed(InputAction.CallbackContext context)
     {
-        // Get the input vector and update visual state if there's movement
         moveInput = context.ReadValue<Vector2>();
         if (moveInput != Vector2.zero)
         {
             UpdateVisualState(moveInput);
-            animator.SetBool("isWalking", true); // Set walking animation state
+            animator.SetBool("isWalking", true);
         }
     }
 
+    /// <summary>
+    /// Handles when movement keys are released
+    /// </summary>
     private void OnMovementCanceled(InputAction.CallbackContext context)
     {
-        // Reset movement input when no keys are pressed
         moveInput = Vector2.zero;
-        animator.SetBool("isWalking", false); // Stop walking animation
+        animator.SetBool("isWalking", false);
     }
 
+    /// <summary>
+    /// Updates physics-based movement
+    /// </summary>
     private void FixedUpdate()
     {
-        // Update physics-based movement in FixedUpdate for consistency
         rb.linearVelocity = moveInput * moveSpeed;
     }
 
+    /// <summary>
+    /// Initiates the slide action with movement to destination
+    /// </summary>
+    /// <param name="destination">Target position to move to</param>
+    public void Slide(Vector3 destination)
+    {
+        if (!isSliding && animator != null)
+        {
+            StartCoroutine(SlideCoroutine(destination));
+        }
+    }
+
+    /// <summary>
+    /// Manages the slide state, colliders, and movement to destination
+    /// </summary>
+    private IEnumerator SlideCoroutine(Vector3 destination)
+    {
+        isSliding = true;
+        const float MOVE_DURATION = 1f;
+        
+        // Disable colliders during slide
+        foreach (var collider in playerColliders)
+        {
+            collider.enabled = false;
+        }
+        
+        animator.SetTrigger("Shrink");
+        Vector3 startPosition = transform.position;
+        float startTime = Time.time;
+        
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") && 
+               !animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+        {
+            float elapsedTime = Time.time - startTime;
+            float remainingTime = Mathf.Max(MOVE_DURATION - elapsedTime, Time.deltaTime);
+            
+            Vector3 currentPosition = transform.position;
+            Vector3 toDestination = destination - currentPosition;
+            
+            if (toDestination.magnitude > 0.01f)
+            {
+                float speed = toDestination.magnitude / remainingTime;
+                transform.position = Vector3.MoveTowards(
+                    currentPosition,
+                    destination,
+                    speed * Time.deltaTime
+                );
+            }
+            
+            yield return null;
+        }
+        
+        transform.position = destination;
+        
+        // Re-enable colliders
+        foreach (var collider in playerColliders)
+        {
+            collider.enabled = true;
+        }
+        
+        isSliding = false;
+    }
+
+    /// <summary>
+    /// Initiates the jump action with movement to destination
+    /// </summary>
+    /// <param name="destination">Target position to move to</param>
+    public void Jump(Vector3 destination)
+    {
+        if (!isJumping && animator != null)
+        {
+            StartCoroutine(JumpCoroutine(destination));
+        }
+    }
+
+    /// <summary>
+    /// Manages the jump state and movement to destination
+    /// </summary>
+    private IEnumerator JumpCoroutine(Vector3 destination)
+    {
+        isJumping = true;
+        const float MOVE_DURATION = 0.5f;
+        
+        animator.SetTrigger("Jump");
+        Vector3 startPosition = transform.position;
+        float startTime = Time.time;
+        float totalDistance = Vector3.Distance(startPosition, destination);
+        
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") && 
+               !animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+        {
+            float elapsedTime = Time.time - startTime;
+            float remainingTime = Mathf.Max(MOVE_DURATION - elapsedTime, Time.deltaTime);
+            
+            Vector3 currentPosition = transform.position;
+            Vector3 toDestination = destination - currentPosition;
+            
+            if (toDestination.magnitude > 0.01f)
+            {
+                float speed = toDestination.magnitude / remainingTime;
+                
+                // Calculate progress for arc movement (0 to 1)
+                float progress = 1f - (toDestination.magnitude / totalDistance);
+                float verticalOffset = jumpHeight * Mathf.Sin(progress * Mathf.PI);
+                
+                // Move towards destination with arc
+                Vector3 targetPosition = Vector3.MoveTowards(
+                    currentPosition,
+                    destination,
+                    speed * Time.deltaTime
+                );
+                targetPosition.y += verticalOffset;
+                
+                transform.position = targetPosition;
+            }
+            
+            yield return null;
+        }
+        
+        transform.position = destination;
+        isJumping = false;
+    }
+
+    /// <summary>
+    /// Updates the visual representation based on movement direction
+    /// </summary>
     private void UpdateVisualState(Vector2 direction)
     {
-        // Compare absolute values to determine if movement is more horizontal or vertical
         float absX = Mathf.Abs(direction.x);
         float absY = Mathf.Abs(direction.y);
 
         if (absX > absY)
         {
-            // Horizontal movement is dominant
+            // Horizontal movement
             SetActiveObjects(sideObjects, true);
             SetActiveObjects(frontObjects, false);
             SetActiveObjects(backObjects, false);
 
-            // Update facing direction if needed
             bool shouldFaceLeft = direction.x < 0;
             if (shouldFaceLeft != isFacingLeft)
             {
@@ -135,7 +288,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // Vertical movement is dominant
+            // Vertical movement
             if (direction.y > 0)
             {
                 // Moving up
@@ -153,6 +306,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Activates or deactivates a group of GameObjects
+    /// </summary>
     private void SetActiveObjects(GameObject[] objects, bool active)
     {
         foreach (var obj in objects)
@@ -162,6 +318,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Flips the scale of side objects to face left or right
+    /// </summary>
     private void FlipSideObjects(bool faceLeft)
     {
         foreach (var obj in sideObjects)
