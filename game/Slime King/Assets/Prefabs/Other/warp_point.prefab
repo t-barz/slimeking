@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5590118086271101566}
   - component: {fileID: 5618866631957604818}
   - component: {fileID: 4472521842506983548}
+  - component: {fileID: -6535944883833421082}
   m_Layer: 0
   m_Name: warp_point
   m_TagString: Untagged
@@ -87,3 +88,19 @@ MonoBehaviour:
   warpDuration: 1
   slideAnimationTrigger: Slide
   jumpAnimationTrigger: Jump
+--- !u!114 &-6535944883833421082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584523374292078795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fea9c7ffab40df49bfac8624f2d777e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shape: 0
+  gizmoColor: {r: 0.4156863, g: 0.3529412, b: 0.8039216, a: 1}
+  gizmoSize: {x: 1, y: 1}
+  showInGame: 1
