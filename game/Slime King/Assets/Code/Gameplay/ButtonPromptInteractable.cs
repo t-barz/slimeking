@@ -21,6 +21,13 @@ public class ButtonPromptInteractable : Interactable
         {
             Vector3 spawnPosition = transform.position + (Vector3)uiOffset;
             currentPrompt = Instantiate(buttonPromptPrefab, spawnPosition, Quaternion.identity);
+            
+            // Disable AnchorOnScreen component if it exists
+            var anchorComponent = currentPrompt.GetComponent<AnchorOnScreen>();
+            if (anchorComponent != null)
+            {
+                anchorComponent.enabled = false;
+            }
         }
     }
 

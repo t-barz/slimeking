@@ -15,21 +15,15 @@ public class MainScreenEffects : MonoBehaviour
     [SerializeField] private float moveSpeedX = 0.5f;
     [SerializeField] private float moveSpeedY = 0.5f;
     [SerializeField] private float moveDuration = 1f;
-    [SerializeField] private Vector2 maxOffset = new Vector2(1f, 1f);
 
-    private Vector3 initialBackgroundPosition;
     private float currentFadeTime;
-    private float currentMoveTime;
     private bool startFade;
-    private bool isMoving = true;
 
     private void Start()
     {
         // Configura estado inicial
-        initialBackgroundPosition = backgroundImage.transform.position;
         logoImage.color = new Color(1f, 1f, 1f, 0f);
         startFade = false;
-        currentMoveTime = 0f;
 
         // Inicia o fade após o delay
         Invoke(nameof(StartFade), fadeInDelay);

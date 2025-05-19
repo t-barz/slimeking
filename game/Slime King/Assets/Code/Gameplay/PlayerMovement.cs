@@ -138,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        rb.linearVelocity = moveInput * moveSpeed * Time.fixedDeltaTime * 120f;
     }
 
     /// <summary>

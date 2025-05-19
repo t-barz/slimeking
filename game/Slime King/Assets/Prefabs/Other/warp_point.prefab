@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5618866631957604818}
   - component: {fileID: 4472521842506983548}
   - component: {fileID: -6535944883833421082}
+  - component: {fileID: 7555181061030761633}
   m_Layer: 0
   m_Name: warp_point
   m_TagString: Untagged
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 584523374292078795}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.496, y: 1.757, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -69,7 +70,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.2
 --- !u!114 &4472521842506983548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,9 +84,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  warpType: 0
+  warpType: 1
   destinationPoint: {fileID: 0}
-  warpDuration: 1
+  warpDuration: 0.25
   slideAnimationTrigger: Slide
   jumpAnimationTrigger: Jump
 --- !u!114 &-6535944883833421082
@@ -102,5 +103,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shape: 0
   gizmoColor: {r: 0.4156863, g: 0.3529412, b: 0.8039216, a: 1}
-  gizmoSize: {x: 1, y: 1}
+  gizmoSize: {x: 0.8, y: 0.8}
   showInGame: 1
+--- !u!114 &7555181061030761633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584523374292078795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cb76b6749e7e8448b2de42b9c7b7c93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionButtonSprite: {fileID: 0}
+  buttonPromptPrefab: {fileID: 5642176478498417816, guid: 4ef7916eea4114f4991f3b11497a24e5, type: 3}
+  uiOffset: {x: 0, y: 0.25}

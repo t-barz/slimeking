@@ -11,9 +11,6 @@ public abstract class Interactable : MonoBehaviour
     [Tooltip("Sprite do botão de interação (ex: tecla 'E')")]
     [SerializeField] protected Sprite interactionButtonSprite;
 
-    [Tooltip("Cor do contorno quando interagível")]
-    [SerializeField] protected Color outlineColor = Color.white;
-
     // Propriedade pública somente leitura para saber se o jogador está próximo
     public bool PlayerInRange { get; protected set; }
 
