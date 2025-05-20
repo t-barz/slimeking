@@ -26,6 +26,13 @@ public class EnergyCollectable : CollectableInteractable
 
     [Header("Configurações Visuais")]
     [Tooltip("Cores para cada tipo de elemento")]
+
+    [Header("Configurações de Áudio")]
+    [SerializeField] private AudioClip[] collectSound;
+    [Tooltip("Volume do som de coleta")]
+    [SerializeField] private float volume = 1f;
+
+    private AudioSource audioSource;
     [SerializeField] private Color[] elementColors = new Color[]
     {
         new Color(0, 0.4f, 1f),    // Água: Azul
@@ -39,17 +46,33 @@ public class EnergyCollectable : CollectableInteractable
     protected override void Start()
     {
         base.Start();
-        
+
         // Configura a cor baseada no tipo de elemento
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
             spriteRenderer.color = elementColors[(int)elementType];
         }
+        
+        // Configura o AudioSource se houver som de coleta
+        if (collectSound != null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.clip = collectSound != null && collectSound.Length > 0 ? collectSound[0] : null;
+            audioSource.clip = collectSound[Random.Range(0, collectSound.Length)];
+            audioSource.volume = volume;
+            audioSource.playOnAwake = false;
+        }
     }
 
     protected override void CollectItem()
     {
+        // Toca o som de coleta se existir
+        if (audioSource != null)
+        {
+            audioSource.Play();
+        }
+        
         // Configura a trigger de absorção no Animator
         var animator = GetComponent<Animator>();
         if (animator != null)
@@ -72,7 +95,7 @@ public class EnergyCollectable : CollectableInteractable
         
         // Aguarda até a animação atual terminar
         var animator = GetComponent<Animator>();
-        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Destroy"))
         {
             yield return null;
         }
@@ -82,7 +105,6 @@ public class EnergyCollectable : CollectableInteractable
     
     private void FinishCollection()
     {
-        Debug.Log($"Coletou {energyAmount} de energia {elementType}");
         base.CollectItem();
     }
 
