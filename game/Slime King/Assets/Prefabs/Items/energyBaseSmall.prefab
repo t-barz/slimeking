@@ -36,6 +36,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: energyBaseSmall
       objectReference: {fileID: 0}
+    - target: {fileID: 1160356261127867848, guid: 69951b84b3f813c46a416c0863af7f47, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 04f845e241b2abd48b5551b5ef2c565b, type: 2}
     - target: {fileID: 3626916397498700004, guid: 69951b84b3f813c46a416c0863af7f47, type: 3}
       propertyPath: m_Color.b
       value: 1
@@ -51,6 +55,10 @@ PrefabInstance:
     - target: {fileID: 3626916397498700004, guid: 69951b84b3f813c46a416c0863af7f47, type: 3}
       propertyPath: m_SortingLayer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: 69951b84b3f813c46a416c0863af7f47, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: 69951b84b3f813c46a416c0863af7f47, type: 3}
       propertyPath: m_SortingLayerID

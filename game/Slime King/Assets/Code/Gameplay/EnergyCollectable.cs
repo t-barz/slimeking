@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -49,12 +50,39 @@ public class EnergyCollectable : CollectableInteractable
 
     protected override void CollectItem()
     {
-        // Adiciona a energia ao jogador ou sistema relevante
-        // Por exemplo: PlayerEnergy.Instance.AddEnergy(elementType, energyAmount);
+        // Configura a trigger de absorção no Animator
+        var animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.SetTrigger("Absorv");
+            
+            // Aguarda a animação terminar antes de coletar
+            StartCoroutine(WaitForAbsorvAnimation());
+        }
+        else
+        {
+            FinishCollection();
+        }
+    }
+    
+    private IEnumerator WaitForAbsorvAnimation()
+    {
+        // Aguarda um frame para garantir que a animação começou
+        yield return null;
         
+        // Aguarda até a animação atual terminar
+        var animator = GetComponent<Animator>();
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+        {
+            yield return null;
+        }
+        
+        FinishCollection();
+    }
+    
+    private void FinishCollection()
+    {
         Debug.Log($"Coletou {energyAmount} de energia {elementType}");
-        
-        // Chama a implementação base para efeitos visuais e destruição
         base.CollectItem();
     }
 

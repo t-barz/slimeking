@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: e7eea8fe6308a114382611ebf7490d83
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: energyBase_Clip
+    second: {fileID: 7400000, guid: e1e819890283fda49af9f747e6641ead, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +107,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638832091453208050
+  platformSettingsDirtyTick: 638833452567101745
   textureAssetName: 
   singleSpriteImportData:
   - name: 
