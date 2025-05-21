@@ -14,7 +14,29 @@ public class SceneController : MonoBehaviour
     [Tooltip("Permite carregar a Scene ao pressionar o botão de ação")]
     [SerializeField] private bool loadOnAction = false;
 
+    [Header("Input Configuration")]
+    [Tooltip("Referência para a ação de ataque que ativa a Scene")]
+    [SerializeField] private InputActionReference attackAction;
+
     private AsyncOperation preloadOperation;
+
+    private void OnEnable()
+    {
+        if (loadOnAction && attackAction != null)
+        {
+            attackAction.action.performed += OnAttackPerformed;
+            attackAction.action.Enable();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (attackAction != null)
+        {
+            attackAction.action.performed -= OnAttackPerformed;
+            attackAction.action.Disable();
+        }
+    }
 
     private void Start()
     {
@@ -24,18 +46,17 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void OnAttackPerformed(InputAction.CallbackContext context)
     {
-        if (loadOnAction && Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame)
+        if (!loadOnAction) return;
+
+        if (preloadOperation != null)
         {
-            if (preloadOperation != null)
-            {
-                preloadOperation.allowSceneActivation = true;
-            }
-            else
-            {
-                LoadConfiguredScene();
-            }
+            preloadOperation.allowSceneActivation = true;
+        }
+        else
+        {
+            LoadConfiguredScene();
         }
     }
 

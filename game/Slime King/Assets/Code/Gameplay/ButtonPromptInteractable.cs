@@ -14,13 +14,20 @@ public class ButtonPromptInteractable : Interactable
 
     private GameObject currentPrompt;
 
-    protected override void ShowVisualFeedback()
+        protected override void ShowVisualFeedback()
     {
         base.ShowVisualFeedback();
         if (buttonPromptPrefab != null)
         {
             Vector3 spawnPosition = transform.position + (Vector3)uiOffset;
             currentPrompt = Instantiate(buttonPromptPrefab, spawnPosition, Quaternion.identity);
+            
+            // Set input type to Action2
+            var inputController = currentPrompt.GetComponent<InputController>();
+            if (inputController != null)
+            {
+                inputController.SetInputType(InputController.InputType.Action2);
+            }
             
             // Disable AnchorOnScreen component if it exists
             var anchorComponent = currentPrompt.GetComponent<AnchorOnScreen>();

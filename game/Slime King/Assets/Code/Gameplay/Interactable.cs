@@ -7,11 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public abstract class Interactable : MonoBehaviour
 {
-    [Header("Configurações Básicas")]
-    [Tooltip("Sprite do botão de interação (ex: tecla 'E')")]
-    [SerializeField] protected Sprite interactionButtonSprite;
-
-    // Propriedade pública somente leitura para saber se o jogador está próximo
+     // Propriedade pública somente leitura para saber se o jogador está próximo
     public bool PlayerInRange { get; protected set; }
 
     /// <summary>

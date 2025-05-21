@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2289358372243553602, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -2253911629886400664, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
       propertyPath: m_Name
@@ -70,11 +70,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.16909
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.74588
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8abf7922e8700ee49a60bc31c960cc10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputType: 0
 --- !u!114 &7193704091537178495
 MonoBehaviour:
   m_ObjectHideFlags: 0

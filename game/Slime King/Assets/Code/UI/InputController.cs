@@ -4,13 +4,27 @@ using UnityEngine.InputSystem.XInput;
 using UnityEngine.InputSystem.DualShock;
 using UnityEngine.InputSystem.Switch;
 
-
 /// <summary>
 /// Controla a detecção de dispositivos de entrada e atualiza o Animator 
-/// com o tipo de dispositivo atual.
+/// com o tipo de dispositivo e input atuais.
 /// </summary>
 public class InputController : MonoBehaviour
 {
+    /// <summary>
+    /// Define os tipos de input que podem ser exibidos
+    /// </summary>
+    public enum InputType
+    {
+        Start,      // Botão de início/pausa
+        Action1,    // Ação primária
+        Action2,    // Ação secundária
+        Movement    // Movimentação
+    }
+
+    [Header("Input Configuration")]
+    [Tooltip("Tipo de input que este controlador representa")]
+    [SerializeField] private InputType inputType;
+
     private Animator animator;
     
     /// <summary>
@@ -23,6 +37,17 @@ public class InputController : MonoBehaviour
     private const int PLATFORM_SWITCH = 4;
     private const int PLATFORM_OTHER = 5;
 
+    private void Awake()
+    {
+        // Ativa o objeto filho correspondente ao InputType
+        foreach (Transform child in transform)
+        {
+            bool shouldBeActive = child.name.Equals(inputType.ToString(), 
+                System.StringComparison.OrdinalIgnoreCase);
+            child.gameObject.SetActive(shouldBeActive);
+        }
+    }
+
     /// <summary>
     /// Inicializa o componente e realiza a primeira detecção de dispositivo.
     /// </summary>
@@ -34,7 +59,6 @@ public class InputController : MonoBehaviour
             Debug.LogError("Animator not found on GameObject!");
             return;
         }
-
         UpdateInputDevice();
     }
 
@@ -98,6 +122,37 @@ public class InputController : MonoBehaviour
             _ => $"Other Controller ({Gamepad.current.GetType().Name})"
         };
 
-        Debug.Log($"Active Input Device: {deviceName}");
+        string inputTypeName = inputType.ToString();
+        Debug.Log($"Active Input Device: {deviceName} | Input Type: {inputTypeName}");
     }
+
+    /// <summary>
+    /// Define o tipo de input e atualiza o estado visual
+    /// </summary>
+    /// <param name="newType">Novo tipo de input a ser configurado</param>
+    public void SetInputType(InputType newType)
+    {
+        if (inputType == newType) return;
+        
+        inputType = newType;
+        
+        // Atualiza os objetos filhos
+        foreach (Transform child in transform)
+        {
+            bool shouldBeActive = child.name.Equals(inputType.ToString(), 
+                System.StringComparison.OrdinalIgnoreCase);
+            child.gameObject.SetActive(shouldBeActive);
+        }
+
+        // Atualiza o Animator
+        if (animator != null)
+        {
+            animator.SetInteger("InputType", (int)inputType);
+        }
+    }
+
+    /// <summary>
+    /// Retorna o tipo de input configurado para este controlador
+    /// </summary>
+    public InputType GetInputType() => inputType;
 }
