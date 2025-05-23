@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5212295508769142838}
   - component: {fileID: 7607528000810646007}
   - component: {fileID: 3530041232618338598}
-  - component: {fileID: 4042441955943381657}
   m_Layer: 0
   m_Name: prp_grassA
   m_TagString: Untagged
@@ -125,18 +124,3 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0.23}
   m_Radius: 0.19
---- !u!114 &4042441955943381657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7671713885525703888}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db6e09db071284243855bf3bd11d0daf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionButtonSprite: {fileID: -7407887575261583267, guid: 8e92b06840be5f54aaad294ccc97b9a4, type: 3}
-  outlineMaterial: {fileID: 2100000, guid: 14c6dd78d3eeb724282c792bf684d656, type: 2}
-  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

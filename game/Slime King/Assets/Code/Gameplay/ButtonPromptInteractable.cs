@@ -49,10 +49,6 @@ public class ButtonPromptInteractable : Interactable
 
     public override void Interact()
     {
-        // Exemplo de implementação de diálogo
-        DialogueSystem.Instance.StartDialogue(new[] {
-            "Isso é um exemplo de diálogo!",
-            "Pressione ESPAÇO para continuar..."
-        });
+
     }
 }
