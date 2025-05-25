@@ -25,10 +25,15 @@ public class EnvironmentInteractable : Interactable
     private static readonly int IsShaking = Animator.StringToHash("Shake");
     private static readonly int IsDestroying = Animator.StringToHash("Destroy");
 
+    private GameObject particleObject;
+
     private void Awake()
     {
         // Get or add required components
         if (animator == null) animator = GetComponent<Animator>();
+
+        // Cache particles reference
+        particleObject = transform.Find("particulas")?.gameObject;
 
         if (interactionSound != null)
         {
@@ -64,11 +69,16 @@ public class EnvironmentInteractable : Interactable
 
     private void TriggerShake()
     {
-
         // Trigger shake animation
         if (animator != null)
         {
             animator.SetTrigger(IsShaking);
+        }
+
+        // Activate particles
+        if (particleObject != null)
+        {
+            particleObject.SetActive(true);
         }
 
         // Play sound if configured
@@ -86,6 +96,12 @@ public class EnvironmentInteractable : Interactable
         if (animator != null)
         {
             animator.SetTrigger(IsDestroying);
+
+            // Activate particles
+            if (particleObject != null)
+            {
+                particleObject.SetActive(true);
+            }
 
             // Play sound if configured
             if (audioSource != null && interactionSound != null)

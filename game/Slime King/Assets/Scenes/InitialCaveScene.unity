@@ -1034,8 +1034,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementAction: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  attackAction: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   moveSpeed: 0.6
   jumpHeight: 2
+  attackDuration: 0.3
+  attackSound: {fileID: 8300000, guid: e7cf01b86372d1a4089e4b24ffa6cb5d, type: 3}
   walkingSound: {fileID: 8300000, guid: 58c06747c72d6af4d8bad13d48a52e72, type: 3}
   jumpSound: {fileID: 0}
   slideSound: {fileID: 8300000, guid: d26c346ae587f274c9fe67246ff68f18, type: 3}
@@ -1550,14 +1553,6 @@ PrefabInstance:
     - target: {fileID: 767930104440350021, guid: c58418ea6fda92847acc75c84e03de14, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3530041232618338598, guid: c58418ea6fda92847acc75c84e03de14, type: 3}
-      propertyPath: m_Radius
-      value: 0.16
-      objectReference: {fileID: 0}
-    - target: {fileID: 3530041232618338598, guid: c58418ea6fda92847acc75c84e03de14, type: 3}
-      propertyPath: m_Offset.y
-      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -3,30 +3,42 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 /// <summary>
-/// Controls the player's movement and visual state based on direction using the new Input System
+/// Controla o movimento do jogador e seu estado visual baseado na direção usando o novo Input System.
+/// Esta classe gerencia todas as mecânicas de movimento do personagem, incluindo:
+/// - Movimentação básica em 8 direções
+/// - Sistema de pulo com arco parabólico
+/// - Sistema de deslize
+/// - Sistema de ataque
+/// - Gerenciamento de estados visuais (frente, costas, lateral)
+/// - Sistema de áudio para diferentes ações
 /// </summary>
+/// <remarks>
+/// Requer os seguintes componentes:
+/// - Rigidbody2D
+/// - Animator com os parâmetros: "isWalking", "Jump", "Shrink", "Attack01"
+/// - Collider2D
+/// - Input System com ações de movimento e ataque configuradas
+/// </remarks>
 public class PlayerMovement : MonoBehaviour
 {
+    #region Campos Serializados
     [Header("Input")]
-    [SerializeField] private InputActionReference movementAction;    // Reference to the movement input action
+    [Tooltip("Referência para a ação de movimento do Input System")]
+    [SerializeField] private InputActionReference movementAction;
+    [Tooltip("Referência para a ação de ataque do Input System")]
+    [SerializeField] private InputActionReference attackAction;
 
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;                  // Controls how fast the player moves
-    [SerializeField] private float jumpHeight = 2f;                 // Controls the height of the jump arc
+    [Tooltip("Velocidade de movimento do personagem")]
+    [SerializeField] private float moveSpeed = 5f;
+    [Tooltip("Altura máxima do pulo")]
+    [SerializeField] private float jumpHeight = 2f;
 
-    // References to different visual states of the player
-    private GameObject[] frontObjects;    // Objects with "front" in their name
-    private GameObject[] backObjects;     // Objects with "back" in their name
-    private GameObject[] sideObjects;     // Objects with "side" in their name
-    private Collider2D[] playerColliders; // Array to store all player colliders
-
-    // Movement and state variables
-    private Vector2 moveInput;            // Stores the current movement input vector
-    private Rigidbody2D rb;              // Reference to the Rigidbody2D component
-    private Animator animator;            // Reference to the Animator component
-    private bool isFacingLeft = false;    // Tracks whether the character is facing left
-    private bool isSliding = false;       // Tracks if the player is currently sliding
-    private bool isJumping = false;       // Tracks if the player is currently jumping
+    [Header("Attack Settings")]
+    [Tooltip("Duração da animação de ataque")]
+    [SerializeField] private float attackDuration = 0.5f;
+    [Tooltip("Som reproduzido ao atacar")]
+    [SerializeField] private AudioClip attackSound;
 
     [Header("Audio Settings")]
     [Tooltip("Som reproduzido durante a movimentação")]
@@ -38,12 +50,35 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Volume dos sons")]
     [Range(0, 1)]
     [SerializeField] private float soundVolume = 1f;
+    #endregion
 
-    // Add AudioSource to the existing private fields
+    #region Campos Privados
+    private GameObject[] frontObjects;
+    private GameObject[] backObjects;
+    private GameObject[] sideObjects;
+    private GameObject vfxFront;
+    private GameObject vfxBack;
+    private GameObject vfxSide;
+    private Collider2D[] playerColliders;
+
+    private Vector2 moveInput;
+    private Rigidbody2D rb;
+    private Animator animator;
     private AudioSource audioSource;
 
+    private bool isFacingLeft = false;
+    private bool isSliding = false;
+    private bool isJumping = false;
+    private bool isAttacking = false;
+    private static readonly int Attack01 = Animator.StringToHash("Attack01");
+
+    private float walkingSoundInterval = 0.5f;
+    private float lastWalkingSoundTime;
+    #endregion
+
+    #region Métodos Unity
     /// <summary>
-    /// Initialize components and gather child objects on startup
+    /// Inicializa os componentes necessários e configura o sistema de áudio
     /// </summary>
     private void Awake()
     {
@@ -52,10 +87,20 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         playerColliders = GetComponents<Collider2D>();
 
-        // Initialize visual objects arrays by searching child objects by name
+        // Initialize visual objects arrays
         frontObjects = GetObjectsByNameContains("front");
         backObjects = GetObjectsByNameContains("back");
         sideObjects = GetObjectsByNameContains("side");
+
+        // Initialize VFX objects
+        vfxFront = transform.Find("vfx_front")?.gameObject;
+        vfxBack = transform.Find("vfx_back")?.gameObject;
+        vfxSide = transform.Find("vfx_side")?.gameObject;
+
+        // Ensure VFX objects are initially inactive
+        if (vfxFront) vfxFront.SetActive(false);
+        if (vfxBack) vfxBack.SetActive(false);
+        if (vfxSide) vfxSide.SetActive(false);
 
         // Setup audio source
         audioSource = gameObject.AddComponent<AudioSource>();
@@ -65,48 +110,15 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets all child GameObjects that contain the specified string in their name
-    /// </summary>
-    private GameObject[] GetObjectsByNameContains(string nameContains)
-    {
-        // Get all child transforms
-        Transform[] allChildren = GetComponentsInChildren<Transform>();
-
-        // Count objects that match the name criteria
-        int matchCount = 0;
-        foreach (Transform child in allChildren)
-        {
-            if (child != transform && child.name.ToLower().Contains(nameContains))
-            {
-                matchCount++;
-            }
-        }
-
-        // Create and fill array with matching objects
-        GameObject[] matchingObjects = new GameObject[matchCount];
-        int index = 0;
-        foreach (Transform child in allChildren)
-        {
-            if (child != transform && child.name.ToLower().Contains(nameContains))
-            {
-                matchingObjects[index] = child.gameObject;
-                index++;
-            }
-        }
-
-        return matchingObjects;
-    }
-
-    /// <summary>
-    /// Set initial visual state
+    /// Configura o estado visual inicial do personagem
     /// </summary>
     private void Start()
     {
-        UpdateVisualState(Vector2.down); // Set initial visual state to face front/down
+        UpdateVisualState(Vector2.down);
     }
 
     /// <summary>
-    /// Subscribe to input events when enabled
+    /// Ativa as ações do Input System e inscreve os callbacks
     /// </summary>
     private void OnEnable()
     {
@@ -116,10 +128,17 @@ public class PlayerMovement : MonoBehaviour
             movementAction.action.canceled += OnMovementCanceled;
             movementAction.action.Enable();
         }
+
+        // NEW: Attack input subscription
+        if (attackAction != null)
+        {
+            attackAction.action.performed += OnAttackPerformed;
+            attackAction.action.Enable();
+        }
     }
 
     /// <summary>
-    /// Unsubscribe from input events when disabled
+    /// Desativa as ações do Input System e remove os callbacks
     /// </summary>
     private void OnDisable()
     {
@@ -130,7 +149,13 @@ public class PlayerMovement : MonoBehaviour
             movementAction.action.Disable();
         }
 
-        // Stop any playing sounds
+        // NEW: Attack input cleanup
+        if (attackAction != null)
+        {
+            attackAction.action.performed -= OnAttackPerformed;
+            attackAction.action.Disable();
+        }
+
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
@@ -138,21 +163,47 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Handles movement input when keys are pressed
+    /// Gerencia o movimento do personagem usando física
     /// </summary>
+    private void FixedUpdate()
+    {
+        if (!isAttacking && !isSliding && !isJumping)
+        {
+            rb.linearVelocity = moveInput * moveSpeed * Time.fixedDeltaTime * 120f;
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+    #endregion
+
+    #region Manipulação de Input
+    /// <summary>
+    /// Manipula o input de movimento quando uma ação é executada
+    /// </summary>
+    /// <param name="context">Contexto da ação de input</param>
     private void OnMovementPerformed(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
-        if (moveInput != Vector2.zero)
+        if (moveInput != Vector2.zero && !isAttacking) // NEW: Check attack state
         {
             UpdateVisualState(moveInput);
             animator.SetBool("isWalking", true);
+
+            // Try to play walking sound with interval check
+            if (Time.time - lastWalkingSoundTime >= walkingSoundInterval)
+            {
+                PlayWalkingSound();
+                lastWalkingSoundTime = Time.time;
+            }
         }
     }
 
     /// <summary>
-    /// Handles when movement keys are released
+    /// Manipula o fim do input de movimento
     /// </summary>
+    /// <param name="context">Contexto da ação de input</param>
     private void OnMovementCanceled(InputAction.CallbackContext context)
     {
         moveInput = Vector2.zero;
@@ -166,17 +217,23 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates physics-based movement
+    /// Manipula o input de ataque
     /// </summary>
-    private void FixedUpdate()
+    /// <param name="context">Contexto da ação de input</param>
+    private void OnAttackPerformed(InputAction.CallbackContext context)
     {
-        rb.linearVelocity = moveInput * moveSpeed * Time.fixedDeltaTime * 120f;
+        if (!isAttacking && !isJumping && !isSliding)
+        {
+            StartCoroutine(AttackCoroutine());
+        }
     }
+    #endregion
 
+    #region Sistema de Movimento
     /// <summary>
-    /// Initiates the slide action with movement to destination
+    /// Inicia uma animação de deslize em direção a um destino específico
     /// </summary>
-    /// <param name="destination">Target position to move to</param>
+    /// <param name="destination">Posição final do deslize</param>
     public void Slide(Vector3 destination)
     {
         if (!isSliding && animator != null)
@@ -194,8 +251,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Manages the slide state, colliders, and movement to destination
+    /// Corrotina que executa a animação de deslize
     /// </summary>
+    /// <param name="destination">Posição final do deslize</param>
     private IEnumerator SlideCoroutine(Vector3 destination)
     {
         isSliding = true;
@@ -236,10 +294,11 @@ public class PlayerMovement : MonoBehaviour
         isSliding = false;
     }
 
+
     /// <summary>
-    /// Initiates the jump action with movement to destination
+    /// Inicia um pulo em direção a um destino específico
     /// </summary>
-    /// <param name="destination">Target position to move to</param>
+    /// <param name="destination">Posição final do pulo</param>
     public void Jump(Vector3 destination)
     {
         if (!isJumping && animator != null)
@@ -256,8 +315,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Manages the jump state and movement to destination
+    /// Corrotina que executa a animação de pulo em arco
     /// </summary>
+    /// <param name="destination">Posição final do pulo</param>
     private IEnumerator JumpCoroutine(Vector3 destination)
     {
         isJumping = true;
@@ -303,9 +363,85 @@ public class PlayerMovement : MonoBehaviour
         isJumping = false;
     }
 
+
     /// <summary>
-    /// Updates the visual representation based on movement direction
+    /// Corrotina que executa a animação de ataque
     /// </summary>
+    private IEnumerator AttackCoroutine()
+    {
+        isAttacking = true;
+        moveInput = Vector2.zero; // Stop movement during attack
+        animator.SetBool("isWalking", false);
+
+        // Determine which VFX to activate based on current visual state
+        GameObject activeVfx = null;
+        if (frontObjects[0]?.activeSelf == true && vfxFront != null)
+        {
+            activeVfx = vfxFront;
+        }
+        else if (backObjects[0]?.activeSelf == true && vfxBack != null)
+        {
+            activeVfx = vfxBack;
+        }
+        else if (sideObjects[0]?.activeSelf == true && vfxSide != null)
+        {
+            activeVfx = vfxSide;
+            // Ajusta a escala do VFX lateral de acordo com a direção
+            if (isFacingLeft)
+            {
+                activeVfx.transform.localScale = new Vector3(-Mathf.Abs(activeVfx.transform.localScale.x),
+                                                           activeVfx.transform.localScale.y,
+                                                           activeVfx.transform.localScale.z);
+            }
+            else
+            {
+                activeVfx.transform.localScale = new Vector3(Mathf.Abs(activeVfx.transform.localScale.x),
+                                                           activeVfx.transform.localScale.y,
+                                                           activeVfx.transform.localScale.z);
+            }
+        }
+
+        // Activate the appropriate VFX
+        if (activeVfx != null)
+        {
+            activeVfx.SetActive(true);
+        }
+
+        // Trigger attack animation
+        animator.SetTrigger(Attack01);
+
+        // Play attack sound
+        if (attackSound != null)
+        {
+            audioSource.Stop();
+            audioSource.loop = false;
+            audioSource.clip = attackSound;
+            audioSource.Play();
+        }
+
+        yield return new WaitForSeconds(attackDuration);
+
+        // Deactivate VFX and re-enable movement
+        if (activeVfx != null)
+        {
+            activeVfx.SetActive(false);
+        }
+
+        // Re-enable movement
+        isAttacking = false;
+        if (moveInput != Vector2.zero)
+        {
+            animator.SetBool("isWalking", true);
+            UpdateVisualState(moveInput);
+        }
+    }
+    #endregion
+
+    #region Gerenciamento Visual
+    /// <summary>
+    /// Atualiza o estado visual do personagem baseado na direção do movimento
+    /// </summary>
+    /// <param name="direction">Direção do movimento</param>
     private void UpdateVisualState(Vector2 direction)
     {
         float absX = Mathf.Abs(direction.x);
@@ -346,8 +482,10 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates or deactivates a group of GameObjects
+    /// Ativa ou desativa um conjunto de objetos
     /// </summary>
+    /// <param name="objects">Array de objetos para alterar o estado</param>
+    /// <param name="active">Estado desejado (ativo/inativo)</param>
     private void SetActiveObjects(GameObject[] objects, bool active)
     {
         foreach (var obj in objects)
@@ -358,8 +496,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Flips the scale of side objects to face left or right
+    /// Inverte a escala horizontal dos objetos laterais para simular mudança de direção
     /// </summary>
+    /// <param name="faceLeft">True se deve virar para a esquerda, False para direita</param>
     private void FlipSideObjects(bool faceLeft)
     {
         foreach (var obj in sideObjects)
@@ -372,17 +511,57 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Sistema de Áudio
     /// <summary>
-    /// Tenta reproduzir o som de movimento
+    /// Reproduz o som de passos se não estiver já tocando
     /// </summary>
     public void PlayWalkingSound()
     {
-        if (walkingSound != null && audioSource != null)
+        if (walkingSound != null && audioSource != null && !audioSource.isPlaying)
         {
             audioSource.loop = false;
             audioSource.clip = walkingSound;
             audioSource.Play();
         }
     }
+    #endregion
+
+    #region Métodos Auxiliares
+    /// <summary>
+    /// Encontra objetos filhos cujos nomes contêm uma string específica
+    /// </summary>
+    /// <param name="nameContains">String que deve estar contida no nome do objeto</param>
+    /// <returns>Array de GameObjects que correspondem ao critério</returns>
+    private GameObject[] GetObjectsByNameContains(string nameContains)
+    {
+        // Get all child transforms
+        Transform[] allChildren = GetComponentsInChildren<Transform>();
+
+        // Count objects that match the name criteria
+        int matchCount = 0;
+        foreach (Transform child in allChildren)
+        {
+            if (child != transform && child.name.ToLower().Contains(nameContains))
+            {
+                matchCount++;
+            }
+        }
+
+        // Create and fill array with matching objects
+        GameObject[] matchingObjects = new GameObject[matchCount];
+        int index = 0;
+        foreach (Transform child in allChildren)
+        {
+            if (child != transform && child.name.ToLower().Contains(nameContains))
+            {
+                matchingObjects[index] = child.gameObject;
+                index++;
+            }
+        }
+
+        return matchingObjects;
+    }
+    #endregion
 }
