@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
+using SlimeKing.Gameplay;
 
 /// <summary>
 /// Controls warp points that can move the player to a specified destination using different movement types
