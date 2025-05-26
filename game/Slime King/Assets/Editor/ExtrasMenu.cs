@@ -45,35 +45,34 @@ public static class ExtrasMenu
         }
 
         AssetDatabase.Refresh();
-        Debug.Log("✅ Estrutura de pastas criada!");
+        EditorUtility.DisplayDialog("Estrutura de Pastas", "Estrutura de pastas criada com sucesso!", "OK");
     }
 
-        private static void CreateFolderRecursive(string path)
+    private static void CreateFolderRecursive(string path)
     {
         string[] folders = path.Split('/');
         string parentPath = "";
         string currentPath = "";
-    
+
         for (int i = 0; i < folders.Length; i++)
         {
             string folder = folders[i];
-            
+
             if (i == 0) // Assets folder
             {
                 currentPath = folder;
                 continue;
             }
-    
+
             parentPath = currentPath;
             currentPath += "/" + folder;
-    
+
             if (!AssetDatabase.IsValidFolder(currentPath))
             {
                 string parentFolder = parentPath;
                 string newFolderName = folder;
-                
+
                 AssetDatabase.CreateFolder(parentFolder, newFolderName);
-                Debug.Log($"Criando pasta: {currentPath}");
             }
         }
     }
@@ -86,20 +85,20 @@ public static class ExtrasMenu
     private static void GroupSelected()
     {
         if (!Selection.activeTransform) return;
-        
+
         // Cria um GameObject vazio para servir como grupo
         var groupObj = new GameObject(Selection.activeTransform.name + " Group");
         Undo.RegisterCreatedObjectUndo(groupObj, "Group Selected");
-        
+
         // Define o pai como o mesmo dos objetos selecionados
         groupObj.transform.SetParent(Selection.activeTransform.parent, false);
-        
+
         // Move os objetos selecionados para o grupo
         foreach (var transform in Selection.transforms)
         {
             Undo.SetTransformParent(transform, groupObj.transform, "Group Selected");
         }
-        
+
         // Seleciona o novo grupo
         Selection.activeGameObject = groupObj;
     }

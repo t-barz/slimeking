@@ -100,25 +100,19 @@ namespace SlimeKing.Gameplay
         {
             GameObject activeVfx = null;
 
-            // Log do estado atual para debug
-            LogVfxState();
-
             // Verifica se há objetos na array antes de tentar acessar
             if (frontObjects.Length > 0 && frontObjects[0] != null && frontObjects[0].activeSelf && vfxFront != null)
             {
                 activeVfx = vfxFront;
-                Debug.Log("Retornando VFX Front");
             }
             else if (backObjects.Length > 0 && backObjects[0] != null && backObjects[0].activeSelf && vfxBack != null)
             {
                 activeVfx = vfxBack;
-                Debug.Log("Retornando VFX Back");
             }
             else if (sideObjects.Length > 0 && sideObjects[0] != null && sideObjects[0].activeSelf && vfxSide != null)
             {
                 activeVfx = vfxSide;
                 UpdateSideVfxScale(activeVfx);
-                Debug.Log("Retornando VFX Side");
             }
 
             return activeVfx;
@@ -179,24 +173,6 @@ namespace SlimeKing.Gameplay
             }
 
             return matchingObjects;
-        }
-        #endregion
-
-        #region Debug
-        private void LogVfxState()
-        {
-            if (frontObjects.Length > 0)
-            {
-                Debug.Log($"Front Object Active: {frontObjects[0]?.activeSelf}, VFX Front: {(vfxFront != null ? vfxFront.activeSelf.ToString() : "null")}");
-            }
-            if (backObjects.Length > 0)
-            {
-                Debug.Log($"Back Object Active: {backObjects[0]?.activeSelf}, VFX Back: {(vfxBack != null ? vfxBack.activeSelf.ToString() : "null")}");
-            }
-            if (sideObjects.Length > 0)
-            {
-                Debug.Log($"Side Object Active: {sideObjects[0]?.activeSelf}, VFX Side: {(vfxSide != null ? vfxSide.activeSelf.ToString() : "null")}");
-            }
         }
         #endregion
     }

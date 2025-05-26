@@ -1,5 +1,9 @@
 using UnityEngine;
+using SlimeKing.Core;
 using SlimeKing.Gameplay;
+using SlimeKing.Gameplay.Combat;
+using SlimeKing.Gameplay.Items;
+using System.Collections.Generic;
 
 /// <summary>
 /// Controla interações com elementos do ambiente que reagem à presença 
@@ -9,7 +13,9 @@ public class EnvironmentInteractable : Interactable, IDamageable
 {
     [Header("Health Settings")]
     [Tooltip("Pontos de vida/resistência inicial do objeto")]
-    [SerializeField] private float maxHealth = 1f; [Header("Visual Settings")]
+    [SerializeField] private float maxHealth = 1f;
+
+    [Header("Visual Settings")]
     [Tooltip("Animator que controla o efeito visual")]
     [SerializeField] private Animator animator;
 
@@ -35,53 +41,42 @@ public class EnvironmentInteractable : Interactable, IDamageable
 
     [Header("Hit Effect")]
     [Tooltip("Efeito visual instanciado ao receber dano")]
-    [SerializeField] private GameObject hitEffectPrefab;
+    [SerializeField] private GameObject hitEffectPrefab; [Header("Audio Settings")]
+    [Tooltip("Lista de sons que podem ser reproduzidos durante a interação")]
+    [SerializeField] private AudioClip[] interactionSounds;
 
-    [Header("Audio Settings")]
-    [Tooltip("Som reproduzido durante a interação")]
-    [SerializeField] private AudioClip interactionSound; [Tooltip("Volume do som")]
+    [Tooltip("Volume do som")]
     [Range(0, 1)]
     [SerializeField] private float volume = 0.5f;
 
-    private AudioSource audioSource;
-    private float lastEffectTime;
-    private int currentHits = 0;
+    #region Private Fields
+    private Transform cachedTransform;
+    private GameObject particleObject;
     private float currentHealth;
     private static readonly int IsShaking = Animator.StringToHash("Shake");
     private static readonly int IsDestroying = Animator.StringToHash("Destroy");
-
-    private GameObject particleObject;
+    private Dictionary<GameObject, Rigidbody2D> cachedRigidbodies;
+    #endregion
 
     public float CurrentHealth => currentHealth;
-    public float MaxHealth => maxHealth; private void Awake()
-    {
-        // Get or add required components
-        if (animator == null) animator = GetComponent<Animator>();
+    public float MaxHealth => maxHealth;
 
-        // Cache particles reference
+    private void Awake()
+    {
+        // Cache components and references
+        animator ??= GetComponent<Animator>();
+        cachedTransform = transform;
         particleObject = transform.Find("particulas")?.gameObject;
 
-        if (interactionSound != null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.clip = interactionSound;
-            audioSource.volume = volume;
-            audioSource.spatialBlend = 1f; // 3D sound
-            audioSource.playOnAwake = false;
-        }
-
-        // Inicializa a vida
+        // Initialize cache and state
+        cachedRigidbodies = new Dictionary<GameObject, Rigidbody2D>(maxDropCount);
         currentHealth = maxHealth;
     }
 
-    /// <summary>
-    /// Destroi este objeto imediatamente
-    /// </summary>
-    public void DestroyObject()
+    private void OnDestroy()
     {
-        Destroy(gameObject);
+        cachedRigidbodies?.Clear();
     }
-
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -97,51 +92,42 @@ public class EnvironmentInteractable : Interactable, IDamageable
     }
     private void TriggerShake()
     {
-        // Trigger shake animation
         if (animator != null)
         {
             animator.SetTrigger(IsShaking);
         }
 
-        // Activate particles
         if (particleObject != null)
         {
             particleObject.SetActive(true);
         }
 
-        // Play sound if configured
-        if (audioSource != null && interactionSound != null)
+        if (interactionSounds != null && interactionSounds.Length > 0)
         {
-            audioSource.Play();
+            AudioClip randomSound = interactionSounds[Random.Range(0, interactionSounds.Length)];
+            GetComponent<AudioSource>()?.PlayOneShot(randomSound, volume);
         }
+    }
 
-    }    /// <summary>
-         /// Inicia a animação de destruição do objeto
-         /// </summary>    
     public void TriggerDestroy()
     {
-        // Tenta dropar itens antes de iniciar a destruição
-        //SpawnDrops();
+        SpawnDrops();
 
         if (animator != null)
         {
-            animator.SetTrigger(IsDestroying);
-
-            // Activate particles
-            if (particleObject != null)
+            animator.SetTrigger(IsDestroying); if (particleObject != null)
             {
                 particleObject.SetActive(true);
             }
 
-            // Play sound if configured
-            if (audioSource != null && interactionSound != null)
+            if (interactionSounds != null && interactionSounds.Length > 0)
             {
-                audioSource.Play();
+                AudioClip randomSound = interactionSounds[Random.Range(0, interactionSounds.Length)];
+                CombatEffectsManager.Instance.PlayHitSound(cachedTransform.position, false);
             }
         }
         else
         {
-            // If no animator, destroy immediately
             Destroy(gameObject);
         }
     }
@@ -155,6 +141,7 @@ public class EnvironmentInteractable : Interactable, IDamageable
     {
         // Optional: Remove highlight or visual cue
     }
+
     public override void Interact()
     {
         // This type auto-interacts on collision, no manual interaction needed
@@ -166,13 +153,11 @@ public class EnvironmentInteractable : Interactable, IDamageable
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
 
-        // Spawna efeito de hit na posição do impacto
-        SpawnHitEffect(transform.position);
+        // Use CombatEffectsManager to spawn pooled effect
+        CombatEffectsManager.Instance.SpawnHitEffect(cachedTransform.position, Quaternion.identity);
 
-        // Sempre mostra feedback visual ao tomar dano
         TriggerShake();
 
-        // Se perdeu toda a vida, inicia a destruição
         if (currentHealth <= 0)
         {
             TriggerDestroy();
@@ -182,50 +167,60 @@ public class EnvironmentInteractable : Interactable, IDamageable
         return true;
     }
 
-    public void SpawnDrops()
+    private void SpawnDrops()
     {
-        if (possibleDrops == null || possibleDrops.Length == 0) return;
+        if (possibleDrops == null || possibleDrops.Length == 0 ||
+            Random.Range(0f, 100f) > dropChance) return;
 
-        // Verifica se deve dropar baseado na chance configurada
-        if (Random.Range(0f, 100f) > dropChance) return;
-
-        // Decide quantos itens serão dropados
         int dropCount = Random.Range(1, maxDropCount + 1);
+        var position = cachedTransform.position;
 
         for (int i = 0; i < dropCount; i++)
         {
-            // Escolhe um item aleatório da lista
             GameObject dropPrefab = possibleDrops[Random.Range(0, possibleDrops.Length)];
             if (dropPrefab == null) continue;
 
-            // Calcula uma posição aleatória próxima ao objeto
-            Vector2 randomOffset = Random.insideUnitCircle * 0.3f;
-            Vector3 dropPosition = transform.position + new Vector3(randomOffset.x, randomOffset.y, 0);
-
-            // Instancia o item
-            Instantiate(dropPrefab, dropPosition, Quaternion.identity);
-            Debug.Log($"Item {dropPrefab.name} spawned at {dropPosition}");
-            // Opcional: pode adicionar lógica para aplicar física ao item, como Rigidbody2D
-            Rigidbody2D rb = dropPrefab.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                // Adiciona uma força aleatória para simular queda
-                rb.AddForce(new Vector2(Random.Range(-1f, 1f), Random.Range(0.5f, 1f)) * 2f, ForceMode2D.Impulse);
-            }
-            // Log de depuração
-            Debug.Log($"Spawned drop: {dropPrefab.name} at position: {dropPosition}");
-
+            SpawnSingleDrop(dropPrefab, position);
         }
     }
 
-    private void SpawnHitEffect(Vector3 hitPosition)
+    private void SpawnSingleDrop(GameObject prefab, Vector3 basePosition)
     {
-        if (hitEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(hitEffectPrefab, hitPosition, Quaternion.identity);
+        // Calculate position with offset
+        Vector2 randomOffset = Random.insideUnitCircle * 0.3f;
+        Vector3 dropPosition = basePosition + new Vector3(randomOffset.x, randomOffset.y, 0);
 
-            // Opcionalmente, destruir o efeito após um tempo
-            Destroy(effect, 2f);
+        // Use ItemPool to instantiate
+        var droppedItem = GameUtilities.ItemPool.GetItem(prefab, dropPosition, Quaternion.identity);
+        if (droppedItem == null) return;
+
+        // Use Rigidbody2D cache
+        if (!cachedRigidbodies.TryGetValue(droppedItem, out var rb))
+        {
+            rb = droppedItem.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                cachedRigidbodies[droppedItem] = rb;
+        }
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.AddForce(new Vector2(
+                Random.Range(-1f, 1f),
+                Random.Range(0.5f, 1f)
+            ) * 2f, ForceMode2D.Impulse);
+        }
+
+        // Setup return to pool when collected
+        if (droppedItem.TryGetComponent<ICollectable>(out var collectable))
+        {
+            collectable.OnCollected += () =>
+            {
+                GameUtilities.ItemPool.ReturnToPool(droppedItem, prefab);
+                if (rb != null)
+                    cachedRigidbodies.Remove(droppedItem);
+            };
         }
     }
 }

@@ -4,12 +4,13 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Controla efeitos de fade para objetos usando SortingGroup.
 /// </summary>
+[RequireComponent(typeof(SortingGroup))]
 public class InputEffects : MonoBehaviour
 {
     [Header("Configurações de Fade")]
     [Tooltip("Tempo em segundos antes do objeto começar a aparecer")]
     [SerializeField] private float fadeDelay = 2f;
-    
+
     [Tooltip("Duração em segundos do efeito de fade")]
     [SerializeField] private float fadeDuration = 1f;
 
@@ -22,18 +23,11 @@ public class InputEffects : MonoBehaviour
     {
         // Obtém o componente SortingGroup
         sortingGroup = GetComponent<SortingGroup>();
-        if (sortingGroup == null)
-        {
-            Debug.LogError("SortingGroup component not found!");
-            enabled = false;
-            return;
-        }
 
         // Obtém todos os SpriteRenderers dentro do SortingGroup
         spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         if (spriteRenderers.Length == 0)
         {
-            Debug.LogError("No SpriteRenderers found in children!");
             enabled = false;
             return;
         }

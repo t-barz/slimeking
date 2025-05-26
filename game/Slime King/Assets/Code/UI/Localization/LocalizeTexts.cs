@@ -52,13 +52,11 @@ namespace SlimeKing.UI.Localization
                 }
                 else
                 {
-                    Debug.LogError($"[LocalizeTexts] LocalizationService not initialized in LocalizationManager!", this);
                     enabled = false;
                 }
             }
             else
             {
-                Debug.LogError($"[LocalizeTexts] No LocalizationManager found in scene! Make sure to add one to your scene.", this);
                 enabled = false;
             }
         }
@@ -67,7 +65,6 @@ namespace SlimeKing.UI.Localization
         {
             if (string.IsNullOrEmpty(textKey))
             {
-                Debug.LogWarning("Text key is empty!", this);
                 return;
             }
 

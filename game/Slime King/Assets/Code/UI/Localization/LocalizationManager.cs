@@ -18,7 +18,6 @@ namespace SlimeKing.UI.Localization
         {
             if (localizationData == null)
             {
-                Debug.LogError("LocalizationData not assigned!", this);
                 enabled = false;
                 return;
             }

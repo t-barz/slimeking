@@ -58,16 +58,13 @@ public class SceneController : MonoBehaviour
         {
             LoadConfiguredScene();
         }
-    }
-
-    /// <summary>
-    /// Pré-carrega a Scene configurada em segundo plano.
-    /// </summary>
+    }    /// <summary>
+         /// Pré-carrega a Scene configurada em segundo plano.
+         /// </summary>
     private void PreLoadScene()
     {
         if (string.IsNullOrEmpty(preloadSceneName))
         {
-            Debug.LogError("Scene name not configured!");
             return;
         }
 
@@ -75,11 +72,10 @@ public class SceneController : MonoBehaviour
         {
             preloadOperation = SceneManager.LoadSceneAsync(preloadSceneName);
             preloadOperation.allowSceneActivation = false;
-            Debug.Log($"Pre-loading scene: {preloadSceneName}");
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
-            Debug.LogError($"Error pre-loading scene {preloadSceneName}: {e.Message}");
+            // Ignore loading errors in release builds
         }
     }
 
@@ -90,18 +86,16 @@ public class SceneController : MonoBehaviour
     {
         if (string.IsNullOrEmpty(preloadSceneName))
         {
-            Debug.LogError("Scene name not configured!");
             return;
         }
 
         try
         {
             SceneManager.LoadSceneAsync(preloadSceneName);
-            Debug.Log($"Loading scene: {preloadSceneName}");
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
-            Debug.LogError($"Error loading scene {preloadSceneName}: {e.Message}");
+            // Ignore loading errors in release builds
         }
     }
 }
