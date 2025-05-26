@@ -15,8 +15,11 @@ namespace SlimeKing.Gameplay
         private GameObject[] sideObjects;
         private GameObject vfxFront;
         private GameObject vfxBack;
-        private GameObject vfxSide;
-        private bool isFacingLeft = false;
+        private GameObject vfxSide; private bool isFacingLeft = false;
+        #endregion
+
+        #region Propriedades Públicas
+        public bool IsFacingLeft => isFacingLeft;
         #endregion
 
         #region Métodos Unity

@@ -9,14 +9,14 @@ public class EnvironmentInteractable : Interactable, IDamageable
 {
     [Header("Health Settings")]
     [Tooltip("Pontos de vida/resistência inicial do objeto")]
-    [SerializeField] private float maxHealth = 1f; [Header("Visual Settings")]
+    [SerializeField] private float maxHealth = 1f;
+
+    [Header("Visual Settings")]
     [Tooltip("Animator que controla o efeito visual")]
     [SerializeField] private Animator animator;
 
     [Tooltip("Tag das entidades que podem ativar o efeito")]
-    [SerializeField] private string[] interactableTags = { "Player", "Creature" };
-
-    [Header("Destruction Settings")]
+    [SerializeField] private string[] interactableTags = { "Player", "Creature" };    [Header("Destruction Settings")]
     [Tooltip("Se verdadeiro, o objeto pode ser destruído após receber dano")]
     [SerializeField] private bool isDestructible = false;
 
@@ -39,11 +39,10 @@ public class EnvironmentInteractable : Interactable, IDamageable
 
     [Header("Audio Settings")]
     [Tooltip("Som reproduzido durante a interação")]
-    [SerializeField] private AudioClip interactionSound; [Tooltip("Volume do som")]
+    [SerializeField] private AudioClip interactionSound;
+    [Tooltip("Volume do som")]
     [Range(0, 1)]
-    [SerializeField] private float volume = 0.5f;
-
-    private AudioSource audioSource;
+    [SerializeField] private float volume = 0.5f; private AudioSource audioSource;
     private float lastEffectTime;
     private int currentHits = 0;
     private float currentHealth;
@@ -115,13 +114,14 @@ public class EnvironmentInteractable : Interactable, IDamageable
             audioSource.Play();
         }
 
-    }    /// <summary>
-         /// Inicia a animação de destruição do objeto
-         /// </summary>    
-    public void TriggerDestroy()
+    }
+
+    /// <summary>
+    /// Inicia a animação de destruição do objeto
+    /// </summary>    public void TriggerDestroy()
     {
         // Tenta dropar itens antes de iniciar a destruição
-        //SpawnDrops();
+        SpawnDrops();
 
         if (animator != null)
         {
@@ -155,12 +155,11 @@ public class EnvironmentInteractable : Interactable, IDamageable
     {
         // Optional: Remove highlight or visual cue
     }
+
     public override void Interact()
     {
         // This type auto-interacts on collision, no manual interaction needed
-    }
-
-    public bool TakeDamage(float damage, GameObject source = null)
+    }    public bool TakeDamage(float damage, GameObject source = null)
     {
         if (currentHealth <= 0) return false;
 
@@ -182,7 +181,7 @@ public class EnvironmentInteractable : Interactable, IDamageable
         return true;
     }
 
-    public void SpawnDrops()
+    private void SpawnDrops()
     {
         if (possibleDrops == null || possibleDrops.Length == 0) return;
 
@@ -199,22 +198,11 @@ public class EnvironmentInteractable : Interactable, IDamageable
             if (dropPrefab == null) continue;
 
             // Calcula uma posição aleatória próxima ao objeto
-            Vector2 randomOffset = Random.insideUnitCircle * 0.3f;
+            Vector2 randomOffset = Random.insideUnitCircle * 0.5f;
             Vector3 dropPosition = transform.position + new Vector3(randomOffset.x, randomOffset.y, 0);
 
             // Instancia o item
             Instantiate(dropPrefab, dropPosition, Quaternion.identity);
-            Debug.Log($"Item {dropPrefab.name} spawned at {dropPosition}");
-            // Opcional: pode adicionar lógica para aplicar física ao item, como Rigidbody2D
-            Rigidbody2D rb = dropPrefab.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                // Adiciona uma força aleatória para simular queda
-                rb.AddForce(new Vector2(Random.Range(-1f, 1f), Random.Range(0.5f, 1f)) * 2f, ForceMode2D.Impulse);
-            }
-            // Log de depuração
-            Debug.Log($"Spawned drop: {dropPrefab.name} at position: {dropPosition}");
-
         }
     }
 
@@ -223,7 +211,7 @@ public class EnvironmentInteractable : Interactable, IDamageable
         if (hitEffectPrefab != null)
         {
             GameObject effect = Instantiate(hitEffectPrefab, hitPosition, Quaternion.identity);
-
+            
             // Opcionalmente, destruir o efeito após um tempo
             Destroy(effect, 2f);
         }

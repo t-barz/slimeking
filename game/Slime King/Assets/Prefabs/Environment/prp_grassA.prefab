@@ -116,7 +116,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.5
+      scalar: 0.25
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4863,11 +4863,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a23cd325752cda843b82034ad2df9451, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.5721238
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a23cd325752cda843b82034ad2df9451, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -4.2714095
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a23cd325752cda843b82034ad2df9451, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4971,11 +4971,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbfcacaa8131b7b4d874c6334e030e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 2
   animator: {fileID: 8640103506728703872}
   interactableTags:
   - Player
   - Creature
-  interactionSound: {fileID: 0}
+  isDestructible: 1
+  resistance: 2
+  dropChance: 50
+  possibleDrops:
+  - {fileID: 9153756091400273574, guid: 46277662c2b1c274abbcc6adc63fba06, type: 3}
+  maxDropCount: 2
+  hitEffectPrefab: {fileID: 0}
+  interactionSound: {fileID: 8300000, guid: d26c346ae587f274c9fe67246ff68f18, type: 3}
   volume: 0.5
 --- !u!114 &2083830595732009269
 MonoBehaviour:
