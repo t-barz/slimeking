@@ -10,16 +10,16 @@ public class CollectableInteractable : Interactable
     [Header("Configurações de Coleta")]
     [Tooltip("Velocidade de movimento até o jogador")]
     [SerializeField] private float moveSpeed = 5f;
-    
+
     [Tooltip("Distância mínima para considerar coletado")]
     [SerializeField] private float collectDistance = 0.1f;
-    
+
     [Tooltip("Prefab do efeito visual de coleta")]
     [SerializeField] private GameObject collectEffectPrefab;
-    
+
     [Tooltip("Se verdadeiro, move automaticamente quando próximo. Se falso, requer interação")]
     [SerializeField] private bool autoCollectInRange = true;
-    
+
     [Tooltip("Referência para a ação de interação")]
     [SerializeField] private InputActionReference interactAction;
 
@@ -45,6 +45,7 @@ public class CollectableInteractable : Interactable
             interactAction.action.Enable();
         }
     }
+
 
     protected virtual void OnDisable()
     {

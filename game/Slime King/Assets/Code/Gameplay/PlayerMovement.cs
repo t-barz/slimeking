@@ -20,6 +20,7 @@ namespace SlimeKing.Gameplay
         [Header("Input")]
         [SerializeField] private InputActionReference movementAction;
         [SerializeField] private InputActionReference attackAction;
+        [SerializeField] private InputActionReference crouchAction;
 
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
@@ -33,6 +34,8 @@ namespace SlimeKing.Gameplay
         private PlayerCombat combat;
         private PlayerActionController actionController;
         private PlayerAudioManager audioManager;
+        private Collider2D[] playerColliders;
+        private bool isHiding;
         #endregion
 
         #region Métodos Unity
@@ -44,6 +47,7 @@ namespace SlimeKing.Gameplay
             combat = GetComponent<PlayerCombat>();
             actionController = GetComponent<PlayerActionController>();
             audioManager = GetComponent<PlayerAudioManager>();
+            playerColliders = GetComponents<Collider2D>();
         }
 
         private void Start()
@@ -58,7 +62,7 @@ namespace SlimeKing.Gameplay
 
         private void OnDisable()
         {
-            DisableInput();
+            //DisableInput();
         }
 
         private void FixedUpdate()
@@ -82,6 +86,13 @@ namespace SlimeKing.Gameplay
                 attackAction.action.performed += OnAttackPerformed;
                 attackAction.action.Enable();
             }
+
+            if (crouchAction != null)
+            {
+                crouchAction.action.started += OnCrouchStarted;
+                crouchAction.action.canceled += OnCrouchCanceled;
+                crouchAction.action.Enable();
+            }
         }
 
         private void DisableInput()
@@ -97,6 +108,13 @@ namespace SlimeKing.Gameplay
             {
                 attackAction.action.performed -= OnAttackPerformed;
                 attackAction.action.Disable();
+            }
+
+            if (crouchAction != null)
+            {
+                crouchAction.action.started -= OnCrouchStarted;
+                crouchAction.action.canceled -= OnCrouchCanceled;
+                crouchAction.action.Disable();
             }
         }
 
@@ -124,13 +142,52 @@ namespace SlimeKing.Gameplay
                 moveInput = Vector2.zero;
             }
         }
+
+        private void OnCrouchStarted(InputAction.CallbackContext context)
+        {
+            isHiding = true;
+            animator.SetBool("isHiding", true);
+        }
+
+        private void OnCrouchCanceled(InputAction.CallbackContext context)
+        {
+            isHiding = false;
+            animator.SetBool("isHiding", false);
+            EnableColliders();
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (other.CompareTag("Obstáculo") && isHiding)
+            {
+                DisableColliders();
+            }
+        }
+
+        private void DisableColliders()
+        {
+            foreach (var collider in playerColliders)
+            {
+                collider.enabled = false;
+            }
+        }
+
+        private void EnableColliders()
+        {
+            foreach (var collider in playerColliders)
+            {
+                collider.enabled = true;
+            }
+        }
         #endregion
 
         #region Sistema de Movimento
         private void UpdateMovement()
         {
-            if (!combat.IsAttacking && !actionController.IsSliding && !actionController.IsJumping)
+            Debug.Log($"Move Input: {moveInput}, Is Attacking: {combat.IsAttacking}, Is Sliding: {actionController.IsSliding}, Is Jumping: {actionController.IsJumping}, Is Hiding: {isHiding}");
+            if (!combat.IsAttacking && !actionController.IsSliding && !actionController.IsJumping && !isHiding)
             {
+                Debug.Log("Updating Player Movement");
                 rb.linearVelocity = moveInput * moveSpeed * Time.fixedDeltaTime * 120f;
             }
             else
