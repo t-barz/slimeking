@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using SlimeKing.Gameplay;
 
 namespace SlimeKing.Gameplay
 {
@@ -38,6 +39,9 @@ namespace SlimeKing.Gameplay
         private Animator animator;
         private PlayerVisualManager visualManager;
         private PlayerAudioManager audioManager;
+        private Collider2D[] playerColliders;
+        private bool isHiding;
+        private PlayerMovement playerMovement; // Referência para PlayerMovement
         private bool isAttacking;
         private static readonly int Attack01 = Animator.StringToHash("Attack01");
         private readonly Collider2D[] attackResults = new Collider2D[8]; // Cache para otimização
@@ -53,6 +57,7 @@ namespace SlimeKing.Gameplay
             animator = GetComponent<Animator>();
             visualManager = GetComponent<PlayerVisualManager>();
             audioManager = GetComponent<PlayerAudioManager>();
+            playerMovement = GetComponent<PlayerMovement>(); // Inicializa referência
         }
 
         private void OnDrawGizmosSelected()
@@ -70,7 +75,8 @@ namespace SlimeKing.Gameplay
         #region Sistema de Combate
         public void TryAttack()
         {
-            if (!isAttacking)
+            // Não permite atacar se estiver abaixado/escondido
+            if (!isAttacking && playerMovement != null && !playerMovement.IsHiding)
             {
                 Attack();
             }
@@ -108,17 +114,16 @@ namespace SlimeKing.Gameplay
             Vector2 attackPosition = (Vector2)transform.position + GetAttackOffset();
 
             // Detecta alvos na área de ataque
-            int hitCount = Physics2D.OverlapCircleNonAlloc(
+            int hitCount = 0;
+            Collider2D[] results = Physics2D.OverlapCircleAll(
                 attackPosition,
                 attackRange,
-                attackResults,
                 targetLayers
             );
-
-            // Aplica dano a todos os alvos detectados
+            hitCount = results.Length;
             for (int i = 0; i < hitCount; i++)
             {
-                var damageable = attackResults[i].GetComponent<IDamageable>();
+                var damageable = results[i].GetComponent<IDamageable>();
                 if (damageable != null)
                 {
                     damageable.TakeDamage(attackDamage, gameObject);

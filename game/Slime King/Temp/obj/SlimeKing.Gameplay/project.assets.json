@@ -1,0 +1,130 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETStandard,Version=v2.1": {
+      "SlimeKing.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "SlimeKing.Utils": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/SlimeKing.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SlimeKing.Core.dll": {}
+        }
+      },
+      "SlimeKing.UI/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/SlimeKing.UI.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SlimeKing.UI.dll": {}
+        }
+      },
+      "SlimeKing.Utils/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/SlimeKing.Utils.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SlimeKing.Utils.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SlimeKing.Core/1.0.0": {
+      "type": "project",
+      "path": "SlimeKing.Core.csproj",
+      "msbuildProject": "SlimeKing.Core.csproj"
+    },
+    "SlimeKing.UI/1.0.0": {
+      "type": "project",
+      "path": "SlimeKing.UI.csproj",
+      "msbuildProject": "SlimeKing.UI.csproj"
+    },
+    "SlimeKing.Utils/1.0.0": {
+      "type": "project",
+      "path": "SlimeKing.Utils.csproj",
+      "msbuildProject": "SlimeKing.Utils.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETStandard,Version=v2.1": [
+      "SlimeKing.Core >= 1.0.0",
+      "SlimeKing.UI >= 1.0.0",
+      "SlimeKing.Utils >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/Users/barz/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Gameplay.csproj",
+      "projectName": "SlimeKing.Gameplay",
+      "projectPath": "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Gameplay.csproj",
+      "packagesPath": "/Users/barz/.nuget/packages/",
+      "outputPath": "/Users/barz/Documents/coding/slimeking/game/Slime King/Temp/obj/SlimeKing.Gameplay/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/barz/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netstandard2.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "targetAlias": "netstandard2.1",
+          "projectReferences": {
+            "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Core.csproj": {
+              "projectPath": "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Core.csproj"
+            },
+            "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.UI.csproj": {
+              "projectPath": "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.UI.csproj"
+            },
+            "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Utils.csproj": {
+              "projectPath": "/Users/barz/Documents/coding/slimeking/game/Slime King/SlimeKing.Utils.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "netstandard2.1": {
+        "targetAlias": "netstandard2.1",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

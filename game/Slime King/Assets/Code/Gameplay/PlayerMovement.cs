@@ -36,6 +36,7 @@ namespace SlimeKing.Gameplay
         private PlayerAudioManager audioManager;
         private Collider2D[] playerColliders;
         private bool isHiding;
+        public bool IsHiding => isHiding;
         #endregion
 
         #region Métodos Unity
