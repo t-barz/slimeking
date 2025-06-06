@@ -96,6 +96,8 @@ namespace SlimeKing.Gameplay
             // Detecta e aplica dano aos alvos
             CheckAndDamageTargets();
 
+            // Para a animação de caminhada e inicia o ataque
+            animator.SetBool("isWalking", false);
             animator.SetTrigger(Attack01);
             audioManager.PlayAttackSound();
         }
@@ -104,6 +106,14 @@ namespace SlimeKing.Gameplay
         {
             isAttacking = false;
             visualManager.DisableAllVfx();
+
+            // Verifica se há movimento e reinicia a animação de caminhada
+            if (playerMovement != null && playerMovement.HasMovementInput)
+            {
+                Vector2 currentInput = playerMovement.CurrentMoveInput;
+                visualManager.UpdateVisualState(currentInput);
+                animator.SetBool("isWalking", true);
+            }
         }
         #endregion
 

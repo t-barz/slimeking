@@ -36,7 +36,12 @@ namespace SlimeKing.Gameplay
         private PlayerAudioManager audioManager;
         private Collider2D[] playerColliders;
         private bool isHiding;
+        #endregion
+
+        #region Propriedades Públicas
+        public bool HasMovementInput => moveInput != Vector2.zero;
         public bool IsHiding => isHiding;
+        public Vector2 CurrentMoveInput => moveInput;
         #endregion
 
         #region Métodos Unity
