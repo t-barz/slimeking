@@ -8,7 +8,6 @@ namespace SlimeKing.Gameplay
     /// </summary>
     public class PlayerAudioManager : MonoBehaviour
     {
-        #region Campos Serializados
         [Header("Audio Clips")]
         [SerializeField] private AudioClip walkingSound;
         [SerializeField] private AudioClip jumpSound;
@@ -18,22 +17,16 @@ namespace SlimeKing.Gameplay
         [Header("Settings")]
         [Range(0, 1)]
         [SerializeField] private float soundVolume = 1f;
-        #endregion
 
-        #region Campos Privados
         private AudioSource audioSource;
         private float walkingSoundInterval = 0.3f;
         private float lastWalkingSoundTime;
-        #endregion
 
-        #region Métodos Unity
         private void Awake()
         {
             SetupAudioSource();
         }
-        #endregion
 
-        #region Inicialização
         private void SetupAudioSource()
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -41,9 +34,7 @@ namespace SlimeKing.Gameplay
             audioSource.playOnAwake = false;
             audioSource.spatialBlend = 0f; // Set to 2D sound
         }
-        #endregion
 
-        #region Sistema de Áudio
         public void PlayWalkingSound()
         {
             if (walkingSound != null && !audioSource.isPlaying)
@@ -95,6 +86,5 @@ namespace SlimeKing.Gameplay
                 audioSource.Stop();
             }
         }
-        #endregion
     }
 }
