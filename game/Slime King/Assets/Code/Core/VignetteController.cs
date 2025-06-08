@@ -27,7 +27,7 @@ namespace SlimeKing.Core
         [SerializeField] private bool targetRounded = false;
 
         [Header("Transition Settings")]
-        [SerializeField] private float delayBeforeTransition = 5f;
+        [SerializeField] private float delayBeforeTransition = 8f;
         [SerializeField] private float transitionDuration = 1f;
         [SerializeField] private AnimationCurve transitionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
