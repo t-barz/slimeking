@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public abstract class Interactable : MonoBehaviour
 {
-     // Propriedade pública somente leitura para saber se o jogador está próximo
+    // Propriedade pública somente leitura para saber se o jogador está próximo
     public bool PlayerInRange { get; protected set; }
 
     /// <summary>
@@ -22,11 +22,9 @@ public abstract class Interactable : MonoBehaviour
             // Registra este objeto como interativo atual no InteractionManager
             InteractionManager.Instance.RegisterInteractable(this);
         }
-    }
-
-    /// <summary>
-    /// Detecta quando o jogador sai da área de interação.
-    /// </summary>
+    }    /// <summary>
+         /// Detecta quando o jogador sai da área de interação.
+         /// </summary>
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -34,7 +32,7 @@ public abstract class Interactable : MonoBehaviour
             PlayerInRange = false;
             HideVisualFeedback();
             // Remove este objeto do registro de interação
-            InteractionManager.Instance.UnregisterInteractable();
+            InteractionManager.Instance.UnregisterInteractable(this);
         }
     }
 

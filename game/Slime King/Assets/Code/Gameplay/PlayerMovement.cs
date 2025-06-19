@@ -20,7 +20,9 @@ namespace SlimeKing.Gameplay
         [Header("Input")]
         [SerializeField] private InputActionReference movementAction;
         [SerializeField] private InputActionReference attackAction;
+        [SerializeField] private InputActionReference interactAction;
         [SerializeField] private InputActionReference crouchAction;
+        [SerializeField] private InputActionReference jumpAction;
 
         [Header("Movement Settings")]
         [SerializeField] private float moveSpeed = 5f;
@@ -93,11 +95,23 @@ namespace SlimeKing.Gameplay
                 attackAction.action.Enable();
             }
 
+            if (interactAction != null)
+            {
+                interactAction.action.performed += OnInteractPerformed;
+                interactAction.action.Enable();
+            }
+
             if (crouchAction != null)
             {
                 crouchAction.action.started += OnCrouchStarted;
                 crouchAction.action.canceled += OnCrouchCanceled;
                 crouchAction.action.Enable();
+            }
+
+            if (jumpAction != null)
+            {
+                jumpAction.action.performed += OnJumpPerformed;
+                jumpAction.action.Enable();
             }
         }
 
@@ -109,11 +123,16 @@ namespace SlimeKing.Gameplay
                 movementAction.action.canceled -= OnMovementCanceled;
                 movementAction.action.Disable();
             }
-
             if (attackAction != null)
             {
                 attackAction.action.performed -= OnAttackPerformed;
                 attackAction.action.Disable();
+            }
+
+            if (interactAction != null)
+            {
+                interactAction.action.performed -= OnInteractPerformed;
+                interactAction.action.Disable();
             }
 
             if (crouchAction != null)
@@ -121,6 +140,12 @@ namespace SlimeKing.Gameplay
                 crouchAction.action.started -= OnCrouchStarted;
                 crouchAction.action.canceled -= OnCrouchCanceled;
                 crouchAction.action.Disable();
+            }
+
+            if (jumpAction != null)
+            {
+                jumpAction.action.performed -= OnJumpPerformed;
+                jumpAction.action.Disable();
             }
         }
 
@@ -160,6 +185,35 @@ namespace SlimeKing.Gameplay
             isHiding = false;
             animator.SetBool("isHiding", false);
             EnableColliders();
+        }
+
+        private void OnInteractPerformed(InputAction.CallbackContext context)
+        {
+            // Verifica se há algum objeto interativo próximo 
+            // Essa lógica será tratada pelo InteractionManager
+        }
+
+        private void OnJumpPerformed(InputAction.CallbackContext context)
+        {
+            if (!combat.IsAttacking && !actionController.IsSliding && !isHiding)
+            {
+                // Calcula a direção do pulo baseada na direção atual do jogador
+                Vector2 jumpDirection = moveInput.normalized;
+                if (jumpDirection == Vector2.zero)
+                {
+                    // Se não houver direção de movimento, usa a direção para onde o jogador está olhando
+                    jumpDirection = visualManager.IsFacingLeft ? Vector2.left : Vector2.right;
+                }
+
+                // Calcula o destino do pulo (uma pequena distância na direção atual)
+                Vector3 jumpDestination = transform.position + new Vector3(jumpDirection.x, jumpDirection.y, 0f) * 2f;
+
+                // Executa o pulo
+                actionController.Jump(jumpDestination);
+
+                // Reproduz som de pulo
+                audioManager.PlayJumpSound();
+            }
         }
 
         private void OnTriggerStay2D(Collider2D other)

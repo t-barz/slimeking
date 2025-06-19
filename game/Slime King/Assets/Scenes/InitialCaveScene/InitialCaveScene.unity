@@ -9520,6 +9520,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  interactionPriority: 2
+  showDebugInfo: 0
 --- !u!4 &1361017635
 Transform:
   m_ObjectHideFlags: 0
@@ -9600,6 +9602,7 @@ MonoBehaviour:
   speakerIcon: {fileID: 0}
   typingSpeed: 0.05
   fadeTime: 0.1
+  interactAction: {fileID: 0}
 --- !u!1001 &1363960042
 PrefabInstance:
   m_ObjectHideFlags: 0
