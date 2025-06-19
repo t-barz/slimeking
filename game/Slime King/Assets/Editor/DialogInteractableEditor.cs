@@ -69,11 +69,9 @@ namespace SlimeKing.EditorTools
 
             // Aplica as modificações
             serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary>
-        /// Cria um indicador visual básico para o objeto interativo
-        /// </summary>
+        }        /// <summary>
+                 /// Cria um indicador visual básico para o objeto interativo
+                 /// </summary>
         private void CreateVisualCue()
         {
             DialogInteractable dialogInteractable = (DialogInteractable)target;
@@ -90,14 +88,16 @@ namespace SlimeKing.EditorTools
                 Rect rect = new Rect(0, 0, texture.width, texture.height);
                 Vector2 pivot = new Vector2(0.5f, 0.5f);
                 spriteRenderer.sprite = Sprite.Create(texture, rect, pivot);
-            }
+            }            // Garante que o SpriteRenderer seja corretamente configurado
             spriteRenderer.sortingOrder = 10;
+            spriteRenderer.enabled = false; // O SpriteRenderer começa desativado
+            spriteRenderer.color = Color.white; // Certifica-se de que a cor está configurada corretamente
 
             visualCueProp.objectReferenceValue = visualCue;
             serializedObject.ApplyModifiedProperties();
 
-            // Desativa o indicador por padrão
-            visualCue.SetActive(false);
+            // Mantém o GameObject sempre ativo
+            visualCue.SetActive(true);
         }
     }
 }

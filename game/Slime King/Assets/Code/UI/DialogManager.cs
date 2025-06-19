@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 namespace SlimeKing.UI
 {
@@ -32,12 +33,22 @@ namespace SlimeKing.UI
         private Coroutine fadeCoroutine;
         private Coroutine typewriterCoroutine;
 
+        [Header("Input System")]
+        [SerializeField] private InputActionReference interactAction; // Referência à ação de interação
+
         private void Awake()
         {
             if (Instance == null)
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+
+                // Configura o Input System
+                if (interactAction != null)
+                {
+                    interactAction.action.Enable();
+                    interactAction.action.performed += OnInteractInput;
+                }
             }
             else
             {
@@ -54,6 +65,26 @@ namespace SlimeKing.UI
                 }
                 canvasGroup.alpha = 0f;
                 dialogBox.SetActive(true);
+            }
+        }
+
+        /// <summary>
+        /// Callback para quando o botão de interação é pressionado
+        /// </summary>
+        private void OnInteractInput(InputAction.CallbackContext context)
+        {
+            if (isDialogActive)
+            {
+                // Se estiver digitando o texto, pula a animação
+                if (isTyping)
+                {
+                    SkipTypewriter();
+                }
+                // Se não estiver digitando, fecha o diálogo
+                else
+                {
+                    CloseDialog();
+                }
             }
         }
 
@@ -189,23 +220,7 @@ namespace SlimeKing.UI
             return isDialogActive;
         }
 
-        private void Update()
-        {
-            // Processa eventos de input
-            if (isDialogActive && Input.GetKeyDown(KeyCode.E))
-            {
-                // Se estiver digitando o texto, pula a animação
-                if (isTyping)
-                {
-                    SkipTypewriter();
-                }
-                // Se não estiver digitando, fecha o diálogo
-                else
-                {
-                    CloseDialog();
-                }
-            }
-        }
+        // O método Update foi removido pois agora usamos o Input System com eventos
 
         /// <summary>
         /// Pula a animação de digitação e mostra o texto completo imediatamente
@@ -311,6 +326,15 @@ namespace SlimeKing.UI
                 // Garante que todo o texto está visível no final
                 dialogText.text = text;
                 isTyping = false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // Limpa o evento do Input System
+            if (interactAction != null)
+            {
+                interactAction.action.performed -= OnInteractInput;
             }
         }
     }

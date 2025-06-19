@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using SlimeKing.UI;
+using SlimeKing.Core;
 
 namespace SlimeKing.Gameplay
 {
@@ -29,12 +31,24 @@ namespace SlimeKing.Gameplay
         [SerializeField] private GameObject visualCue;
 
         private int currentDialogIndex = 0;
+        private SpriteRenderer visualCueRenderer; // Referência para o SpriteRenderer
 
         private void Start()
         {
-            // Garante que o indicador visual começa oculto
+            // Inicializa o renderer e garante que começa oculto
             if (visualCue != null)
-                visualCue.SetActive(false);
+            {
+                visualCueRenderer = visualCue.GetComponent<SpriteRenderer>();
+                if (visualCueRenderer != null)
+                {
+                    visualCueRenderer.enabled = false;
+                }
+                else
+                {
+                    visualCue.SetActive(false);
+                    Debug.LogWarning("Visual cue GameObject does not have a SpriteRenderer component. Disabling visual cue.");
+                }
+            }
         }
 
         /// <summary>
@@ -123,24 +137,38 @@ namespace SlimeKing.Gameplay
                     speakerIcon
                 );
             }
-        }
-
-        /// <summary>
-        /// Mostra o feedback visual quando o jogador está perto
-        /// </summary>
+        }        /// <summary>
+                 /// Mostra o feedback visual quando o jogador está perto
+                 /// </summary>
         protected override void ShowVisualFeedback()
         {
-            if (visualCue != null)
-                visualCue.SetActive(true);
-        }
+            // Verifica se já temos a referência para o SpriteRenderer
+            if (visualCueRenderer == null && visualCue != null)
+            {
+                visualCueRenderer = visualCue.GetComponent<SpriteRenderer>();
+            }
 
-        /// <summary>
-        /// Oculta o feedback visual quando o jogador se afasta
-        /// </summary>
+            // Ativa apenas o SpriteRenderer, mantendo o GameObject sempre ativo
+            if (visualCueRenderer != null)
+            {
+                visualCueRenderer.enabled = true;
+            }
+        }        /// <summary>
+                 /// Oculta o feedback visual quando o jogador se afasta
+                 /// </summary>
         protected override void HideVisualFeedback()
         {
-            if (visualCue != null)
-                visualCue.SetActive(false);
+            // Verifica se já temos a referência para o SpriteRenderer
+            if (visualCueRenderer == null && visualCue != null)
+            {
+                visualCueRenderer = visualCue.GetComponent<SpriteRenderer>();
+            }
+
+            // Desativa apenas o SpriteRenderer, mantendo o GameObject sempre ativo
+            if (visualCueRenderer != null)
+            {
+                visualCueRenderer.enabled = false;
+            }
 
             // Assegura que o diálogo seja fechado se o jogador sair da área
             if (SlimeKing.UI.DialogManager.Instance != null && SlimeKing.UI.DialogManager.Instance.IsDialogActive())
