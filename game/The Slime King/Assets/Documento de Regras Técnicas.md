@@ -56,7 +56,7 @@ Cada sistema foi projetado com três princípios fundamentais em mente:
 - 6.1 Tipos de Fragmentos
 - 6.2 Detecção e Coleta
 - 6.3 Armazenamento de Energia
-- **6.4 Fragmentos Elementais (Prefabs)**
+- 6.4 Fragmentos Elementais (Prefabs)
 
 
 ### 7. **Sistema de Inventário**
@@ -71,8 +71,8 @@ Cada sistema foi projetado com três princípios fundamentais em mente:
 - 8.1 Detecção de Objetos
 - 8.2 Feedback Visual
 - 8.3 Tipos de Interação
-- **8.4 Objetos Destrutíveis**
-- **8.5 Objetos Móveis**
+- 8.4 Objetos Destrutíveis
+- 8.5 Objetos Móveis
 
 
 ### 9. **Sistema de Stealth**
@@ -115,6 +115,13 @@ Cada sistema foi projetado com três princípios fundamentais em mente:
 - 14.1 Save Data Structure
 - 14.2 Auto-Save Triggers
 - 14.3 Loading States
+
+
+### 15. **Sistema de Localização de Textos**
+
+- 15.1 Estrutura de Arquivos CSV
+- 15.2 Detecção Automática de Idioma
+- 15.3 Sistema de Configuração
 
 ---
 
@@ -208,17 +215,17 @@ Quando `isHiding` está ativo, o sistema de movimento deve verificar esta condi�
 
 #### 2.3 Estados de Transição
 
-| Estado Origem | Estado Destino | Condição | Duração |
-| :-- | :-- | :-- | :-- |
-| Idle | Walking | `isWalking == true` | Immediate |
-| Walking | Idle | `isWalking == false` | 0.1s |
-| Any State | Hiding | `isHiding == true` | 0.2s |
-| Hiding | Idle | `isHiding == false` | 0.2s |
-| Idle | Attack01 | `Attack01 trigger` | Fixed 0.5s |
-| Idle | Shrink/Jump | `Shrink/Jump trigger` | Fixed 0.3s |
+| Estado Origem | Estado Destino | Condição |
+| :-- | :-- | :-- |
+| Idle | Walking | `isWalking == true` |
+| Walking | Idle | `isWalking == false` |
+| Any State | Hiding | `isHiding == true` |
+| Hiding | Idle | `isHiding == false` |
+| Idle | Attack01 | `Attack01 trigger` |
+| Idle | Shrink/Jump | `Shrink/Jump trigger` |
 
 **Timing Considerations:**
-As durações são calibradas para parecerem naturais e responsivas. Transições muito rápidas podem parecer bruscas, enquanto transições muito lentas fazem o jogo parecer lento. Os valores escolhidos foram testados para oferecer a melhor sensação de responsividade.
+As transições são calibradas para parecerem naturais e responsivas. Transições muito rápidas podem parecer bruscas, enquanto transições muito lentas fazem o jogo parecer lento. Os valores escolhidos foram testados para oferecer a melhor sensação de responsividade.
 
 ### 3. **Sistema de Movimento**
 
@@ -609,9 +616,11 @@ Os fragmentos elementais são os building blocks do sistema de progressão, proj
 | Componente | Regra de Implementação |
 | :-- | :-- |
 | **Prefab Base** | `ElementalFragment` (Script + SpriteRenderer + Rigidbody2D opcional) |
-| **Variantes de Sprite** | Três tamanhos definidos na `Awake()`: `Small`, `Medium`, `Large` <br>Array `spriteVariants` no Inspector |
+| **Variantes de Sprite** | Três tamanhos: `Small`, `Medium`, `Large` <br>Array `spriteVariants` no Inspector |
 | **Cor Dinâmica** | Parâmetros `colorA` e `colorB` recebidos ao instanciar <br>Na `Awake()`: `Color.Lerp(colorA, colorB, Random.value)` |
 | **Energia Gerada** | `[Small = 1] [Medium = 3] [Large = 7]` (configurável via ScriptableObject) |
+| **Sorteio de Sprite** | Ao instanciar, sortear tamanho usando `DropTable` do objeto origem |
+| **Configuração de Drop** | `allowedSizes[]` + `dropChance[]` por tamanho em cada inimigo/objeto |
 | **Comportamento Física** | `AddImpulse` aleatório para "pular" do ponto de origem |
 | **Sistema de Atração** | **Fragmentos se deslocam automaticamente em direção ao slime quando ele passa por perto** <br>Raio de detecção: 2.0 units <br>Velocidade de movimento: 8.0 units/segundo |
 | **Detecção de Proximidade** | `OverlapCircle` contínuo para detectar slime na área <br>Quando detectado, ativar movimento em direção ao slime |
@@ -1098,7 +1107,7 @@ Os mini-slimes representam uma extensão única do protagonista, oferecendo vers
 - **Ar**: Move-se 100% mais rápido, plana pequenas distâncias
 
 **Balancing Philosophy:**
-Mini-slimes são poderosos mas temporários e custosos, requerendo decisões estratégicas sobre quando e como usá-los.
+Mini-slimes são poderosos mas temporários e custosos, requerindo decisões estratégicas sobre quando e como usá-los.
 
 ### 11. **Sistema de UI**
 
@@ -1283,19 +1292,189 @@ O sistema salva automaticamente em momentos estratégicos:
 - **Load Specific**: Seleção de slot de save específico
 - **Backup**: Sistema de backup automático para prevenir perda
 
+
+### 15. **Sistema de Localização de Textos**
+
+O sistema de localização em **The Slime King** foi projetado para oferecer uma experiência multilíngue fluida e acessível, garantindo que jogadores de diferentes regiões possam desfrutar completamente da atmosfera cozy e narrativa do jogo. O sistema utiliza arquivos CSV para facilitar a tradução e manutenção dos textos.
+
+Este sistema é fundamental para o alcance global do jogo, permitindo que a experiência emocional e os vínculos narrativos sejam preservados independente do idioma do jogador.
+
+#### 15.1 Estrutura de Arquivos CSV
+
+O sistema utiliza arquivos CSV organizados para facilitar tanto o desenvolvimento quanto o processo de tradução por terceiros.
+
+**Organização dos Arquivos CSV**
+
+Todos os textos do jogo são armazenados em arquivos CSV localizados no diretório:
+
+```
+/Assets/StreamingAssets/Localization/
+```
+
+**Estrutura do Arquivo CSV**
+
+
+| Key | EN | PT_BR | ES | FR | DE | JA | ZH_CN |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| ui_start_game | Start Game | Iniciar Jogo | Iniciar Juego | Commencer | Spiel Starten | ゲーム開始 | 开始游戏 |
+| ui_continue | Continue | Continuar | Continuar | Continuer | Weiter | 続ける | 继续 |
+| ui_settings | Settings | Configurações | Configuración | Paramètres | Einstellungen | 設定 | 设置 |
+| item_apple_name | Apple | Maçã | Manzana | Pomme | Apfel | りんご | 苹果 |
+| item_apple_desc | Restores 20 HP | Restaura 20 de vida | Restaura 20 de vida | Restaure 20 PV | Stellt 20 LP wieder her | HPを20回復 | 恢复20生命值 |
+
+**Convenções de Nomenclatura para Keys**
+
+- **UI Elements**: `ui_[elemento]_[acao]` (ex: `ui_button_start`, `ui_menu_pause`)
+- **Items**: `item_[nome]_[propriedade]` (ex: `item_apple_name`, `item_sword_description`)
+- **Diálogos**: `dialog_[npc]_[contexto]_[numero]` (ex: `dialog_fairy_greeting_01`)
+- **Tutoriais**: `tutorial_[sistema]_[passo]` (ex: `tutorial_movement_basic`)
+- **Mensagens**: `message_[tipo]_[contexto]` (ex: `message_error_save`, `message_success_evolution`)
+
+**Idiomas Suportados**
+
+
+| Código | Idioma | Região |
+| :-- | :-- | :-- |
+| EN | English | Global |
+| PT_BR | Português | Brasil |
+| ES | Español | América Latina |
+| FR | Français | França |
+| DE | Deutsch | Alemanha |
+| JA | 日本語 | Japão |
+| ZH_CN | 中文 | China |
+
+#### 15.2 Detecção Automática de Idioma
+
+O sistema implementa detecção automática inteligente do idioma preferido do usuário com fallbacks apropriados.
+
+**Hierarquia de Detecção de Idioma**
+
+1. **Configuração do Usuário**: Verificar `config.json` para preferência explícita
+2. **Idioma do Sistema**: Detectar idioma configurado no dispositivo
+3. **Fallback Regional**: Se idioma específico não disponível, usar variante regional
+4. **Fallback Global**: Se nenhuma opção anterior funcionar, usar Inglês (EN)
+
+**Implementação Técnica**
+
+```csharp
+public class LocalizationManager : MonoBehaviour
+{
+    [Header("Configuração")]
+    public string defaultLanguage = "EN";
+    public string csvFileName = "localization.csv";
+    
+    private Dictionary<string, Dictionary<string, string>> localizationData;
+    private string currentLanguage;
+    private GameConfig gameConfig;
+    
+    void Start()
+    {
+        LoadCSVData();
+        SetLanguage(DetermineLanguage());
+    }
+    
+    private string DetermineLanguage()
+    {
+        // 1. Verificar configuração do usuário
+        if (gameConfig != null && !string.IsNullOrEmpty(gameConfig.preferredLanguage))
+        {
+            if (IsLanguageSupported(gameConfig.preferredLanguage))
+                return gameConfig.preferredLanguage;
+        }
+        
+        // 2. Detectar idioma do sistema
+        string systemLanguage = GetSystemLanguage();
+        if (IsLanguageSupported(systemLanguage))
+            return systemLanguage;
+        
+        // 3. Tentar fallback regional
+        string regionalFallback = GetRegionalFallback(systemLanguage);
+        if (IsLanguageSupported(regionalFallback))
+            return regionalFallback;
+        
+        // 4. Usar fallback global (Inglês)
+        return defaultLanguage;
+    }
+    
+    private string GetSystemLanguage()
+    {
+        switch (Application.systemLanguage)
+        {
+            case SystemLanguage.Portuguese: return "PT_BR";
+            case SystemLanguage.Spanish: return "ES";
+            case SystemLanguage.French: return "FR";
+            case SystemLanguage.German: return "DE";
+            case SystemLanguage.Japanese: return "JA";
+            case SystemLanguage.ChineseSimplified: return "ZH_CN";
+            default: return "EN";
+        }
+    }
+    
+    private string GetRegionalFallback(string language)
+    {
+        // Exemplos de fallbacks regionais
+        if (language.StartsWith("PT")) return "PT_BR";
+        if (language.StartsWith("ES")) return "ES";
+        if (language.StartsWith("ZH")) return "ZH_CN";
+        return language;
+    }
+}
+```
+
+
+#### 15.3 Sistema de Configuração
+
+O sistema utiliza um arquivo `config.json` para armazenar configurações do jogo, incluindo preferências de idioma do usuário.
+
+**Estrutura do config.json**
+
+```json
+{
+    "gameSettings": {
+        "version": "1.0.0",
+        "preferredLanguage": "",
+        "audioSettings": {
+            "masterVolume": 1.0,
+            "musicVolume": 0.8,
+            "sfxVolume": 0.9,
+            "uiVolume": 0.7
+        },
+        "videoSettings": {
+            "fullscreen": true,
+            "resolution": "1920x1080",
+            "vsync": true,
+            "targetFramerate": 60
+        },
+        "accessibilitySettings": {
+            "uiScale": 1.0,
+            "highContrast": false,
+            "reduceMotion": false,
+            "subtitlesEnabled": true
+        },
+        "inputSettings": {
+            "autoDetectInputType": true,
+            "keyboardMouseEnabled": true,
+            "gamepadEnabled": true
+        }
+    }
+}
+```
+
+
 ---
 
-## **Observações de Implementação**
+## **Observações de Implementação Atualizadas**
 
 ### **Convenções de Nomenclatura**
 
 A consistência na nomenclatura é fundamental para manutenibilidade do código e colaboração efetiva da equipe:
 
 - GameObjects: camelCase (ex: `slimeBaby`)
-- Scripts: PascalCase (ex: `PlayerMovement`)
-- Variáveis públicas: camelCase (ex: `moveSpeed`)
-- Variáveis privadas: camelCase com _ (ex: `_currentHP`)
-- Constantes: UPPER_CASE (ex: `MAX_FOLLOWERS`)
+- Scripts: PascalCase (ex: `PlayerMovement`, `LocalizationManager`)
+- Variáveis públicas: camelCase (ex: `moveSpeed`, `localizationKey`)
+- Variáveis privadas: camelCase com _ (ex: `_currentHP`, `_localizationData`)
+- Constantes: UPPER_CASE (ex: `MAX_FOLLOWERS`, `DEFAULT_LANGUAGE`)
+- Chaves de Localização: snake_case (ex: `ui_start_game`, `dialog_fairy_greeting_01`)
 
 
 ### **Configurações Específicas para PC**
@@ -1307,6 +1486,7 @@ O sistema PC deve ser flexível e responsivo a diferentes métodos de entrada:
 - O sistema deve detectar automaticamente se o jogador está usando teclado ou gamepad
 - Prompts de UI devem alternar dinamicamente entre ícones de teclado e gamepad
 - Suporte simultâneo para jogadores que alternam entre dispositivos
+- Textos de UI adaptam-se automaticamente ao idioma selecionado
 
 
 #### **Configuração Unity Input System**
@@ -1330,71 +1510,4 @@ void Start()
 
 - **Scroll Mouse**: Funciona como alternativa ao D-pad para mudança de itens
 - **Tab**: Alternativa de teclado para navegação em inventário
-- **ESC**: Equivalente ao botão Menu para abrir pausas rápidas
-- **Right Click**: Funcionalidade adicional para examinar itens (opcional)
-
-
-#### **Remapeamento e Personalização**
-
-- Suporte nativo ao remapeamento através do Unity Input System
-- Salvamento de configurações personalizadas por perfil de jogador
-- Reset para configurações padrão disponível nas opções
-- Validação para evitar conflitos de mapeamento
-
-
-#### **Feedback Visual Contextual**
-
-- Ícones de botões adaptativos na UI conforme dispositivo detectado
-- Tooltips e prompts mostram o controle correto (teclado vs gamepad)
-- Animações de UI responsivas ao tipo de input utilizado
-
-
-### **Arquitetura de Eventos**
-
-```csharp
-// Sistema de eventos desacoplado
-public static class GameEvents 
-{
-    public static UnityEvent<int> OnEnergyAbsorbed;
-    public static UnityEvent<int> OnGrowthStageChanged;
-    public static UnityEvent<FollowerData> OnFollowerAdded;
-    public static UnityEvent<Vector3> OnMiniSlimeCreated;
-}
-```
-
-
-### **Performance Guidelines**
-
-- **Object Pooling**: Para fragmentos, VFX e mini-slimes
-- **LOD System**: Animações simplificadas para seguidores distantes
-- **Batching**: Sprites com mesmo material em atlas
-- **Culling**: Desabilitar componentes fora da tela
-- **Update Optimization**: Use FixedUpdate apenas para física
-
-
-### **Plataforma-Specific**
-
-- **PC**: Suporte completo a 120 FPS
-- **Console**: 60 FPS estável com VSync
-- **Mobile**: 30 FPS com UI adaptada para touch
-- **Web**: Configurações reduzidas para compatibilidade
-
-
-### **Controles e Acessibilidade**
-
-- **Remapeamento**: Suporte nativo ao remapeamento de botões nas configurações do console
-- **Configurações Padrão**: Layouts otimizados por plataforma conforme mapeamento oficial
-- **Feedback Contextual**: Prompts visuais adaptam-se automaticamente ao controle conectado
-- **Detecção Automática**: Sistema detecta automaticamente tipo de controle e ajusta UI
-
-
-### **Debug Tools**
-
-Ferramentas de desenvolvimento para facilitar testing e debugging:
-
-- **Growth Cheat**: Tecla G para crescimento instantâneo
-- **Energy Cheat**: Ability inputs para adicionar energia elemental
-- **Follower Spawn**: Tecla F para spawn de seguidor teste
-- **Info Panel**: Tecla I para mostrar dados de debug
-
----
+- **ESC**: Equivalente ao botão Menu para abrir pausa
