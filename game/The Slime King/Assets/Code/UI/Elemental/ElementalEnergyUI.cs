@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using DG.Tweening;
+using System.Collections;  // Para usar coroutines em vez de DOTween
 
 namespace TheSlimeKing.Core.Elemental.UI
 {
@@ -157,24 +157,67 @@ namespace TheSlimeKing.Core.Elemental.UI
             UpdateBar(ElementalType.Water, animate, false);
             UpdateBar(ElementalType.Fire, animate, false);
             UpdateBar(ElementalType.Air, animate, false);
-        }
-
-        /// <summary>
-        /// Aplica efeito de pulse na barra especificada
-        /// </summary>
+        }        /// <summary>
+                 /// Aplica efeito de pulse na barra especificada
+                 /// </summary>
         private void PulseBar(GameObject barObject, float duration, float scale)
         {
             if (barObject == null)
                 return;
 
-            // Sequência de animação: escala aumenta e depois retorna
-            barObject.transform.DOScale(scale, duration / 2f)
-                .SetEase(Ease.OutQuad)
-                .OnComplete(() =>
-                {
-                    barObject.transform.DOScale(1f, duration / 2f)
-                        .SetEase(Ease.InQuad);
-                });
+            // Inicia coroutine para animar o pulse
+            StartCoroutine(PulseBarCoroutine(barObject.transform, duration, scale));
+        }
+
+        /// <summary>
+        /// Coroutine para animar o efeito de pulse
+        /// </summary>
+        private IEnumerator PulseBarCoroutine(Transform targetTransform, float duration, float targetScale)
+        {
+            Vector3 startScale = Vector3.one;
+            Vector3 endScale = new Vector3(targetScale, targetScale, 1f);
+            float halfDuration = duration * 0.5f;
+
+            // Primeira parte: aumenta a escala
+            float elapsedTime = 0f;
+            while (elapsedTime < halfDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / halfDuration);
+                t = EaseOutQuad(t); // Aplicando easing
+                targetTransform.localScale = Vector3.Lerp(startScale, endScale, t);
+                yield return null;
+            }
+
+            // Segunda parte: diminui a escala de volta ao normal
+            elapsedTime = 0f;
+            while (elapsedTime < halfDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / halfDuration);
+                t = EaseInQuad(t); // Aplicando easing
+                targetTransform.localScale = Vector3.Lerp(endScale, startScale, t);
+                yield return null;
+            }
+
+            // Garante que a escala final seja exatamente 1
+            targetTransform.localScale = Vector3.one;
+        }
+
+        /// <summary>
+        /// Função de easing quadrática (ease out)
+        /// </summary>
+        private float EaseOutQuad(float t)
+        {
+            return 1 - (1 - t) * (1 - t);
+        }
+
+        /// <summary>
+        /// Função de easing quadrática (ease in)
+        /// </summary>
+        private float EaseInQuad(float t)
+        {
+            return t * t;
         }
 
         /// <summary>
@@ -226,20 +269,38 @@ namespace TheSlimeKing.Core.Elemental.UI
             // Atualiza texto se necessário
             if (_valueText != null && _showValueAsText)
                 _valueText.text = value.ToString();
-        }
-
-        /// <summary>
-        /// Anima a barra até o valor especificado
-        /// </summary>
+        }        /// <summary>
+                 /// Anima a barra até o valor especificado
+                 /// </summary>
         public void AnimateToValue(int value, float fillAmount, float duration)
         {
             // Anima a barra de preenchimento
             if (_fillImage != null)
-                _fillImage.DOFillAmount(fillAmount, duration);
+                StartCoroutine(AnimateFillAmount(_fillImage, fillAmount, duration));
 
             // Atualiza texto se necessário
             if (_valueText != null && _showValueAsText)
                 _valueText.text = value.ToString();
+        }
+
+        /// <summary>
+        /// Coroutine para animar o fillAmount da Image
+        /// </summary>
+        private IEnumerator AnimateFillAmount(Image image, float targetFillAmount, float duration)
+        {
+            float startFillAmount = image.fillAmount;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / duration);
+                image.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, t);
+                yield return null;
+            }
+
+            // Garante que o valor final seja exatamente o alvo
+            image.fillAmount = targetFillAmount;
         }
 
         /// <summary>
