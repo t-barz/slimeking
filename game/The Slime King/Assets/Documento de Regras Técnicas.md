@@ -962,7 +962,7 @@ Durante a instanciação, o sistema deve receber dois parâmetros de cor (colorA
 
 ### 7. **Sistema de Crescimento**
 
-Implementar após absorção elemental estar funcional.
+O sistema de crescimento implementado gerencia a evolução do protagonista ao longo do jogo conforme acumula energia elemental.
 
 #### 7.1 Estágios de Evolução
 
@@ -973,15 +973,138 @@ Implementar após absorção elemental estar funcional.
 | Adult Slime | 600 | 3 | 3 | 2 |
 | Elder/King | 1200 | 4 | 4 | 3 |
 
-#### 7.2 Eventos de Crescimento
+#### 7.2 Arquitetura do Sistema
 
-Os eventos de crescimento devem seguir as especificações:
+O sistema é composto por três componentes principais:
+
+1. **PlayerGrowth**: Singleton que gerencia a lógica central de crescimento
+2. **SlimeGrowthStage**: ScriptableObject para configurar cada estágio
+3. **SlimeGrowthVisuals**: Gerencia mudanças visuais durante o crescimento
+
+**Estrutura de Classes:**
+
+```csharp
+// Classe principal que gerencia o crescimento do Slime
+public class PlayerGrowth : MonoBehaviour
+{
+    // Eventos disparados durante o processo de crescimento
+    public GrowthEvent OnGrowthStageChanged;
+    public UnityEvent OnGrowthStarted;
+    public UnityEvent OnGrowthCompleted;
+    
+    // Avalia e inicia a transição de estágio se necessário
+    public void EvaluateGrowthStage(int stage = -1);
+    
+    // Obtém o estágio atual do Slime
+    public SlimeStage GetCurrentStage();
+    
+    // Retorna a configuração do estágio atual
+    public SlimeGrowthStage GetCurrentStageConfig();
+}
+
+// ScriptableObject que define propriedades de cada estágio
+[CreateAssetMenu(fileName = "NewSlimeStage", menuName = "The Slime King/Slime Growth Stage")]
+public class SlimeGrowthStage : ScriptableObject
+{
+    // Propriedades disponíveis para cada estágio
+    public SlimeStage StageType { get; }
+    public string StageName { get; }
+    public int RequiredElementalEnergy { get; }
+    public int InventorySlots { get; }
+    public float SizeMultiplier { get; }
+    public float SpeedMultiplier { get; }
+    public bool CanSqueeze { get; }
+    public bool CanBounce { get; }
+    public bool CanClimb { get; }
+}
+```
+
+#### 7.3 Eventos de Crescimento
+
+Os eventos de crescimento seguem as especificações:
 
 - **Trigger**: Energia elemental acumulada ≥ threshold
 - **Efeito Visual**: Partículas especiais + screen flash suave
 - **Efeito Sonoro**: Som harmônico ascendente
 - **Duração**: 2 segundos de animação
 - **Durante Crescimento**: Input desabilitado, invulnerabilidade temporária
+
+**Fluxo de Crescimento:**
+
+1. O sistema elemental detecta quando um threshold é atingido
+2. ElementalEvents.OnElementalThresholdReached é disparado com o estágio atual
+3. PlayerGrowth recebe o evento e inicia a transição visual
+4. Durante a transição, controles são temporariamente desabilitados
+5. Efeitos visuais e sonoros são reproduzidos
+6. Ao concluir, as novas habilidades são desbloqueadas
+
+**Código de Transição:**
+
+```csharp
+// Dentro da coroutine de transição de crescimento
+private IEnumerator GrowthTransitionCoroutine(SlimeStage targetStage)
+{
+    // Notificar início e desabilitar input
+    OnGrowthStarted?.Invoke();
+    playerControls.enabled = false;
+    
+    // Efeitos visuais e sonoros
+    PlayGrowthVFX(targetConfig);
+    PlayGrowthSFX(targetConfig);
+    
+    // Animação gradual de crescimento
+    float elapsedTime = 0f;
+    while (elapsedTime < _growthTransitionDuration)
+    {
+        float t = _growthCurve.Evaluate(elapsedTime / _growthTransitionDuration);
+        _slimeTransform.localScale = Vector3.Lerp(startSize, targetSize, t);
+        elapsedTime += Time.deltaTime;
+        yield return null;
+    }
+    
+    // Atualiza estágio e aplica novas propriedades
+    _currentStage = targetStage;
+    ApplyStageProperties(targetConfig);
+    
+    // Notifica conclusão e reativa controle
+    OnGrowthCompleted?.Invoke();
+    OnGrowthStageChanged?.Invoke(_currentStage);
+    playerControls.enabled = true;
+}
+```
+
+#### 7.4 Integração com Outros Sistemas
+
+O sistema de crescimento integra-se com diversos outros sistemas:
+
+1. **Sistema Elemental**: Recebe eventos de threshold de energia para acionar crescimento
+2. **Sistema de Inventário**: Expande slots disponíveis conforme o estágio
+3. **Sistema de Seguidores**: Desbloqueia novos seguidores em estágios avançados
+4. **Sistema de Colisão**: Ajusta tamanho dos colliders conforme o slime cresce
+5. **Sistema de Status**: Atualiza atributos base (saúde, ataque, defesa)
+
+**Exemplo de Integração com Inventário:**
+
+```csharp
+// Dentro de PlayerGrowth.ApplyStageProperties
+private void ApplyStageProperties(SlimeGrowthStage stageConfig)
+{
+    // Atualiza slots de inventário disponíveis
+    InventoryManager inventoryManager = InventoryManager.Instance;
+    if (inventoryManager != null)
+    {
+        inventoryManager.SetAvailableSlots(stageConfig.InventorySlots);
+    }
+}
+```
+
+#### 7.5 Ferramentas de Desenvolvimento
+
+Para auxiliar os designers e desenvolvedores, foram criadas ferramentas de editor:
+
+1. **PlayerGrowthEditor**: Inspector customizado para configuração do sistema
+2. **SlimeGrowthStageEditor**: Editor para criação e edição de estágios
+3. **Modo Debug**: Permite forçar crescimento para testes durante o jogo
 
 
 ### 8. **Sistema de Inventário**

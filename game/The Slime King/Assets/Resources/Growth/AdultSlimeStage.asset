@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: SCRIPTGUIDHERE, type: 3}
+  m_Name: AdultSlimeStage
+  m_EditorClassIdentifier: 
+  stageType: 2
+  stageName: Adult Slime
+  description: "O terceiro est\xE1gio do slime. Robusto e capaz de escalar superf\xEDcies.
+    Pode ter at\xE9 3 seguidores."
+  requiredElementalEnergy: 600
+  baseHealth: 200
+  baseAttack: 20
+  baseSpecial: 15
+  baseDefense: 15
+  sizeMultiplier: 1.5
+  speedMultiplier: 0.9
+  inventorySlots: 3
+  canSqueeze: 0
+  canBounce: 1
+  canClimb: 1
+  canUsePowerfulAbilities: 0
+  slimeSprite: {fileID: 0}
+  animatorController: {fileID: 0}
+  growthEffect: {fileID: 0}
+  growthSound: {fileID: 0}
