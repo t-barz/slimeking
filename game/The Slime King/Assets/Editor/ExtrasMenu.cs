@@ -12,10 +12,100 @@ using System.Linq;
 public static class ExtrasMenu
 {
     /// <summary>
+    /// Adiciona um item de menu "Extras > The Slime King > Verificar CSV Localização" para validar o arquivo de localização.
+    /// </summary>
+    [MenuItem("Extras/The Slime King/Localização/Verificar CSV Localização")]
+    public static void ValidateLocalizationCSV()
+    {
+        string csvPath = "Assets/StreamingAssets/Localization/localization.csv";
+        if (!File.Exists(csvPath))
+        {
+            EditorUtility.DisplayDialog("Erro", "Arquivo de localização não encontrado:\n" + csvPath, "OK");
+            return;
+        }
+
+        try
+        {
+            string[] lines = File.ReadAllLines(csvPath);
+            if (lines.Length == 0)
+            {
+                EditorUtility.DisplayDialog("Erro", "Arquivo de localização está vazio!", "OK");
+                return;
+            }
+
+            // Verifica o cabeçalho
+            string[] headers = lines[0].Split(',');
+            if (headers.Length < 2 || headers[0] != "Key")
+            {
+                EditorUtility.DisplayDialog("Erro", "Cabeçalho do arquivo de localização inválido!", "OK");
+                return;
+            }
+
+            // Conta entradas por prefixo
+            Dictionary<string, int> prefixCount = new Dictionary<string, int>();
+            int totalEntries = 0;
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (string.IsNullOrEmpty(lines[i].Trim())) continue;
+
+                string[] values = lines[i].Split(',');
+                if (values.Length > 0)
+                {
+                    string key = values[0];
+                    string prefix = GetKeyPrefix(key);
+
+                    if (!prefixCount.ContainsKey(prefix))
+                    {
+                        prefixCount[prefix] = 0;
+                    }
+
+                    prefixCount[prefix]++;
+                    totalEntries++;
+                }
+            }
+
+            // Constrói mensagem de estatísticas
+            System.Text.StringBuilder stats = new System.Text.StringBuilder();
+            stats.AppendLine("Arquivo de localização validado com sucesso!");
+            stats.AppendLine($"Total de entradas: {totalEntries}");
+            stats.AppendLine($"Idiomas suportados: {headers.Length - 1}");
+            stats.AppendLine("\nEntradas por prefixo:");
+
+            foreach (var entry in prefixCount.OrderByDescending(e => e.Value))
+            {
+                stats.AppendLine($"- {entry.Key}: {entry.Value}");
+            }
+
+            EditorUtility.DisplayDialog("Validação Concluída", stats.ToString(), "OK");
+        }
+        catch (System.Exception ex)
+        {
+            EditorUtility.DisplayDialog("Erro", "Erro ao validar arquivo de localização:\n" + ex.Message, "OK");
+        }
+    }
+
+    /// <summary>
+    /// Extrai o prefixo da chave de localização (ui_, dialog_, desc_, msg_, etc.)
+    /// </summary>
+    private static string GetKeyPrefix(string key)
+    {
+        if (string.IsNullOrEmpty(key)) return "sem_prefixo";
+
+        int underscorePos = key.IndexOf('_');
+        if (underscorePos > 0)
+        {
+            return key.Substring(0, underscorePos + 1);
+        }
+
+        return "sem_prefixo";
+    }
+
+    /// <summary>
     /// Adiciona um item de menu "Extras > Criar Estrutura de Pastas" ao Editor.
     /// Este código só será executado no ambiente de desenvolvimento da Unity.
     /// </summary>
-    [MenuItem("Extras/Criar Estrutura de Pastas")]
+    [MenuItem("Extras/The Slime King/Criar Estrutura de Pastas")]
     public static void GenerateFolders()
     {
         List<string> folders = new List<string>

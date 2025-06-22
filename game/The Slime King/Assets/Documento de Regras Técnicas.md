@@ -1,5 +1,5 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.0
+## Versão 1.2
 
 ---
 
@@ -18,15 +18,15 @@
 
 #### **1. Sistema de Localização de Textos**
 
-- [1.1 Estrutura de Arquivos CSV](#11-estrutura-de-arquivos-csv)
-- [1.2 Detecção Automática de Idioma](#12-detec%C3%A7%C3%A3o-autom%C3%A1tica-de-idioma)
-- [1.3 Sistema de Configuração](#13-sistema-de-configura%C3%A7%C3%A3o)
+- [x] [1.1 Estrutura de Arquivos CSV](#11-estrutura-de-arquivos-csv)
+- [x] [1.2 Detecção Automática de Idioma](#12-detec%C3%A7%C3%A3o-autom%C3%A1tica-de-idioma)
+- [x] [1.3 Sistema de Configuração](#13-sistema-de-configura%C3%A7%C3%A3o)
 
 
 #### **2. Sistema de Ícone Superior**
 
-- [2.1 Detecção de Plataforma](#21-detec%C3%A7%C3%A3o-de-plataforma)
-- [2.2 Sistema de Exibição Dinâmica](#22-sistema-de-exibi%C3%A7%C3%A3o-din%C3%A2mica)
+- [ ] [2.1 Detecção de Plataforma](#21-detec%C3%A7%C3%A3o-de-plataforma)
+- [ ] [2.2 Sistema de Exibição Dinâmica](#22-sistema-de-exibi%C3%A7%C3%A3o-din%C3%A2mica)
 
 ---
 
@@ -36,21 +36,21 @@
 
 #### **3. Sistema de Personagem**
 
-- [3.1 Estrutura de GameObjects](#31-estrutura-de-gameobjects)
-- [3.2 Regras de Visibilidade](#32-regras-de-visibilidade)
-- [3.3 Componentes Obrigatórios](#33-componentes-obrigat%C3%B3rios)
+- [x] [3.1 Estrutura de GameObjects](#31-estrutura-de-gameobjects)
+- [x] [3.2 Regras de Visibilidade](#32-regras-de-visibilidade)
+- [x] [3.3 Componentes Obrigatórios](#33-componentes-obrigat%C3%B3rios)
 
 
 #### **4. Sistema de Movimento**
 
-- [4.1 Input Actions](#41-input-actions)
-- [4.2 Configurações de Física](#42-configura%C3%A7%C3%B5es-de-f%C3%ADsica)
+- [x] [4.1 Input Actions](#41-input-actions)
+- [x] [4.2 Configurações de Física](#42-configura%C3%A7%C3%B5es-de-f%C3%ADsica)
 
 
 #### **5. Sistema de Animação**
 
-- [5.1 Parâmetros do Animator](#51-par%C3%A2metros-do-animator)
-- [5.2 Regras dos Parâmetros](#52-regras-dos-par%C3%A2metros)
+- [x] [5.1 Parâmetros do Animator](#51-par%C3%A2metros-do-animator)
+- [x] [5.2 Regras dos Parâmetros](#52-regras-dos-par%C3%A2metros)
 
 ---
 
@@ -60,20 +60,20 @@
 
 #### **6. Sistema de Absorção Elemental**
 
-- [6.1 Tipos de Energia](#61-tipos-de-energia)
-- [6.2 Fragmentos Elementais (Prefabs)](#62-fragmentos-elementais-prefabs)
+- [ ] [6.1 Tipos de Energia](#61-tipos-de-energia)
+- [ ] [6.2 Fragmentos Elementais (Prefabs)](#62-fragmentos-elementais-prefabs)
 
 
 #### **7. Sistema de Crescimento**
 
-- [7.1 Estágios de Evolução](#71-est%C3%A1gios-de-evolu%C3%A7%C3%A3o)
-- [7.2 Eventos de Crescimento](#72-eventos-de-crescimento)
+- [ ] [7.1 Estágios de Evolução](#71-est%C3%A1gios-de-evolu%C3%A7%C3%A3o)
+- [ ] [7.2 Eventos de Crescimento](#72-eventos-de-crescimento)
 
 
 #### **8. Sistema de Inventário**
 
-- [8.1 Estrutura de Slots](#81-estrutura-de-slots)
-- [8.2 Sistema de Uso](#82-sistema-de-uso)
+- [ ] [8.1 Estrutura de Slots](#81-estrutura-de-slots)
+- [ ] [8.2 Sistema de Uso](#82-sistema-de-uso)
 
 ---
 
@@ -83,16 +83,16 @@
 
 #### **9. Sistema de Combate**
 
-- [9.1 Tipos de Ataque](#91-tipos-de-ataque)
-- [9.2 Sistema de Dano](#92-sistema-de-dano)
+- [ ] [9.1 Tipos de Ataque](#91-tipos-de-ataque)
+- [ ] [9.2 Sistema de Dano](#92-sistema-de-dano)
 
 
 #### **10. Sistema de Objetos Interativos**
 
-- [10.1 Estrutura e Configuração](#101-estrutura-e-configura%C3%A7%C3%A3o)
-- [10.2 Sistema de Feedback Visual](#102-sistema-de-feedback-visual)
-- [10.3 Objetos Destrutíveis](#103-objetos-destrut%C3%ADveis)
-- [10.4 Objetos Móveis](#104-objetos-m%C3%B3veis)
+- [ ] [10.1 Estrutura e Configuração](#101-estrutura-e-configura%C3%A7%C3%A3o)
+- [ ] [10.2 Sistema de Feedback Visual](#102-sistema-de-feedback-visual)
+- [ ] [10.3 Objetos Destrutíveis](#103-objetos-destrut%C3%ADveis)
+- [ ] [10.4 Objetos Móveis](#104-objetos-m%C3%B3veis)
 
 ---
 
@@ -102,22 +102,22 @@
 
 #### **11. Sistema de Diálogos**
 
-- [11.1 Interface de Diálogo](#111-interface-de-di%C3%A1logo)
-- [11.2 Sistema de Carregamento de Texto](#112-sistema-de-carregamento-de-texto)
-- [11.3 Animações e Transições](#113-anima%C3%A7%C3%B5es-e-transi%C3%A7%C3%B5es)
+- [ ] [11.1 Interface de Diálogo](#111-interface-de-di%C3%A1logo)
+- [ ] [11.2 Sistema de Carregamento de Texto](#112-sistema-de-carregamento-de-texto)
+- [ ] [11.3 Animações e Transições](#113-anima%C3%A7%C3%B5es-e-transi%C3%A7%C3%B5es)
 
 
 #### **12. Sistema de Portal**
 
-- [12.1 Tipos de Portal e Configuração](#121-tipos-de-portal-e-configura%C3%A7%C3%A3o)
-- [12.2 Sistema de Ativação](#122-sistema-de-ativa%C3%A7%C3%A3o)
-- [12.3 Teleporte Intra-Cena e Inter-Cena](#123-teleporte-intra-cena-e-inter-cena)
+- [ ] [12.1 Tipos de Portal e Configuração](#121-tipos-de-portal-e-configura%C3%A7%C3%A3o)
+- [ ] [12.2 Sistema de Ativação](#122-sistema-de-ativa%C3%A7%C3%A3o)
+- [ ] [12.3 Teleporte Intra-Cena e Inter-Cena](#123-teleporte-intra-cena-e-inter-cena)
 
 
 #### **13. Sistema de Movimento Especial**
 
-- [13.1 Encolher e Esgueirar](#131-encolher-e-esgueirar)
-- [13.2 Sistema de Pular](#132-sistema-de-pular)
+- [ ] [13.1 Encolher e Esgueirar](#131-encolher-e-esgueirar)
+- [ ] [13.2 Sistema de Pular](#132-sistema-de-pular)
 
 ---
 
@@ -127,21 +127,21 @@
 
 #### **14. Sistema de Stealth**
 
-- [14.1 Estados de Visibilidade](#141-estados-de-visibilidade)
-- [14.2 Objetos de Cobertura](#142-objetos-de-cobertura)
+- [ ] [14.1 Estados de Visibilidade](#141-estados-de-visibilidade)
+- [ ] [14.2 Objetos de Cobertura](#142-objetos-de-cobertura)
 
 
 #### **15. Sistema de UI**
 
-- [15.1 HUD Elements](#151-hud-elements)
-- [15.2 Configurações de Canvas](#152-configura%C3%A7%C3%B5es-de-canvas)
+- [ ] [15.1 HUD Elements](#151-hud-elements)
+- [ ] [15.2 Configurações de Canvas](#152-configura%C3%A7%C3%B5es-de-canvas)
 
 
 #### **16. Sistema de Seguidores e Mini-Slimes**
 
-- [16.1 Gestão de Seguidores](#161-gest%C3%A3o-de-seguidores)
-- [16.2 IA de Companheiros](#162-ia-de-companheiros)
-- [16.3 Sistema de Mini-Slimes](#163-sistema-de-mini-slimes)
+- [ ] [16.1 Gestão de Seguidores](#161-gest%C3%A3o-de-seguidores)
+- [ ] [16.2 IA de Companheiros](#162-ia-de-companheiros)
+- [ ] [16.3 Sistema de Mini-Slimes](#163-sistema-de-mini-slimes)
 
 ---
 
@@ -151,15 +151,15 @@
 
 #### **17. Sistema de Áudio**
 
-- [17.1 Triggers Sonoros](#171-triggers-sonoros)
-- [17.2 Mixagem Dinâmica](#172-mixagem-din%C3%A2mica)
+- [ ] [17.1 Triggers Sonoros](#171-triggers-sonoros)
+- [ ] [17.2 Mixagem Dinâmica](#172-mixagem-din%C3%A2mica)
 
 
 #### **18. Sistema de Efeitos Visuais**
 
-- [18.1 Partículas](#181-part%C3%ADculas)
-- [18.2 Pós-Processamento](#182-p%C3%B3s-processamento)
-- [18.3 Shaders Customizados](#183-shaders-customizados)
+- [ ] [18.1 Partículas](#181-part%C3%ADculas)
+- [ ] [18.2 Pós-Processamento](#182-p%C3%B3s-processamento)
+- [ ] [18.3 Shaders Customizados](#183-shaders-customizados)
 
 ---
 
@@ -169,9 +169,9 @@
 
 #### **19. Sistema de Persistência**
 
-- [19.1 Save Data Structure](#191-save-data-structure)
-- [19.2 Auto-Save Triggers](#192-auto-save-triggers)
-- [19.3 Loading States](#193-loading-states)
+- [ ] [19.1 Save Data Structure](#191-save-data-structure)
+- [ ] [19.2 Auto-Save Triggers](#192-auto-save-triggers)
+- [ ] [19.3 Loading States](#193-loading-states)
 
 ---
 
@@ -905,5 +905,118 @@ O sistema deve salvar automaticamente em:
 - **Fases 3-4**: Implementar object pooling para fragmentos e efeitos
 - **Fases 5-6**: Otimizar detecção de proximidade e culling de objetos distantes
 - **Fases 7-8**: Implementar LOD system e batching para performance final
+
+
+---
+
+## **IMPLEMENTAÇÕES DETALHADAS**
+
+Esta seção contém detalhes técnicos sobre as implementações realizadas, servindo como documentação para desenvolvedores.
+
+### **1. Sistema de Localização de Textos**
+
+O Sistema de Localização foi implementado conforme as especificações, com foco em flexibilidade, extensibilidade e facilidade de uso.
+
+#### 1.1 Estrutura e Funcionalidades Implementadas
+
+**Classes Principais:**
+- **LocalizationManager**: Singleton que gerencia toda a lógica de localização
+- **LocalizedText**: Componente para TextMeshProUGUI que atualiza textos automaticamente
+- **LanguageMenu**: Facilita a criação de seletores de idioma na UI
+
+**Diretórios e Arquivos:**
+- `/Assets/Code/Core/Localization/`: Classes principais do sistema
+- `/Assets/StreamingAssets/Localization/`: Arquivos CSV de tradução
+- `/config.json`: Armazenado no PersistentDataPath para preferências do usuário
+
+**Linguagens Suportadas:**
+- EN (Inglês)
+- PT_BR (Português Brasil)
+- ES (Espanhol)
+- FR (Francês)
+- DE (Alemão)
+- JA (Japonês)
+- ZH_CN (Chinês Simplificado)
+
+#### 1.2 API e Utilização
+
+**Obtenção de Textos em Scripts:**
+```csharp
+// Pegar texto localizado pela chave
+string texto = LocalizationManager.Instance.GetLocalizedText("ui_start_game");
+
+// Alterar idioma programaticamente
+LocalizationManager.Instance.SetLanguage("PT_BR");
+
+// Obter idioma atual
+string idiomaAtual = LocalizationManager.Instance.GetCurrentLanguage();
+
+// Listar idiomas suportados
+string[] idiomas = LocalizationManager.Instance.GetSupportedLanguages();
+```
+
+**Aplicação em Elementos de UI:**
+1. Adicione o componente `LocalizedText` a qualquer TextMeshProUGUI
+2. Defina a chave de localização no campo _localizationKey
+3. O texto será automaticamente traduzido no Start()
+
+**Criando Menu de Idiomas:**
+1. Crie um TMP_Dropdown na UI
+2. Adicione o componente `LanguageMenu` ao GameObject
+3. Arraste o dropdown para o campo _languageDropdown
+4. Conecte o evento OnValueChanged do dropdown ao método OnLanguageChanged do script
+
+#### 1.3 Hierarquia de Detecção de Idioma
+
+O sistema implementa a hierarquia conforme especificado:
+
+1. **Configuração do Usuário**: Verifica se há uma preferência salva em config.json
+2. **Idioma do Sistema**: Detecta automaticamente usando CultureInfo.CurrentCulture
+3. **Fallback Regional**: Se o idioma exato não está disponível, tenta uma variante da mesma região
+4. **Fallback Global**: Se nenhum outro método funcionar, usa Inglês (EN) como padrão
+
+#### 1.4 Convenções de Nomenclatura
+
+O arquivo CSV implementa todas as convenções de nomenclatura conforme especificado:
+
+- **Interface**: `ui_[categoria]_[elemento]` (ex: `ui_menu_start`) 
+- **Diálogos**: `dialog_[npc]_[contexto]_[numero]` (ex: `dialog_fairy_greeting_01`)
+- **Descrições**: `desc_[objeto]_[tipo]` (ex: `desc_item_apple`)
+- **Mensagens**: `msg_[categoria]_[tipo]` (ex: `msg_system_save_complete`)
+
+#### 1.5 Benefícios da Implementação
+
+- **Escalabilidade**: Fácil adição de novos idiomas sem modificar código
+- **Performance**: Carregamento assíncrono de arquivos para não bloquear a thread principal
+- **Manutenibilidade**: Separação clara entre dados (CSV) e lógica (código)
+- **Usabilidade**: API simples e componentes que facilitam a aplicação em UI
+
+#### 1.6 Ferramentas de Edição
+
+O sistema de localização inclui ferramentas de edição integradas ao Unity Editor para facilitar o trabalho dos desenvolvedores:
+
+**Editor de Localização:**
+- Acesso via menu `Extras > The Slime King > Localização > Editor CSV`
+- Interface visual para gerenciar as entradas do arquivo CSV
+- Visualização, adição, edição e exclusão de entradas
+- Busca e filtragem por prefixo (ui_, dialog_, msg_, desc_)
+- Agrupamento visual por categorias
+
+**Adição Rápida de Entradas:**
+- Acesso via menu `Extras > The Slime King > Localização > Adicionar Nova Entrada`
+- Interface simplificada para adicionar novas chaves de localização
+- Seleção rápida de prefixos padronizados
+
+**Validação do CSV:**
+- Acesso via menu `Extras > The Slime King > Localização > Verificar CSV Localização`
+- Verifica integridade do arquivo CSV
+- Apresenta estatísticas sobre entradas por categoria
+- Identifica problemas no formato ou conteúdo
+
+**Fluxo de Trabalho Recomendado:**
+1. Usar o Editor de Localização para criar novas entradas
+2. Adicionar as traduções para o idioma principal (geralmente EN)
+3. Compartilhar o CSV com tradutores para preenchimento dos outros idiomas
+4. Verificar o arquivo com a ferramenta de validação antes de compilar
 
 ---
