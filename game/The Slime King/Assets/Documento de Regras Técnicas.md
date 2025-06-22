@@ -60,8 +60,9 @@
 
 #### **6. Sistema de Absorção Elemental**
 
-- [ ] [6.1 Tipos de Energia](#61-tipos-de-energia)
-- [ ] [6.2 Fragmentos Elementais (Prefabs)](#62-fragmentos-elementais-prefabs)
+- [x] [6.1 Tipos de Energia](#61-tipos-de-energia)
+- [x] [6.2 Fragmentos Elementais (Prefabs)](#62-fragmentos-elementais-prefabs)
+- [x] [6.3 Implementação do Sistema Elemental](#63-implementa%C3%A7%C3%A3o-do-sistema-elemental)
 
 
 #### **7. Sistema de Crescimento**
@@ -415,6 +416,86 @@ Durante a instanciação, o sistema deve receber dois parâmetros de cor (colorA
 - **Chances de Drop**: Probabilidade específica para cada tamanho
 - **Quantidade**: Número mínimo e máximo de fragmentos
 - **Elemento**: Tipo elemental ou configuração para drop aleatório
+
+#### 6.3 Implementação do Sistema Elemental
+
+**Classes Principais:**
+
+1. **ElementalType (enum)**: Define os tipos de energia elemental disponíveis no jogo.
+   - `None`: Valor padrão/nulo
+   - `Earth`: Terra (defesa)
+   - `Water`: Água (regeneração)
+   - `Fire`: Fogo (ataque)
+   - `Air`: Ar (velocidade)
+
+2. **ElementalEvents (static class)**: Gerencia eventos globais relacionados ao sistema elemental.
+   - `OnFragmentAbsorbed`: Disparado quando um fragmento é absorvido
+   - `OnElementalAbilityUsed`: Disparado quando uma habilidade elemental é usada
+   - `OnElementalThresholdReached`: Disparado quando um threshold de crescimento é alcançado
+
+3. **ElementalEnergyManager (MonoBehaviour/Singleton)**: Gerencia o armazenamento e uso de energia elemental.
+   - Mantém um mapeamento de energia atual por tipo elemental
+   - Rastreia energia total absorvida para progressão
+   - Fornece métodos para adicionar/usar energia
+   - Verifica thresholds de crescimento
+   - Gerencia efeitos passivos de cada elemento
+   - Implementa salvamento/carregamento de dados
+
+4. **ElementalFragment (MonoBehaviour)**: Representa um fragmento elemental coletável.
+   - Define propriedades visuais e físicas
+   - Implementa comportamento de flutuação e rotação
+   - Gerencia detecção e atração para o jogador
+   - Aplica cores dinâmicas baseado no tipo elemental
+   - Controla a absorção quando coletado pelo jogador
+
+5. **ElementalFragmentSpawner (MonoBehaviour)**: Sistema para gerar fragmentos elementais.
+   - Possui prefabs de referência para cada tamanho
+   - Gerencia configurações de spawn
+   - Permite geração de múltiplos fragmentos em padrões específicos
+   - Aplica características visuais baseado no tipo elemental
+
+6. **ElementalFragmentConfig (ScriptableObject)**: Configuração de fragmentos elementais.
+   - Define sprites e cores para cada tipo e tamanho
+   - Gerencia configurações de drop por tipo de objeto
+   - Permite personalização de chances por tamanho
+   - Configura o comportamento de geração
+
+7. **ElementalAbilityManager (MonoBehaviour)**: Gerencia habilidades elementais do jogador.
+   - Mantém lista de habilidades disponíveis
+   - Gerencia cooldowns globais e específicos
+   - Verifica disponibilidade de energia antes de usar habilidades
+   - Aplica efeitos visuais e sonoros quando habilidades são ativadas
+
+8. **ElementalEnergyUI (MonoBehaviour)**: Interface de usuário para visualização de energia.
+   - Exibe barras para cada tipo elemental
+   - Mostra valores atuais e capacidade máxima
+   - Implementa animações para ganho/uso de energia
+   - Feedback visual para absorção de fragmentos
+
+**Fluxo de Absorção de Energia:**
+
+1. Um `ElementalFragment` é gerado no mundo via `ElementalFragmentSpawner`
+2. O jogador se aproxima e o fragmento é atraído magneticamente
+3. Quando coletado, o fragmento dispara `ElementalEvents.OnFragmentAbsorbed`
+4. `ElementalEnergyManager` recebe o evento e adiciona a energia apropriada
+5. `ElementalEnergyUI` é notificado e atualiza a interface visual
+6. Efeitos passivos são aplicados baseado na energia acumulada
+7. Quando um threshold é atingido, evento de crescimento é disparado
+
+**Efeitos Passivos Elementais:**
+
+- **Terra**: Aumenta defesa, calculado como energia Terra ÷ 10
+- **Água**: Aumenta regeneração de vida, calculado como energia Água ÷ 10
+- **Fogo**: Aumenta dano de ataque, calculado como energia Fogo ÷ 10
+- **Ar**: Aumenta velocidade de movimento, calculado como energia Ar ÷ 10
+
+**Ferramentas de Editor:**
+
+- `ElementalSystemEditor`: Janela de editor para gerenciar e testar o sistema elemental
+  - Visualizar valores de energia atual
+  - Adicionar energia para testes
+  - Gerar fragmentos de teste na cena
+  - Checar problemas na configuração do sistema
 
 
 ### 7. **Sistema de Crescimento**
@@ -868,7 +949,7 @@ O sistema deve salvar automaticamente em:
 
 ---
 
-## **Observações de Implementação por Fase**
+### **Observações de Implementação por Fase**
 
 ### **Teste e Validação por Fase**
 
@@ -1175,5 +1256,295 @@ O sistema inclui ferramentas de edição integradas ao Unity Editor para facilit
 2. Criar ou atualizar o mapeamento de ícones usando o Editor de Mapeamento
 3. Adicionar o componente `IconDisplay` aos objetos interativos relevantes
 4. Testar a visualização em diferentes dispositivos com o Testador
+
+### **6. Sistema de Absorção Elemental**
+
+O Sistema de Absorção Elemental foi implementado como uma mecânica central de progressão do jogo, permitindo que o slime absorva energia de diferentes elementos para crescer e desenvolver habilidades especiais conforme especificado na documentação.
+
+#### 6.1 Estrutura e Funcionalidades Implementadas
+
+**Classes Principais:**
+- **ElementalEnergyManager**: Singleton responsável por gerenciar toda a energia elemental do jogador
+- **ElementalFragment**: Controla o comportamento dos fragmentos elementais coletáveis
+- **ElementalFragmentSpawner**: Gerencia a criação de fragmentos com system de object pooling
+- **ElementalAbilityManager**: Controla as habilidades elementais que o jogador pode usar
+- **ElementalEvents**: Sistema de eventos para comunicação desacoplada entre componentes
+
+**Diretórios e Arquivos:**
+- `/Assets/Code/Core/Elemental/`: Classes principais do sistema
+- `/Assets/Prefabs/Elemental/Fragments/`: Prefabs para os diferentes tipos de fragmentos
+- `/Assets/ScriptableObjects/Elemental/`: Dados configuráveis para fragmentos e habilidades
+- `/Assets/VFX/Elemental/`: Efeitos visuais específicos por elemento
+
+**Elementos Implementados:**
+- Terra: Cor marrom (#8B4513/#DEB887), bônus de defesa
+- Água: Cor azul (#4169E1/#87CEEB), bônus de regeneração
+- Fogo: Cor laranja/vermelho (#FF4500/#FFA500), bônus de ataque
+- Ar: Cor azul claro/branco (#E6E6FA/#F0F8FF), bônus de velocidade
+
+#### 6.2 Fragmentos Elementais
+
+**Tamanhos de Fragmentos:**
+- **Small**: 1 ponto de energia, mais comum, tamanho 0.7x
+- **Medium**: 3 pontos de energia, frequência média, tamanho 1.0x
+- **Large**: 7 pontos de energia, mais raro, tamanho 1.5x
+
+**Sistema de Cores Dinâmicas:**
+```csharp
+// Exemplo de código para coloração dinâmica
+private void AnimateColors()
+{
+    _currentColorBlend = (Mathf.Sin(Time.time * _blinkSpeed) + 1) * 0.5f;
+    _spriteRenderer.color = Color.Lerp(_primaryColor, _secondaryColor, _currentColorBlend);
+}
+```
+
+**Atributos Físicos:**
+- **Atração Magnética**: Raio de 2.0 unidades para atração ao jogador
+- **Velocidade de Atração**: 8.0 unidades por segundo quando dentro do raio
+- **Rotação**: Os fragmentos rotacionam suavemente (90° por segundo)
+- **Efeito de Bounce**: Ao serem criados, recebem uma força inicial aleatória
+
+**Sistema de Coleta:**
+```csharp
+// Trecho simplificado da lógica de absorção
+private void AbsorbIntoPlayer(Transform playerTransform)
+{
+    _isFadingOut = true;
+    _collider2D.enabled = false;
+    
+    // Reproduz som e efeito visual
+    AudioSource.PlayClipAtPoint(_absorbSound, transform.position, 0.5f);
+    Instantiate(_absorbEffectPrefab, transform.position, Quaternion.identity);
+    
+    // Notifica o gerenciador de energia
+    int energyValue = GetEnergyValue();
+    ElementalEnergyManager.Instance?.AddElementalEnergy(_elementType, energyValue);
+    
+    // Dispara evento global de absorção
+    ElementalEvents.OnFragmentAbsorbed?.Invoke(_elementType, energyValue, transform.position);
+}
+```
+
+#### 6.3 Sistema de Object Pooling
+
+O sistema implementa um robusto Object Pooling para otimizar performance:
+
+**Funcionamento:**
+- Fragmentos são reutilizados ao invés de destruídos/criados constantemente
+- Pools separadas por tipo elemental para rápido acesso
+- Fragmentos desativados retornam automaticamente à pool após uso
+- Configuração visual (cor, escala, sprite) aplicada ao reativar
+
+```csharp
+// Método para obter fragmento da pool ou criar novo
+private GameObject SpawnSingleFragment(Vector3 position, ElementalType elementType, ElementalFragment.FragmentSize size) 
+{
+    // Verificação da pool
+    if (_fragmentPools[elementType].Count > 0)
+    {
+        GameObject fragment = _fragmentPools[elementType].Dequeue();
+        fragment.transform.position = position;
+        fragment.SetActive(true);
+        return fragment;
+    }
+    
+    // Criação de novo quando pool vazia
+    int randomPrefabIndex = Random.Range(0, _fragmentPrefabs.Length);
+    GameObject newFragment = Instantiate(_fragmentPrefabs[randomPrefabIndex], position, Quaternion.identity);
+    
+    // Configuração do fragmento
+    ElementalFragment fragComponent = newFragment.GetComponent<ElementalFragment>();
+    fragComponent.Setup(elementType, size);
+    
+    return newFragment;
+}
+```
+
+#### 6.4 Sistema de Drop Configurável
+
+Foi implementado um sistema flexível para configurar drops de fragmentos por objeto:
+
+**Classe FragmentDropConfig:**
+- Configuração de tamanhos permitidos (small, medium, large)
+- Probabilidades por tamanho (ex: small 70%, medium 25%, large 5%)
+- Configuração de quantidade mínima e máxima
+- Opção para tipo elemental fixo ou aleatório
+- Distribuição de probabilidades por elemento quando aleatório
+
+**Exemplo de Uso:**
+```csharp
+// Configuração de drop para uma rocha
+FragmentDropConfig rockConfig = new FragmentDropConfig
+{
+    canDropSmall = true,
+    canDropMedium = true, 
+    canDropLarge = false,
+    
+    smallChance = 80f,
+    mediumChance = 20f,
+    
+    minFragments = 2,
+    maxFragments = 4,
+    
+    fixedElementType = ElementalType.Earth  // Rochas sempre dropam Terra
+};
+
+// Aplicação do drop
+_fragmentSpawner.SpawnFragments(transform.position, rockConfig);
+```
+
+#### 6.5 Integração com Sistema de UI
+
+O sistema de UI para energia elemental foi implementado com:
+
+**Barras de Energia:**
+- Quatro barras distintas para cada tipo elemental
+- Animação de preenchimento suave com DOTween
+- Efeito de pulso ao ganhar energia
+- Texto indicando valor numérico atual
+
+**Feedback Visual:**
+- Flash de cor ao absorver fragmentos
+- Efeito especial ao atingir thresholds de crescimento
+- Indicador de progresso para próximo estágio
+
+#### 6.6 Sistema de Efeitos Passivos
+
+Os efeitos passivos por tipo elemental foram implementados conforme especificado:
+
+| Elemento | Efeito Passivo | Implementação |
+| :-- | :-- | :-- |
+| Terra | +1 Defense a cada 10 pontos | Redução de dano recebido |
+| Água | +1 Regeneração a cada 10 pontos | Cura periódica de HP |
+| Fogo | +1 Attack a cada 10 pontos | Aumento de dano causado |
+| Ar | +1 Speed a cada 10 pontos | Aumento de velocidade de movimento |
+
+**Exemplo de Implementação:**
+```csharp
+// Trecho do processamento de efeitos passivos
+private void SetupPassiveEffects()
+{
+    // Terra: +1 Defense a cada 10 pontos
+    _passiveEffects[ElementalType.Earth] = () => {
+        int defenseBuff = _elementalEnergy[ElementalType.Earth] / 10;
+        StatusManager.Instance?.SetElementalBuff("Defense", defenseBuff);
+    };
+    
+    // Água: +1 Regeneração a cada 10 pontos
+    _passiveEffects[ElementalType.Water] = () => {
+        int regenBuff = _elementalEnergy[ElementalType.Water] / 10;
+        StatusManager.Instance?.SetElementalBuff("Regeneration", regenBuff);
+    };
+    
+    // Similar para Fogo e Ar
+}
+```
+
+#### 6.7 Habilidades Elementais
+
+O sistema de habilidades elementais permite ao jogador usar ativamente a energia acumulada:
+
+**Sistema de Slots:**
+- Slots de habilidade limitados pelo estágio de crescimento
+- Mapeamento para teclas 1-4 no teclado ou botões de ombro no gamepad
+- Troca dinâmica de habilidades via menu de habilidades
+
+**Componentes de Habilidade:**
+- Custo em energia elemental
+- Tempo de cooldown específico por habilidade
+- Efeito visual específico por elemento
+- Som específico por elemento
+
+**Verificação de Uso:**
+```csharp
+public bool UseAbility(int abilityIndex)
+{
+    ElementalAbility ability = _abilities[abilityIndex];
+    
+    // Verificações
+    if (ability.cooldownRemaining > 0)
+        return false;
+        
+    if (!ElementalEnergyManager.Instance.UseElementalEnergy(ability.elementType, ability.energyCost))
+        return false;
+    
+    // Uso da habilidade
+    _playerAnimator.SetTrigger("Attack02");
+    
+    // Instantiate efeito
+    GameObject effectObject = Instantiate(
+        ability.abilityEffectPrefab,
+        _playerTransform.position,
+        _playerTransform.rotation
+    );
+    
+    // Aplicar cooldowns
+    _globalCooldownRemaining = _globalCooldown;
+    ability.cooldownRemaining = ability.cooldown;
+    
+    // Notificar via evento
+    ElementalEvents.OnElementalAbilityUsed?.Invoke(
+        ability.elementType,
+        ability.energyCost,
+        _playerTransform.position
+    );
+    
+    return true;
+}
+```
+
+#### 6.8 Integração com Sistema de Crescimento
+
+A energia elemental total serve como trigger para o crescimento do slime:
+
+**Thresholds de Crescimento:**
+- Young: 200 pontos totais
+- Adult: 600 pontos totais
+- Elder: 1200 pontos totais
+
+**Verificação Automática:**
+```csharp
+private void CheckGrowthThreshold()
+{
+    int totalEnergy = GetTotalAbsorbedEnergy();
+    int currentStage = GetCurrentGrowthStage();
+    
+    if (currentStage > _lastGrowthThresholdReached)
+    {
+        _lastGrowthThresholdReached = currentStage;
+        OnTotalEnergyThresholdReached?.Invoke();
+        PlayerGrowth.Instance?.EvaluateGrowthStage();
+    }
+}
+```
+
+#### 6.9 Benefícios da Implementação
+
+- **Desacoplamento**: Sistema de eventos permite que componentes se comuniquem sem referências diretas
+- **Eficiência**: Object pooling reduz alocação de memória e garbage collection
+- **Customização**: Uso de ScriptableObjects para configuração sem código
+- **Extensibilidade**: Fácil adição de novos tipos de fragmentos ou habilidades
+- **Feedback Visual**: Sistema robusto de feedback ajuda na compreensão do jogador
+
+#### 6.10 Editor Tools
+
+Foram desenvolvidas ferramentas de editor para auxiliar no desenvolvimento:
+
+**Fragmento Spawner Tool:**
+- Ferramenta para testar diferentes configurações de drop
+- Visualização em tempo real de probabilidades
+- Debug de raio de atração e comportamento
+
+**Elemental Energy Viewer:**
+- Janela de editor para visualizar e modificar energia elemental
+- Útil para testes e debugging
+- Botões para simular thresholds de crescimento
+
+**Fluxo de Trabalho Recomendado:**
+1. Configurar fragmentos via ScriptableObjects para diferentes elementos e tamanhos
+2. Configurar drops específicos por objeto/inimigo com FragmentDropConfig
+3. Ajustar animações de absorção e valores de energia por prefab
+4. Testar thresholds de crescimento com a ferramenta de editor
 
 ---
