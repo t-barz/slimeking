@@ -1,5 +1,5 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.2
+## Versão 1.3
 
 ---
 
@@ -1186,6 +1186,8 @@ Quando slime está próximo, objetos interativos podem exibir contorno colorido 
 
 
 #### 10.3 Objetos Destrutíveis
+Esses objetos podem ser destruídos por ataques e dropam itens assim como inimigos.
+Quando os Pontos de Vida do objeto chega à 0, a trigger de animação Destroy deve ser executada e um efeito de piscar (alpha variando entre 25% e 100%) ocorre por um tempo configurado e em seguida começa a desaparecer (diminuir alpha) até que o GameObject é destruído ao chegar ao valor mínimo de alpha.
 
 **Atributos de Resistência:**
 
