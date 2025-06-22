@@ -73,8 +73,8 @@
 
 #### **8. Sistema de Inventário**
 
-- [ ] [8.1 Estrutura de Slots](#81-estrutura-de-slots)
-- [ ] [8.2 Sistema de Uso](#82-sistema-de-uso)
+- [x] [8.1 Estrutura de Slots](#81-estrutura-de-slots)
+- [x] [8.2 Sistema de Uso](#82-sistema-de-uso)
 
 ---
 
@@ -196,6 +196,468 @@
 Este documento estabelece as diretrizes técnicas fundamentais para a implementação de **The Slime King**, organizadas em uma sequência lógica de desenvolvimento que respeita as dependências entre sistemas e permite implementação incremental e testável.
 
 O objetivo é fornecer um roadmap claro para a equipe de desenvolvimento, onde cada fase constrói sobre as anteriores, garantindo que funcionalidades básicas estejam sólidas antes de adicionar complexidade.
+
+---
+
+## **IMPLEMENTAÇÕES DETALHADAS**
+
+Esta seção fornece uma documentação detalhada da implementação técnica de cada um dos sistemas marcados como concluídos neste documento, incluindo arquitetura, fluxo de trabalho, componentes principais e exemplos de uso.
+
+### **Sistema de Localização de Textos**
+
+**Visão Geral:** O sistema de localização permite que todos os textos do jogo sejam exibidos em múltiplos idiomas, com suporte para detecção automática do idioma do sistema e preferências do usuário.
+
+#### Componentes Principais:
+
+1. **LocalizationManager.cs** - Singleton responsável por gerenciar a localização:
+   - Carrega o arquivo CSV de localização
+   - Mantém um dicionário de chave-valor para textos
+   - Fornece métodos para obtenção de textos traduzidos
+   - Implementa a lógica de fallback de idiomas
+
+2. **LocalizedText.cs** - Componente para UI que exibe texto localizado:
+   - Mantém referência à chave de localização
+   - Atualiza automaticamente o texto quando o idioma é alterado
+   - Se conecta a componentes Text ou TextMeshProUGUI
+   - Possui inspector customizado para facilitar a visualização de traduções
+
+3. **LanguageMenu.cs** - Interface para o jogador escolher idioma:
+   - Exibe opções de idiomas disponíveis
+   - Salva a preferência do usuário no arquivo de configuração
+   - Atualiza todos os textos localizados imediatamente
+
+4. **LocalizationTester.cs** - Ferramenta para teste durante o desenvolvimento:
+   - Permite alternar entre idiomas rapidamente para verificar traduções
+   - Exibe estatísticas de cobertura de tradução
+
+#### Ferramentas de Editor:
+
+1. **LocalizationEditor.cs** - Janela de editor para gerenciar o arquivo CSV:
+   - Interface visual para adicionar/editar/remover entradas
+   - Validação automática para identificar chaves duplicadas ou entradas vazias
+   - Suporte para importar/exportar CSVs
+   - Destaque visual para entradas incompletas
+
+2. **ExtrasMenu.cs** - Adiciona menus na barra de ferramentas do Unity:
+   - Menu "The Slime King > Localização > Verificar CSV" para validar o arquivo
+   - Menu "The Slime King > Localização > Adicionar Nova Entrada" para facilitar inclusão de novas chaves
+
+#### Fluxo de Trabalho:
+
+1. Os textos são definidos no arquivo `localization.csv` seguindo as convenções de nomenclatura
+2. No início do jogo, o `LocalizationManager` é inicializado e carrega o arquivo
+3. O idioma é definido seguindo a hierarquia de detecção descrita na seção 1.2
+4. Os componentes `LocalizedText` registram-se no `LocalizationManager` para receber atualizações
+5. Quando o idioma é alterado, todos os textos são atualizados automaticamente
+
+#### Exemplo de Uso:
+
+```csharp
+// Obter um texto traduzido diretamente
+string mensagem = LocalizationManager.Instance.GetText("ui_welcome_message");
+
+// Definir o idioma manualmente
+LocalizationManager.Instance.SetLanguage("PT_BR");
+
+// Verificar o idioma atual
+string currentLang = LocalizationManager.Instance.CurrentLanguage;
+```
+
+### **Sistema de Ícone Superior**
+
+**Visão Geral:** Sistema que exibe ícones de interação acima de objetos interativos, adaptando-se ao dispositivo de entrada atual (teclado/mouse, gamepad Xbox, PlayStation, etc.).
+
+#### Componentes Principais:
+
+1. **IconManager.cs** - Singleton responsável por gerenciar os ícones:
+   - Detecta o dispositivo de entrada atual
+   - Mantém registro de ícones ativos
+   - Gerencia animações de fade-in/fade-out
+   - Atualiza ícones quando o dispositivo muda
+
+2. **InteractionIconTrigger.cs** - Componente para ativar ícones:
+   - Detecta proximidade do jogador
+   - Define o tipo de interação (E, Space, A, B, etc.)
+   - Controla exibição do ícone com base no contexto
+   - Gerencia prioridade entre múltiplos ícones
+
+3. **DeviceDetector.cs** - Responsável por detectar o dispositivo atual:
+   - Monitora continuamente mudanças de input
+   - Identifica tipo preciso do controle (Xbox, PlayStation, Switch, etc.)
+   - Dispara eventos quando o dispositivo muda
+
+#### Prefabs e Assets:
+
+1. **IconContainer.prefab** - Container para os ícones:
+   - Sistema de posicionamento acima do objeto
+   - Animador para efeitos de fade-in/out
+   - Suporte para seguir objetos em movimento
+
+2. **Input Icons** - Conjunto de sprites para cada dispositivo:
+   - Ícones de teclado (E, Space, Q, etc.)
+   - Ícones Xbox (A, B, X, Y, etc.)
+   - Ícones PlayStation (Cross, Circle, Square, Triangle, etc.)
+   - Ícones Switch (A, B, X, Y, etc.)
+   - Ícones genéricos para controladores não identificados
+
+#### Fluxo de Trabalho:
+
+1. Os objetos interativos possuem o componente `InteractionIconTrigger`
+2. Quando o jogador se aproxima, o componente detecta e solicita um ícone ao `IconManager`
+3. O `IconManager` instancia o ícone apropriado para o dispositivo atual
+4. O ícone aparece com animação de fade-in e segue a posição do objeto
+5. Se o jogador se afasta ou o objeto fica desativado, o ícone desaparece com fade-out
+6. Se o dispositivo de input muda, os ícones são atualizados instantaneamente
+
+#### Exemplo de Uso:
+
+```csharp
+// Em um objeto interativo
+[SerializeField] private string _keyboardKey = "E";
+[SerializeField] private string _gamepadButton = "A";
+
+// Para mostrar um ícone
+IconManager.Instance.ShowIcon(transform, _keyboardKey, _gamepadButton);
+
+// Para esconder o ícone
+IconManager.Instance.HideIcon(transform);
+```
+
+### **Sistema de Personagem**
+
+**Visão Geral:** Define a estrutura e comportamento do protagonista (Slime), gerenciando sua representação visual, movimentação e interações.
+
+#### Componentes Principais:
+
+1. **SlimeInputHandler.cs** - Gerencia inputs do jogador:
+   - Processa inputs do novo Input System
+   - Distribui comandos para os sistemas relevantes
+   - Adapta-se às diferentes plataformas
+   - Controla estados que desabilitam inputs (diálogo, cutscene, etc.)
+
+2. **SlimeMovement.cs** - Controla o movimento do personagem:
+   - Implementa física baseada em Rigidbody2D
+   - Gerencia velocidade, aceleração e drag
+   - Adapta parâmetros conforme estágios de crescimento
+   - Implementa colisões e interações físicas
+
+3. **SlimeVisualController.cs** - Gerencia aparência visual:
+   - Controla sprites direcionais (front, back, side)
+   - Implementa sistema de flip para movimentos laterais
+   - Gerencia visibilidade de componentes visuais
+   - Coordena efeitos visuais e feedback
+
+4. **SlimeAnimationController.cs** - Controla as animações:
+   - Gerencia transições do Animator
+   - Sincroniza estados de animação com movimento
+   - Implementa triggers para ações especiais
+   - Controla parâmetros de animação
+
+5. **SlimeInteractionController.cs** - Gerencia interações:
+   - Detecta objetos interativos próximos
+   - Processa ações de interação
+   - Coordena feedback para o jogador
+   - Gerencia prioridades entre múltiplas interações possíveis
+
+#### Estrutura de GameObjects:
+
+A hierarquia do objeto "slimeBaby" foi implementada conforme especificado:
+```
+slimeBaby
+├── back          // Sprite para movimento norte
+├── vfx_back      // Efeitos visuais traseiros
+├── vfx_front     // Efeitos visuais frontais
+├── front         // Sprite para movimento sul
+├── side          // Sprite para movimento leste/oeste
+├── vfx_side      // Efeitos visuais laterais
+└── shadow        // Sombra sempre visível
+```
+
+#### Fluxo de Trabalho:
+
+1. `SlimeInputHandler` recebe inputs do jogador
+2. Os inputs são convertidos em intenções (mover, interagir, atacar)
+3. `SlimeMovement` atualiza a posição com base na intenção de movimento
+4. `SlimeVisualController` atualiza sprites visíveis com base na direção
+5. `SlimeAnimationController` sincroniza animações com o estado atual
+6. `SlimeInteractionController` processa interações quando ativadas
+
+#### Exemplo de Uso:
+
+```csharp
+// Em SlimeInputHandler.cs
+private void OnMove(InputAction.CallbackContext context)
+{
+    Vector2 moveInput = context.ReadValue<Vector2>();
+    _slimeMovement.SetMoveDirection(moveInput);
+    _slimeAnimationController.SetIsWalking(moveInput.magnitude > 0.1f);
+    _slimeVisualController.UpdateVisibleSprites(moveInput);
+}
+
+// Em SlimeInteractionController.cs
+public void TryInteract()
+{
+    if (_nearbyInteractables.Count > 0)
+    {
+        _nearbyInteractables[0].Interact(_slimeTransform);
+    }
+}
+```
+
+### **Sistema de Movimento**
+
+**Visão Geral:** Implementa o movimento do jogador usando o novo Input System da Unity, com suporte a múltiplos dispositivos e configurações físicas que evoluem conforme o crescimento do slime.
+
+#### Componentes Principais:
+
+1. **SlimeMovement.cs** - Núcleo do sistema de movimento:
+   - Implementa movimento baseado em forças físicas
+   - Gerencia aceleração e desaceleração suaves
+   - Controla limites de velocidade e comportamento físico
+   - Implementa estados especiais (congelado, em cutscene, etc.)
+
+2. **InputSystem_Actions.inputactions** - Asset de configuração do Input System:
+   - Define mapeamentos para teclado e controles
+   - Implementa ações para movimento, interação, ataque, etc.
+   - Configura chaves e botões conforme a documentação
+   - Permite remapeamento em runtime
+
+#### Configurações Físicas:
+
+Para cada estágio de evolução, os parâmetros físicos foram implementados conforme especificado:
+
+| Propriedade | Baby Slime | Young Slime | Adult Slime | Elder Slime |
+| :-- | :-- | :-- | :-- | :-- |
+| Velocidade Base | 3.0 | 4.0 | 4.5 | 5.0 |
+| Massa | 0.5 | 1.0 | 1.5 | 2.0 |
+| Drag Linear | 5.0 | 4.0 | 3.0 | 2.0 |
+| Freeze Rotation | true | true | true | true |
+
+#### Mapeamento de Input:
+
+O sistema implementa o mapeamento universal de ações conforme especificado:
+
+| Ação | Função | Teclado | Gamepad PC (Xbox) |
+| :-- | :-- | :-- | :-- |
+| Move | Movimento em 8 direções | WASD / Arrows | Left Stick |
+| Attack | Ataque básico | Space | B |
+| Interact | Interagir com objetos | E | A |
+| Crouch | Stealth/esconder | Q | X |
+| Use Item | Usar item selecionado | Left Alt | Y |
+| Change Item | Alternar item selecionado | Scroll Mouse / Tab | D-pad (qualquer direção) |
+| Ability 1-4 | Habilidades elementais | 1-4 | LB, LT, RB, RT |
+| Menu | Menu principal | Enter | Menu |
+| Inventory | Menu de inventário | Right Shift | View |
+
+#### Fluxo de Trabalho:
+
+1. O Input System captura entradas do dispositivo ativo
+2. O `SlimeInputHandler` recebe callbacks do Input System
+3. Comandos de movimento são enviados para o `SlimeMovement`
+4. O `SlimeMovement` aplica forças ao Rigidbody2D
+5. O drag e massa afetam como o personagem acelera e desacelera
+6. O sistema visual e de animação responde às mudanças de movimento
+
+#### Exemplo de Uso:
+
+```csharp
+// Configuração do sistema em Player
+public class SlimeInputHandler : MonoBehaviour
+{
+    private PlayerInput _playerInput;
+    private SlimeMovement _movement;
+    
+    private void Awake()
+    {
+        _playerInput = GetComponent<PlayerInput>();
+        _movement = GetComponent<SlimeMovement>();
+        
+        // Registrar callbacks
+        _playerInput.actions["Move"].performed += OnMove;
+        _playerInput.actions["Move"].canceled += OnMove;
+    }
+    
+    private void OnMove(InputAction.CallbackContext context)
+    {
+        Vector2 moveInput = context.ReadValue<Vector2>();
+        _movement.SetMoveDirection(moveInput);
+    }
+}
+```
+
+### **Sistema de Animação**
+
+**Visão Geral:** Gerencia as animações do personagem com base em seu estado atual, usando um Animator complexo com diversos parâmetros e transições.
+
+#### Componentes Principais:
+
+1. **SlimeAnimationController.cs** - Coordenador de animações:
+   - Gerencia parâmetros do Animator
+   - Sincroniza animações com estados do jogo
+   - Processa eventos de animação
+   - Coordena feedbacks visuais e sonoros
+
+2. **Animator Controllers** - Controladores para cada estágio:
+   - Define transições entre estados
+   - Implementa máquinas de estado para diferentes comportamentos
+   - Configura layers de animação
+   - Usa blend trees para animações direcionais
+
+#### Parâmetros do Animator:
+
+Os parâmetros foram implementados conforme especificado:
+
+- `isSleeping` (bool) - Estado de descanso do slime
+- `isHiding` (bool) - Estado de stealth ativo
+- `isWalking` (bool) - Movimento ativo
+- `Shrink` (Trigger) - Animação de encolhimento para passar por espaços
+- `Jump` (Trigger) - Animação de salto
+- `Attack01` (Trigger) - Ataque básico
+- `Attack02` (Trigger) - Ataque especial
+
+#### Regras Importantes:
+
+- **Estado isHiding**: Quando ativado, o movimento é completamente desabilitado
+- **Transições de Estado**: Triggers como Jump e Attack têm prioridade e podem interromper outras animações
+- **Sincronização**: Animações são sincronizadas com efeitos sonoros via Animation Events
+
+#### Fluxo de Trabalho:
+
+1. O `SlimeInputHandler` atualiza o `SlimeAnimationController` baseado no input
+2. Os parâmetros do Animator são atualizados
+3. O Animator gerencia as transições entre estados
+4. Eventos de animação são enviados durante frames específicos
+5. Efeitos visuais e sonoros são sincronizados com as animações
+6. O `SlimeMovement` é notificado sobre estados que restringem movimento
+
+#### Exemplo de Uso:
+
+```csharp
+// No SlimeAnimationController
+public void SetIsWalking(bool walking)
+{
+    _animator.SetBool("isWalking", walking);
+}
+
+public void TriggerAttack()
+{
+    _animator.SetTrigger("Attack01");
+}
+
+public void SetIsHiding(bool hiding)
+{
+    _animator.SetBool("isHiding", hiding);
+    
+    // Comunica ao sistema de movimento para desabilitar movimento
+    _slimeMovement.SetMovementEnabled(!hiding);
+}
+```
+
+### **Sistema de Absorção Elemental**
+
+**Visão Geral:** Sistema central para progressão do jogador, permitindo coletar e utilizar energia elemental de diferentes tipos, cada um oferecendo habilidades e benefícios distintos.
+
+#### Componentes Principais:
+
+1. **ElementalType.cs** - Enum que define os tipos elementais:
+   - `None` - Valor padrão/nulo
+   - `Earth` - Terra (defesa)
+   - `Water` - Água (regeneração)
+   - `Fire` - Fogo (ataque)
+   - `Air` - Ar (velocidade)
+
+2. **ElementalEvents.cs** - Sistema de eventos globais:
+   - `OnFragmentAbsorbed` - Disparado quando um fragmento é absorvido
+   - `OnElementalAbilityUsed` - Disparado quando uma habilidade é usada
+   - `OnElementalThresholdReached` - Disparado quando um threshold de evolução é atingido
+
+3. **ElementalEnergyManager.cs** - Singleton para gerenciamento de energia:
+   - Mantém registro da energia por tipo elemental
+   - Processa adição e consumo de energia
+   - Verifica thresholds de crescimento
+   - Gerencia efeitos passivos de cada elemento
+   - Serializa/deserializa dados para save
+
+4. **ElementalFragment.cs** - Representa fragmentos coletáveis:
+   - Implementa flutuação e rotação visual
+   - Detecta proximidade do jogador
+   - Ativa atração magnética quando próximo
+   - Controla a absorção quando coletado
+
+5. **ElementalFragmentSpawner.cs** - Gera fragmentos no mundo:
+   - Gerencia perfis de spawn configuráveis
+   - Aplica características visuais baseadas no elemento
+   - Controla distribuição e quantidade
+   - Suporta spawn aleatório ou específico
+
+6. **ElementalAbilityManager.cs** - Gerencia habilidades elementais:
+   - Controla cooldowns e custos de energia
+   - Verifica disponibilidade e requisitos
+   - Ativa efeitos visuais e sonoros
+   - Implementa efeitos específicos de habilidades
+
+7. **ElementalEnergyUI.cs** - Interface para visualização:
+   - Exibe barras para cada tipo elemental
+   - Anima transições entre valores
+   - Aplica feedbacks visuais para ganhos/consumos
+   - Exibe ícones e valores numéricos
+
+#### Configurações por Elemento:
+
+| Elemento | Cor Principal | Cor Secundária | Habilidade | Efeito Passivo |
+| :-- | :-- | :-- | :-- | :-- |
+| Terra | \#8B4513 | \#DEB887 | Quebrar rochas | +1 Defense/10pts |
+| Água | \#4169E1 | \#87CEEB | Nadar/crescer plantas | +1 Regeneração/10pts |
+| Fogo | \#FF4500 | \#FFA500 | Iluminar/derreter | +1 Attack/10pts |
+| Ar | \#E6E6FA | \#F0F8FF | Planar/ativar eólicos | +1 Speed/10pts |
+
+#### Tamanhos de Fragmentos:
+
+- **Small**: 1 ponto de energia, comuns
+- **Medium**: 3 pontos de energia, médios
+- **Large**: 7 pontos de energia, raros
+
+#### Ferramentas de Editor:
+
+1. **ElementalSystemEditor.cs** - Janela de editor:
+   - Interface para testar o sistema
+   - Visualização em tempo real de valores
+   - Ferramentas para debug e ajustes
+   - Validação de configuração
+
+#### Fluxo de Trabalho:
+
+1. Fragmentos elementais são gerados no mundo
+2. O jogador se aproxima e os fragmentos são atraídos magneticamente
+3. Ao coletar, a energia é adicionada ao tipo correspondente
+4. A UI atualiza mostrando o novo valor com animações
+5. Efeitos passivos são aplicados baseados na energia acumulada
+6. O jogador pode usar habilidades gastando energia
+7. Quando thresholds são atingidos, o sistema de crescimento é notificado
+
+#### Exemplo de Uso:
+
+```csharp
+// Adicionar energia manualmente
+ElementalEnergyManager.Instance.AddElementalEnergy(ElementalType.Fire, 10);
+
+// Verificar se há energia suficiente
+int currentWaterEnergy = ElementalEnergyManager.Instance.GetElementalEnergy(ElementalType.Water);
+
+// Usar uma habilidade elemental
+ElementalAbilityManager.Instance.UseAbility("water_splash");
+
+// Gerar fragmentos no mundo
+ElementalFragmentSpawner.SpawnConfig config = new ElementalFragmentSpawner.SpawnConfig
+{
+    elementType = ElementalType.Earth,
+    minAmount = 3,
+    maxAmount = 5,
+    randomElement = false,
+    profile = ElementalFragmentSpawner.SpawnProfile.Balanced
+};
+fragmentSpawner.SpawnFragments(transform.position, config);
+```
 
 ---
 
@@ -1546,5 +2008,141 @@ Foram desenvolvidas ferramentas de editor para auxiliar no desenvolvimento:
 2. Configurar drops específicos por objeto/inimigo com FragmentDropConfig
 3. Ajustar animações de absorção e valores de energia por prefab
 4. Testar thresholds de crescimento com a ferramenta de editor
+
+---
+
+### **Sistema de Inventário**
+
+**Visão Geral:** Sistema que permite ao jogador coletar, gerenciar e usar itens, com número de slots que evolui conforme o crescimento do slime.
+
+#### Componentes Principais:
+
+1. **InventoryManager.cs** - Singleton responsável por gerenciar o inventário:
+   - Controla o número de slots disponíveis baseado no estágio
+   - Gerencia adição, remoção e uso de itens
+   - Implementa sistema de navegação entre slots
+   - Emite eventos para atualização da UI
+   - Integra-se com sistemas de crescimento e elemental
+
+2. **InventoryItem.cs** - Classe que representa um item no inventário:
+   - Mantém referência ao ItemData e quantidade
+   - Gerencia stacks e combinações
+   - Implementa lógica de capacidade máxima
+
+3. **ItemData.cs** - ScriptableObject que define propriedades de itens:
+   - Define nome, descrição, ícone localizado
+   - Especifica tipo, raridade, stack máximo
+   - Configura efeitos visuais e sonoros de uso
+   - Define comportamentos específicos (consumível, quest)
+
+4. **InventoryUI.cs** - Interface visual do inventário:
+   - Exibe slots com ícones e quantidades
+   - Anima abertura/fechamento do inventário
+   - Implementa seleção via mouse/teclado
+   - Responde a eventos de mudança no inventário
+
+5. **ItemWorldDrop.cs** - Representação de itens no mundo:
+   - Efeitos visuais de flutuação e rotação
+   - Sistema de atração para o jogador
+   - Colisão e coleta automática
+   - Feedback visual de coleta
+
+#### Fluxo de Trabalho:
+
+1. Itens são criados como ScriptableObjects usando a ferramenta de editor
+2. Objetos no mundo podem dropar itens quando destruídos
+3. O jogador coleta itens ao se aproximar deles
+4. O sistema gerencia automaticamente stacks e organização
+5. O número de slots aumenta com o crescimento do slime
+6. O jogador pode selecionar e usar itens via UI ou atalhos
+
+#### Sistema de Expansão de Slots:
+
+| Estágio | Slots Disponíveis | 
+| :-- | :-- |
+| Baby Slime | 1 | 
+| Young Slime | 2 | 
+| Adult Slime | 3 | 
+| Elder Slime | 4 |
+
+#### Sistema de Uso de Itens:
+
+O sistema implementa uma forma intuitiva de gerenciar e usar itens:
+
+- **Navegação**: Mouse wheel, Tab ou D-pad para alternar slots
+- **Seleção**: Slot selecionado tem destaque visual e efeito de pulsação
+- **Uso**: Left Alt ou Y (gamepad) consome o item selecionado
+- **Feedback**: Efeitos visuais e sonoros específicos por item
+- **Auto-organização**: Slots vazios são automaticamente reorganizados
+
+#### Ferramentas de Editor:
+
+1. **InventoryEditor.cs** - Editor para criação e gerenciamento de itens:
+   - Interface para criação de novos itens
+   - Visualização e edição de itens existentes
+   - Duplicação e exclusão de itens
+   - Configuração visual de ícones e efeitos
+
+2. **InventoryTester.cs** - Ferramenta para testar o sistema:
+   - Adicionar itens aleatórios ao inventário
+   - Testar uso e descarte de itens
+   - Simular crescimento e expansão de slots
+   - Dropar itens no mundo para testes
+
+#### Exemplo de Uso:
+
+```csharp
+// Adicionar um item ao inventário
+public void ColetarItem(ItemData itemData, int quantidade)
+{
+    if (InventoryManager.Instance.AddItem(itemData, quantidade))
+    {
+        Debug.Log($"Coletado: {itemData.name} x{quantidade}");
+    }
+    else
+    {
+        Debug.Log("Inventário cheio!");
+    }
+}
+
+// Verificar e usar um item específico
+public bool UsarPocaoDeVida()
+{
+    if (InventoryManager.Instance.HasItem("pocao_vida", 1))
+    {
+        // Usar diretamente o item selecionado
+        if (InventoryManager.Instance.GetSelectedItem()?.ItemData.ItemId == "pocao_vida")
+        {
+            InventoryManager.Instance.UseSelectedItem();
+            return true;
+        }
+        // Ou remover programaticamente
+        else
+        {
+            InventoryManager.Instance.RemoveItem("pocao_vida", 1);
+            AplicarEfeitoPocao();
+            return true;
+        }
+    }
+    return false;
+}
+```
+
+**Integração com Sistema de Crescimento:**
+- Slots de inventário são desbloqueados automaticamente ao evoluir
+- O sistema de inventário escuta eventos do sistema elemental
+- Verificações automáticas são feitas quando thresholds são atingidos
+
+**Integração com Input System:**
+- Utiliza as ações "UseItem", "ChangeItem" e "Inventory"
+- Compatível com teclado, mouse e controles
+- Configurável através do InputSystem_Actions
+
+**Fluxo de Trabalho Recomendado:**
+1. Criar ItemData para todos os itens do jogo usando o InventoryEditor
+2. Configurar prefabs para ItemWorldDrop com efeitos visuais
+3. Configurar coletor de itens em objetos e inimigos
+4. Integrar UI de inventário na interface do jogo
+5. Testar uso de itens e crescimento com InventoryTester
 
 ---
