@@ -1,7 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.6
+## Versão 1.7
 
-**Nota de Atualização:** Esta versão implementa o Sistema de Objetos Interativos completo (Seção 10) com base unificada para interações, feedback visual, objetos destrutíveis, e objetos móveis com sistema de rastros.
+**Nota de Atualização:** Esta versão implementa o Sistema de Diálogos completo (Seção 11) com interface visual, animações e integração com o sistema de localização, suporte para diálogos ramificados e ferramentas de editor para criação e gerenciamento eficiente de conteúdo.
 
 ---
 
@@ -108,9 +108,9 @@
 
 #### **11. Sistema de Diálogos**
 
-- [ ] [11.1 Interface de Diálogo](#111-interface-de-di%C3%A1logo)
-- [ ] [11.2 Sistema de Carregamento de Texto](#112-sistema-de-carregamento-de-texto)
-- [ ] [11.3 Animações e Transições](#113-anima%C3%A7%C3%B5es-e-transi%C3%A7%C3%B5es)
+- [x] [11.1 Interface de Diálogo](#111-interface-de-di%C3%A1logo)
+- [x] [11.2 Sistema de Carregamento de Texto](#112-sistema-de-carregamento-de-texto)
+- [x] [11.3 Animações e Transições](#113-anima%C3%A7%C3%B5es-e-transi%C3%A7%C3%B5es)
 
 
 #### **12. Sistema de Portal**
@@ -1475,37 +1475,104 @@ public class InteractionDetector : MonoBehaviour
 
 ### 11. **Sistema de Diálogos**
 
-Implementar após localização e objetos interativos estarem funcionais.
+Sistema completo de diálogos implementado para comunicação entre NPCs e jogador, baseado em ScriptableObjects e totalmente integrado com o sistema de localização.
 
 #### 11.1 Interface de Diálogo
 
-**Componentes da Interface:**
+**Componentes da Interface Implementados:**
 
-- **Caixa de Fundo**: Imagem de fundo semitransparente para legibilidade
-- **Área de Texto**: Campo onde texto é exibido gradualmente
-- **Campo de Título**: Mostra nome do personagem falante
-- **Imagem do Falante**: Retrato opcional do NPC
-- **Indicador de Continuação**: Seta indicando mais texto disponível
+- **Caixa de Fundo**: Painel semitransparente para melhor legibilidade sobre diferentes fundos de jogo
+- **Área de Texto**: TextMeshProUGUI com suporte a formatação, tamanho dinâmico conforme conteúdo
+- **Campo de Título**: Exibe o nome do personagem falante com localização automática
+- **Imagem do Falante**: Mostra opcional do avatar/retrato do NPC durante o diálogo
+- **Indicador de Continuação**: Seta animada indicando que há mais texto disponível
+- **Painel de Escolhas**: Suporte para diálogos ramificados com múltiplas escolhas
+
+**Interface UI Responsiva:**
+- Layout adaptável para diferentes resoluções de tela
+- Canvas com renderMode "Screen Space - Camera" para consistência visual
+- Suporte para modo retrato e paisagem em dispositivos móveis
+- Cores e opacidade ajustáveis para diferentes ambientes de jogo
 
 
 #### 11.2 Sistema de Carregamento de Texto
 
 **Integração com Localização:**
 
-- **Chaves Específicas**: Identificadores únicos para cada linha de diálogo
-- **Carregamento Dinâmico**: Textos carregados na língua atual
-- **Fallback Automático**: Inglês usado se tradução não disponível
-- **Cache Inteligente**: Diálogos frequentes mantidos em memória
+- **Chaves Dinâmicas**: Sistema de prefixo dialog_[npc]_[contexto]_[numero] para organização
+- **Carregamento por Demanda**: Textos carregados apenas quando necessário para otimizar memória
+- **Fallback Automático**: Sistema herda comportamento de fallback do LocalizationManager
+- **ScriptableObjects para Diálogos**: Sistema baseado em assets para facilitar referências
+- **Organização por Categorias**: Diálogos organizados em NPC, Tutorial, Ambiente, Item, etc.
+
+**Estrutura de Dados:**
+```csharp
+// Exemplo da estrutura DialogueLine
+[Serializable]
+public class DialogueLine
+{
+    public string TextKey;        // Chave de localização para o texto
+    public string SpeakerNameKey; // Chave de localização para o nome do falante
+    public Sprite SpeakerSprite;  // Imagem do falante (opcional)
+}
+
+// Exemplo da estrutura DialogueData
+[CreateAssetMenu]
+public class DialogueData : ScriptableObject
+{
+    public string DialogueID;           // ID único para este diálogo
+    public List<DialogueLine> Lines;    // Linhas do diálogo
+    public bool HasBeenShown { get; set; } // Status de exibição
+}
+```
 
 
 #### 11.3 Animações e Transições
 
-**Animação de Texto:**
+**Sistema de Apresentação Texto:**
 
-- **Velocidade Configurável**: Caracteres por segundo ajustável
-- **Pausa em Pontuação**: Delay extra em vírgulas e pontos
-- **Skip Disponível**: Pressionar botão completa texto imediatamente
-- **Som de Digitação**: Efeito sonoro sutil para cada caractere
+- **Velocidade Ajustável**: Configuração de 10-60 caracteres por segundo
+- **Pausas Contextuais**: 0.1s para vírgulas, 0.3s para pontos finais, exclamações e interrogações
+- **Skip Instantâneo**: Pressionar interação enquanto o texto está aparecendo completa instantaneamente
+- **Feedback Sonoro**: Som de digitação sutil com volume e frequência configuráveis
+- **Animações de Transição**: Fade-in/out suaves para entradas e saídas de diálogos
+
+**Efeitos Visuais:**
+- Animação de pulsação do indicador de continuação
+- Efeitos de escala usando DOTween para entrada/saída suave dos painéis
+- Feedback visual quando novas escolhas são apresentadas
+- Suporte para tags de rich text do TMPro para estilização de texto
+
+**Ferramentas de Editor:**
+
+- **Editor de Diálogos**: Janela customizada para criar e editar diálogos
+- **Inspector Customizado**: Visualização de prévia de textos traduzidos direto no editor
+- **Ferramenta de Teste**: Sistema para testar diálogos completos durante o desenvolvimento
+- **Gerador de Chaves**: Ferramenta para criar rapidamente sequências de chaves de diálogo
+- **Localização de Usos**: Encontra onde um diálogo específico é utilizado no jogo
+
+**Exemplo de Uso:**
+```csharp
+// Início de um diálogo simples
+DialogueManager.Instance.StartSimpleDialogue(
+    "dialog_tutorial_welcome",
+    "npc_guide_name"
+);
+
+// Início de um diálogo completo com callback
+DialogueManager.Instance.StartDialogue(dialogueData, OnDialogueCompleted);
+
+// Exemplo de trigger de diálogo via objeto interativo
+public class DialogueTrigger : InteractableObject
+{
+    [SerializeField] private DialogueData _dialogueData;
+    
+    public override void Interact(GameObject interactor)
+    {
+        DialogueManager.Instance.StartDialogue(_dialogueData);
+    }
+}
+```
 
 
 ### 12. **Sistema de Portal**
