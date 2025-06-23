@@ -1,7 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.5
+## Versão 1.6
 
-**Nota de Atualização:** Esta versão implementa o Sistema de Combate completo (Seção 9) com interface IDamageable, sistema de dano e efeitos elementais, integrado com os sistemas de animação e física.
+**Nota de Atualização:** Esta versão implementa o Sistema de Objetos Interativos completo (Seção 10) com base unificada para interações, feedback visual, objetos destrutíveis, e objetos móveis com sistema de rastros.
 
 ---
 
@@ -95,10 +95,10 @@
 
 #### **10. Sistema de Objetos Interativos**
 
-- [ ] [10.1 Estrutura e Configuração](#101-estrutura-e-configura%C3%A7%C3%A3o)
-- [ ] [10.2 Sistema de Feedback Visual](#102-sistema-de-feedback-visual)
-- [ ] [10.3 Objetos Destrutíveis](#103-objetos-destrut%C3%ADveis)
-- [ ] [10.4 Objetos Móveis](#104-objetos-m%C3%B3veis)
+- [x] [10.1 Estrutura e Configuração](#101-estrutura-e-configura%C3%A7%C3%A3o)
+- [x] [10.2 Sistema de Feedback Visual](#102-sistema-de-feedback-visual)
+- [x] [10.3 Objetos Destrutíveis](#103-objetos-destrut%C3%ADveis)
+- [x] [10.4 Objetos Móveis](#104-objetos-m%C3%B3veis)
 
 ---
 
@@ -1260,7 +1260,7 @@ public int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint 
 
 ### 10. **Sistema de Objetos Interativos**
 
-Base para todos os objetos do mundo que podem ser ativados.
+Base unificada para todos os objetos do mundo com os quais o jogador pode interagir.
 
 #### 10.1 Estrutura e Configuração
 
@@ -1279,6 +1279,44 @@ Base para todos os objetos do mundo que podem ser ativados.
 - **Puzzle**: Ativa parte de quebra-cabeça maior
 - **Portal**: Inicia sequência de teleporte
 
+**Classes e Interfaces Principais:**
+
+```csharp
+// Interface base para todos os objetos interativos
+public interface IInteractable
+{
+    void Interact(GameObject interactor);
+    bool CanInteract(GameObject interactor);
+    string GetInteractionPrompt();
+    InteractionType GetInteractionType();
+    Transform GetTransform();
+}
+
+// Tipos de interação
+public enum InteractionType
+{
+    Activate,  // Ativa objetos/mecanismos
+    Collect,   // Coleta itens
+    Talk,      // Inicia diálogos
+    Puzzle,    // Ativa puzzles
+    Portal,    // Teleporta jogador
+    Push       // Objetos móveis
+}
+
+// Classe base para objetos interativos
+public class InteractableObject : MonoBehaviour, IInteractable
+{
+    [SerializeField] private InteractionType _interactionType;
+    [SerializeField] private string _interactionPrompt;
+    [SerializeField] private bool _useOutline;
+    [SerializeField] private Color _outlineColor;
+    // ...
+}
+```
+
+**Configuração no Inspector:**
+
+![Exemplo de Inspector](exemplo_inspector.png)
 
 #### 10.2 Sistema de Feedback Visual
 
@@ -1290,10 +1328,54 @@ Quando slime está próximo, objetos interativos podem exibir contorno colorido 
 - Pulsa suavemente para chamar atenção
 - Desaparece quando slime se afasta
 
+**Implementação:**
+
+```csharp
+public class OutlineVisualEffect : MonoBehaviour
+{
+    [SerializeField] private Color _outlineColor = Color.white;
+    [SerializeField] private float _outlineThickness = 1.0f;
+    [SerializeField] private float _pulseSpeed = 1.0f;
+    [SerializeField] private float _pulseAmount = 0.2f;
+    
+    // Métodos públicos
+    public void FadeIn();
+    public void FadeOut();
+    public void SetColor(Color color);
+    public void SetEnabled(bool enabled);
+}
+```
+
+**Shader Personalizado:**
+O efeito de contorno utiliza um shader personalizado que aplica o contorno sem modificar o sprite original, com suporte a:
+- Cores personalizáveis
+- Espessura configurável
+- Animação de pulso
+- Fade In/Out suave
 
 #### 10.3 Objetos Destrutíveis
-Esses objetos podem ser destruídos por ataques e dropam itens assim como inimigos.
-Quando os Pontos de Vida do objeto chega à 0, a trigger de animação Destroy deve ser executada e um efeito de piscar (alpha variando entre 25% e 100%) ocorre por um tempo configurado e em seguida começa a desaparecer (diminuir alpha) até que o GameObject é destruído ao chegar ao valor mínimo de alpha.
+
+Implementa `IDamageable` e herda de `InteractableObject` para unificar os sistemas.
+
+```csharp
+public class DestructibleObject : InteractableObject, IDamageable
+{
+    [SerializeField] private int _maxHealth = 50;
+    [SerializeField] private int _defense = 2;
+    [SerializeField] private List<ItemDropChance> _possibleDrops;
+    [SerializeField] private List<ItemDropChance> _guaranteedDrops;
+    
+    // Implementa IDamageable
+    public int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint = null);
+    public bool IsDead();
+    public int GetCurrentHealth();
+    public int GetMaxHealth();
+    
+    // Drops
+    private void DropItems();
+    private void SpawnItemDrop(ItemData itemData, int quantity);
+}
+```
 
 **Atributos de Resistência:**
 
@@ -1308,8 +1390,29 @@ Quando os Pontos de Vida do objeto chega à 0, a trigger de animação Destroy d
 - **Rare Drops**: Itens especiais com baixa chance
 - **Guaranteed Drops**: Itens que sempre são dropados
 
+**Feedback Visual:**
+- Flash vermelho ao receber dano
+- Efeitos de partículas no ponto de impacto
+- Fade out gradual na destruição
+- Animação de destruição via trigger "Destroy" 
 
 #### 10.4 Objetos Móveis
+
+```csharp
+public class MovableObject : InteractableObject
+{
+    [SerializeField] private float _moveSpeed = 2f;
+    [SerializeField] private float _maxPushDistance = 5f;
+    [SerializeField] private bool _lockXAxis = false;
+    [SerializeField] private bool _lockYAxis = false;
+    [SerializeField] private bool _enableTrail = false;
+    
+    // Métodos principais
+    private void StartPushing(GameObject pusher);
+    private void StopPushing();
+    private void MoveBasedOnPlayerInput();
+}
+```
 
 **Requisitos de Interação:**
 
@@ -1318,11 +1421,51 @@ Quando os Pontos de Vida do objeto chega à 0, a trigger de animação Destroy d
 - **Input de Interação**: Pressionar botão quando próximo e direcionado
 
 **Sistema de Rastro Opcional:**
+Instancia prefabs de rastro conforme o objeto se move:
 
 - **Trail Prefab**: GameObject que representa a marca deixada
 - **Trail Spacing**: Distância entre cada instância do rastro
 - **Trail Lifetime**: Tempo que rastro permanece no ambiente
 - **Material Specific**: Diferentes rastros baseados na superfície
+
+**Integração com Crescimento:**
+Opção para verificar o estágio de crescimento do slime, permitindo que apenas slimes maiores movam certos objetos.
+
+#### 10.5 Sistema de Detecção de Interações
+
+```csharp
+public class InteractionDetector : MonoBehaviour
+{
+    [SerializeField] private float _interactionRadius = 1.5f;
+    [SerializeField] private LayerMask _interactableLayers;
+    [SerializeField] private InputAction _interactAction;
+    
+    // Estado
+    private List<IInteractable> _nearbyInteractables = new List<IInteractable>();
+    private IInteractable _currentTarget;
+    
+    // Prompt de interação
+    private void UpdateInteractionPrompt();
+}
+```
+
+**Funcionamento:**
+1. Detecta objetos interativos próximos usando triggers
+2. Identifica o objeto mais próximo para foco
+3. Verifica se o objeto pode interagir (`CanInteract`)
+4. Mostra prompt na tela com instruções
+5. Processa input e executa a interação (`Interact`)
+
+**Checklist de implementação:**
+
+- [x] Interface IInteractable
+- [x] Classe base InteractableObject
+- [x] Sistema visual de contorno (OutlineVisualEffect + shader)
+- [x] Objetos destrutíveis com sistema de dano e drops
+- [x] Objetos móveis com sistema de empurrar/puxar
+- [x] Detector de interação para o jogador
+- [x] Sistema de prompt visual para interação
+- [x] Integração com sistema de inventário
 
 ---
 
