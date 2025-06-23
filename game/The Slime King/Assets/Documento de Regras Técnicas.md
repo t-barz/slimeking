@@ -1,7 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.7
+## Versão 1.8
 
-**Nota de Atualização:** Esta versão implementa o Sistema de Diálogos completo (Seção 11) com interface visual, animações e integração com o sistema de localização, suporte para diálogos ramificados e ferramentas de editor para criação e gerenciamento eficiente de conteúdo.
+**Nota de Atualização:** Esta versão implementa o Sistema de Portais completo (Seção 12) com teleporte intra e inter-cenas, efeitos visuais, condições de acesso e integração completa com os sistemas de interação e crescimento.
 
 ---
 
@@ -115,9 +115,9 @@
 
 #### **12. Sistema de Portal**
 
-- [ ] [12.1 Tipos de Portal e Configuração](#121-tipos-de-portal-e-configura%C3%A7%C3%A3o)
-- [ ] [12.2 Sistema de Ativação](#122-sistema-de-ativa%C3%A7%C3%A3o)
-- [ ] [12.3 Teleporte Intra-Cena e Inter-Cena](#123-teleporte-intra-cena-e-inter-cena)
+- [x] [12.1 Tipos de Portal e Configuração](#121-tipos-de-portal-e-configura%C3%A7%C3%A3o)
+- [x] [12.2 Sistema de Ativação](#122-sistema-de-ativa%C3%A7%C3%A3o)
+- [x] [12.3 Teleporte Intra-Cena e Inter-Cena](#123-teleporte-intra-cena-e-inter-cena)
 
 
 #### **13. Sistema de Movimento Especial**
@@ -1577,50 +1577,250 @@ public class DialogueTrigger : InteractableObject
 
 ### 12. **Sistema de Portal**
 
-Implementar após objetos interativos e diálogos estarem funcionais.
+Sistema completo para permitir a navegação do jogador entre pontos dentro da mesma cena ou entre diferentes cenas do jogo. Totalmente integrado com os sistemas de interação e crescimento.
 
 #### 12.1 Tipos de Portal e Configuração
 
-**Tipos de Ativação:**
+**Arquitetura do Sistema:**
 
-- **Por Toque**: Portal ativa automaticamente quando slime encosta
-- **Por Interação**: Portal requer pressionar botão de interação
+```csharp
+// Gerencia o sistema de portais globalmente como um singleton
+public class PortalManager : MonoBehaviour 
+{
+    public static PortalManager Instance { get; private set; }
+    
+    // Métodos principais
+    public void TeleportIntraSameCene(GameObject player, Vector3 destination, Vector3? lookDirection = null);
+    public void TeleportToScene(string targetSceneName, string targetPortalID = null, Vector3? targetPosition = null, Vector3? targetRotation = null);
+    
+    // Métodos auxiliares
+    private void DisablePlayerControl(GameObject player);
+    private void EnablePlayerControl(GameObject player);
+    private void SaveCurrentGameState();
+}
+
+// Controla uma instância específica de portal no ambiente de jogo
+public class PortalController : InteractableObject
+{
+    [SerializeField] private string _portalID;
+    [SerializeField] private PortalActivationType _activationType;
+    [SerializeField] private bool _isScenePortal;
+    // ... outras configurações
+    
+    // Métodos principais
+    private void ActivatePortal(GameObject player);
+    public Vector3 GetExitOffset();
+    public void SetPortalActive(bool active);
+}
+
+// Define o tipo de ativação do portal
+public enum PortalActivationType
+{
+    Touch,      // Ativa automaticamente ao tocar
+    Interaction // Requer pressionar botão de interação
+}
+```
+
+**Tipos de Ativação Implementados:**
+
+- **Por Toque**: Portal ativa automaticamente quando o slime encosta, com um delay de 0.5 segundos para evitar ativações acidentais
+- **Por Interação**: Portal requer que o jogador pressione explicitamente o botão de interação quando estiver próximo
 
 **Configuração de Destino:**
 
-- **Tipo de Destino**: Mesmo cena ou cena diferente
-- **Ponto de Destino**: Coordenadas exatas ou ID de outro portal
-- **Cena de Destino**: Nome da cena alvo (para teleporte inter-cena)
-- **Condições de Acesso**: Requisitos opcionais (estágio mínimo, itens)
+- **Portal Intra-Cena**: Teleporta para outro ponto na mesma cena
+  * Destino via ID: Referencia outro portal pelo seu ID único
+  * Destino via Coordenadas: Define posição e rotação específicas
+  
+- **Portal Inter-Cena**: Teleporta para outra cena do jogo
+  * Cena + ID: Carrega nova cena e busca portal específico pelo ID
+  * Cena + Coordenadas: Carrega nova cena e posiciona em coordenadas específicas
+
+**Condições de Acesso:**
+- Verificação de estágio de crescimento mínimo do slime (configura _requiredGrowthStage)
+- Sistema expansível para adicionar outros requisitos (itens específicos, missões concluídas, etc.)
 
 
 #### 12.2 Sistema de Ativação
 
-**Portal por Toque:**
-Teleporte inicia automaticamente após breve delay para evitar ativação acidental.
+**Portal por Toque (Touch):**
+- Ativa automaticamente quando o jogador entra no trigger do portal
+- Implementa um delay configurável (padrão: 0.5s) para evitar teleportes acidentais
+- Ideal para transições mais fluidas como passagens entre ambientes
+
+```csharp
+protected virtual void Update()
+{
+    // Processa ativação por toque quando jogador está na área
+    if (_activationType == PortalActivationType.Touch && _isPlayerNearby && !_isActivating)
+    {
+        _activationTimer += Time.deltaTime;
+        
+        if (_activationTimer >= TOUCH_ACTIVATION_DELAY)
+        {
+            _isActivating = true;
+            _activationTimer = 0f;
+            
+            // Ativa o portal
+            ActivatePortal(GameObject.FindGameObjectWithTag("Player"));
+        }
+    }
+    else if (!_isPlayerNearby)
+    {
+        // Resetar timer quando jogador sai da área
+        _activationTimer = 0f;
+    }
+}
+```
 
 **Portal por Interação:**
+- Herda do sistema `InteractableObject` e utiliza o mecanismo de interação padrão
+- Exibe ícone de interação quando o jogador está próximo (via `InteractionDetector`)
+- Mostra contorno visual (usando `OutlineVisualEffect`)
+- Exibe prompt de interação na UI
+- Ideal para portais que requerem decisão explícita do jogador
 
-- Exibir Ícone Superior quando slime está próximo
-- Ativar apenas quando botão de interação é pressionado
-- Fornecer feedback visual claro sobre disponibilidade
+```csharp
+public override void Interact(GameObject interactor)
+{
+    // Se for portal por interação, processa normalmente
+    if (_activationType == PortalActivationType.Interaction)
+    {
+        base.Interact(interactor);
+        ActivatePortal(interactor);
+    }
+}
+```
+
+**Feedback Visual e Sonoro:**
+- Efeito de partículas constante enquanto o portal está disponível
+- Efeito visual ao ativar o portal
+- Som de teleporte reproduzido na origem e no destino
+- Animações fade-in/out para transições entre cenas
 
 
 #### 12.3 Teleporte Intra-Cena e Inter-Cena
 
-**Teleporte na Mesma Cena:**
+**Teleporte na Mesma Cena (Implementação):**
 
-- Reproduzir efeito visual de desaparecimento no portal origem
-- Mover instantaneamente o slime para posição de destino
-- Reproduzir efeito visual de aparecimento no destino
-- Temporariamente desabilitar portal de destino para evitar loop
+```csharp
+private IEnumerator IntraSameCeneTeleportCoroutine(GameObject player, Vector3 destination, Vector3? lookDirection)
+{
+    _isTeleporting = true;
+    
+    // Desabilita controle do jogador
+    DisablePlayerControl(player);
+    
+    // Efeito de saída e som
+    if (_teleportOutEffectPrefab != null)
+    {
+        Instantiate(_teleportOutEffectPrefab, player.transform.position, Quaternion.identity);
+    }
+    
+    if (_teleportSound != null && _audioSource != null)
+    {
+        _audioSource.PlayOneShot(_teleportSound, _teleportSoundVolume);
+    }
 
-**Teleporte Entre Cenas:**
+    // Espera o delay configurado
+    yield return new WaitForSeconds(_sameCeneTeleportDelay);
+    
+    // Teleporta o jogador
+    player.transform.position = destination;
+    
+    // Configura para onde o jogador está olhando, se especificado
+    if (lookDirection.HasValue)
+    {
+        // Rotaciona apenas no eixo Y para manter jogador na vertical
+        player.transform.rotation = Quaternion.Euler(0, lookDirection.Value.y, 0);
+    }
 
-- Salvar estado atual do jogo antes de trocar cena
-- Carregar nova cena de forma assíncrona
-- Posicionar slime no ponto correto da nova cena
-- Restaurar estado de seguidores e inventário
+    // Efeito de entrada e som no destino
+    if (_teleportInEffectPrefab != null)
+    {
+        Instantiate(_teleportInEffectPrefab, player.transform.position, Quaternion.identity);
+    }
+    
+    // Reativa controle do jogador
+    yield return new WaitForSeconds(0.1f);
+    EnablePlayerControl(player);
+    
+    // Espera o cooldown terminar
+    yield return new WaitForSeconds(_portalCooldown);
+    _isTeleporting = false;
+}
+```
+
+**Sistema Anti-Loop:**
+- Desabilita temporariamente o portal de destino ao teleportar
+- Implementa cooldown entre usos consecutivos do mesmo portal
+- Impede que portais sejam ativados enquanto um teleporte já está em andamento
+
+**Teleporte Entre Cenas (Implementação):**
+
+```csharp
+private IEnumerator SceneTransitionCoroutine()
+{
+    _isTeleporting = true;
+
+    // Cria o objeto de transição visual
+    GameObject transitionObj = null;
+    if (_sceneTransitionPrefab != null)
+    {
+        transitionObj = Instantiate(_sceneTransitionPrefab);
+        var transition = transitionObj.GetComponent<SceneTransition>();
+        if (transition != null)
+        {
+            transition.FadeIn(_fadeOutDuration);
+        }
+    }
+
+    // Espera o fade out completar
+    yield return new WaitForSeconds(_fadeOutDuration);
+
+    // Salva o estado e carrega a cena de forma assíncrona
+    SaveCurrentGameState();
+    AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(_targetSceneName);
+    
+    while (!asyncLoad.isDone)
+    {
+        yield return null;
+    }
+
+    // O evento OnSceneLoaded posicionará o player no destino
+
+    // Faz o fade out da transição
+    if (transitionObj != null)
+    {
+        var transition = transitionObj.GetComponent<SceneTransition>();
+        if (transition != null)
+        {
+            transition.FadeOut(_fadeInDuration);
+            yield return new WaitForSeconds(_fadeInDuration);
+            Destroy(transitionObj);
+        }
+    }
+
+    _isTeleporting = false;
+}
+```
+
+**Integração com Outros Sistemas:**
+1. **Sistema de Interação**: Herda de `InteractableObject` para integração completa
+2. **Sistema de Crescimento**: Verifica requisitos de estágio para uso do portal
+3. **Sistema de UI**: Mostra ícones de interação quando aplicável
+4. **Sistema de Salvamento**: Prepara estado para persistir entre cenas
+
+**Checklist de implementação:**
+- [x] Singleton PortalManager para gerenciamento global
+- [x] PortalController que herda de InteractableObject
+- [x] Suporte para portais por toque e interação
+- [x] Teleporte na mesma cena com efeitos visuais
+- [x] Teleporte entre cenas com transições suaves
+- [x] Verificação de requisitos de crescimento
+- [x] Sistema anti-loop e cooldown
+- [x] Integração com sistema de interação
+- [x] Documentação e prefab de exemplo
 
 
 ### 13. **Sistema de Movimento Especial**

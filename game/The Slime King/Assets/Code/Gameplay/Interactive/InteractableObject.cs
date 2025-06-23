@@ -227,5 +227,13 @@ namespace TheSlimeKing.Gameplay.Interactive
                 Gizmos.DrawRay(transform.position, leftBound);
             }
         }
+
+        /// <summary>
+        /// Define o prompt de interação
+        /// </summary>
+        public void SetInteractionPrompt(string prompt)
+        {
+            _interactionPrompt = prompt;
+        }
     }
 }
