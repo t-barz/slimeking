@@ -1,5 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.3
+## Versão 1.5
+
+**Nota de Atualização:** Esta versão implementa o Sistema de Combate completo (Seção 9) com interface IDamageable, sistema de dano e efeitos elementais, integrado com os sistemas de animação e física.
 
 ---
 
@@ -67,8 +69,11 @@
 
 #### **7. Sistema de Crescimento**
 
-- [ ] [7.1 Estágios de Evolução](#71-est%C3%A1gios-de-evolu%C3%A7%C3%A3o)
-- [ ] [7.2 Eventos de Crescimento](#72-eventos-de-crescimento)
+- [x] [7.1 Estágios de Evolução](#71-est%C3%A1gios-de-evolu%C3%A7%C3%A3o)
+- [x] [7.2 Eventos de Crescimento](#72-eventos-de-crescimento)
+- [x] [7.3 Arquitetura do Sistema](#73-arquitetura-do-sistema)
+- [x] [7.4 Integração com Outros Sistemas](#74-integra%C3%A7%C3%A3o-com-outros-sistemas)
+- [x] [7.5 Ferramentas de Desenvolvimento](#75-ferramentas-de-desenvolvimento)
 
 
 #### **8. Sistema de Inventário**
@@ -84,8 +89,8 @@
 
 #### **9. Sistema de Combate**
 
-- [ ] [9.1 Tipos de Ataque](#91-tipos-de-ataque)
-- [ ] [9.2 Sistema de Dano](#92-sistema-de-dano)
+- [x] [9.1 Tipos de Ataque](#91-tipos-de-ataque)
+- [x] [9.2 Sistema de Dano](#92-sistema-de-dano)
 
 
 #### **10. Sistema de Objetos Interativos**
@@ -1088,8 +1093,7 @@ O sistema de crescimento integra-se com diversos outros sistemas:
 ```csharp
 // Dentro de PlayerGrowth.ApplyStageProperties
 private void ApplyStageProperties(SlimeGrowthStage stageConfig)
-{
-    // Atualiza slots de inventário disponíveis
+{    // Atualiza slots de inventário disponíveis
     InventoryManager inventoryManager = InventoryManager.Instance;
     if (inventoryManager != null)
     {
@@ -1097,6 +1101,21 @@ private void ApplyStageProperties(SlimeGrowthStage stageConfig)
     }
 }
 ```
+
+#### 7.5 Ferramentas de Desenvolvimento
+
+Para auxiliar os designers e desenvolvedores, foram criadas ferramentas de editor:
+
+1. **PlayerGrowthEditor**: Inspector customizado para configuração do sistema
+2. **SlimeGrowthStageEditor**: Editor para criação e edição de estágios
+3. **GrowthTester**: Componente de jogo que permite forçar transições entre estágios durante testes
+4. **Prefabs de Estágio**: Conjunto de ScriptableObjects pré-configurados para os quatro estágios
+
+**Características do Editor de Estágios:**
+- Visualização de sprite do estágio no inspector
+- Sugestões automáticas de valores baseados no GDD
+- Verificação de consistência de parâmetros
+- Previsualização de cores e efeitos
 
 #### 7.5 Ferramentas de Desenvolvimento
 
@@ -1137,7 +1156,7 @@ O sistema deve otimizar para não interromper o fluxo de gameplay:
 
 ### 9. **Sistema de Combate**
 
-Implementar após movimento e animação estarem sólidos.
+Sistema completo para gerenciar ataques, dano e interações de combate entre jogador e inimigos.
 
 #### 9.1 Tipos de Ataque
 
@@ -1147,10 +1166,97 @@ Implementar após movimento e animação estarem sólidos.
 | Dash Attack | Hold Attack | 15 + Nível | 2.0 unity | 1.0s | Movimento + Dano |
 | Ataque Especial | Special | 20 + Especial | 1.5 unity | 2.0s | Efeito elemental |
 
+**Implementação:**
+
+- **SlimeCombatManager**: Classe principal que gerencia todos os tipos de ataque
+- **AttackType**: Enum que define os tipos de ataque (Basic, Dash, Special, Charged)
+- **IDamageable**: Interface implementada por entidades que podem receber dano
+- **SimpleEnemy**: Implementação de referência para inimigos que implementam IDamageable
+
+**Integração com Sistema de Input:**
+
+```csharp
+// Exemplo de integração com o sistema de input
+public void OnAttackInput(InputAction.CallbackContext context)
+{
+    if (context.performed)
+    {
+        _combatManager.PerformBasicAttack();
+    }
+}
+
+public void OnSpecialInput(InputAction.CallbackContext context)
+{
+    if (context.performed)
+    {
+        ElementalType currentType = _elementalManager.GetActiveElementalType();
+        _combatManager.PerformSpecialAttack(currentType);
+    }
+}
+```
+
+**Efeitos Elementais:**
+
+O sistema de ataque especial está integrado com o sistema elemental, produzindo efeitos diferentes baseados no tipo elemental ativo:
+
+- **Fogo**: Causa dano ao longo do tempo (DOT)
+- **Água**: Reduz a velocidade do inimigo temporariamente
+- **Terra**: Aumenta o efeito de knockback
+- **Ar**: Aplica knockback em área, afetando inimigos próximos
+
 #### 9.2 Sistema de Dano
 
-O sistema deve utilizar fórmula: `realDamage = max(baseDamage - defense, 1)`
+O sistema utiliza a fórmula: `realDamage = max(baseDamage - defense, 1)`
 Garantindo que todo ataque cause pelo menos 1 de dano.
+
+**Interface IDamageable:**
+
+```csharp
+public interface IDamageable
+{
+    int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint = null);
+    bool IsDead();
+    int GetCurrentHealth();
+    int GetMaxHealth();
+}
+```
+
+**Exemplo de implementação em PlayerStatus:**
+
+```csharp
+public int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint = null)
+{
+    int defense = GetDefense();
+    int actualDamage = Mathf.Max(damage - defense, 1);
+    _currentHealth = Mathf.Max(0, _currentHealth - actualDamage);
+    
+    // Feedback visual/sonoro
+    if (hitPoint.HasValue)
+    {
+        // Efeitos no ponto de impacto
+    }
+    
+    return actualDamage;
+}
+```
+
+**Checklist de implementação:**
+
+- [x] Interface IDamageable para objetos que recebem dano
+- [x] Enum AttackType para os tipos de ataque
+- [x] Sistema de cooldown para ataques
+- [x] Detecção de inimigos baseada em físicas (OverlapCircleAll)
+- [x] Feedback visual e sonoro
+- [x] Sistema de efeitos elementais
+- [x] Implementação de knockback
+- [x] Integração com sistema de animação
+
+**Notas para futura expansão:**
+
+- Adicionar tipos de ataque específicos por estágio de crescimento
+- Implementar sistema de combos
+- Adicionar sistema de crítico
+- Considerar resistências elementais no cálculo de dano
 
 ### 10. **Sistema de Objetos Interativos**
 

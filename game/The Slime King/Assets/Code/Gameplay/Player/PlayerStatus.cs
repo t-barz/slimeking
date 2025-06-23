@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using TheSlimeKing.Core.Combat;
 
 namespace TheSlimeKing.Core
 {
     /// <summary>
     /// Gerencia os atributos e status do jogador
     /// </summary>
-    public class PlayerStatus : MonoBehaviour
+    public class PlayerStatus : MonoBehaviour, IDamageable
     {
         [Header("Stats Base")]
         [SerializeField] private int _baseHealth = 100;
@@ -131,19 +132,25 @@ namespace TheSlimeKing.Core
         public int GetCurrentHealth()
         {
             return _currentHealth;
-        }
-
-        /// <summary>
-        /// Aplica dano ao jogador considerando defesa
-        /// </summary>
-        public int TakeDamage(int rawDamage)
+        }        /// <summary>
+                 /// Aplica dano ao jogador considerando defesa
+                 /// </summary>
+        public int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint = null)
         {
             int defense = GetDefense();
-            int actualDamage = Mathf.Max(rawDamage - defense, 1); // Sempre pelo menos 1 de dano
+            int actualDamage = Mathf.Max(damage - defense, 1); // Sempre pelo menos 1 de dano
 
             _currentHealth = Mathf.Max(0, _currentHealth - actualDamage);
 
-            // Aqui você pode adicionar eventos de dano, etc.
+            // Feedback visual (pode ser implementado mais tarde)
+            if (hitPoint.HasValue)
+            {
+                // Spawnar efeito de dano na posição de impacto
+                Debug.Log($"Dano recebido em {hitPoint.Value}");
+            }
+
+            // Aqui você pode adicionar eventos de dano, som, etc.
+            Debug.Log($"Player recebeu {actualDamage} de dano de {(attacker ? attacker.name : "desconhecido")}");
 
             return actualDamage;
         }
@@ -161,6 +168,14 @@ namespace TheSlimeKing.Core
             // Aqui você pode adicionar eventos de cura, etc.
 
             return healingDone;
+        }
+
+        /// <summary>
+        /// Verifica se o jogador está morto
+        /// </summary>
+        public bool IsDead()
+        {
+            return _currentHealth <= 0;
         }
     }
 }
