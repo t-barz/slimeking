@@ -298,6 +298,15 @@ namespace TheSlimeKing.Gameplay
             return _lastNonZeroDirection;
         }
 
+        /// <summary>
+        /// Verifica se o personagem está agachado
+        /// Método adicionado para compatibilidade com o sistema de Stealth
+        /// </summary>
+        public bool IsCrouching()
+        {
+            return _isCrouching;
+        }
+
         #endregion
     }
 }

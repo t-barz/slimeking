@@ -142,5 +142,42 @@ namespace TheSlimeKing.Gameplay
         {
             return _isFacingRight;
         }
+
+        /// <summary>
+        /// Define a opacidade (alpha) de todos os sprites do slime
+        /// Usado pelo sistema de Stealth para tornar o slime semi-transparente quando escondido
+        /// </summary>
+        /// <param name="alpha">Valor entre 0 (transparente) e 1 (opaco)</param>
+        public void SetAlpha(float alpha)
+        {
+            // Limita o valor entre 0 e 1
+            alpha = Mathf.Clamp01(alpha);
+
+            // Aplica alpha a todos os sprites direcionais
+            ApplyAlphaToGameObject(frontSprite, alpha);
+            ApplyAlphaToGameObject(backSprite, alpha);
+            ApplyAlphaToGameObject(sideSprite, alpha);
+
+            // Aplica alpha aos efeitos visuais
+            ApplyAlphaToGameObject(vfxFront, alpha);
+            ApplyAlphaToGameObject(vfxBack, alpha);
+            ApplyAlphaToGameObject(vfxSide, alpha);
+        }
+
+        /// <summary>
+        /// Aplica alpha a todos os SpriteRenderers em um GameObject e seus filhos
+        /// </summary>
+        private void ApplyAlphaToGameObject(GameObject obj, float alpha)
+        {
+            if (obj == null) return;
+
+            // Aplica aos SpriteRenderers do objeto e seus filhos
+            foreach (SpriteRenderer renderer in obj.GetComponentsInChildren<SpriteRenderer>())
+            {
+                Color color = renderer.color;
+                color.a = alpha;
+                renderer.color = color;
+            }
+        }
     }
 }

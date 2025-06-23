@@ -1,7 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.9
+## Versão 1.10
 
-**Nota de Atualização:** Esta versão implementa o Sistema de Movimento Especial completo (Seção 13) com mecânicas de Encolher e Esgueirar e Sistema de Pulo, incluindo efeitos visuais, feedback e integração com o controle do jogador.
+**Nota de Atualização:** Esta versão implementa o Sistema de Stealth completo (Seção 14) com estados de visibilidade e objetos de cobertura, incluindo feedback visual e integração com o controlador do jogador.
 
 ---
 
@@ -133,8 +133,8 @@
 
 #### **14. Sistema de Stealth**
 
-- [ ] [14.1 Estados de Visibilidade](#141-estados-de-visibilidade)
-- [ ] [14.2 Objetos de Cobertura](#142-objetos-de-cobertura)
+- [x] [14.1 Estados de Visibilidade](#141-estados-de-visibilidade)
+- [x] [14.2 Objetos de Cobertura](#142-objetos-de-cobertura)
 
 
 #### **15. Sistema de UI**

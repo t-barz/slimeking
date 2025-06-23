@@ -248,6 +248,23 @@ namespace TheSlimeKing.Gameplay
                 animator.SetBool(walkingParam, _isWalking);
         }
 
+        /// <summary>
+        /// Executa animação de crescer (oposto de encolher)
+        /// Usado pelo sistema de Stealth para retornar ao tamanho normal
+        /// </summary>
+        public void PlayGrowAnimation()
+        {
+            // Como não existe um trigger específico para crescer,
+            // desativa o estado de encolher/esconder
+            if (animator != null)
+            {
+                animator.SetBool(hidingParam, false);
+
+                // Se houver um parâmetro específico para crescer no futuro, use-o aqui
+                // animator.SetTrigger("Grow");
+            }
+        }
+
         #endregion
     }
 }
