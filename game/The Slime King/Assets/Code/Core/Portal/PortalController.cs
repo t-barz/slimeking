@@ -227,7 +227,7 @@ namespace TheSlimeKing.Core.Portal
         /// </summary>
         public void SetPortalActive(bool active)
         {
-            SetInteractable(active); // Usa o método público da base para alterar a interatividade
+            SetInteractable(active); // Usa o método público herdado para definir se é interagível
 
             if (_portalIdleEffect != null)
             {

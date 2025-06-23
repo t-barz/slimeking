@@ -1,7 +1,7 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.8
+## Versão 1.9
 
-**Nota de Atualização:** Esta versão implementa o Sistema de Portais completo (Seção 12) com teleporte intra e inter-cenas, efeitos visuais, condições de acesso e integração completa com os sistemas de interação e crescimento.
+**Nota de Atualização:** Esta versão implementa o Sistema de Movimento Especial completo (Seção 13) com mecânicas de Encolher e Esgueirar e Sistema de Pulo, incluindo efeitos visuais, feedback e integração com o controle do jogador.
 
 ---
 
@@ -122,8 +122,8 @@
 
 #### **13. Sistema de Movimento Especial**
 
-- [ ] [13.1 Encolher e Esgueirar](#131-encolher-e-esgueirar)
-- [ ] [13.2 Sistema de Pular](#132-sistema-de-pular)
+- [x] [13.1 Encolher e Esgueirar](#131-encolher-e-esgueirar)
+- [x] [13.2 Sistema de Pular](#132-sistema-de-pular)
 
 ---
 
@@ -1829,6 +1829,13 @@ Implementar após animação e objetos interativos estarem funcionais.
 
 #### 13.1 Encolher e Esgueirar
 
+**Status: Implementado**
+
+**Arquitetura:**
+- `EncolherEsgueirarController`: Componente responsável pelo movimento de encolher e esgueirar
+- `IPlayerController`: Interface para controlar o jogador durante movimentos especiais
+- `SlimeMovement`: Implementação da interface para manipular o movimento do jogador
+
 **Requisitos de Ativação:**
 
 - **Proximidade**: Slime deve estar próximo ao ponto de passagem (≤ 1.5 units)
@@ -1844,22 +1851,43 @@ Implementar após animação e objetos interativos estarem funcionais.
 4. Tempo de deslocamento configurável por ponto
 5. Slime retorna ao tamanho normal e recupera controle
 
+**Configuração do Level Designer:**
+- Pontos de entrada e saída configuráveis
+- Duração e escala de encolhimento ajustáveis
+- Efeitos visuais e sonoros personalizáveis
+- Consulte `SpecialMovement_Setup.md` para detalhes completos
+
 #### 13.2 Sistema de Pular
+
+**Status: Implementado**
+
+**Arquitetura:**
+- `JumpController`: Componente responsável pelo movimento de pulo em arco
+- `IPlayerController`: Interface para controlar o jogador durante movimentos especiais
+- Sistema de detecção de obstáculos para verificar trajetória de pulo
 
 **Requisitos de Ativação:**
 
 - **Posicionamento**: Slime deve estar próximo ao ponto de pulo
 - **Direcionamento**: Slime deve estar olhando para o destino
-- **Verificação de Obstáculos**: Sistema verifica se trajetória está livre
+- **Verificação de Obstáculos**: Sistema verifica se trajetória está livre com raycasts
 - **Input de Interação**: Botão de interação dispara sequência
 
 **Sequência de Pulo:**
 
-1. Animação de preparação para salto
+1. Animação de preparação para salto com efeito visual
 2. Slime se projeta em arco em direção ao destino
-3. Movimento suave seguindo curva parabólica natural
+3. Movimento suave seguindo curva parabólica personalizável
 4. Animação de aterrissagem com efeito visual
 5. Breve pausa antes de recuperar controle total
+
+**Configuração do Level Designer:**
+- Pontos de decolagem e pouso configuráveis
+- Altura e duração do pulo ajustáveis
+- Curvas para controle preciso da trajetória
+- Detecção de obstáculos para prevenção de colisões
+- Feedback visual e sonoro durante sequência
+- Consulte `SpecialMovement_Setup.md` para detalhes completos
 
 ---
 

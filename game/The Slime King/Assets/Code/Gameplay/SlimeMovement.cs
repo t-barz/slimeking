@@ -8,7 +8,7 @@ namespace TheSlimeKing.Gameplay
     /// Compatível com URP 2D no Unity 6
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class SlimeMovement : MonoBehaviour
+    public class SlimeMovement : MonoBehaviour, IPlayerController
     {
         [Header("Configurações de Movimento")]
         [SerializeField] private float moveSpeed = 5f;
@@ -31,6 +31,9 @@ namespace TheSlimeKing.Gameplay
         // Estado
         private Vector2 _currentVelocity;
         private Vector2 _lastNonZeroDirection = Vector2.down; // Começa olhando para frente
+        private bool _controlEnabled = true;
+        private bool _inSpecialMovement = false;
+        private float _currentScale = 1.0f;
 
         private void Awake()
         {
@@ -188,6 +191,111 @@ namespace TheSlimeKing.Gameplay
             {
                 interactionController.TryInteract();
             }
+        }
+
+        #endregion
+
+        #region IPlayerController Implementation
+
+        /// <summary>
+        /// Desativa o controle do jogador
+        /// </summary>
+        public void DisableControl()
+        {
+            _controlEnabled = false;
+            _moveInput = Vector2.zero;
+            _rb.linearVelocity = Vector2.zero;
+
+            // Desativa animação de movimento se existir um controlador de animação
+            if (animationController != null)
+            {
+                // Comentado até termos detalhes da implementação do SlimeAnimationController
+                // animationController.SetAnimation("Idle");
+            }
+
+            _inSpecialMovement = true;
+        }
+
+        /// <summary>
+        /// Reativa o controle do jogador
+        /// </summary>
+        public void EnableControl()
+        {
+            _controlEnabled = true;
+            _inSpecialMovement = false;
+
+            // Restaura escala normal se necessário
+            if (_currentScale != 1.0f)
+                SetScale(1.0f);
+        }
+
+        /// <summary>
+        /// Move o jogador para uma posição específica
+        /// </summary>
+        public void MoveToPosition(Vector2 position, bool immediate = false)
+        {
+            if (immediate)
+            {
+                transform.position = position;
+                _rb.position = position;
+                _rb.linearVelocity = Vector2.zero;
+            }
+            else
+            {
+                _rb.MovePosition(position);
+            }
+        }
+
+        /// <summary>
+        /// Define a escala visual do jogador
+        /// </summary>
+        public void SetScale(float scale)
+        {
+            _currentScale = scale;
+            transform.localScale = new Vector3(scale, scale, scale);
+
+            // Ajusta o collider se necessário
+            CapsuleCollider2D capsuleCollider = GetComponent<CapsuleCollider2D>();
+            if (capsuleCollider != null)
+            {
+                capsuleCollider.size = new Vector2(capsuleCollider.size.x, capsuleCollider.size.y * scale);
+            }
+
+            // Atualiza visualização, se necessário
+            if (visualController != null)
+            {
+                // Atualiza visual com base na última direção conhecida
+                visualController.UpdateDirection(_lastNonZeroDirection);
+            }
+        }
+
+        /// <summary>
+        /// Atualiza a direção visual do jogador
+        /// </summary>
+        public void SetDirection(Vector2 direction)
+        {
+            if (direction != Vector2.zero)
+                _lastNonZeroDirection = direction.normalized;
+
+            // Atualiza visualização baseada na direção
+            if (visualController != null)
+                visualController.UpdateDirection(_lastNonZeroDirection);
+        }
+
+        /// <summary>
+        /// Obtém a posição atual do jogador
+        /// </summary>
+        public Vector2 GetPosition()
+        {
+            return transform.position;
+        }
+
+        /// <summary>
+        /// Obtém a direção atual do jogador
+        /// </summary>
+        public Vector2 GetDirection()
+        {
+            return _lastNonZeroDirection;
         }
 
         #endregion
