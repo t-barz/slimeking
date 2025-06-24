@@ -10,7 +10,7 @@ namespace TheSlimeKing.Testing
     public class SpecialMovementTester : MonoBehaviour
     {
         [Header("Referências")]
-        [SerializeField] private EncolherEsgueirarController encolherTester;
+        [SerializeField] private SlideController encolherTester;
         [SerializeField] private JumpController jumpTester;
         [SerializeField] private Transform playerTransform;
 
@@ -76,10 +76,10 @@ namespace TheSlimeKing.Testing
             exitPoint.transform.parent = _createdEncolherObject.transform;
 
             // Configura o controlador
-            EncolherEsgueirarController controller = _createdEncolherObject.GetComponent<EncolherEsgueirarController>();
+            SlideController controller = _createdEncolherObject.GetComponent<SlideController>();
 
             // Usa reflexão para definir o exitPoint privado
-            System.Reflection.FieldInfo fieldInfo = typeof(EncolherEsgueirarController).GetField("exitPoint",
+            System.Reflection.FieldInfo fieldInfo = typeof(SlideController).GetField("exitPoint",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
             if (fieldInfo != null)
