@@ -1,5 +1,5 @@
 # Documento de Regras Técnicas – The Slime King
-## Versão 1.10
+## Versão 1.11
 
 **Nota de Atualização:** Esta versão implementa o Sistema de Stealth completo (Seção 14) com estados de visibilidade e objetos de cobertura, incluindo feedback visual e integração com o controlador do jogador.
 
@@ -741,6 +741,28 @@ Os ícones superiores devem aparecer automaticamente quando o slime está próxi
 - Permanecer visível enquanto interação é possível
 - Desaparecer com fade-out quando slime se afasta
 - Trocar instantaneamente quando dispositivo de input muda
+
+#### 2.3 Integração com Input System Actions
+
+**Mapeamento de Ações:**
+O sistema de ícones trabalha diretamente com o Input System para associar cada ação à entrada correspondente:
+
+```csharp
+// Exemplo de integração com o sistema de input
+[SerializeField] private InputActionReference _interactAction;
+
+// No código
+_interactAction.action.performed += context => {
+    // Executa a interação
+    Interact();
+};
+
+// No InteractionIconTrigger
+[SerializeField] private InputActionReference _actionReference;
+```
+
+**Atualização Dinâmica:**
+O sistema monitora alterações no dispositivo de entrada e atualiza os ícones correspondentes automaticamente, sem necessidade de código adicional nos objetos interativos.
 
 ---
 
@@ -2233,15 +2255,15 @@ O sistema de localização inclui ferramentas de edição integradas ao Unity Ed
 
 ### **2. Sistema de Ícone Superior**
 
-O Sistema de Ícone Superior foi implementado para fornecer feedback visual dinâmico sobre ações contextualmente disponíveis, adaptando-se automaticamente ao dispositivo de entrada que o jogador está utilizando.
+O Sistema de Ícone Superior foi implementado para fornecer feedback visual dinâmico sobre ações contextualmente disponíveis, adaptando-se automaticamente ao dispositivo de entrada que o jogador está utilizando. O sistema foi atualizado para integrar-se diretamente com o Unity Input System e suas InputActions.
 
 #### 2.1 Estrutura e Funcionalidades Implementadas
 
 **Classes Principais:**
 - **IconManager**: Singleton central que gerencia a exibição e comportamento dos ícones
 - **InputIconData**: ScriptableObject que mapeia ações para ícones específicos por dispositivo
-- **IconDisplay**: Componente para objetos interativos que precisam exibir ícones contextuais
-- **DeviceDetector**: Classe responsável por identificar e notificar mudanças de dispositivo
+- **InteractionIconTrigger**: Componente que detecta proximidade e exibe ícones contextuais baseados em InputActions
+- **DeviceDetector**: Classe responsável por identificar e notificar mudanças de dispositivo utilizando as APIs do Input System
 
 **Diretórios e Arquivos:**
 - `/Assets/Code/Core/UI/Icons/`: Classes principais do sistema
@@ -2258,10 +2280,15 @@ O Sistema de Ícone Superior foi implementado para fornecer feedback visual din�
 
 #### 2.2 API e Utilização
 
-**Exibição de Ícones em Scripts:**
+**Exibição de Ícones em Scripts com Input System:**
 ```csharp
-// Mostrar ícone para uma ação específica
-IconManager.Instance.ShowIcon("Interact", transform.position + Vector3.up);
+// Mostrar ícone utilizando uma referência ao Input Action
+[SerializeField] private InputActionReference _actionReference;
+IconManager.Instance.ShowIcon(IconManager.Instance.GetActionNameForInputAction(_actionReference.action), transform.position + Vector3.up);
+
+// Alternativa utilizando diretamente o componente InteractionIconTrigger
+[SerializeField] private InteractionIconTrigger _iconTrigger;
+_iconTrigger.ShowIcon();
 
 // Ocultar ícone atual
 IconManager.Instance.HideIcon();
@@ -2274,30 +2301,46 @@ IconManager.Instance.OnDeviceChanged += HandleDeviceChanged;
 ```
 
 **Integração com Objetos Interativos:**
-1. Adicione o componente `IconDisplay` ao GameObject interativo
-2. Defina a ação associada no campo _actionType (ex: "Interact", "Attack", "Crouch")
+1. Adicione o componente `InteractionIconTrigger` ao GameObject interativo
+2. Vincule diretamente a InputAction usando o campo _actionReference (ex: PlayerInput.actions["Interact"])
 3. Configure a distância de detecção no campo _detectionRadius
-4. O ícone aparecerá automaticamente quando o slime estiver próximo
+4. O ícone aparecerá automaticamente quando o slime estiver próximo e será atualizado dinamicamente conforme o dispositivo de entrada
 
-**Detecção Contínua de Dispositivo:**
+**Detecção Contínua de Dispositivo com Input System:**
 ```csharp
-// Exemplo da lógica interna do DeviceDetector
-void Update() {
-    if (Gamepad.current is XInputController) {
-        SetCurrentDevice(DeviceType.Xbox);
+// Exemplo da lógica interna do DeviceDetector atualizada para Input System
+private DeviceType DetectCurrentDevice()
+{
+    // Verifica se há um controle de gamepad ativo
+    if (Gamepad.current != null)
+    {
+        // Verifica o tipo específico de gamepad
+        if (Gamepad.current is XInputController)
+        {
+            return DeviceType.Xbox;
+        }
+        else if (Gamepad.current is DualShockGamepad)
+        {
+            return DeviceType.PlayStation;
+        }
+        else if (Gamepad.current.description.interfaceName.Contains("Switch"))
+        {
+            return DeviceType.Switch;
+        }
+        else
+        {
+            return DeviceType.Generic;
+        }
     }
-    else if (Gamepad.current is DualShockGamepad) {
-        SetCurrentDevice(DeviceType.PlayStation);
+    
+    // Se houver atividade no teclado ou mouse, assume que é o dispositivo atual
+    if (Keyboard.current != null && (Keyboard.current.anyKey.isPressed || Mouse.current.leftButton.isPressed))
+    {
+        return DeviceType.Keyboard;
     }
-    else if (Gamepad.current is SwitchProController) {
-        SetCurrentDevice(DeviceType.Switch);
-    }
-    else if (Gamepad.current != null) {
-        SetCurrentDevice(DeviceType.Generic);
-    }
-    else if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) {
-        SetCurrentDevice(DeviceType.Keyboard);
-    }
+    
+    // Mantém o dispositivo atual se não houver mudança detectada
+    return _currentDevice;
 }
 ```
 
@@ -2336,15 +2379,22 @@ O sistema de ícones implementa animações suaves para melhorar a experiência 
 - **Fade-out**: Quando o slime deixa a área de interação (0.3s)
 - **Troca Instantânea**: Quando o dispositivo de input muda, o ícone é atualizado imediatamente
 
-**Detecção de Proximidade:**
+**Detecção de Proximidade com Input Actions:**
 Cada objeto interativo usa um OverlapCircle para detectar quando o slime está próximo o suficiente:
 
 ```csharp
+// No InteractionIconTrigger
+[SerializeField] private InputActionReference _actionReference; // Referência direta à InputAction
+
 void Update() {
     if (Physics2D.OverlapCircle(transform.position, _detectionRadius, _playerLayer)) {
         if (!_isDisplayingIcon) {
             _isDisplayingIcon = true;
-            IconManager.Instance.ShowIcon(_actionType, _iconPosition.position);
+            // Usa o nome da ação do Input System
+            string actionName = _actionReference != null 
+                ? IconManager.Instance.GetActionNameForInputAction(_actionReference.action) 
+                : _actionName;
+            IconManager.Instance.ShowIcon(actionName, _iconAnchor.position + Vector3.up);
         }
     } 
     else if (_isDisplayingIcon) {
@@ -2368,25 +2418,37 @@ O sistema inclui ferramentas de edição integradas ao Unity Editor para facilit
 
 **Editor de Mapeamento de Ícones:**
 - Acesso via menu `Extras > The Slime King > Ícones > Editor de Mapeamento`
-- Interface visual para gerenciar o mapeamento entre ações e ícones
+- Interface visual para gerenciar o mapeamento entre ações do Input System e ícones
 - Visualização de todos os sprites por dispositivo
 - Possibilidade de modificar mapeamentos existentes ou criar novos
 
-**Testador de Dispositivos:**
+**Testador de Dispositivos com Input System:**
 - Acesso via menu `Extras > The Slime King > Ícones > Testador de Dispositivos`
 - Simula diferentes dispositivos para verificar a aparência dos ícones
 - Permite testar a detecção automática de dispositivos
+- Exibe informações de diagnóstico sobre o dispositivo ativo no Input System
 
 **Prefabs Pré-configurados:**
-- Prefabs prontos para uso com configurações otimizadas
+- Prefabs prontos para uso com configurações otimizadas para o Input System
 - Variações específicas para diferentes tipos de interação
 - Integração facilitada com o sistema de objetos interativos
 
 **Fluxo de Trabalho Recomendado:**
-1. Definir as ações de input necessárias no Input System
+1. Definir as ações de input necessárias no Input System (`InputSystem_Actions.inputactions`)
 2. Criar ou atualizar o mapeamento de ícones usando o Editor de Mapeamento
-3. Adicionar o componente `IconDisplay` aos objetos interativos relevantes
-4. Testar a visualização em diferentes dispositivos com o Testador
+3. Adicionar o componente `InteractionIconTrigger` aos objetos interativos relevantes
+4. Vincular a InputAction correspondente no inspector
+5. Testar a visualização em diferentes dispositivos com o Testador
+
+#### 2.7 Integração Completa com Input System
+
+O sistema agora está totalmente integrado com o Unity Input System, oferecendo:
+
+- Referências diretas a InputActions via InputActionReference
+- Detecção automática de dispositivos usando a API do Input System
+- Mapeamento consistente dos controles conforme a tabela de Input Mapping
+- Suporte para InputActionAssets compartilhados entre sistemas
+- Atualização automática de ícones quando o jogador alterna entre teclado e gamepad
 
 ### **6. Sistema de Absorção Elemental**
 

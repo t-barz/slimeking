@@ -16,8 +16,6 @@ namespace TheSlimeKing.Gameplay.Movement
         [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         [Header("Feedback")]
-        [SerializeField] private ParticleSystem shrinkEffect;
-        [SerializeField] private ParticleSystem expandEffect;
         [SerializeField] private AudioClip shrinkSound;
         [SerializeField] private AudioClip expandSound;
         [SerializeField] private GameObject interactionIcon;
@@ -32,6 +30,7 @@ namespace TheSlimeKing.Gameplay.Movement
         private GameObject _player;
         private IPlayerController _playerController;
         private AudioSource _audioSource;
+        private SlimeAnimationController _animationController;
 
         // Estado
         private bool _isActive = false;
@@ -55,6 +54,7 @@ namespace TheSlimeKing.Gameplay.Movement
         }
 
         private void Start()
+
         {
             // Configura o ícone de interação
             if (interactionIcon != null)
@@ -72,11 +72,22 @@ namespace TheSlimeKing.Gameplay.Movement
 
             _player = interactor;
             _playerController = _player.GetComponent<IPlayerController>();
+            _animationController = _player.GetComponent<SlimeAnimationController>();
 
             if (_playerController == null)
             {
                 Debug.LogError("Jogador não implementa a interface IPlayerController");
                 return;
+            }
+
+            // Dispara a trigger de Shrink no Animator do Player
+            if (_animationController != null)
+            {
+                _animationController.PlayShrinkAnimation();
+            }
+            else
+            {
+                Debug.LogWarning("SlimeAnimationController não encontrado no jogador");
             }
 
             StartCoroutine(EncolherEsgueirarSequence());
@@ -120,18 +131,9 @@ namespace TheSlimeKing.Gameplay.Movement
             _isActive = true;
 
             // 1. Desabilitar controles do jogador
-            _playerController.DisableControl();
-
-            // 2. Reproduzir efeito de encolhimento
-            if (shrinkEffect != null)
-                shrinkEffect.Play();
-
+            _playerController.DisableControl();            // 2. Reproduzir som de encolhimento
             if (shrinkSound != null && _audioSource != null)
                 _audioSource.PlayOneShot(shrinkSound);
-
-            // 3. Posicionar o jogador na entrada
-            _playerController.MoveToPosition(transform.position);
-            _playerController.SetDirection((exitPoint.position - transform.position).normalized);
 
             yield return new WaitForSeconds(0.5f);
 
@@ -147,10 +149,8 @@ namespace TheSlimeKing.Gameplay.Movement
             }
             _playerController.SetScale(shrinkScale);
 
-            yield return new WaitForSeconds(0.2f);
-
-            // 5. Mover o jogador pelo caminho
-            Vector3 startPosition = transform.position;
+            yield return new WaitForSeconds(0.2f);            // 5. Mover o jogador pelo caminho a partir da sua posição atual
+            Vector3 startPosition = _player.transform.position;
             Vector3 targetPosition = exitPoint.position;
 
             elapsed = 0;
@@ -165,12 +165,7 @@ namespace TheSlimeKing.Gameplay.Movement
                 yield return null;
             }
 
-            _playerController.MoveToPosition(targetPosition);
-
-            // 6. Expandir o jogador de volta ao tamanho normal
-            if (expandEffect != null)
-                expandEffect.Play();
-
+            _playerController.MoveToPosition(targetPosition);            // 6. Expandir o jogador de volta ao tamanho normal
             if (expandSound != null && _audioSource != null)
                 _audioSource.PlayOneShot(expandSound);
 
@@ -196,12 +191,9 @@ namespace TheSlimeKing.Gameplay.Movement
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            // Desenha linha entre pontos de entrada e saída
+            // Desenha apenas o ponto de saída e a área de interação
             if (exitPoint != null)
             {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(transform.position, exitPoint.position);
-
                 // Desenha área de interação
                 Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
                 Gizmos.DrawSphere(transform.position, maxInteractionDistance);
@@ -209,6 +201,12 @@ namespace TheSlimeKing.Gameplay.Movement
                 // Desenha ponto de saída
                 Gizmos.color = Color.green;
                 Gizmos.DrawSphere(exitPoint.position, 0.3f);
+
+                // Desenha seta indicativa na direção do movimento
+                Gizmos.color = Color.yellow;
+                Vector3 direction = (exitPoint.position - transform.position).normalized;
+                float arrowLength = Vector3.Distance(transform.position, exitPoint.position) * 0.8f;
+                Gizmos.DrawRay(transform.position, direction * arrowLength);
             }
         }
 #endif
