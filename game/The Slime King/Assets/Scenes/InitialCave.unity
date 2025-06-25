@@ -7408,12 +7408,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 437811790}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8c3e9be4e8a26145b5a733d02ba007e, type: 3}
+  m_Script: {fileID: 11500000, guid: 85125d16526c68242957fd21fee312e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exitPoint: {fileID: 19065492}
-  movementDuration: 2
-  shrinkScale: 0.5
+  interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  slideAnimationTrigger: Shrink
+  destinationPoint: {fileID: 19065492}
+  movementDuration: 0.25
   movementCurve:
     serializedVersion: 2
     m_Curve:
@@ -7438,13 +7439,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  shrinkSound: {fileID: 0}
-  expandSound: {fileID: 0}
-  interactionIcon: {fileID: 0}
-  maxInteractionDistance: 1.5
-  maxInteractionAngle: 30
-  interactionPrompt: Pressione E para esgueirar
-  interactionPriority: 10
 --- !u!1 &1779000621
 GameObject:
   m_ObjectHideFlags: 0
