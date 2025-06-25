@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -305,6 +306,70 @@ namespace TheSlimeKing.Gameplay
         public bool IsCrouching()
         {
             return _isCrouching;
+        }
+
+        /// <summary>
+        /// Desliza o slime até uma posição específica durante um tempo determinado
+        /// </summary>
+        /// <param name="destination">Posição de destino</param>
+        /// <param name="duration">Duração do movimento em segundos</param>
+        public void Slide(Vector2 destination, float duration)
+        {
+            // Calcula a direção para o destino
+            Vector2 direction = (destination - (Vector2)transform.position).normalized;
+
+            // Atualiza a direção visual do slime
+            SetDirection(direction);
+
+            // Inicia a coroutine de deslizamento
+            StartCoroutine(SlideCoroutine(destination, duration));
+        }
+
+        /// <summary>
+        /// Coroutine que controla o movimento suave do slime durante o deslizamento
+        /// </summary>
+        private IEnumerator SlideCoroutine(Vector2 destination, float duration)
+        {
+            // Desabilita o controle do jogador durante o slide
+            DisableControl();
+
+            // Salva a posição inicial
+            Vector2 startPosition = transform.position;
+
+            // Tempo decorrido
+            float elapsed = 0f;
+
+            // Se existe animationController, poderia acionar uma animação de deslizamento aqui
+            if (animationController != null)
+            {
+                // Supondo que exista um método para animação de slide
+                animationController.PlayShrinkAnimation();
+            }
+
+            while (elapsed < duration)
+            {
+                // Calcula o progresso (0 a 1) com suavização
+                float t = elapsed / duration;
+                float smoothT = Mathf.SmoothStep(0, 1, t); // Adiciona aceleração e desaceleração suaves
+
+                // Interpola a posição
+                Vector2 newPosition = Vector2.Lerp(startPosition, destination, smoothT);
+
+                // Move o slime para a posição interpolada
+                MoveToPosition(newPosition, true);
+
+                // Atualiza o tempo decorrido
+                elapsed += Time.deltaTime;
+
+                // Espera até o próximo frame
+                yield return null;
+            }
+
+            // Garante que a posição final seja exatamente a de destino
+            MoveToPosition(destination, true);
+
+            // Reativa o controle do jogador
+            EnableControl();
         }
 
         #endregion

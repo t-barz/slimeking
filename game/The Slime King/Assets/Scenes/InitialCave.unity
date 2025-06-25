@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: _iconOffset.y
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 8310831072763696362, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
+      propertyPath: destinationPoint
+      value: 
+      objectReference: {fileID: 1668141564}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -821,11 +825,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &437811790 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 642944124420479412, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
-  m_PrefabInstance: {fileID: 8986119349965525033}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &454690221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7399,46 +7398,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 360790214081671633, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
   m_PrefabInstance: {fileID: 8986119349965525033}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1668141565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 437811790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85125d16526c68242957fd21fee312e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  slideAnimationTrigger: Shrink
-  destinationPoint: {fileID: 19065492}
-  movementDuration: 0.25
-  movementCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &1779000621
 GameObject:
   m_ObjectHideFlags: 0
@@ -8881,13 +8840,14 @@ PrefabInstance:
       propertyPath: _fadeDuration
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 8310831072763696362, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
+      propertyPath: destinationPoint
+      value: 
+      objectReference: {fileID: 19065492}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 642944124420479412, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1668141565}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
