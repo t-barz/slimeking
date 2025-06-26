@@ -1,14 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using TheSlimeKing.Core.Combat;
 
 namespace TheSlimeKing.Core
 {
     /// <summary>
     /// Gerencia os atributos e status do jogador
     /// </summary>
-    public class PlayerStatus : MonoBehaviour, IDamageable
+    public class PlayerStatus : MonoBehaviour
     {
         [Header("Stats Base")]
         [SerializeField] private int _baseHealth = 100;

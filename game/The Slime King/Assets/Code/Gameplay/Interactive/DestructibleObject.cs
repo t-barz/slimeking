@@ -1,131 +1,168 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using TheSlimeKing.Core.Combat;
-using TheSlimeKing.Core.Inventory;
-using TheSlimeKing.Core.Elemental;
-using TheSlimeKing.Gameplay.Combat;
 
 namespace TheSlimeKing.Gameplay.Interactive
 {
     /// <summary>
-    /// Objetos destrutíveis que podem receber dano e dropar itens
+    /// Objetos destrutíveis que podem receber dano e mudar de estado visual
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class DestructibleObject : InteractableObject, IDamageable
+    public class DestructibleObject : MonoBehaviour
     {
         [Header("Configurações de Vida")]
-        [SerializeField] private int _maxHealth = 1;
+        [Tooltip("Quantidade máxima de pontos de vida do objeto")]
+        [SerializeField] private int _maxHealth = 10;
+
+        [Tooltip("Redução de dano aplicada a cada ataque")]
         [SerializeField] private int _defense = 0;
 
-        [Header("Resistências Elementais")]
-        [SerializeField] private int _fireResistance = 0; // Porcentagem de redução de dano
-        [SerializeField] private int _waterResistance = 0;
-        [SerializeField] private int _earthResistance = 0;
-        [SerializeField] private int _airResistance = 0;
-
-        [Header("Configurações de Destruição")]
-        [SerializeField] private float _flashDuration = 0.15f;
-        [Tooltip("Cor do efeito de flash ao receber dano")]
-        [SerializeField] private Color _flashColor = Color.red;
-        [SerializeField] private float _destroyFadeDuration = 1.5f;
-        [SerializeField] private float _minAlphaBeforeDestroy = 0.05f;
-
         [Header("Efeitos")]
-        [SerializeField] private GameObject _hitEffectPrefab;
-        [SerializeField] private GameObject _destructionEffectPrefab;
-        [SerializeField] private AudioClip _hitSound;
-        [SerializeField] private AudioClip _breakSound;
+        [Tooltip("Cor do flash quando o objeto recebe dano")]
+        [SerializeField] private Color _hitFlashColor = Color.red;
 
-        [Header("Drops")]
-        [SerializeField] private List<ItemDropChance> _possibleDrops = new List<ItemDropChance>();
-        [SerializeField] private List<ItemDropChance> _guaranteedDrops = new List<ItemDropChance>();
-        [SerializeField] private int _minTotalDrops = 0;
-        [SerializeField] private int _maxTotalDrops = 3;
-        [SerializeField] private float _dropForceMin = 2f;
-        [SerializeField] private float _dropForceMax = 5f;
+        [Tooltip("Duração do efeito de flash em segundos")]
+        [SerializeField] private float _flashDuration = 0.15f;
+
+        [Header("Tag e Layer")]
+        [Tooltip("Lembrete: Certifique-se que o objeto tem a tag 'Destructible'")]
+        [SerializeField] private bool _checkTagOnStart = true;
 
         // Estado
         private int _currentHealth;
-        private bool _isDead = false;
-        private bool _isInDamagedState = false; // Controla se já entrou no estado de metade da vida
-        private SpriteRenderer _spriteRenderer;
+        private bool _isCracked = false;
+        private bool _isDestroyed = false;
+
+        // Componentes
         private Animator _animator;
+        private SpriteRenderer _spriteRenderer;
         private Color _originalColor;
 
-        // Cache
-        private static readonly int AnimatorHitParam = Animator.StringToHash("Hit");
-        private static readonly int AnimatorDestroyParam = Animator.StringToHash("Destroy");
-        private static readonly int AnimatorStageParam = Animator.StringToHash("Stage");
+        // Hashes do animator para melhor performance
+        private static readonly int IsCrackedHash = Animator.StringToHash("isCracked");
+        private static readonly int IsDestroyedHash = Animator.StringToHash("isDestroyed");
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
-
+            // Inicializa a vida atual com o valor máximo
             _currentHealth = _maxHealth;
-            _spriteRenderer = GetComponent<SpriteRenderer>();
-            _animator = GetComponent<Animator>();
 
+            // Obtém os componentes necessários
+            _animator = GetComponent<Animator>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+
+            // Armazena a cor original para restaurar após o flash
             if (_spriteRenderer != null)
             {
                 _originalColor = _spriteRenderer.color;
             }
+        }
 
-            // Inicializa o animator com o estágio 0 (objeto intacto)
-            if (_animator != null)
+        private void Start()
+        {
+            // Verifica se a tag está configurada corretamente
+            if (_checkTagOnStart && !CompareTag("Destructible"))
             {
-                _animator.SetInteger(AnimatorStageParam, 0);
+                Debug.LogWarning($"O objeto {gameObject.name} tem o componente DestructibleObject mas não está com a tag 'Destructible'");
             }
         }
 
-        #region IDamageable Implementation
-
         /// <summary>
-        /// Aplica dano ao objeto
+        /// Aplica dano ao objeto destrutível
         /// </summary>
-        public int TakeDamage(int damage, GameObject attacker = null, Vector3? hitPoint = null)
+        /// <param name="damage">Quantidade de dano bruto</param>
+        /// <param name="attacker">Referência ao atacante (opcional)</param>
+        /// <param name="hitPoint">Ponto onde ocorreu o impacto (opcional)</param>
+        /// <returns>Quantidade de dano real aplicado após defesas</returns>
+        public int TakeDamage(int damage, GameObject attacker, Vector3? hitPoint = null)
         {
-            if (_isDead)
+            // Se já estiver destruído, não causa mais dano
+            if (_isDestroyed)
                 return 0;
 
-            // Aplica defesa ao dano
-            int actualDamage = Mathf.Max(damage - _defense, 1);
+            // Calcula o dano real subtraindo a defesa (mínimo 1 de dano)
+            int actualDamage = Mathf.Max(1, damage - _defense);
 
-            if (actualDamage > 0)
+            // Subtrai o dano da vida atual
+            _currentHealth -= actualDamage;
+
+            // Aplica efeito visual de dano apenas se o dano for significativo (>=1)
+            if (actualDamage >= 1)
             {
-                StartCoroutine(FlashEffect());
+                FlashEffect();
             }
 
+            // Log de debug para informar sobre o dano
+            Debug.Log($"Objeto {gameObject.name} recebeu {actualDamage} de dano" +
+                     (attacker != null ? $" de {attacker.name}" : ""));
 
-            if (hitPoint.HasValue && _hitEffectPrefab != null)
+            // Verifica se chegou à metade da vida e ainda não está rachado
+            if (!_isCracked && _currentHealth <= _maxHealth / 2)
             {
-                Instantiate(_hitEffectPrefab, hitPoint.Value, Quaternion.identity);
-            }
-
-            if (_hitSound != null)
-            {
-                AudioSource.PlayClipAtPoint(_hitSound, transform.position, 0.7f);
+                _isCracked = true;
+                if (_animator != null)
+                {
+                    _animator.SetBool(IsCrackedHash, true);
+                    Debug.Log($"Objeto {gameObject.name} rachou (vida: {_currentHealth}/{_maxHealth})");
+                }
             }
 
             // Verifica se foi destruído
-            if (_currentHealth <= 0 && !_isDead)
+            if (!_isDestroyed && _currentHealth <= 0)
             {
-                Die();
+                _isDestroyed = true;
+                if (_animator != null)
+                {
+                    _animator.SetBool(IsDestroyedHash, true);
+                    Debug.Log($"Objeto {gameObject.name} foi destruído");
+                }
+
+                // Desativa os colliders após destruição
+                DisableColliders();
             }
 
             return actualDamage;
         }
 
         /// <summary>
-        /// Verifica se o objeto foi destruído
+        /// Aplica efeito visual de flash quando o objeto recebe dano
         /// </summary>
-        public bool IsDead()
+        private void FlashEffect()
         {
-            return _isDead;
+            if (_spriteRenderer != null)
+            {
+                // Usa Coroutine para retornar à cor original após o flash
+                StartCoroutine(FlashCoroutine());
+            }
         }
 
         /// <summary>
-        /// Retorna a saúde atual
+        /// Coroutine para aplicar o efeito de flash temporário
+        /// </summary>
+        private System.Collections.IEnumerator FlashCoroutine()
+        {
+            // Muda para a cor de dano
+            _spriteRenderer.color = _hitFlashColor;
+
+            // Aguarda o tempo definido
+            yield return new WaitForSeconds(_flashDuration);
+
+            // Retorna à cor original
+            _spriteRenderer.color = _originalColor;
+        }
+
+        /// <summary>
+        /// Desativa todos os colliders do objeto após a destruição
+        /// </summary>
+        private void DisableColliders()
+        {
+            Collider2D[] colliders = GetComponents<Collider2D>();
+            foreach (var collider in colliders)
+            {
+                collider.enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Retorna a saúde atual do objeto
         /// </summary>
         public int GetCurrentHealth()
         {
@@ -133,210 +170,27 @@ namespace TheSlimeKing.Gameplay.Interactive
         }
 
         /// <summary>
-        /// Retorna a saúde máxima
+        /// Retorna a saúde máxima do objeto
         /// </summary>
         public int GetMaxHealth()
         {
             return _maxHealth;
         }
 
-        #endregion
-
         /// <summary>
-        /// Processa a destruição do objeto
+        /// Verifica se o objeto já está destruído
         /// </summary>
-        private void Die()
+        public bool IsDestroyed()
         {
-            _isDead = true;
-
-            // Desativar interações
-            SetInteractable(false);
-
-            // Animação de destruição
-            if (_animator != null)
-            {
-                _animator.SetInteger(AnimatorStageParam, 2);
-                _animator.SetTrigger(AnimatorDestroyParam);
-                Debug.Log($"Objeto {gameObject.name} entrou no estado destruído (Stage 2)");
-            }
-
-            // Efeito de destruição
-            if (_destructionEffectPrefab != null)
-            {
-                Instantiate(_destructionEffectPrefab, transform.position, Quaternion.identity);
-            }
-
-            // Som de quebra
-            if (_breakSound != null)
-            {
-                AudioSource.PlayClipAtPoint(_breakSound, transform.position);
-            }
-
-            // Física
-            Rigidbody2D rb = GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.simulated = false;
-            }
-
-            // Desativar colliders
-            foreach (Collider2D col in GetComponents<Collider2D>())
-            {
-                col.enabled = false;
-            }
-
-            // Efeito de fade out
-            StartCoroutine(DestroyWithFadeout());
-
-            // Dropar itens
-            DropItems();
+            return _isDestroyed;
         }
 
         /// <summary>
-        /// Aplica resistência elemental ao dano
+        /// Implementação da interface IDamageable - verifica se o objeto está "morto" (destruído)
         /// </summary>
-        private int ApplyElementalResistance(int damage, ElementalType elementalType)
+        public bool IsDead()
         {
-            int resistance = 0;
-
-            switch (elementalType)
-            {
-                case ElementalType.Fire:
-                    resistance = _fireResistance;
-                    break;
-                case ElementalType.Water:
-                    resistance = _waterResistance;
-                    break;
-                case ElementalType.Earth:
-                    resistance = _earthResistance;
-                    break;
-                case ElementalType.Air:
-                    resistance = _airResistance;
-                    break;
-            }
-
-            // Aplica a redução de dano
-            if (resistance > 0)
-            {
-                float damageMultiplier = 1f - (resistance / 100f);
-                damage = Mathf.RoundToInt(damage * damageMultiplier);
-            }
-
-            return Mathf.Max(damage, 1); // Mínimo de 1 de dano
+            return _isDestroyed;
         }
-
-        /// <summary>
-        /// Efeito de piscar ao receber dano
-        /// </summary>
-        private IEnumerator FlashEffect()
-        {
-            if (_spriteRenderer == null)
-                yield break;
-
-            // Usa a cor configurada para o flash
-            _spriteRenderer.color = _flashColor;
-            yield return new WaitForSeconds(_flashDuration);
-            _spriteRenderer.color = _originalColor;
-        }
-
-        /// <summary>
-        /// Aplica fade out gradual antes de destruir o objeto
-        /// </summary>
-        private IEnumerator DestroyWithFadeout()
-        {
-            if (_spriteRenderer == null)
-            {
-                Destroy(gameObject);
-                yield break;
-            }
-
-            float elapsedTime = 0f;
-            Color startColor = _spriteRenderer.color;
-            Color targetColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
-
-            while (elapsedTime < _destroyFadeDuration)
-            {
-                _spriteRenderer.color = Color.Lerp(startColor, targetColor, elapsedTime / _destroyFadeDuration);
-                elapsedTime += Time.deltaTime;
-
-                if (_spriteRenderer.color.a <= _minAlphaBeforeDestroy)
-                    break;
-
-                yield return null;
-            }
-
-            Destroy(gameObject);
-        }
-
-        /// <summary>
-        /// Gera os drops de itens
-        /// </summary>
-        private void DropItems()
-        {
-            // Primeiro, dropar os itens garantidos
-            foreach (ItemDropChance guaranteedDrop in _guaranteedDrops)
-            {
-                if (guaranteedDrop.ItemData != null)
-                {
-                    SpawnItemDrop(guaranteedDrop.ItemData, guaranteedDrop.Quantity);
-                }
-            }
-
-            // Depois, escolhe aleatoriamente dos possíveis drops
-            if (_possibleDrops.Count > 0)
-            {
-                int totalDrops = Random.Range(_minTotalDrops, _maxTotalDrops + 1);
-
-                for (int i = 0; i < totalDrops; i++)
-                {
-                    // Percorre a lista de possíveis drops e verifica cada chance
-                    foreach (ItemDropChance dropChance in _possibleDrops)
-                    {
-                        if (Random.Range(0f, 100f) < dropChance.DropChance)
-                        {
-                            SpawnItemDrop(dropChance.ItemData, dropChance.Quantity);
-                            break; // Para cada slot de drop, só dropa um item
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Cria um item no mundo
-        /// </summary>
-        private void SpawnItemDrop(ItemData itemData, int quantity)
-        {
-            if (itemData == null)
-                return;
-
-            // Instancia o item no mundo
-            GameObject itemObj = new GameObject($"Drop_{itemData.name}");
-            itemObj.transform.position = transform.position;
-
-            // Adiciona o componente de drop
-            ItemWorldDrop dropComponent = itemObj.AddComponent<ItemWorldDrop>();
-            dropComponent.SetItem(itemData, quantity);
-
-            // Aplica força aleatória para espalhar os items
-            float force = Random.Range(_dropForceMin, _dropForceMax);
-            Vector2 direction = new Vector2(
-                Random.Range(-1f, 1f),
-                Random.Range(-0.2f, 1f)
-            );
-
-            dropComponent.ApplyInitialForce(direction, force);
-        }
-    }
-
-    /// <summary>
-    /// Define um item que pode ser dropado com sua chance
-    /// </summary>
-    [System.Serializable]
-    public class ItemDropChance
-    {
-        public ItemData ItemData;
-        [Range(1, 99)] public int Quantity = 1;
-        [Range(0f, 100f)] public float DropChance = 100f;
     }
 }

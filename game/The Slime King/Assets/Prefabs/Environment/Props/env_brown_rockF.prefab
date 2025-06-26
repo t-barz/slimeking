@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: env_brown_rockF
       objectReference: {fileID: 0}
+    - target: {fileID: -2253911629886400664, guid: 4ae47912f4596614f9f11f371e00bcba, type: 3}
+      propertyPath: m_TagString
+      value: Destructible
+      objectReference: {fileID: 0}
     - target: {fileID: 1160356261127867848, guid: 4ae47912f4596614f9f11f371e00bcba, type: 3}
       propertyPath: m_Controller
       value: 
@@ -71,6 +75,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 4ae47912f4596614f9f11f371e00bcba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7766959287421651419}
+    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 4ae47912f4596614f9f11f371e00bcba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5875791583112244041}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 4ae47912f4596614f9f11f371e00bcba, type: 3}
 --- !u!1 &7894067387907552395 stripped
 GameObject:
@@ -123,3 +130,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.2, y: 0.1}
   m_EdgeRadius: 0
+--- !u!114 &5875791583112244041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7894067387907552395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 189c76d6db496c044985b13014cc7325, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 1
+  _defense: 0
+  _hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  _flashDuration: 0.15
+  _checkTagOnStart: 1

@@ -1,5 +1,4 @@
 using UnityEngine;
-using TheSlimeKing.Core.Combat;
 using System.Collections;
 
 namespace TheSlimeKing.Gameplay.Enemies
@@ -8,7 +7,7 @@ namespace TheSlimeKing.Gameplay.Enemies
     /// Implementação básica de um inimigo simples
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-    public class SimpleEnemy : MonoBehaviour, IDamageable
+    public class SimpleEnemy : MonoBehaviour
     {
         [Header("Status")]
         [SerializeField] private int _maxHealth = 50;
@@ -134,16 +133,6 @@ namespace TheSlimeKing.Gameplay.Enemies
                 _attackRange,
                 _playerLayer
             );
-
-            foreach (Collider2D hit in hitPlayers)
-            {
-                // Tenta aplicar dano
-                IDamageable damageable = hit.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(_damage, gameObject);
-                }
-            }
 
             // Termina o ataque após um pequeno delay
             StartCoroutine(EndAttackAfterDelay(0.5f));
