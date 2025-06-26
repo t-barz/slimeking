@@ -11,6 +11,13 @@ public class SlidePointController : MonoBehaviour
     [Tooltip("Duração do movimento de deslizamento em segundos")]
     [SerializeField] private float slideDuration = 0.5f;
 
+    [Header("Visual no Editor")]
+    [Tooltip("Cor da linha no editor que conecta o ponto inicial ao destino")]
+    [SerializeField] private Color pathColor = Color.cyan;
+
+    [Tooltip("Cor da esfera no ponto de destino")]
+    [SerializeField] private Color destinationColor = Color.blue;
+
     [Header("Configurações de Input")]
     [Tooltip("Ação de input que ativa o deslizamento")]
     [SerializeField] private InputActionReference slideAction;
@@ -68,7 +75,6 @@ public class SlidePointController : MonoBehaviour
             Debug.LogError($"SlidePointController ({gameObject.name}): CircleCollider2D deve ser configurado como trigger!");
         }
 
-        Debug.Log($"SlidePointController ({gameObject.name}) inicializado com sucesso.");
     }
 
     // Gerencia os listeners de input
@@ -79,14 +85,12 @@ public class SlidePointController : MonoBehaviour
             // Ativa a escuta do input quando o jogador estiver no alcance
             if (playerInRange && !isListeningToInput)
             {
-                Debug.Log($"SlidePointController: Adicionando listener para a ação {slideAction.action.name}");
                 slideAction.action.performed += OnSlideActionPerformed;
                 isListeningToInput = true;
             }
             // Desativa a escuta do input quando o jogador sair do alcance
             else if (!playerInRange && isListeningToInput)
             {
-                Debug.Log($"SlidePointController: Removendo listener da ação {slideAction.action.name}");
                 slideAction.action.performed -= OnSlideActionPerformed;
                 isListeningToInput = false;
                 currentPlayer = null;
@@ -97,24 +101,14 @@ public class SlidePointController : MonoBehaviour
     // Callback quando a ação de deslizar é executada
     private void OnSlideActionPerformed(InputAction.CallbackContext context)
     {
-        Debug.Log($"SlidePointController ({gameObject.name}): Ação de deslizamento ativada!");
 
         if (currentPlayer != null && destinationPoint != null)
         {
             SlimeMovement slimeMovement = currentPlayer.GetComponent<SlimeMovement>();
             if (slimeMovement != null)
             {
-                Debug.Log($"SlidePointController: Iniciando deslizamento para {destinationPoint.position}");
                 slimeMovement.Slide(destinationPoint.position, slideDuration);
             }
-            else
-            {
-                Debug.LogError("SlidePointController: O jogador não possui componente SlimeMovement!");
-            }
-        }
-        else
-        {
-            Debug.LogError($"SlidePointController: Não é possível iniciar deslizamento. Jogador: {(currentPlayer != null)}, Destino: {(destinationPoint != null)}");
         }
     }
 
@@ -125,7 +119,6 @@ public class SlidePointController : MonoBehaviour
         {
             playerInRange = true;
             currentPlayer = other.gameObject;
-            Debug.Log($"SlidePointController ({gameObject.name}): Jogador entrou na área");
         }
     }
 
@@ -134,7 +127,6 @@ public class SlidePointController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            Debug.Log($"SlidePointController ({gameObject.name}): Jogador saiu da área");
         }
     }
 
@@ -143,13 +135,37 @@ public class SlidePointController : MonoBehaviour
     {
         if (destinationPoint != null)
         {
-            // Cores para destacar o caminho de deslizamento
-            Gizmos.color = Color.cyan;
+            // Desenha uma linha do ponto de origem até o destino com a cor configurada
+            Gizmos.color = pathColor;
             Gizmos.DrawLine(transform.position, destinationPoint.position);
 
-            // Desenha uma esfera no ponto de destino
-            Gizmos.color = Color.blue;
+            // Desenha uma esfera no ponto de destino com a cor configurada
+            Gizmos.color = destinationColor;
             Gizmos.DrawSphere(destinationPoint.position, 0.2f);
+        }
+    }
+
+    // Desenha gizmos adicionais quando o objeto está selecionado
+    private void OnDrawGizmosSelected()
+    {
+        if (destinationPoint != null)
+        {
+            // Desenha uma linha pontilhada quando selecionado para destacar melhor
+            Gizmos.color = new Color(pathColor.r, pathColor.g, pathColor.b, 0.5f);
+            Gizmos.DrawLine(transform.position, destinationPoint.position);
+
+            // Desenha um círculo no ponto de origem para indicar a área de detecção
+            CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
+            if (circleCollider != null)
+            {
+                // Usa uma cor semi-transparente para o círculo de detecção
+                Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+                Gizmos.DrawWireSphere(transform.position, circleCollider.radius);
+            }
+
+            // Destaca o ponto de destino com uma esfera maior quando selecionado
+            Gizmos.color = new Color(destinationColor.r, destinationColor.g, destinationColor.b, 0.7f);
+            Gizmos.DrawSphere(destinationPoint.position, 0.25f);
         }
     }
 

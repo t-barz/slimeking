@@ -17,9 +17,7 @@ namespace TheSlimeKing.Gameplay.Combat
         [SerializeField] private float _specialAttackRange = 1.5f;
 
         [Header("Configurações de Dano")]
-        [SerializeField] private int _basicAttackDamage = 10;
-        [SerializeField] private int _dashAttackDamage = 15;
-        [SerializeField] private int _specialAttackDamage = 20;
+        [Tooltip("A força do knockback aplicada aos inimigos")]
         [SerializeField] private float _knockbackForce = 5f;
 
         [Header("Configurações de Cooldown")]
@@ -48,6 +46,7 @@ namespace TheSlimeKing.Gameplay.Combat
         private Rigidbody2D _rb;
         private Animator _animator;
         private AudioSource _audioSource;
+        private SlimeStats _slimeStats;
 
         // Eventos
         public event Action<AttackType, int> OnAttackPerformed;
@@ -58,6 +57,7 @@ namespace TheSlimeKing.Gameplay.Combat
             _rb = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
             _audioSource = GetComponent<AudioSource>();
+            _slimeStats = GetComponent<SlimeStats>();
 
             // Cria um audio source se não existir
             if (_audioSource == null)
@@ -68,6 +68,49 @@ namespace TheSlimeKing.Gameplay.Combat
                 _audioSource.volume = 0.7f;
                 _audioSource.pitch = 1.0f;
             }
+
+            // Verifica se encontrou SlimeStats
+            if (_slimeStats == null)
+            {
+                Debug.LogWarning("SlimeCombatManager não encontrou componente SlimeStats. Os valores de ataque serão reduzidos.");
+            }
+        }
+
+        /// <summary>
+        /// Obtém o dano de ataque básico do SlimeStats
+        /// </summary>
+        private int GetBasicAttackDamage()
+        {
+            if (_slimeStats != null)
+            {
+                // Usa o valor de Attack do SlimeStats
+                return Mathf.RoundToInt(_slimeStats.Attack.Value);
+            }
+
+            return 10; // Valor padrão se SlimeStats não estiver disponível
+        }
+
+        /// <summary>
+        /// Obtém o dano de dash attack (sempre o dobro do ataque básico)
+        /// </summary>
+        private int GetDashAttackDamage()
+        {
+            // Dash attack é sempre o dobro do ataque básico
+            return GetBasicAttackDamage() * 2;
+        }
+
+        /// <summary>
+        /// Obtém o dano de ataque especial do SlimeStats
+        /// </summary>
+        private int GetSpecialAttackDamage()
+        {
+            if (_slimeStats != null)
+            {
+                // Usa o valor de Special do SlimeStats
+                return Mathf.RoundToInt(_slimeStats.Special.Value);
+            }
+
+            return 20; // Valor padrão se SlimeStats não estiver disponível
         }
 
         /// <summary>
@@ -83,14 +126,14 @@ namespace TheSlimeKing.Gameplay.Combat
 
             // Anima o ataque
             if (_animator != null)
-                _animator.SetTrigger("Attack");
+                _animator.SetTrigger("Attack01");
 
             // Executa o ataque após um delay para sincronizar com a animação
             // No futuro, pode ser substituído por Animation Events
             Invoke(nameof(ExecuteBasicAttack), 0.1f);
 
             // Notifica evento
-            OnAttackPerformed?.Invoke(AttackType.Basic, _basicAttackDamage);
+            OnAttackPerformed?.Invoke(AttackType.Basic, GetBasicAttackDamage());
         }
 
         /// <summary>
@@ -112,36 +155,36 @@ namespace TheSlimeKing.Gameplay.Combat
             Invoke(nameof(ExecuteDashAttack), 0.05f);
 
             // Notifica evento
-            OnAttackPerformed?.Invoke(AttackType.Dash, _dashAttackDamage);
+            OnAttackPerformed?.Invoke(AttackType.Dash, GetDashAttackDamage());
         }        /// <summary>
-        /// Executa um ataque especial (com efeito elemental)
-        /// </summary>
+                 /// Executa um ataque especial (com efeito elemental)
+                 /// </summary>
         public void PerformSpecialAttack(ElementalType elementalType)
         {
             // Verifica cooldown
             if (Time.time - _lastSpecialAttackTime < _specialAttackCooldown)
                 return;
-            
+
             // Verificar se tem energia suficiente (no futuro)
             // Por agora, apenas permite o ataque
-            
+
             _lastSpecialAttackTime = Time.time;
-            
+
             // Anima o especial
             if (_animator != null)
                 _animator.SetTrigger("Special");
-            
+
             // Executa com delay para sincronizar com animação
             // Passa o tipo elemental para o método de execução
             Invoke(nameof(ExecuteSpecialAttack), 0.2f);
-            
+
             // Salva o tipo elemental para uso quando o ataque for executado
             _currentElementalType = elementalType;
-            
+
             // Notifica evento
-            OnAttackPerformed?.Invoke(AttackType.Special, _specialAttackDamage);
+            OnAttackPerformed?.Invoke(AttackType.Special, GetSpecialAttackDamage());
         }
-        
+
         // Tipo elemental atual para o próximo ataque especial
         private ElementalType _currentElementalType = ElementalType.None;
 
@@ -149,18 +192,31 @@ namespace TheSlimeKing.Gameplay.Combat
 
         private void ExecuteBasicAttack()
         {
-            // Detecta inimigos no alcance
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            // Detecta todos os colliders no alcance (sem filtrar por layer)
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(
                 _attackPoint != null ? _attackPoint.position : transform.position,
-                _basicAttackRange,
-                _enemyLayers
+                _basicAttackRange
             );
 
-            // Aplica dano
-            foreach (Collider2D enemy in hitEnemies)
+            // Aplica dano a objetos com tag Enemy ou Destructible
+            foreach (Collider2D collider in hitColliders)
             {
-                DealDamageToEnemy(enemy.gameObject, _basicAttackDamage);
-                ApplyKnockback(enemy.gameObject, _knockbackForce * 0.5f);
+                GameObject targetObject = collider.gameObject;
+
+                // Verifica se o objeto tem uma das tags necessárias
+                if (targetObject.CompareTag("Enemy") || targetObject.CompareTag("Destructible"))
+                {
+                    // Aplica dano
+                    DealDamageToEnemy(targetObject, GetBasicAttackDamage());
+
+                    // Aplica knockback apenas em inimigos (objetos destrutíveis geralmente são estáticos)
+                    if (targetObject.CompareTag("Enemy"))
+                    {
+                        ApplyKnockback(targetObject, _knockbackForce * 0.5f);
+                    }
+
+                    Debug.Log($"Ataque básico atingiu {targetObject.name} com tag {targetObject.tag}");
+                }
             }
 
             // VFX e SFX
@@ -177,18 +233,31 @@ namespace TheSlimeKing.Gameplay.Combat
                 _rb.AddForce(dashDirection * _knockbackForce * 2, ForceMode2D.Impulse);
             }
 
-            // Detecta inimigos no alcance
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            // Detecta todos os colliders no alcance (sem filtrar por layer)
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(
                 _attackPoint != null ? _attackPoint.position : transform.position,
-                _dashAttackRange,
-                _enemyLayers
+                _dashAttackRange
             );
 
-            // Aplica dano
-            foreach (Collider2D enemy in hitEnemies)
+            // Aplica dano a objetos com tag Enemy ou Destructible
+            foreach (Collider2D collider in hitColliders)
             {
-                DealDamageToEnemy(enemy.gameObject, _dashAttackDamage);
-                ApplyKnockback(enemy.gameObject, _knockbackForce);
+                GameObject targetObject = collider.gameObject;
+
+                // Verifica se o objeto tem uma das tags necessárias
+                if (targetObject.CompareTag("Enemy") || targetObject.CompareTag("Destructible"))
+                {
+                    // Aplica dano
+                    DealDamageToEnemy(targetObject, GetDashAttackDamage());
+
+                    // Aplica knockback apenas em inimigos (objetos destrutíveis geralmente são estáticos)
+                    if (targetObject.CompareTag("Enemy"))
+                    {
+                        ApplyKnockback(targetObject, _knockbackForce);
+                    }
+
+                    Debug.Log($"Dash attack atingiu {targetObject.name} com tag {targetObject.tag}");
+                }
             }
 
             // VFX e SFX
@@ -198,21 +267,34 @@ namespace TheSlimeKing.Gameplay.Combat
 
         private void ExecuteSpecialAttack()
         {
-            // Detecta inimigos no alcance
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(
+            // Detecta todos os colliders no alcance (sem filtrar por layer)
+            Collider2D[] hitColliders = Physics2D.OverlapCircleAll(
                 _attackPoint != null ? _attackPoint.position : transform.position,
-                _specialAttackRange,
-                _enemyLayers
+                _specialAttackRange
             );
 
-            // Aplica dano
-            foreach (Collider2D enemy in hitEnemies)
+            // Aplica dano a objetos com tag Enemy ou Destructible
+            foreach (Collider2D collider in hitColliders)
             {
-                DealDamageToEnemy(enemy.gameObject, _specialAttackDamage);
-                ApplyKnockback(enemy.gameObject, _knockbackForce * 1.5f);
+                GameObject targetObject = collider.gameObject;
 
-                // Efeitos elementais (a ser implementado)
-                ApplyElementalEffect(enemy.gameObject, _currentElementalType);
+                // Verifica se o objeto tem uma das tags necessárias
+                if (targetObject.CompareTag("Enemy") || targetObject.CompareTag("Destructible"))
+                {
+                    // Aplica dano
+                    DealDamageToEnemy(targetObject, GetSpecialAttackDamage());
+
+                    // Aplica knockback apenas em inimigos (objetos destrutíveis geralmente são estáticos)
+                    if (targetObject.CompareTag("Enemy"))
+                    {
+                        ApplyKnockback(targetObject, _knockbackForce * 1.5f);
+
+                        // Aplica efeitos elementais apenas em inimigos
+                        ApplyElementalEffect(targetObject, _currentElementalType);
+                    }
+
+                    Debug.Log($"Ataque especial atingiu {targetObject.name} com tag {targetObject.tag}");
+                }
             }
 
             // VFX e SFX
@@ -361,7 +443,7 @@ namespace TheSlimeKing.Gameplay.Combat
             // Verificação básica
             if (enemy == null || elementalType == ElementalType.None)
                 return;
-            
+
             // Efeito baseado no tipo elemental
             switch (elementalType)
             {
@@ -370,7 +452,7 @@ namespace TheSlimeKing.Gameplay.Combat
                     StartCoroutine(ApplyDamageOverTime(enemy, 2, 3, 0.5f));
                     Debug.Log($"Efeito de Fogo aplicado em {enemy.name}");
                     break;
-                    
+
                 case ElementalType.Water:
                     // Reduz a velocidade do inimigo
                     // Implementação depende da estrutura do inimigo
@@ -382,13 +464,13 @@ namespace TheSlimeKing.Gameplay.Combat
                     }
                     Debug.Log($"Efeito de Água aplicado em {enemy.name}");
                     break;
-                    
+
                 case ElementalType.Earth:
                     // Aumenta o knockback
                     ApplyKnockback(enemy, _knockbackForce * 2.5f);
                     Debug.Log($"Efeito de Terra aplicado em {enemy.name}");
                     break;
-                    
+
                 case ElementalType.Air:
                     // Empurrão em área
                     Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(
@@ -396,7 +478,7 @@ namespace TheSlimeKing.Gameplay.Combat
                         2f, // Raio de efeito em área
                         _enemyLayers
                     );
-                    
+
                     foreach (var nearbyEnemy in nearbyEnemies)
                     {
                         if (nearbyEnemy.gameObject != enemy) // Não aplica duas vezes ao alvo principal
@@ -404,11 +486,11 @@ namespace TheSlimeKing.Gameplay.Combat
                             ApplyKnockback(nearbyEnemy.gameObject, _knockbackForce * 1.0f);
                         }
                     }
-                    Debug.Log($"Efeito de Ar aplicado em {enemy.name} e {nearbyEnemies.Length-1} inimigos próximos");
+                    Debug.Log($"Efeito de Ar aplicado em {enemy.name} e {nearbyEnemies.Length - 1} inimigos próximos");
                     break;
             }
         }
-        
+
         /// <summary>
         /// Aplica dano ao longo do tempo a um inimigo
         /// </summary>
@@ -417,28 +499,28 @@ namespace TheSlimeKing.Gameplay.Combat
         {
             IDamageable damageable = enemy.GetComponent<IDamageable>();
             if (damageable == null) yield break;
-            
+
             for (int i = 0; i < ticks; i++)
             {
                 // Espera pelo intervalo
                 yield return new WaitForSeconds(interval);
-                
+
                 // Verifica se o objeto ainda existe e não está morto
-                if (enemy == null || damageable.IsDead()) 
+                if (enemy == null || damageable.IsDead())
                     break;
-                
+
                 // Aplica o dano
                 damageable.TakeDamage(damagePerTick, gameObject);
             }
         }
-        
+
         /// <summary>
         /// Reinicia o drag do inimigo após um tempo
         /// </summary>
         private System.Collections.IEnumerator ResetDrag(Rigidbody2D rb, float originalDrag, float delay)
         {
             yield return new WaitForSeconds(delay);
-            
+
             if (rb != null)
             {
                 rb.linearDamping = originalDrag;

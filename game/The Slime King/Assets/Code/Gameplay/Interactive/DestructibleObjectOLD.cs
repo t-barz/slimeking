@@ -12,7 +12,7 @@ namespace TheSlimeKing.Gameplay.Interactive
     /// Objetos destrutíveis que podem receber dano e dropar itens
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class DestructibleObject : InteractableObject, IDamageable
+    public class DestructibleObjectOLD : InteractableObject, IDamageable
     {
         [Header("Configurações de Vida")]
         [SerializeField] private int _maxHealth = 1;
