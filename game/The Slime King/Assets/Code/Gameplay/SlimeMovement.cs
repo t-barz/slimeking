@@ -348,12 +348,11 @@ namespace TheSlimeKing.Gameplay
 
             while (elapsed < duration)
             {
-                // Calcula o progresso (0 a 1) com suavização
+                // Calcula o progresso (0 a 1) linear
                 float t = elapsed / duration;
-                float smoothT = Mathf.SmoothStep(0, 1, t); // Adiciona aceleração e desaceleração suaves
 
-                // Interpola a posição
-                Vector2 newPosition = Vector2.Lerp(startPosition, destination, smoothT);
+                // Interpola a posição com movimento linear
+                Vector2 newPosition = Vector2.Lerp(startPosition, destination, t);
 
                 // Move o slime para a posição interpolada
                 MoveToPosition(newPosition, true);

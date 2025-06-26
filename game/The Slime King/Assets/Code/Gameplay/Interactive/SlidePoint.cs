@@ -93,6 +93,7 @@ public class SlidePoint : MonoBehaviour
                 Debug.Log($"Removendo listener da ação de slide: {slideAction.action.name}");
                 slideAction.action.performed -= OnSlideActionPerformed;
                 isListeningToInput = false;
+
             }
         }
     }
