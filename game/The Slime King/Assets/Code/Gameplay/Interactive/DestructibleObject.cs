@@ -27,6 +27,13 @@ namespace TheSlimeKing.Gameplay.Interactive
         [Tooltip("Lembrete: Certifique-se que o objeto tem a tag 'Destructible'")]
         [SerializeField] private bool _checkTagOnStart = true;
 
+        [Header("Efeitos de Destruição")]
+        [Tooltip("Duração do efeito de fade-out em segundos")]
+        [SerializeField] private float _fadeOutDuration = 1.5f;
+
+        [Tooltip("Curva de animação para o efeito de fade-out")]
+        [SerializeField] private AnimationCurve _fadeOutCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
+
         // Estado
         private int _currentHealth;
         private bool _isCracked = false;
@@ -184,9 +191,64 @@ namespace TheSlimeKing.Gameplay.Interactive
 
                 // Desativa os colliders após destruição
                 DisableColliders();
+
+                // Inicia o efeito de fade out e destruição
+                StartCoroutine(FadeOutAndDestroy());
             }
 
             return actualDamage;
+        }
+
+        /// <summary>
+        /// Coroutine para fazer o fade-out gradual do objeto e destruí-lo ao final
+        /// </summary>
+        private System.Collections.IEnumerator FadeOutAndDestroy()
+        {
+            // Verifica se temos um SpriteRenderer
+            if (_spriteRenderer == null)
+            {
+                Destroy(gameObject);
+                yield break;
+            }
+
+            // Tempo decorrido
+            float elapsed = 0f;
+
+            // Armazena o alpha inicial
+            float startAlpha = _spriteRenderer.color.a;
+
+            // Executa o fade-out gradual
+            while (elapsed < _fadeOutDuration)
+            {
+                // Calcula o tempo normalizado (0 a 1)
+                float normalizedTime = elapsed / _fadeOutDuration;
+
+                // Usa a curva de animação para ajustar o alpha
+                float currentAlpha = startAlpha * _fadeOutCurve.Evaluate(normalizedTime);
+
+                // Aplica o novo alpha, mantendo as cores RGB originais
+                Color fadeColor = _spriteRenderer.color;
+                fadeColor.a = currentAlpha;
+                _spriteRenderer.color = fadeColor;
+
+                // Incrementa o tempo decorrido
+                elapsed += Time.deltaTime;
+
+                // Aguarda o próximo frame
+                yield return null;
+            }
+
+            // Garante que o alpha seja zero no final
+            Color finalColor = _spriteRenderer.color;
+            finalColor.a = 0f;
+            _spriteRenderer.color = finalColor;
+
+            // Pequeno delay antes de destruir o objeto (opcional)
+            yield return new WaitForSeconds(0.1f);
+
+            // Destroi o GameObject ao finalizar o fade-out
+            Debug.Log($"Objeto {gameObject.name} destruído após fade-out");
+            Destroy(gameObject);
         }
     }
 }
