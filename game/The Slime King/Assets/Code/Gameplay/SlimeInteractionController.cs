@@ -11,7 +11,6 @@ namespace TheSlimeKing.Gameplay
     public class SlimeInteractionController : MonoBehaviour
     {
         [Header("Configurações de Detecção")]
-        [SerializeField] private float interactionRadius = 1.5f;
         [SerializeField] private LayerMask interactableLayers;
 
         [Header("Referencias")]
@@ -79,7 +78,6 @@ namespace TheSlimeKing.Gameplay
             // Detecta colliders interativos próximos
             Collider2D[] colliders = Physics2D.OverlapCircleAll(
                 transform.position,
-                interactionRadius,
                 interactableLayers
             );
 
@@ -276,11 +274,13 @@ namespace TheSlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Executa a interação com o objeto atual
+        /// Executa a interação com o objeto atual se houver um objeto interativo próximo
         /// </summary>
-        public void Interact()
+        /// <returns>True se uma interação foi realizada, false caso contrário</returns>
+        public bool Interact()
         {
-            if (_currentInteractable != null)
+            // Verifica primeiro se existe um objeto interativo próximo
+            if (_currentInteractable != null && _nearbyInteractables.Count > 0)
             {
                 // Executa a interação
                 InteractionType type = _currentInteractable.GetInteractionType();
@@ -302,34 +302,12 @@ namespace TheSlimeKing.Gameplay
                             break;
                     }
                 }
+
+                return true; // Interação realizada com sucesso
             }
-        }
 
-        /// <summary>
-        /// Tenta interagir com o objeto interativo atual
-        /// </summary>
-        public void TryInteract()
-        {
-            if (_currentInteractable != null && _currentInteractable.CanInteract())
-            {
-                // Executa a interação
-                _currentInteractable.Interact(this.gameObject);
-
-                // Animação de interação (se aplicável)
-                if (animationController != null)
-                {
-                    // Podemos adicionar uma animação específica para interação no futuro
-                    // Por enquanto, usamos uma animação existente
-                    animationController.PlayShrinkAnimation();
-                }
-
-                // Efeitos visuais de interação
-                if (interactionHintParticles != null)
-                {
-                    // Burst de partículas
-                    interactionHintParticles.Play();
-                }
-            }
+            // Não há objeto interativo próximo
+            return false;
         }
 
         /// <summary>
@@ -349,14 +327,6 @@ namespace TheSlimeKing.Gameplay
             return transform.position;
         }
 
-        /// <summary>
-        /// Para debug: desenha o raio de interação
-        /// </summary>
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, interactionRadius);
-        }
     }
 
     /// <summary>

@@ -20,6 +20,7 @@ namespace TheSlimeKing.Gameplay
         [Header("Referências")]
         [SerializeField] private SlimeVisualController visualController;
         [SerializeField] private SlimeAnimationController animationController;
+        [SerializeField] private GameObject attackCollider;  // Referência ao GameObject com o collider de ataque
 
         // Input System
         private Vector2 _moveInput;
@@ -153,9 +154,30 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         public void OnAttackPressed()
         {
+            // Verifica se o controle está habilitado
+            if (!_controlEnabled)
+                return;
+
             if (animationController != null)
             {
                 animationController.PlayAttack1Animation();
+
+                // Ativa o collider de ataque
+                if (attackCollider != null)
+                {
+                    // Configura o AttackCollider para usar ataque básico
+                    SlimeAttackCollider attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
+                    if (attackComponent != null)
+                    {
+                        attackComponent.SetAttackType(false); // Ataque normal (não especial)
+                    }
+
+                    // Ativa o collider
+                    attackCollider.SetActive(true);
+
+                    // Programa a desativação do collider após um curto período
+                    StartCoroutine(DeactivateAttackCollider(0.2f)); // 0.2 segundos de duração do ataque
+                }
             }
         }
 
@@ -164,9 +186,30 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         public void OnSpecialAttackPressed()
         {
+            // Verifica se o controle está habilitado
+            if (!_controlEnabled)
+                return;
+
             if (animationController != null)
             {
                 animationController.PlayAttack2Animation();
+
+                // Ativa o collider de ataque
+                if (attackCollider != null)
+                {
+                    // Configura o AttackCollider para usar ataque especial
+                    SlimeAttackCollider attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
+                    if (attackComponent != null)
+                    {
+                        attackComponent.SetAttackType(true); // Ataque especial
+                    }
+
+                    // Ativa o collider
+                    attackCollider.SetActive(true);
+
+                    // Programa a desativação do collider após um curto período
+                    StartCoroutine(DeactivateAttackCollider(0.3f)); // 0.3 segundos de duração do ataque especial (um pouco maior)
+                }
             }
         }
 
@@ -186,11 +229,23 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         public void OnInteractPressed()
         {
-            // Delegado para o controlador de interação
+            // Verifica se o controle está habilitado
+            if (!_controlEnabled)
+                return;
+
+            // Obtém o controlador de interação
             var interactionController = GetComponent<SlimeInteractionController>();
             if (interactionController != null)
             {
-                interactionController.TryInteract();
+                // Tenta realizar a interação - só funciona se houver um objeto interativo próximo
+                // O método retorna true se a interação foi realizada com sucesso
+                bool interacted = interactionController.Interact();
+
+                // Opcionalmente, você poderia adicionar feedback sonoro/visual quando não há objetos para interagir
+                if (!interacted)
+                {
+                    // Não há nada com que interagir - pode adicionar feedback aqui (som, animação, etc.)
+                }
             }
         }
 
@@ -369,6 +424,21 @@ namespace TheSlimeKing.Gameplay
 
             // Reativa o controle do jogador
             EnableControl();
+        }
+
+        /// <summary>
+        /// Coroutine para desativar o collider de ataque após um tempo determinado
+        /// </summary>
+        private IEnumerator DeactivateAttackCollider(float delay)
+        {
+            // Aguarda pelo tempo especificado
+            yield return new WaitForSeconds(delay);
+
+            // Desativa o collider de ataque se ele existir
+            if (attackCollider != null)
+            {
+                attackCollider.SetActive(false);
+            }
         }
 
         #endregion

@@ -1,3 +1,4 @@
+using TheSlimeKing.Core;
 using UnityEngine;
 
 namespace TheSlimeKing.Gameplay.Interactive
@@ -6,7 +7,7 @@ namespace TheSlimeKing.Gameplay.Interactive
     /// Objetos destrutíveis que podem receber dano e mudar de estado visual
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class DestructibleObject : MonoBehaviour
+    public class DestructibleObject : MonoBehaviour, IDamageable
     {
         [Header("Configurações de Vida")]
         [Tooltip("Quantidade máxima de pontos de vida do objeto")]
@@ -63,63 +64,6 @@ namespace TheSlimeKing.Gameplay.Interactive
             {
                 Debug.LogWarning($"O objeto {gameObject.name} tem o componente DestructibleObject mas não está com a tag 'Destructible'");
             }
-        }
-
-        /// <summary>
-        /// Aplica dano ao objeto destrutível
-        /// </summary>
-        /// <param name="damage">Quantidade de dano bruto</param>
-        /// <param name="attacker">Referência ao atacante (opcional)</param>
-        /// <param name="hitPoint">Ponto onde ocorreu o impacto (opcional)</param>
-        /// <returns>Quantidade de dano real aplicado após defesas</returns>
-        public int TakeDamage(int damage, GameObject attacker, Vector3? hitPoint = null)
-        {
-            // Se já estiver destruído, não causa mais dano
-            if (_isDestroyed)
-                return 0;
-
-            // Calcula o dano real subtraindo a defesa (mínimo 1 de dano)
-            int actualDamage = Mathf.Max(1, damage - _defense);
-
-            // Subtrai o dano da vida atual
-            _currentHealth -= actualDamage;
-
-            // Aplica efeito visual de dano apenas se o dano for significativo (>=1)
-            if (actualDamage >= 1)
-            {
-                FlashEffect();
-            }
-
-            // Log de debug para informar sobre o dano
-            Debug.Log($"Objeto {gameObject.name} recebeu {actualDamage} de dano" +
-                     (attacker != null ? $" de {attacker.name}" : ""));
-
-            // Verifica se chegou à metade da vida e ainda não está rachado
-            if (!_isCracked && _currentHealth <= _maxHealth / 2)
-            {
-                _isCracked = true;
-                if (_animator != null)
-                {
-                    _animator.SetBool(IsCrackedHash, true);
-                    Debug.Log($"Objeto {gameObject.name} rachou (vida: {_currentHealth}/{_maxHealth})");
-                }
-            }
-
-            // Verifica se foi destruído
-            if (!_isDestroyed && _currentHealth <= 0)
-            {
-                _isDestroyed = true;
-                if (_animator != null)
-                {
-                    _animator.SetBool(IsDestroyedHash, true);
-                    Debug.Log($"Objeto {gameObject.name} foi destruído");
-                }
-
-                // Desativa os colliders após destruição
-                DisableColliders();
-            }
-
-            return actualDamage;
         }
 
         /// <summary>
@@ -191,6 +135,58 @@ namespace TheSlimeKing.Gameplay.Interactive
         public bool IsDead()
         {
             return _isDestroyed;
+        }
+
+        public float TakeDamage(int damage, GameObject attacker)
+        {
+            // Se já estiver destruído, não causa mais dano
+            if (_isDestroyed)
+                return 0;
+
+            // Calcula o dano real subtraindo a defesa (mínimo 1 de dano)
+            int actualDamage = Mathf.Max(1, damage - _defense);
+
+            // Subtrai o dano da vida atual
+            _currentHealth -= actualDamage;
+
+            // Aplica efeito visual de dano apenas se o dano for significativo (>=1)
+            if (actualDamage >= 1)
+            {
+                FlashEffect();
+            }
+
+            // Log de debug para informar sobre o dano
+            Debug.Log($"Objeto {gameObject.name} recebeu {actualDamage} de dano" +
+                     (attacker != null ? $" de {attacker.name}" : ""));
+
+            // Verifica se chegou à metade da vida e ainda não está rachado
+            if (!_isCracked && _currentHealth <= _maxHealth / 2)
+            {
+                _isCracked = true;
+                if (_animator != null)
+                {
+                    _animator.SetBool(IsCrackedHash, true);
+                    Debug.Log($"Objeto {gameObject.name} rachou (vida: {_currentHealth}/{_maxHealth})");
+                }
+            }
+
+            // Verifica se foi destruído
+            if (!_isDestroyed && _currentHealth <= 0)
+            {
+                _isDestroyed = true;
+                _isCracked = false;
+                if (_animator != null)
+                {
+                    _animator.SetBool(IsCrackedHash, true);
+                    _animator.SetBool(IsDestroyedHash, true);
+                    Debug.Log($"Objeto {gameObject.name} foi destruído");
+                }
+
+                // Desativa os colliders após destruição
+                DisableColliders();
+            }
+
+            return actualDamage;
         }
     }
 }

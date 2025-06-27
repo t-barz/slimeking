@@ -17,12 +17,12 @@ namespace TheSlimeKing.Gameplay
         [SerializeField] private int currentStageIndex = 0;
 
         [Header("Energia Elemental")]
-        [SerializeField] private float earthEnergy;
-        [SerializeField] private float waterEnergy;
-        [SerializeField] private float fireEnergy;
-        [SerializeField] private float airEnergy;
-        [SerializeField] private float totalElementalEnergy;
-        [SerializeField] private float energyRequiredForNextStage;
+        [SerializeField] private int earthEnergy;
+        [SerializeField] private int waterEnergy;
+        [SerializeField] private int fireEnergy;
+        [SerializeField] private int airEnergy;
+        [SerializeField] private int totalElementalEnergy;
+        [SerializeField] private int energyRequiredForNextStage;
 
         // Referências de componentes
         private Transform slimeTransform;
@@ -208,9 +208,9 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         /// <param name="type">Tipo da energia elemental</param>
         /// <param name="amount">Quantidade de energia</param>
-        public void AddElementalEnergy(ElementType type, float amount)
+        public void AddElementalEnergy(ElementType type, int amount)
         {
-            float previousTotal = totalElementalEnergy;
+            int previousTotal = totalElementalEnergy;
 
             // Adiciona ao tipo específico
             switch (type)
@@ -248,7 +248,7 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         /// <param name="type">Tipo do elemento</param>
         /// <returns>Quantidade de energia</returns>
-        public float GetElementalEnergy(ElementType type)
+        public int GetElementalEnergy(ElementType type)
         {
             switch (type)
             {
@@ -271,9 +271,9 @@ namespace TheSlimeKing.Gameplay
         /// <param name="type">Tipo do elemento</param>
         /// <param name="amount">Quantidade a consumir</param>
         /// <returns>Se foi possível consumir</returns>
-        public bool ConsumeElementalEnergy(ElementType type, float amount)
+        public bool ConsumeElementalEnergy(ElementType type, int amount)
         {
-            float currentAmount = GetElementalEnergy(type);
+            int currentAmount = GetElementalEnergy(type);
 
             // Verifica se tem energia suficiente
             if (currentAmount < amount)

@@ -89,7 +89,7 @@ ScriptedImporter:
   previousAsepriteImporterSettings:
     fileImportMode: 1
     importHiddenLayers: 0
-    layerImportMode: 1
+    layerImportMode: 0
     defaultPivotSpace: 1
     defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
@@ -104,7 +104,7 @@ ScriptedImporter:
   asepriteImporterSettings:
     fileImportMode: 1
     importHiddenLayers: 0
-    layerImportMode: 1
+    layerImportMode: 0
     defaultPivotSpace: 1
     defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
@@ -117,7 +117,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638865342390000621
+  platformSettingsDirtyTick: 638865629590845603
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -142,7 +142,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Frame_0
+  - name: brown_rockF_Frame_0
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -154,7 +154,7 @@ ScriptedImporter:
       y: 4
       width: 8
       height: 5
-    spriteID: 3cf7b8a02e55b62499268fc989da1d36
+    spriteID: e56660076a0908747bb859a062dccbc8
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -163,7 +163,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
-  - name: Frame_1
+  - name: brown_rockF_Frame_1
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -175,7 +175,7 @@ ScriptedImporter:
       y: 4
       width: 8
       height: 5
-    spriteID: 4af635e4d49b1ed43882fc0e071df1dc
+    spriteID: 7a8cb7fc6bfa99345911435a5f72ad2c
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -184,7 +184,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 20, y: 4}
-  - name: Frame_2
+  - name: brown_rockF_Frame_2
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -196,7 +196,7 @@ ScriptedImporter:
       y: 4
       width: 10
       height: 4
-    spriteID: 69ebdfe37d8781949af7e965e8f23e5b
+    spriteID: d7da0e484f49e224eb327996ce563b31
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -210,17 +210,17 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 564935732
+      value0: 629959960
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: env_brown_rockF
-    layerFlags: 0
+    name: brown_rockF
+    layerFlags: 3
     layerType: 0
     blendMode: 0
     cells:
-    - name: Frame_0
+    - name: brown_rockF_Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
@@ -228,8 +228,8 @@ ScriptedImporter:
         y: 11
         width: 8
         height: 5
-      spriteId: 3cf7b8a02e55b62499268fc989da1d36
-    - name: Frame_1
+      spriteId: e56660076a0908747bb859a062dccbc8
+    - name: brown_rockF_Frame_1
       frameIndex: 1
       additiveSortOrder: 0
       cellRect:
@@ -237,8 +237,8 @@ ScriptedImporter:
         y: 11
         width: 8
         height: 5
-      spriteId: 4af635e4d49b1ed43882fc0e071df1dc
-    - name: Frame_2
+      spriteId: 7a8cb7fc6bfa99345911435a5f72ad2c
+    - name: brown_rockF_Frame_2
       frameIndex: 2
       additiveSortOrder: 0
       cellRect:
@@ -246,7 +246,7 @@ ScriptedImporter:
         y: 11
         width: 10
         height: 4
-      spriteId: 69ebdfe37d8781949af7e965e8f23e5b
+      spriteId: d7da0e484f49e224eb327996ce563b31
     linkedCells: []
     tileCells: []
     tileSetIndex: 0

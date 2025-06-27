@@ -69,6 +69,8 @@ namespace TheSlimeKing.Core.UI.Icons
         {
             if (change == InputActionChange.ActionPerformed)
             {
+                // Quando ocorre uma alteração no dispositivo de entrada, atualiza o ícone
+                // com prioridade para gamepads
                 SwitchToCurrentPlatformIcon(false);
             }
         }
@@ -138,20 +140,15 @@ namespace TheSlimeKing.Core.UI.Icons
         }
 
         /// <summary>
-        /// Retorna o ícone correspondente à plataforma atual de forma otimizada
+        /// Retorna o ícone correspondente à plataforma atual, priorizando gamepads sobre teclado
         /// </summary>
         private GameObject GetCurrentPlatformIcon()
         {
-            // Verifica qual dispositivo está sendo usado (mais performático verificar na ordem de probabilidade)
+            // Verifica qual dispositivo está sendo usado
             var gamepad = Gamepad.current;
-            var keyboard = Keyboard.current;
 
-            // Se não tiver gamepad conectado ou o teclado foi usado recentemente, usa o ícone de teclado
-            if (gamepad == null || (keyboard != null && keyboard.wasUpdatedThisFrame))
-            {
-                return _keyboardIcon;
-            }
-            else
+            // Prioriza sempre o gamepad quando disponível
+            if (gamepad != null)
             {
                 // Normaliza o nome do gamepad para comparações case-insensitive
                 string deviceName = gamepad.name.ToLowerInvariant();
@@ -174,6 +171,9 @@ namespace TheSlimeKing.Core.UI.Icons
                     return _genericIcon;
                 }
             }
+
+            // Só usa o ícone de teclado se não houver gamepad conectado
+            return _keyboardIcon;
         }        /// <summary>
                  /// Troca para o ícone da plataforma atual de forma otimizada
                  /// </summary>
@@ -320,6 +320,16 @@ namespace TheSlimeKing.Core.UI.Icons
                     ApplyIconOffset(_currentActiveIcon);
                 }
             }
+        }
+
+        /// <summary>
+        /// Atualiza forçadamente o ícone para o dispositivo atual
+        /// Útil para chamar quando mudanças de dispositivo não são detectadas automaticamente
+        /// </summary>
+        public void RefreshCurrentDeviceIcon()
+        {
+            // Força a troca para o ícone do dispositivo atual, priorizando gamepad
+            SwitchToCurrentPlatformIcon(false);
         }
     }
 }

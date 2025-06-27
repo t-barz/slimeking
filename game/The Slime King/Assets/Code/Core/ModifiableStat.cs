@@ -10,13 +10,13 @@ namespace TheSlimeKing.Core
     [System.Serializable]
     public class ModifiableStat
     {
-        [SerializeField] private float baseValue;
+        [SerializeField] private int baseValue;
 
         // Lista não serializável de modificadores
         private readonly List<StatModifier> statModifiers;
 
         // Valor calculado final com todos os modificadores aplicados
-        private float _value;
+        private int _value;
         private bool isDirty = true;
 
         // Acesso somente-leitura aos modificadores
@@ -25,7 +25,7 @@ namespace TheSlimeKing.Core
         /// <summary>
         /// Valor base do atributo antes de qualquer modificador
         /// </summary>
-        public float BaseValue
+        public int BaseValue
         {
             get => baseValue;
             set
@@ -38,7 +38,7 @@ namespace TheSlimeKing.Core
         /// <summary>
         /// Valor calculado final com todos os modificadores aplicados
         /// </summary>
-        public float Value
+        public int Value
         {
             get
             {
@@ -55,7 +55,7 @@ namespace TheSlimeKing.Core
         /// Construtor da classe
         /// </summary>
         /// <param name="baseValue">Valor base do atributo</param>
-        public ModifiableStat(float baseValue)
+        public ModifiableStat(int baseValue)
         {
             this.baseValue = baseValue;
             statModifiers = new List<StatModifier>();
@@ -124,7 +124,7 @@ namespace TheSlimeKing.Core
         /// <summary>
         /// Calcula o valor final aplicando todos os modificadores na ordem correta
         /// </summary>
-        protected virtual float CalculateFinalValue()
+        protected virtual int CalculateFinalValue()
         {
             float finalValue = baseValue;
             float sumPercentAdd = 0;
@@ -159,8 +159,8 @@ namespace TheSlimeKing.Core
                 }
             }
 
-            // Arredonda para evitar erros de precisão de ponto flutuante
-            return Mathf.Round(finalValue * 1000f) / 1000f;
+            // Arredonda para evitar erros de precisão de ponto flutuante e converte para int
+            return Mathf.RoundToInt(finalValue);
         }
     }
 }
