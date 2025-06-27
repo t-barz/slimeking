@@ -24,6 +24,9 @@ namespace TheSlimeKing.Gameplay
         [SerializeField] private int totalElementalEnergy;
         [SerializeField] private int energyRequiredForNextStage;
 
+        [Header("Configurações de Combate")]
+        // Cooldown de ataque foi removido
+
         // Referências de componentes
         private Transform slimeTransform;
         private SpriteRenderer spriteRenderer;
@@ -49,6 +52,7 @@ namespace TheSlimeKing.Gameplay
         public float TotalElementalEnergy => totalElementalEnergy;
         public float EnergyRequiredForNextStage => energyRequiredForNextStage;
         public int MaxInventorySlots => maxInventorySlots;
+        // Propriedade AttackCooldown removida
 
         // Propriedades de habilidades disponíveis
         public bool CanSqueeze => CurrentStageConfig.CanSqueeze;

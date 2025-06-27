@@ -172,7 +172,8 @@ AnimatorState:
   - {fileID: -6837823359271209621}
   - {fileID: -4117125098654575678}
   - {fileID: 2524949598415209789}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -1201731090678676574}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -411,6 +412,30 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &-1201731090678676574
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8889c6301d1db94f805d381b499c20e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NotAttackAnimationBehaviour
+--- !u!114 &-1017791540868602233
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8889c6301d1db94f805d381b499c20e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NotAttackAnimationBehaviour
 --- !u!1102 &-934273594425848600
 AnimatorState:
   serializedVersion: 6
@@ -586,7 +611,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 1534628317602341374}
   - {fileID: -4212880239041203072}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 8361497441498173639}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -745,7 +771,8 @@ AnimatorState:
   - {fileID: -3672138644617591759}
   - {fileID: -2606673639751763167}
   - {fileID: -3216894522370460121}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -1017791540868602233}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -891,7 +918,7 @@ AnimatorStateMachine:
     m_Position: {x: 700, y: 190, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1928346558248127435}
-    m_Position: {x: 280, y: 440, z: 0}
+    m_Position: {x: 280, y: 450, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 9145780076200372043}
     m_Position: {x: 660, y: 290, z: 0}
@@ -954,6 +981,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &8361497441498173639
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93808b3def6855b4398f59f6daf028f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackAnimationBehaviour
 --- !u!1102 &9145780076200372043
 AnimatorState:
   serializedVersion: 6

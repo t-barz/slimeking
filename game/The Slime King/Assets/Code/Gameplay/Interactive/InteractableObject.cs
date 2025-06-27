@@ -15,7 +15,6 @@ namespace TheSlimeKing.Gameplay.Interactive
         [SerializeField] private bool _isInteractable = true;
         [SerializeField] protected float _interactionRadius = 1.5f;
         [SerializeField] private bool _requireFacing = true;
-        [SerializeField] private float _maxInteractionAngle = 45f;
 
         [Header("Feedback Visual")]
         [SerializeField] private bool _useOutline = true;
@@ -91,13 +90,23 @@ namespace TheSlimeKing.Gameplay.Interactive
         /// </summary>
         public virtual bool CanInteract(GameObject interactor)
         {
+            // Adiciona o nome do objeto para referência nos logs
+            string objectName = gameObject.name;
+
+            // Verifica se o objeto está marcado como interagível
             if (!_isInteractable)
+            {
+                Debug.Log($"[{objectName}] Interação negada: objeto não está interagível.");
                 return false;
+            }
 
             // Verifica distância
             float distance = Vector3.Distance(transform.position, interactor.transform.position);
             if (distance > _interactionRadius)
+            {
+                Debug.Log($"[{objectName}] Interação negada: distância ({distance.ToString("F2")}) maior que o raio permitido ({_interactionRadius.ToString("F2")}).");
                 return false;
+            }
 
             // Verifica se o jogador está olhando para o objeto (opcional)
             if (_requireFacing)
@@ -106,10 +115,16 @@ namespace TheSlimeKing.Gameplay.Interactive
                 Vector3 interactorForward = interactor.transform.right * Mathf.Sign(interactor.transform.localScale.x);
 
                 float angle = Vector3.Angle(interactorForward, directionToObject);
-                if (angle > _maxInteractionAngle)
+                Debug.Log($"[{objectName}] Ângulo de interação: {angle.ToString("F2")} graus. Direção jogador: {interactorForward}, Direção ao objeto: {directionToObject}");
+
+                if (angle > 45f) // Valor fixo de 45 graus para o ângulo de interação
+                {
+                    Debug.Log($"[{objectName}] Interação negada: ângulo ({angle.ToString("F2")}) maior que o permitido (45°).");
                     return false;
+                }
             }
 
+            Debug.Log($"[{objectName}] Interação permitida: todas as condições satisfeitas.");
             return true;
         }
 
@@ -209,8 +224,8 @@ namespace TheSlimeKing.Gameplay.Interactive
                 Gizmos.color = Color.green;
                 Gizmos.DrawRay(transform.position, Vector3.right * _interactionRadius * 0.5f);
 
-                // Desenha os limites do ângulo de interação
-                float radianAngle = _maxInteractionAngle * Mathf.Deg2Rad;
+                // Desenha os limites do ângulo de interação (45 graus fixo)
+                float radianAngle = 45f * Mathf.Deg2Rad;
                 Vector3 rightBound = new Vector3(
                     Mathf.Cos(radianAngle) * _interactionRadius * 0.5f,
                     Mathf.Sin(radianAngle) * _interactionRadius * 0.5f,

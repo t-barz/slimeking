@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -36,6 +37,7 @@ namespace TheSlimeKing.Gameplay
         private bool _controlEnabled = true;
         private bool _inSpecialMovement = false;
         private float _currentScale = 1.0f;
+        public bool isAttacking = false;
 
         private void Awake()
         {
@@ -158,25 +160,29 @@ namespace TheSlimeKing.Gameplay
             if (!_controlEnabled)
                 return;
 
+            if (isAttacking)
+                return;
+
+            // Obtém o componente AttackCollider para verificar cooldown
+            SlimeAttackCollider attackComponent = null;
+            if (attackCollider != null)
+            {
+                attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
+            }
+
             if (animationController != null)
             {
                 animationController.PlayAttack1Animation();
 
-                // Ativa o collider de ataque
-                if (attackCollider != null)
+                // Executa o ataque usando o novo sistema
+                if (attackCollider != null && attackComponent != null)
                 {
                     // Configura o AttackCollider para usar ataque básico
-                    SlimeAttackCollider attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
-                    if (attackComponent != null)
-                    {
-                        attackComponent.SetAttackType(false); // Ataque normal (não especial)
-                    }
+                    attackComponent.SetAttackType(false); // Ataque normal (não especial)
 
-                    // Ativa o collider
-                    attackCollider.SetActive(true);
-
-                    // Programa a desativação do collider após um curto período
-                    StartCoroutine(DeactivateAttackCollider(0.2f)); // 0.2 segundos de duração do ataque
+                    // Tenta realizar o ataque em todos os alvos dentro do alcance
+                    attackComponent.TryAttack();
+                    isAttacking = true;
                 }
             }
         }
@@ -190,25 +196,33 @@ namespace TheSlimeKing.Gameplay
             if (!_controlEnabled)
                 return;
 
+            // Obtém o componente AttackCollider para verificar cooldown
+            SlimeAttackCollider attackComponent = null;
+            if (attackCollider != null)
+            {
+                attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
+            }
+
+            // Não há mais verificações sobre se um ataque especial pode ser realizado
+            // Todos os ataques são permitidos a qualquer momento
+
             if (animationController != null)
             {
                 animationController.PlayAttack2Animation();
 
-                // Ativa o collider de ataque
-                if (attackCollider != null)
+                // Executa o ataque usando o novo sistema
+                if (attackCollider != null && attackComponent != null)
                 {
                     // Configura o AttackCollider para usar ataque especial
-                    SlimeAttackCollider attackComponent = attackCollider.GetComponent<SlimeAttackCollider>();
-                    if (attackComponent != null)
+                    attackComponent.SetAttackType(true); // Ataque especial
+
+                    // Tenta realizar o ataque em todos os alvos dentro do alcance
+                    bool attackExecuted = attackComponent.TryAttack();
+
+                    if (attackExecuted)
                     {
-                        attackComponent.SetAttackType(true); // Ataque especial
+                        Debug.Log("Ataque especial executado");
                     }
-
-                    // Ativa o collider
-                    attackCollider.SetActive(true);
-
-                    // Programa a desativação do collider após um curto período
-                    StartCoroutine(DeactivateAttackCollider(0.3f)); // 0.3 segundos de duração do ataque especial (um pouco maior)
                 }
             }
         }
@@ -426,20 +440,13 @@ namespace TheSlimeKing.Gameplay
             EnableControl();
         }
 
-        /// <summary>
-        /// Coroutine para desativar o collider de ataque após um tempo determinado
-        /// </summary>
-        private IEnumerator DeactivateAttackCollider(float delay)
+        internal void EndAttack()
         {
-            // Aguarda pelo tempo especificado
-            yield return new WaitForSeconds(delay);
-
-            // Desativa o collider de ataque se ele existir
-            if (attackCollider != null)
-            {
-                attackCollider.SetActive(false);
-            }
+            isAttacking = false;
         }
+
+        // Método DeactivateAttackCollider removido pois não é mais necessário com o novo sistema de ataque
+        // O collider de ataque agora permanece sempre ativo e TryAttack é chamado quando necessário
 
         #endregion
     }
