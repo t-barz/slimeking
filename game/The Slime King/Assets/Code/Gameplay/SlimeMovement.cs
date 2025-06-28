@@ -69,6 +69,15 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         private void MoveSlime()
         {
+            // Se o slime está atacando, bloqueia qualquer movimento
+            if (isAttacking)
+            {
+                // Define a velocidade como zero durante o ataque
+                _rb.linearVelocity = Vector2.zero;
+                _currentVelocity = Vector2.zero;
+                return; // Sai da função para impedir qualquer outro cálculo de movimento
+            }
+
             // Calcula a velocidade alvo baseada no input e na velocidade do estágio atual
             Vector2 targetVelocity = _moveInput * moveSpeed;            // Aplica multiplicador de velocidade (removida dependência de GetCurrentStageSpeedMultiplier)
             if (_stats != null)

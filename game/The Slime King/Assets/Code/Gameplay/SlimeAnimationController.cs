@@ -265,6 +265,20 @@ namespace TheSlimeKing.Gameplay
             }
         }
 
+        /// <summary>
+        /// Evento chamado pelo AnimationEvent ao final da animação de ataque
+        /// </summary>
+        public void OnAttackAnimationEnd()
+        {
+            // Notifica o SlimeMovement que a animação de ataque terminou
+            SlimeMovement movement = GetComponent<SlimeMovement>();
+            if (movement != null)
+            {
+                movement.EndAttack();
+                Debug.Log("Fim da animação de ataque - liberando movimento");
+            }
+        }
+
         #endregion
     }
 }
