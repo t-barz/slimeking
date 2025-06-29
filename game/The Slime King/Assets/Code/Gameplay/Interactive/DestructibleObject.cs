@@ -1,8 +1,28 @@
 using TheSlimeKing.Core;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace TheSlimeKing.Gameplay.Interactive
 {
+    /// <summary>
+    /// Define um item que pode ser dropado por um objeto destrutível
+    /// </summary>
+    [System.Serializable]
+    public class DropItem
+    {
+        [Tooltip("Prefab do item que será instanciado")]
+        public GameObject itemPrefab;
+
+        [Tooltip("Nome personalizado do item (se vazio, usará o nome do prefab)")]
+        public string itemName;
+    }
+
+    /// <summary>
+    /// Objetos destrutíveis que podem receber dano e mudar de estado visual.
+    /// Também pode dropar itens quando destruído.
+    /// </summary>
+
     /// <summary>
     /// Objetos destrutíveis que podem receber dano e mudar de estado visual
     /// </summary>
@@ -34,6 +54,19 @@ namespace TheSlimeKing.Gameplay.Interactive
         [Tooltip("Curva de animação para o efeito de fade-out")]
         [SerializeField] private AnimationCurve _fadeOutCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
 
+        [Header("Sistema de Drop")]
+        [Tooltip("Lista de itens que podem ser dropados")]
+        [SerializeField] private List<DropItem> _dropItems = new List<DropItem>();
+
+        [Tooltip("Quantidade mínima de itens que serão dropados (0 = sem drop)")]
+        [SerializeField] private int _minDropCount = 0;
+
+        [Tooltip("Quantidade máxima de itens que serão dropados")]
+        [SerializeField] private int _maxDropCount = 1;
+
+        [Tooltip("Distância máxima de dispersão dos itens dropados")]
+        [SerializeField] private float _dropRadius = 0.8f;
+
         // Estado
         private int _currentHealth;
         private bool _isCracked = false;
@@ -43,6 +76,9 @@ namespace TheSlimeKing.Gameplay.Interactive
         private Animator _animator;
         private SpriteRenderer _spriteRenderer;
         private Color _originalColor;
+
+        // Cache de rigidbodies para os itens dropados
+        private static Dictionary<GameObject, Rigidbody2D> _cachedRigidbodies = new Dictionary<GameObject, Rigidbody2D>();
 
         // Hashes do animator para melhor performance
         private static readonly int IsCrackedHash = Animator.StringToHash("isCracked");
@@ -151,7 +187,7 @@ namespace TheSlimeKing.Gameplay.Interactive
                 return 0;
 
             // Calcula o dano real subtraindo a defesa (mínimo 1 de dano)
-            int actualDamage = Mathf.Max(1, damage - _defense);
+            int actualDamage = damage - _defense;
 
             // Subtrai o dano da vida atual
             _currentHealth -= actualDamage;
@@ -162,10 +198,6 @@ namespace TheSlimeKing.Gameplay.Interactive
                 FlashEffect();
             }
 
-            // Log de debug para informar sobre o dano
-            Debug.Log($"Objeto {gameObject.name} recebeu {actualDamage} de dano" +
-                     (attacker != null ? $" de {attacker.name}" : ""));
-
             // Verifica se chegou à metade da vida e ainda não está rachado
             if (!_isCracked && _currentHealth <= _maxHealth / 2)
             {
@@ -173,7 +205,6 @@ namespace TheSlimeKing.Gameplay.Interactive
                 if (_animator != null)
                 {
                     _animator.SetBool(IsCrackedHash, true);
-                    Debug.Log($"Objeto {gameObject.name} rachou (vida: {_currentHealth}/{_maxHealth})");
                 }
             }
 
@@ -186,17 +217,117 @@ namespace TheSlimeKing.Gameplay.Interactive
                 {
                     _animator.SetBool(IsCrackedHash, true);
                     _animator.SetBool(IsDestroyedHash, true);
-                    Debug.Log($"Objeto {gameObject.name} foi destruído");
                 }
 
                 // Desativa os colliders após destruição
                 DisableColliders();
+
+                // Gera os itens de drop
+                DropLoot();
 
                 // Inicia o efeito de fade out e destruição
                 StartCoroutine(FadeOutAndDestroy());
             }
 
             return actualDamage;
+        }
+
+        /// <summary>
+        /// Gera os itens de drop quando o objeto é destruído
+        /// </summary>
+        private void DropLoot()
+        {
+            // Se não há itens configurados ou o mínimo é zero, não dropa nada
+            if (_dropItems.Count == 0 || _minDropCount <= 0)
+            {
+                return;
+            }
+
+            // Determina a quantidade de itens que serão dropados
+            int dropCount = Random.Range(_minDropCount, Mathf.Min(_maxDropCount + 1, _dropItems.Count + 1));
+
+            // Ajusta para não exceder o total de itens disponíveis
+            dropCount = Mathf.Min(dropCount, _dropItems.Count);
+
+            Debug.Log($"Objeto {gameObject.name} vai dropar {dropCount} itens");
+
+            // Lista temporária para fazer a seleção aleatória sem repetição
+            List<DropItem> availableItems = new List<DropItem>(_dropItems);
+
+            // Dropa a quantidade determinada de itens
+            for (int i = 0; i < dropCount; i++)
+            {
+                // Se acabaram os itens disponíveis, interrompe
+                if (availableItems.Count == 0)
+                    break;
+
+                // Seleciona um item aleatório da lista
+                int randomIndex = Random.Range(0, availableItems.Count);
+                DropItem selectedItem = availableItems[randomIndex];
+
+                // Remove o item selecionado para evitar repetição
+                availableItems.RemoveAt(randomIndex);
+
+                // Somente instancia se o prefab estiver configurado
+                if (selectedItem.itemPrefab != null)
+                {
+                    // Gera um único item de drop
+                    SpawnSingleDrop(selectedItem.itemPrefab, transform.position);
+
+                    // Log para depuração
+                    string itemName = !string.IsNullOrEmpty(selectedItem.itemName)
+                        ? selectedItem.itemName
+                        : selectedItem.itemPrefab.name;
+
+                    Debug.Log($"Item dropado: {itemName}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Instancia um único item de drop usando o sistema de pool
+        /// </summary>
+        /// <param name="prefab">O prefab do item a ser dropado</param>
+        /// <param name="basePosition">A posição base para o drop</param>
+        private void SpawnSingleDrop(GameObject prefab, Vector3 basePosition)
+        {
+            // Calcula posição com offset
+            Vector2 randomOffset = Random.insideUnitCircle * _dropRadius;
+            Vector3 dropPosition = basePosition + new Vector3(randomOffset.x, randomOffset.y, 0);
+
+            // Usa ItemPool para instanciar
+            var droppedItem = GameUtilities.ItemPool.GetItem(prefab, dropPosition, Quaternion.identity);
+            if (droppedItem == null) return;
+
+            // Usa cache de Rigidbody2D para melhor performance
+            if (!_cachedRigidbodies.TryGetValue(droppedItem, out var rb))
+            {
+                rb = droppedItem.GetComponent<Rigidbody2D>();
+                if (rb != null)
+                    _cachedRigidbodies[droppedItem] = rb;
+            }
+
+            // Aplica impulso ao objeto dropado se ele tiver um Rigidbody2D
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                rb.AddForce(new Vector2(
+                    Random.Range(-1f, 1f),
+                    Random.Range(0.5f, 1f)
+                ) * 2f, ForceMode2D.Impulse);
+            }
+
+            // Configura retorno ao pool quando coletado
+            if (droppedItem.TryGetComponent<ICollectable>(out var collectable))
+            {
+                collectable.OnCollected += () =>
+                {
+                    GameUtilities.ItemPool.ReturnToPool(droppedItem, prefab);
+                    if (rb != null)
+                        _cachedRigidbodies.Remove(droppedItem);
+                };
+            }
         }
 
         /// <summary>

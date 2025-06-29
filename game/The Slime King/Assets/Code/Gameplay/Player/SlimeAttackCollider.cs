@@ -45,7 +45,6 @@ namespace TheSlimeKing.Gameplay
             // Se não há alvos, não prossegue mas conta como um ataque realizado
             if (_potentialTargets.Count == 0)
             {
-                Debug.Log("Ataque realizado sem alvos");
                 return true;
             }
 
@@ -75,8 +74,6 @@ namespace TheSlimeKing.Gameplay
 
                     // Exibe efeitos de impacto
                     ShowHitEffects(target.transform.position);
-
-                    Debug.Log($"Dano aplicado em {target.gameObject.name}: {attackDamage} pontos com força de knockback {knockbackForce}");
                 }
             }
 
@@ -115,8 +112,8 @@ namespace TheSlimeKing.Gameplay
                 _slimeStats.Special.Value :
                 _slimeStats.Attack.Value;
 
-            // Aplica o multiplicador de dano
-            return baseDamage * damageMultiplier;
+            Debug.Log($"Dano calculado: {baseDamage} (Multiplicador: {damageMultiplier})");
+            return baseDamage;
         }
 
         /// <summary>
@@ -197,7 +194,6 @@ namespace TheSlimeKing.Gameplay
                 if (!_potentialTargets.Contains(other))
                 {
                     _potentialTargets.Add(other);
-                    Debug.Log($"Alvo {other.gameObject.name} entrou no alcance de ataque");
                 }
             }
         }
@@ -211,7 +207,6 @@ namespace TheSlimeKing.Gameplay
             if (_potentialTargets.Contains(other))
             {
                 _potentialTargets.Remove(other);
-                Debug.Log($"Alvo {other.gameObject.name} saiu do alcance de ataque");
             }
         }
 
