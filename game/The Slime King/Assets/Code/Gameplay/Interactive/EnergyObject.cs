@@ -1,6 +1,7 @@
 using UnityEngine;
 using TheSlimeKing.Gameplay;
 using TheSlimeKing.Core;
+using System.Collections;
 
 /// <summary>
 /// Representa um objeto de energia coletável no jogo
@@ -54,9 +55,19 @@ public class EnergyObject : MonoBehaviour
     [Tooltip("Precisão para considerar chegada ao destino (valor pequeno)")]
     [SerializeField] private float arrivalPrecision = 0.05f;
 
+    [Tooltip("Duração mínima do movimento após lançamento (em segundos)")]
+    [SerializeField] private float minMoveDuration = 0.1f;
+
+    [Tooltip("Duração máxima do movimento após lançamento (em segundos)")]
+    [SerializeField] private float maxMoveDuration = 0.2f;
+
     // Variáveis de controle
     private GameObject targetPlayer;
     private bool isMovingTowardsPlayer = false;
+    private Rigidbody2D rb;
+    private bool movementLimited = false;
+    private float moveTimer = 0f;
+    private float currentMoveDuration; // Duração atual para este objeto
 
     void Start()
     {
@@ -67,10 +78,40 @@ public class EnergyObject : MonoBehaviour
         {
             animator = GetComponent<Animator>();
         }
+
+        rb = GetComponent<Rigidbody2D>();
+
+        // Gera um tempo de duração aleatório para este objeto
+        GenerateRandomMoveDuration();
+    }
+
+    /// <summary>
+    /// Gera uma duração aleatória de movimento dentro do intervalo configurado
+    /// </summary>
+    private void GenerateRandomMoveDuration()
+    {
+        currentMoveDuration = Random.Range(minMoveDuration, maxMoveDuration);
     }
 
     void Update()
     {
+        // Se o Rigidbody2D está ativo e o objeto está em movimento
+        if (rb != null && !movementLimited && rb.linearVelocity.sqrMagnitude > 0.1f)
+        {
+            // Incrementa o timer de movimento
+            moveTimer += Time.deltaTime;
+
+            // Se excedeu o tempo de movimento gerado aleatoriamente
+            if (moveTimer >= currentMoveDuration)
+            {
+                // Para o movimento do objeto
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+                movementLimited = true;
+                Debug.Log($"Movimento do objeto de energia limitado após {currentMoveDuration:F2} segundos");
+            }
+        }
+
         // Se está se movendo em direção ao jogador
         if (isMovingTowardsPlayer && targetPlayer != null)
         {
@@ -109,6 +150,8 @@ public class EnergyObject : MonoBehaviour
                 transform.position += direction * moveSpeed * Time.deltaTime;
             }
         }
+
+
     }
 
     /// <summary>
@@ -158,6 +201,7 @@ public class EnergyObject : MonoBehaviour
     {
         targetPlayer = playerObject;
         isMovingTowardsPlayer = true;
+        moveTimer = 0f;
 
         Debug.Log($"Energia começou a se mover em direção ao jogador: {elementType}");
     }
@@ -218,6 +262,23 @@ public class EnergyObject : MonoBehaviour
     public void DestroyEnergy()
     {
         Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// Reinicia o estado de movimento do objeto
+    /// Chamado quando o objeto é reciclado do pool
+    /// </summary>
+    public void ResetMovementState()
+    {
+        movementLimited = false;
+        moveTimer = 0f;
+        isMovingTowardsPlayer = false;
+        targetPlayer = null;
+
+        // Gera uma nova duração aleatória
+        GenerateRandomMoveDuration();
+
+        Debug.Log($"Estado de movimento reiniciado com nova duração: {currentMoveDuration:F2} segundos");
     }
 
     // Detecta colisão para iniciar movimentação em direção ao jogador

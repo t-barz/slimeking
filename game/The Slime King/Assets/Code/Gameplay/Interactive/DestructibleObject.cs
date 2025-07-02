@@ -249,8 +249,6 @@ namespace TheSlimeKing.Gameplay.Interactive
             // Ajusta para não exceder o total de itens disponíveis
             dropCount = Mathf.Min(dropCount, _dropItems.Count);
 
-            Debug.Log($"Objeto {gameObject.name} vai dropar {dropCount} itens");
-
             // Lista temporária para fazer a seleção aleatória sem repetição
             List<DropItem> availableItems = new List<DropItem>(_dropItems);
 
@@ -278,22 +276,58 @@ namespace TheSlimeKing.Gameplay.Interactive
                     string itemName = !string.IsNullOrEmpty(selectedItem.itemName)
                         ? selectedItem.itemName
                         : selectedItem.itemPrefab.name;
-
-                    Debug.Log($"Item dropado: {itemName}");
                 }
             }
         }
 
         /// <summary>
-        /// Instancia um único item de drop usando o sistema de pool
+        /// Instancia um único item de drop usando o sistema de pool, 
+        /// garantindo que seja lançado para longe do player
         /// </summary>
         /// <param name="prefab">O prefab do item a ser dropado</param>
         /// <param name="basePosition">A posição base para o drop</param>
         private void SpawnSingleDrop(GameObject prefab, Vector3 basePosition)
         {
-            // Calcula posição com offset
-            Vector2 randomOffset = Random.insideUnitCircle * _dropRadius;
-            Vector3 dropPosition = basePosition + new Vector3(randomOffset.x, randomOffset.y, 0);
+            // Direção base para o drop (aleatória se não houver jogador)
+            Vector2 dropDirection = Random.insideUnitCircle.normalized;
+            float minDistance = _dropRadius * 0.5f; // Distância mínima para evitar drops próximos ao jogador
+
+            // Encontra o jogador mais próximo (se existir)
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player != null)
+            {
+                // Vetor do objeto ao jogador
+                Vector2 toPlayerVector = (Vector2)player.transform.position - (Vector2)basePosition;
+
+                // Se o jogador estiver perto o suficiente para considerarmos sua posição
+                if (toPlayerVector.magnitude < _dropRadius * 2f)
+                {
+                    // Direção oposta ao jogador (para longe dele)
+                    Vector2 directionAwayFromPlayer = -toPlayerVector.normalized;
+
+                    // Aplicamos uma pequena variação aleatória na direção (menos de 90 graus)
+                    float randomAngle = Random.Range(-45f, 45f);
+                    float rad = randomAngle * Mathf.Deg2Rad;
+
+                    // Aplicamos a rotação usando matriz de rotação 2D
+                    dropDirection = new Vector2(
+                        directionAwayFromPlayer.x * Mathf.Cos(rad) - directionAwayFromPlayer.y * Mathf.Sin(rad),
+                        directionAwayFromPlayer.x * Mathf.Sin(rad) + directionAwayFromPlayer.y * Mathf.Cos(rad)
+                    ).normalized;
+
+                    // Aumenta a distância mínima quando o jogador está próximo
+                    minDistance = Mathf.Max(_dropRadius * 0.7f, toPlayerVector.magnitude * 0.5f);
+
+                    Debug.DrawRay(basePosition, dropDirection * _dropRadius, Color.red, 2.0f);
+                }
+            }
+
+            // Calcula uma distância aleatória (mas sempre maior que a distância mínima)
+            float dropDistance = Random.Range(minDistance, _dropRadius);
+
+            // Calcula a posição final de drop
+            Vector3 dropPosition = basePosition + new Vector3(dropDirection.x * dropDistance, dropDirection.y * dropDistance, 0);
 
             // Usa ItemPool para instanciar
             var droppedItem = GameUtilities.ItemPool.GetItem(prefab, dropPosition, Quaternion.identity);
@@ -312,10 +346,14 @@ namespace TheSlimeKing.Gameplay.Interactive
             {
                 rb.linearVelocity = Vector2.zero;
                 rb.angularVelocity = 0f;
-                rb.AddForce(new Vector2(
-                    Random.Range(-1f, 1f),
-                    Random.Range(0.5f, 1f)
-                ) * 2f, ForceMode2D.Impulse);
+
+                // Força na direção do drop (para longe da origem) com um pequeno salto
+                Vector2 force = new Vector2(
+                    dropDirection.x,
+                    dropDirection.y + 0.5f  // Adiciona um pequeno componente para cima para criar efeito de salto
+                ).normalized * 2f;
+
+                rb.AddForce(force, ForceMode2D.Impulse);
             }
 
             // Configura retorno ao pool quando coletado
