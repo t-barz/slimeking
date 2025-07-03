@@ -2,6 +2,7 @@ using UnityEngine;
 using TheSlimeKing.Gameplay;
 using TheSlimeKing.Core;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Representa um objeto de energia coletável no jogo
@@ -26,15 +27,15 @@ public class EnergyObject : MonoBehaviour
     [Tooltip("Referência ao componente visual (opcional)")]
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    [Tooltip("Som reproduzido ao coletar")]
-    [SerializeField] private AudioClip collectSound;
+    [Tooltip("Sons que podem ser reproduzidos ao coletar (escolhido aleatoriamente)")]
+    [SerializeField] private List<AudioClip> collectSounds = new List<AudioClip>();
 
     [Tooltip("Animator para controle das animações")]
     [SerializeField] private Animator animator;
 
     [Header("Cores Elementais")]
     [Tooltip("Cor para energia sem elemento (None)")]
-    [SerializeField] private Color noneElementColor = new Color(0.8f, 0.8f, 0.8f);
+    [SerializeField] private Color noneElementColor = new Color(1f, 1f, 1f);
 
     [Tooltip("Cor para energia do elemento Terra (Earth)")]
     [SerializeField] private Color earthElementColor = new Color(0.5f, 0.3f, 0.0f);
@@ -61,6 +62,10 @@ public class EnergyObject : MonoBehaviour
     [Tooltip("Duração máxima do movimento após lançamento (em segundos)")]
     [SerializeField] private float maxMoveDuration = 0.2f;
 
+    [Header("Depuração")]
+    [Tooltip("Mostrar mensagens de debug no console")]
+    [SerializeField] private bool _showDebugMessages = false;
+
     // Variáveis de controle
     private GameObject targetPlayer;
     private bool isMovingTowardsPlayer = false;
@@ -68,6 +73,7 @@ public class EnergyObject : MonoBehaviour
     private bool movementLimited = false;
     private float moveTimer = 0f;
     private float currentMoveDuration; // Duração atual para este objeto
+    private bool _soundPlayed = false; // Flag para controlar a execução única do som
 
     void Start()
     {
@@ -108,7 +114,8 @@ public class EnergyObject : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
                 rb.angularVelocity = 0f;
                 movementLimited = true;
-                Debug.Log($"Movimento do objeto de energia limitado após {currentMoveDuration:F2} segundos");
+                if (_showDebugMessages)
+                    Debug.Log($"Movimento do objeto de energia limitado após {currentMoveDuration:F2} segundos");
             }
         }
 
@@ -132,7 +139,8 @@ public class EnergyObject : MonoBehaviour
                 if (animator != null)
                 {
                     animator.SetTrigger("Absorv");
-                    Debug.Log("Trigger de absorção acionada - posição exata");
+                    if (_showDebugMessages)
+                        Debug.Log("Trigger de absorção acionada - posição exata");
                 }
 
                 // Para de se mover em direção ao jogador
@@ -174,23 +182,46 @@ public class EnergyObject : MonoBehaviour
     }
 
     /// <summary>
-    /// Retorna a cor correspondente ao tipo de elemento
+    /// Retorna a cor correspondente ao tipo de elemento, 
+    /// com chance de variar entre a cor definida e a cor atual
     /// </summary>
     private Color GetElementColor()
     {
+        // Cor base do elemento conforme o tipo
+        Color baseColor;
         switch (elementType)
         {
             case ElementType.Earth:
-                return earthElementColor;
+                baseColor = earthElementColor;
+                break;
             case ElementType.Water:
-                return waterElementColor;
+                baseColor = waterElementColor;
+                break;
             case ElementType.Fire:
-                return fireElementColor;
+                baseColor = fireElementColor;
+                break;
             case ElementType.Air:
-                return airElementColor;
+                baseColor = airElementColor;
+                break;
             default:
-                return noneElementColor;
+                baseColor = noneElementColor;
+                break;
         }
+
+        // Se já tiver um spriteRenderer com cor definida, tem chance de manter a cor atual
+        if (spriteRenderer != null && Random.value > 0.7f) // 30% de chance de manter a cor atual
+        {
+            // Mistura a cor base com a cor atual para criar uma variação sutil
+            return Color.Lerp(baseColor, spriteRenderer.color, 0.4f);
+        }
+
+        // Adiciona uma pequena variação aleatória à cor base para mais dinamismo
+        return new Color(
+            Mathf.Clamp01(baseColor.r + Random.Range(-0.1f, 0.1f)),
+            Mathf.Clamp01(baseColor.g + Random.Range(-0.1f, 0.1f)),
+            Mathf.Clamp01(baseColor.b + Random.Range(-0.1f, 0.1f)),
+            baseColor.a
+        );
     }
 
     /// <summary>
@@ -203,7 +234,8 @@ public class EnergyObject : MonoBehaviour
         isMovingTowardsPlayer = true;
         moveTimer = 0f;
 
-        Debug.Log($"Energia começou a se mover em direção ao jogador: {elementType}");
+        if (_showDebugMessages)
+            Debug.Log($"Energia começou a se mover em direção ao jogador: {elementType}");
     }
 
     /// <summary>
@@ -214,7 +246,28 @@ public class EnergyObject : MonoBehaviour
         // Verifica se existe um jogador alvo
         if (targetPlayer != null)
         {
+
+
             ApplyEnergyToPlayer();
+        }
+    }
+
+    public void PlaySound()
+    {
+        // Se o som já foi tocado uma vez, não toca novamente
+        if (_soundPlayed) return;
+
+        // Se houver sons configurados, toca um aleatório
+        if (collectSounds != null && collectSounds.Count > 0)
+        {
+            AudioClip randomClip = collectSounds[Random.Range(0, collectSounds.Count)];
+            AudioSource.PlayClipAtPoint(randomClip, transform.position);
+
+            // Marca que o som foi tocado
+            _soundPlayed = true;
+
+            if (_showDebugMessages)
+                Debug.Log("Som de coleta de energia reproduzido");
         }
     }
 
@@ -230,7 +283,8 @@ public class EnergyObject : MonoBehaviour
             // Aplica a energia ao personagem usando o método existente
             slimeStats.AddElementalEnergy(elementType, energyAmount);
 
-            Debug.Log($"Energia absorvida: {energyAmount} pontos do elemento {elementType}");
+            if (_showDebugMessages)
+                Debug.Log($"Energia absorvida: {energyAmount} pontos do elemento {elementType}");
 
             // Reproduz efeito de coleta, se existir
             if (collectEffect != null)
@@ -242,16 +296,6 @@ public class EnergyObject : MonoBehaviour
                 // Destruir o sistema de partículas após a duração
                 Destroy(collectEffect.gameObject, collectEffect.main.duration);
             }
-
-            // Reproduz som de coleta, se disponível
-            if (collectSound != null)
-            {
-                AudioSource.PlayClipAtPoint(collectSound, transform.position);
-            }
-
-            // Não destruímos o objeto automaticamente mais, isso deve ser feito 
-            // via Animation Event ou outro controle externo quando apropriado
-            // Destroy(gameObject);
         }
     }
 
@@ -274,11 +318,13 @@ public class EnergyObject : MonoBehaviour
         moveTimer = 0f;
         isMovingTowardsPlayer = false;
         targetPlayer = null;
+        _soundPlayed = false; // Reseta a flag de som para permitir que o objeto toque novamente ao ser reutilizado
 
         // Gera uma nova duração aleatória
         GenerateRandomMoveDuration();
 
-        Debug.Log($"Estado de movimento reiniciado com nova duração: {currentMoveDuration:F2} segundos");
+        if (_showDebugMessages)
+            Debug.Log($"Estado de movimento reiniciado com nova duração: {currentMoveDuration:F2} segundos");
     }
 
     // Detecta colisão para iniciar movimentação em direção ao jogador

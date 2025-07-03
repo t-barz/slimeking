@@ -185,9 +185,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 8300000, guid: 85d90e9e85b3c3d4eac5266b4e1c9a13, type: 3}
+  m_Resource: {fileID: 8300000, guid: 85d90e9e85b3c3d4eac5266b4e1c9a13, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -425,6 +425,12 @@ MonoBehaviour:
   acceleration: 50
   deceleration: 20
   rotationSpeed: 10
+  movementSounds:
+  - {fileID: 8300000, guid: 85d90e9e85b3c3d4eac5266b4e1c9a13, type: 3}
+  - {fileID: 8300000, guid: 85d90e9e85b3c3d4eac5266b4e1c9a13, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: f083b2157a380aa47afca42043b46dc4, type: 3}
+  soundVolume: 0.7
   visualController: {fileID: 5553382918352077339}
   animationController: {fileID: 8827055214659405866}
   attackCollider: {fileID: 5629189273334390589}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,15 @@ namespace TheSlimeKing.Gameplay
         [SerializeField] private float acceleration = 50f;
         [SerializeField] private float deceleration = 20f;
         [SerializeField] private float rotationSpeed = 10f;
+
+        [Header("Efeitos Sonoros")]
+        [Tooltip("Sons que podem ser reproduzidos durante animações (selecionados aleatoriamente)")]
+        [SerializeField] private List<AudioClip> movementSounds = new List<AudioClip>();
+        [Tooltip("Sons que podem ser reproduzidos durante ataques (selecionados aleatoriamente)")]
+        [SerializeField] private List<AudioClip> attackSounds = new List<AudioClip>();
+        [Tooltip("Volume dos efeitos sonoros")]
+        [Range(0f, 1f)]
+        [SerializeField] private float soundVolume = 0.7f;
 
         [Header("Referências")]
         [SerializeField] private SlimeVisualController visualController;
@@ -192,6 +202,9 @@ namespace TheSlimeKing.Gameplay
                     // Tenta realizar o ataque em todos os alvos dentro do alcance
                     attackComponent.TryAttack();
                     isAttacking = true;
+
+                    // Reproduz um som de ataque aleatório
+                    PlayRandomAttackSound();
                 }
             }
         }
@@ -230,6 +243,8 @@ namespace TheSlimeKing.Gameplay
 
                     if (attackExecuted)
                     {
+                        // Reproduz um som de ataque aleatório com volume maior para o ataque especial
+                        PlayRandomAttackSoundWithVolume(1.2f);
                         Debug.Log("Ataque especial executado");
                     }
                 }
@@ -291,22 +306,160 @@ namespace TheSlimeKing.Gameplay
                 // Comentado até termos detalhes da implementação do SlimeAnimationController
                 // animationController.SetAnimation("Idle");
             }
-
-            _inSpecialMovement = true;
         }
 
         /// <summary>
-        /// Reativa o controle do jogador
+        /// Ativa o controle do jogador
         /// </summary>
         public void EnableControl()
         {
             _controlEnabled = true;
-            _inSpecialMovement = false;
-
-            // Restaura escala normal se necessário
-            if (_currentScale != 1.0f)
-                SetScale(1.0f);
         }
+
+        /// <summary>
+        /// Verifica se o controle do jogador está ativo
+        /// </summary>
+        public bool IsControlEnabled()
+        {
+            return _controlEnabled;
+        }
+
+        #endregion
+
+        #region Audio Methods
+
+        /// <summary>
+        /// Reproduz um som aleatório da lista de sons de movimento.
+        /// Este método pode ser chamado diretamente a partir de eventos de animação.
+        /// </summary>
+        public void PlayRandomSound()
+        {
+            // Verifica se há sons na lista
+            if (movementSounds == null || movementSounds.Count == 0)
+                return;
+
+            // Seleciona um som aleatório da lista
+            AudioClip randomClip = movementSounds[UnityEngine.Random.Range(0, movementSounds.Count)];
+
+            if (randomClip != null)
+            {
+                // Reproduz o som na posição do jogador
+                AudioSource.PlayClipAtPoint(randomClip, transform.position, soundVolume);
+            }
+        }
+
+        /// <summary>
+        /// Reproduz um som específico da lista de sons de movimento pelo índice.
+        /// Este método pode ser chamado diretamente a partir de eventos de animação quando
+        /// precisa de um som específico para uma animação específica.
+        /// </summary>
+        /// <param name="soundIndex">Índice do som na lista movementSounds</param>
+        public void PlaySound(int soundIndex)
+        {
+            // Verifica se há sons na lista e se o índice é válido
+            if (movementSounds == null || movementSounds.Count == 0 || soundIndex < 0 || soundIndex >= movementSounds.Count)
+                return;
+
+            AudioClip clip = movementSounds[soundIndex];
+
+            if (clip != null)
+            {
+                // Reproduz o som na posição do jogador
+                AudioSource.PlayClipAtPoint(clip, transform.position, soundVolume);
+            }
+        }
+
+        /// <summary>
+        /// Reproduz um som aleatório da lista de sons de movimento com um volume personalizado.
+        /// Útil para eventos que precisam de ajuste de volume diferente do padrão.
+        /// </summary>
+        /// <param name="volumeMultiplier">Multiplicador de volume (entre 0 e 1)</param>
+        public void PlayRandomSoundWithVolume(float volumeMultiplier)
+        {
+            // Verifica se há sons na lista
+            if (movementSounds == null || movementSounds.Count == 0)
+                return;
+
+            // Limita o multiplicador entre 0 e 1
+            volumeMultiplier = Mathf.Clamp01(volumeMultiplier);
+
+            // Seleciona um som aleatório da lista
+            AudioClip randomClip = movementSounds[UnityEngine.Random.Range(0, movementSounds.Count)];
+
+            if (randomClip != null)
+            {
+                // Reproduz o som na posição do jogador com o volume personalizado
+                AudioSource.PlayClipAtPoint(randomClip, transform.position, soundVolume * volumeMultiplier);
+            }
+        }
+
+        /// <summary>
+        /// Reproduz um som aleatório da lista de sons de ataque.
+        /// Este método pode ser chamado diretamente a partir de eventos de animação de ataque.
+        /// </summary>
+        public void PlayRandomAttackSound()
+        {
+            // Verifica se há sons na lista
+            if (attackSounds == null || attackSounds.Count == 0)
+                return;
+
+            // Seleciona um som aleatório da lista
+            AudioClip randomClip = attackSounds[UnityEngine.Random.Range(0, attackSounds.Count)];
+
+            if (randomClip != null)
+            {
+                // Reproduz o som na posição do jogador
+                AudioSource.PlayClipAtPoint(randomClip, transform.position, soundVolume);
+            }
+        }
+
+        /// <summary>
+        /// Reproduz um som específico da lista de sons de ataque pelo índice.
+        /// Este método pode ser chamado diretamente a partir de eventos de animação.
+        /// </summary>
+        /// <param name="soundIndex">Índice do som na lista attackSounds</param>
+        public void PlayAttackSound(int soundIndex)
+        {
+            // Verifica se há sons na lista e se o índice é válido
+            if (attackSounds == null || attackSounds.Count == 0 || soundIndex < 0 || soundIndex >= attackSounds.Count)
+                return;
+
+            AudioClip clip = attackSounds[soundIndex];
+
+            if (clip != null)
+            {
+                // Reproduz o som na posição do jogador
+                AudioSource.PlayClipAtPoint(clip, transform.position, soundVolume);
+            }
+        }
+
+        /// <summary>
+        /// Reproduz um som aleatório da lista de sons de ataque com um volume personalizado.
+        /// Útil para eventos que precisam de ajuste de volume diferente do padrão.
+        /// </summary>
+        /// <param name="volumeMultiplier">Multiplicador de volume (entre 0 e 1)</param>
+        public void PlayRandomAttackSoundWithVolume(float volumeMultiplier)
+        {
+            // Verifica se há sons na lista
+            if (attackSounds == null || attackSounds.Count == 0)
+                return;
+
+            // Limita o multiplicador entre 0 e 1
+            volumeMultiplier = Mathf.Clamp01(volumeMultiplier);
+
+            // Seleciona um som aleatório da lista
+            AudioClip randomClip = attackSounds[UnityEngine.Random.Range(0, attackSounds.Count)];
+
+            if (randomClip != null)
+            {
+                // Reproduz o som na posição do jogador com o volume personalizado
+                AudioSource.PlayClipAtPoint(randomClip, transform.position, soundVolume * volumeMultiplier);
+            }
+        }
+
+        #endregion
+
+        #region Métodos Adicionais
 
         /// <summary>
         /// Move o jogador para uma posição específica
