@@ -106,8 +106,10 @@ namespace TheSlimeKing.Core.Inventory
             // Associar ações de inventário
             try
             {
-                _playerInput.actions["UseItem"].performed += OnUseItem;
-                _playerInput.actions["ChangeItem"].performed += OnChangeItem;
+                _playerInput.actions["UseItem1"].performed += ctx => OnUseItemSlot(0);
+                _playerInput.actions["UseItem2"].performed += ctx => OnUseItemSlot(1);
+                _playerInput.actions["UseItem3"].performed += ctx => OnUseItemSlot(2);
+                _playerInput.actions["UseItem4"].performed += ctx => OnUseItemSlot(3);
                 _playerInput.actions["Inventory"].performed += OnToggleInventory;
             }
             catch (Exception e)
@@ -122,35 +124,19 @@ namespace TheSlimeKing.Core.Inventory
 
             try
             {
-                _playerInput.actions["UseItem"].performed -= OnUseItem;
-                _playerInput.actions["ChangeItem"].performed -= OnChangeItem;
+                _playerInput.actions["UseItem1"].performed -= ctx => OnUseItemSlot(0);
+                _playerInput.actions["UseItem2"].performed -= ctx => OnUseItemSlot(1);
+                _playerInput.actions["UseItem3"].performed -= ctx => OnUseItemSlot(2);
+                _playerInput.actions["UseItem4"].performed -= ctx => OnUseItemSlot(3);
                 _playerInput.actions["Inventory"].performed -= OnToggleInventory;
             }
             catch (Exception) { }
         }
 
-        private void OnUseItem(InputAction.CallbackContext context)
+        private void OnUseItemSlot(int slotIndex)
         {
-            UseSelectedItem();
-        }
-
-        private void OnChangeItem(InputAction.CallbackContext context)
-        {
-            float scrollValue = context.ReadValue<float>();
-
-            // D-Pad vertical ou mouse scroll
-            if (Mathf.Abs(scrollValue) > 0.1f)
-            {
-                if (scrollValue > 0)
-                    NextSlot();
-                else
-                    PreviousSlot();
-            }
-            // Tab
-            else
-            {
-                NextSlot();
-            }
+            // Usa o item do slot correspondente
+            UseItemAtSlot(slotIndex);
         }
 
         private void OnToggleInventory(InputAction.CallbackContext context)
@@ -301,6 +287,41 @@ namespace TheSlimeKing.Core.Inventory
             else
             {
                 Debug.Log("Nenhum item para usar no slot selecionado");
+            }
+        }
+
+        /// <summary>
+        /// Usa o item de um slot específico
+        /// </summary>
+        public void UseItemAtSlot(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= _availableSlots)
+                return;
+
+            if (_items[slotIndex] != null && !_items[slotIndex].IsEmpty)
+            {
+                ItemData itemToUse = _items[slotIndex].ItemData;
+
+                // Verificar se é consumível
+                if (itemToUse.IsConsumable)
+                {
+                    _items[slotIndex].RemoveQuantity(1);
+
+                    // Se o item acabou, limpar o slot
+                    if (_items[slotIndex].IsEmpty)
+                    {
+                        _items[slotIndex] = null;
+                        ReorganizeInventory();
+                    }
+                }
+
+                // Dispara evento de uso
+                OnItemUsed?.Invoke(itemToUse, _slimeTransform.position);
+
+                if (_itemUseSound != null)
+                    AudioSource.PlayClipAtPoint(_itemUseSound, _slimeTransform.position);
+
+                OnInventoryChanged?.Invoke(_items);
             }
         }
 
