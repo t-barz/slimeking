@@ -79,10 +79,10 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         private void MoveSlime()
         {
-            // Se o slime está atacando, bloqueia qualquer movimento
-            if (isAttacking)
+            // Se o slime está atacando ou agachado (hiding), bloqueia qualquer movimento
+            if (isAttacking || _isCrouching)
             {
-                // Define a velocidade como zero durante o ataque
+                // Define a velocidade como zero durante o ataque ou agachamento
                 _rb.linearVelocity = Vector2.zero;
                 _currentVelocity = Vector2.zero;
                 return; // Sai da função para impedir qualquer outro cálculo de movimento
@@ -159,16 +159,43 @@ namespace TheSlimeKing.Gameplay
         /// <summary>
         /// Acionado quando o botão de agachar é ativado/desativado
         /// </summary>
-        public void OnCrouchBool(bool crouchState)
+        public void OnCrouchPressed(bool crouchState)
         {
             _isCrouching = crouchState;
 
-            // Animação de encolher quando agachado
-            if (animationController != null && crouchState)
+            // Animação de esconder/mostrar quando agachado/em pé
+            if (animationController != null)
             {
-                animationController.PlayShrinkAnimation();
+                if (crouchState)
+                {
+                    // Quando pressiona o botão, ativa a animação de esconder
+                    animationController.PlayHideAnimation();
+                    Debug.Log("Hiding animation activated");
+                }
+                else
+                {
+                    // Quando solta o botão, desativa a animação de esconder
+                    animationController.StopHideAnimation();
+                    Debug.Log("Hiding animation deactivated");
+                }
             }
         }
+
+
+        public void OnCrouchRelease()
+        {
+            // Método chamado quando o botão de agachar é solto
+            // Aqui você pode definir o comportamento quando o jogador para de agachar
+            _isCrouching = false;
+
+            // Desativa a animação de esconder
+            if (animationController != null)
+            {
+                animationController.StopHideAnimation();
+                Debug.Log("OnCrouchRelease: Hiding animation deactivated");
+            }
+        }
+
 
         /// <summary>
         /// Acionado quando o botão de ataque é pressionado
@@ -306,6 +333,9 @@ namespace TheSlimeKing.Gameplay
                 // Comentado até termos detalhes da implementação do SlimeAnimationController
                 // animationController.SetAnimation("Idle");
             }
+
+            // Não reseta o _isCrouching aqui pois isso depende do estado do botão
+            // No entanto, garantimos que a animação de esconder esteja correta
         }
 
         /// <summary>
@@ -598,6 +628,16 @@ namespace TheSlimeKing.Gameplay
             // Garante que a posição final seja exatamente a de destino
             MoveToPosition(destination, true);
 
+            // Se existe animationController, desativa a animação de esconder
+            if (animationController != null)
+            {
+                animationController.StopHideAnimation();
+                Debug.Log("SlideCoroutine: StopHideAnimation chamado após o slide");
+            }
+
+            // Garante que o estado de agachamento esteja desativado após o slide
+            _isCrouching = false;
+
             // Reativa o controle do jogador
             EnableControl();
         }
@@ -610,6 +650,34 @@ namespace TheSlimeKing.Gameplay
         // Método DeactivateAttackCollider removido pois não é mais necessário com o novo sistema de ataque
         // O collider de ataque agora permanece sempre ativo e TryAttack é chamado quando necessário
 
+        /// <summary>
+        /// Define forçadamente o estado de agachamento
+        /// </summary>
+        /// <param name="crouchState">True para agachar, false para ficar em pé</param>
+        public void SetCrouchState(bool crouchState)
+        {
+            // Se o estado já é o mesmo, não faz nada
+            if (_isCrouching == crouchState)
+                return;
+
+            // Define o novo estado
+            _isCrouching = crouchState;
+
+            // Atualiza a animação
+            if (animationController != null)
+            {
+                if (crouchState)
+                {
+                    animationController.PlayHideAnimation();
+                    Debug.Log("SetCrouchState: Hiding animation activated (forced)");
+                }
+                else
+                {
+                    animationController.StopHideAnimation();
+                    Debug.Log("SetCrouchState: Hiding animation deactivated (forced)");
+                }
+            }
+        }
         #endregion
     }
 }

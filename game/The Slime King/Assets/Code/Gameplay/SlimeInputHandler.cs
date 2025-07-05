@@ -79,11 +79,18 @@ namespace TheSlimeKing.Gameplay
                     break;
 
                 case "Crouch":
-                    if (movementController != null && context.phase == InputActionPhase.Performed)
+                    if (movementController != null)
                     {
-                        // Extraímos o valor como booleano e chamamos o método adaptado
-                        bool crouchValue = context.ReadValueAsButton();
-                        movementController.OnCrouchBool(crouchValue);
+                        if (context.phase == InputActionPhase.Performed)
+                        {
+                            // Botão pressionado
+                            movementController.OnCrouchPressed(true);
+                        }
+                        else if (context.phase == InputActionPhase.Canceled)
+                        {
+                            // Botão liberado
+                            movementController.OnCrouchRelease();
+                        }
                     }
                     break;
 
@@ -147,9 +154,31 @@ namespace TheSlimeKing.Gameplay
 
             if (movementController != null)
             {
-                // Usar IsPressed() para verificar se o botão está pressionado
-                bool isCrouching = value.isPressed;
-                movementController.OnCrouchBool(isCrouching);
+                // Verificar se o botão está pressionado ou solto
+                bool isPressed = value.isPressed;
+
+                if (isPressed)
+                {
+                    // Botão foi pressionado
+                    movementController.OnCrouchPressed(true);
+                }
+                else
+                {
+                    // Botão foi solto
+                    movementController.OnCrouchRelease();
+                }
+            }
+        }
+
+        public void OnCrouch(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                Debug.Log("Crouch pressionado");
+            }
+            else if (context.canceled)
+            {
+                Debug.Log("Crouch solto");
             }
         }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Reflection;
+using System.Collections;
 
 namespace TheSlimeKing.Gameplay
 {
@@ -16,7 +17,7 @@ namespace TheSlimeKing.Gameplay
         // [SerializeField] private string directionParam = "Direction";   // 0=Front, 1=Back, 2=Side
         [SerializeField] private string facingRightParam = "FacingRight"; // True quando virado para direita
         [SerializeField] private string sleepingParam = "isSleeping";
-        [SerializeField] private string hidingParam = "isHiding";
+        [SerializeField] private string hidingParam = "isHiding"; // Mantido para compatibilidade, use IsHidingHash
         [SerializeField] private string walkingParam = "isWalking";
         [SerializeField] private string shrinkTrigger = "Shrink";
         [SerializeField] private string jumpTrigger = "Jump";
@@ -46,6 +47,10 @@ namespace TheSlimeKing.Gameplay
 
         // Referência ao controlador visual
         private SlimeVisualController _visualController;
+
+
+        private static readonly int IsHidingHash = Animator.StringToHash("isHiding");
+
 
         private void Awake()
         {
@@ -81,6 +86,16 @@ namespace TheSlimeKing.Gameplay
 
             if (_attack02Timer > 0)
                 _attack02Timer -= Time.deltaTime;
+
+            // Verificação periódica do estado isHiding no Animator
+            if (animator != null)
+            {
+                bool currentHidingState = animator.GetBool(IsHidingHash);
+                if (currentHidingState != _isHiding)
+                {
+                    Debug.LogWarning($"Inconsistência detectada: _isHiding={_isHiding}, mas animator.isHiding={currentHidingState}");
+                }
+            }
 
             // Fade out no efeito de post-processing para ataques
             if (attackEffectWeight > 0)
@@ -143,6 +158,44 @@ namespace TheSlimeKing.Gameplay
         {
             if (animator != null)
                 animator.SetTrigger(shrinkTrigger);
+        }
+
+        /// <summary>
+        /// Ativa a animação de esconder (agachar) do slime.
+        /// </summary>
+        public void PlayHideAnimation()
+        {
+            if (animator != null)
+            {
+                _isHiding = true;
+                animator.SetBool(IsHidingHash, true);
+                Debug.Log($"PlayHideAnimation: Set isHiding = true. Animator param value now: {animator.GetBool(IsHidingHash)}");
+            }
+            else
+            {
+                Debug.LogWarning("PlayHideAnimation: Animator reference is null!");
+            }
+        }
+
+        /// <summary>
+        /// Desativa a animação de esconder (agachar) do slime.
+        /// </summary>
+        public void StopHideAnimation()
+        {
+            if (animator != null)
+            {
+                Debug.Log($"[StopHideAnimation] Antes: animator.isHiding = {animator.GetBool(IsHidingHash)}");
+                _isHiding = false;
+                animator.SetBool(IsHidingHash, false);
+                Debug.Log($"[StopHideAnimation] Depois: animator.isHiding = {animator.GetBool(IsHidingHash)}");
+
+                // Inicia coroutine para forçar o parâmetro a ficar falso por vários frames
+                StartCoroutine(ForceHideOff());
+            }
+            else
+            {
+                Debug.LogWarning("StopHideAnimation: Animator reference is null!");
+            }
         }
 
         /// <summary>
@@ -235,7 +288,7 @@ namespace TheSlimeKing.Gameplay
         {
             _isHiding = hiding;
             if (animator != null)
-                animator.SetBool(hidingParam, _isHiding);
+                animator.SetBool(IsHidingHash, _isHiding); // Usando o hash para garantir consistência
         }
 
         /// <summary>
@@ -258,7 +311,9 @@ namespace TheSlimeKing.Gameplay
             // desativa o estado de encolher/esconder
             if (animator != null)
             {
-                animator.SetBool(hidingParam, false);
+                animator.SetBool(IsHidingHash, false);
+                _isHiding = false; // Atualiza também a variável interna para manter consistência
+                Debug.Log("PlayGrowAnimation: Definindo isHiding = false");
 
                 // Se houver um parâmetro específico para crescer no futuro, use-o aqui
                 // animator.SetTrigger("Grow");
@@ -277,6 +332,22 @@ namespace TheSlimeKing.Gameplay
                 movement.EndAttack();
                 Debug.Log("Fim da animação de ataque - liberando movimento");
             }
+        }
+
+        private IEnumerator ForceHideOff()
+        {
+            Debug.Log("[ForceHideOff] Iniciando forçamento do parâmetro isHiding = false");
+
+            // Força o parâmetro a ficar falso por vários frames consecutivos
+            for (int i = 0; i < 5; i++)
+            {
+                _isHiding = false;
+                animator.SetBool(IsHidingHash, false);
+                Debug.Log($"[ForceHideOff] Frame {i}: animator.isHiding = {animator.GetBool(IsHidingHash)}");
+                yield return null; // Aguarda o próximo frame
+            }
+
+            Debug.Log("[ForceHideOff] Finalizado");
         }
 
         #endregion

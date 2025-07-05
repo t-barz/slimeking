@@ -20,7 +20,7 @@ public class SlidePointController : MonoBehaviour
 
     [Header("Configurações de Input")]
     [Tooltip("Ação de input que ativa o deslizamento")]
-    [SerializeField] private InputActionReference slideAction;
+    [SerializeField] private InputActionReference interactAction;
 
     private bool playerInRange = false;
     private bool isListeningToInput = false;
@@ -50,17 +50,17 @@ public class SlidePointController : MonoBehaviour
         }
 
         // Verificar se a ação de input está configurada
-        if (slideAction == null)
+        if (interactAction == null)
         {
             Debug.LogWarning($"SlidePointController ({gameObject.name}): Ação de input não configurada!");
         }
         else
         {
             // Garante que a ação esteja habilitada
-            if (!slideAction.action.enabled)
+            if (!interactAction.action.enabled)
             {
-                Debug.Log($"SlidePointController ({gameObject.name}): Habilitando a ação de input {slideAction.action.name}");
-                slideAction.action.Enable();
+                Debug.Log($"SlidePointController ({gameObject.name}): Habilitando a ação de input {interactAction.action.name}");
+                interactAction.action.Enable();
             }
         }
 
@@ -80,18 +80,18 @@ public class SlidePointController : MonoBehaviour
     // Gerencia os listeners de input
     private void ManageInputAction()
     {
-        if (slideAction != null)
+        if (interactAction != null)
         {
             // Ativa a escuta do input quando o jogador estiver no alcance
             if (playerInRange && !isListeningToInput)
             {
-                slideAction.action.performed += OnSlideActionPerformed;
+                interactAction.action.performed += OnInteractActionPerformed;
                 isListeningToInput = true;
             }
             // Desativa a escuta do input quando o jogador sair do alcance
             else if (!playerInRange && isListeningToInput)
             {
-                slideAction.action.performed -= OnSlideActionPerformed;
+                interactAction.action.performed -= OnInteractActionPerformed;
                 isListeningToInput = false;
                 currentPlayer = null;
             }
@@ -99,7 +99,7 @@ public class SlidePointController : MonoBehaviour
     }
 
     // Callback quando a ação de deslizar é executada
-    private void OnSlideActionPerformed(InputAction.CallbackContext context)
+    private void OnInteractActionPerformed(InputAction.CallbackContext context)
     {
 
         if (currentPlayer != null && destinationPoint != null)
@@ -172,9 +172,9 @@ public class SlidePointController : MonoBehaviour
     // Garante que os listeners sejam removidos quando o objeto for desabilitado
     private void OnDisable()
     {
-        if (slideAction != null && isListeningToInput)
+        if (interactAction != null && isListeningToInput)
         {
-            slideAction.action.performed -= OnSlideActionPerformed;
+            interactAction.action.performed -= OnInteractActionPerformed;
             isListeningToInput = false;
         }
     }
