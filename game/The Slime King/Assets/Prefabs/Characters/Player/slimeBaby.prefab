@@ -299,7 +299,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
+  m_DefaultActionMap: Gameplay
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!50 &8053452709061257841
@@ -405,6 +405,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edfd9beea1f4e23448fc3ff1a65cebae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementAction: {fileID: 9046201654372408449, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  attackAction: {fileID: -8558558619823415959, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  specialAttackAction: {fileID: -5341923532088900436, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  interactAction: {fileID: -661376251861777458, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  crouchAction: {fileID: 6206265830452100402, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  menuAction: {fileID: 5664278408707507503, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  inventoryAction: {fileID: 301332944547378608, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  useItem1Action: {fileID: -6696215086619643723, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  useItem2Action: {fileID: 3055346696048166722, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  useItem3Action: {fileID: -8995847856238336995, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  useItem4Action: {fileID: 5562653718052948337, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   movementController: {fileID: 2028323621730340689}
   interactionController: {fileID: 8320981957209869486}
   animationController: {fileID: 8827055214659405866}
