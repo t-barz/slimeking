@@ -393,6 +393,7 @@ GameObject:
   - component: {fileID: 232525126}
   - component: {fileID: 232525128}
   - component: {fileID: 232525127}
+  - component: {fileID: 232525129}
   m_Layer: 0
   m_Name: pixel_circle_0
   m_TagString: Untagged
@@ -486,6 +487,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.Core.Portal.PortalController
   targetSceneName: InitialForest
+  useVignetteEffect: 1
+  vignetteController: {fileID: 0}
+  vignetteTransitionDuration: 1
+  immediateVignetteEffect: 0
   showDebugMessages: 1
 --- !u!70 &232525128
 CapsuleCollider2D:
@@ -524,6 +529,54 @@ CapsuleCollider2D:
   m_Offset: {x: 0.34, y: 0}
   m_Size: {x: 0.3, y: 1}
   m_Direction: 0
+--- !u!114 &232525129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232525124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9f3c5855e2e78144a6dd0cd27c19bdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VignetteController
+  volumeComponent: {fileID: 1552127507}
+  startColor: {r: 0, g: 0, b: 0, a: 1}
+  startIntensity: 1
+  startSmoothness: 1
+  startRounded: 1
+  targetColor: {r: 0.18, g: 0.13, b: 0.08, a: 1}
+  targetIntensity: 0.3
+  targetSmoothness: 0.5
+  targetRounded: 0
+  delayBeforeTransition: 8
+  transitionDuration: 1
+  transitionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  autoStartTransition: 1
 --- !u!1 &240995298
 GameObject:
   m_ObjectHideFlags: 0
