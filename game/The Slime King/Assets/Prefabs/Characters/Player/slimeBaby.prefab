@@ -493,6 +493,13 @@ MonoBehaviour:
   specialAttackVfx: {fileID: 0}
   attackPostProcessingEffect: {fileID: 0}
   attackEffectWeight: 0
+  attackPrefab: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
+  specialAttackPrefab: {fileID: 0}
+  attackSpawnOffset: {x: 0, y: 0.15, z: 0}
+  attackObjectDuration: 3
+  useObjectPooling: 1
+  attackPoolSize: 5
+  specialAttackPoolSize: 3
 --- !u!114 &8320981957209869486
 MonoBehaviour:
   m_ObjectHideFlags: 0

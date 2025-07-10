@@ -25678,6 +25678,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 735420043}
     m_Modifications:
+    - target: {fileID: 2125188055654334332, guid: 42d0d80a9e2818e4393ca511c176ea29, type: 3}
+      propertyPath: _defense
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8210754924341484237, guid: 42d0d80a9e2818e4393ca511c176ea29, type: 3}
       propertyPath: m_Name
       value: env_brown_rockA (1)
@@ -28661,6 +28665,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7311328894429476672, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
+      propertyPath: _defense
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7311328894429476672, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
       propertyPath: _hitFlashColor.b
       value: 0
       objectReference: {fileID: 0}
@@ -28803,53 +28811,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: slimeBaby
       objectReference: {fileID: 0}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: menuAction
+    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackPrefab
       value: 
-      objectReference: {fileID: 5664278408707507503, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: attackAction
-      value: 
-      objectReference: {fileID: -8558558619823415959, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: crouchAction
-      value: 
-      objectReference: {fileID: 6206265830452100402, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: interactAction
-      value: 
-      objectReference: {fileID: -661376251861777458, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: movementAction
-      value: 
-      objectReference: {fileID: 9046201654372408449, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: useItem1Action
-      value: 
-      objectReference: {fileID: -6696215086619643723, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: useItem2Action
-      value: 
-      objectReference: {fileID: 3055346696048166722, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: useItem3Action
-      value: 
-      objectReference: {fileID: -8995847856238336995, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: useItem4Action
-      value: 
-      objectReference: {fileID: 5562653718052948337, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: inventoryAction
-      value: 
-      objectReference: {fileID: 301332944547378608, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 5664469442477985010, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: specialAttackAction
-      value: 
-      objectReference: {fileID: -5341923532088900436, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-    - target: {fileID: 7728366202223690384, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: m_DefaultActionMap
-      value: Gameplay
+      objectReference: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
+    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackSpawnOffset.y
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackObjectDuration
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
