@@ -195,7 +195,63 @@ namespace TheSlimeKing.Gameplay.Interactive
             // Aplica efeito visual de dano apenas se o dano for significativo (>=1)
             if (actualDamage >= 1)
             {
+                // Efeito de flash no próprio objeto
                 FlashEffect();
+
+                // Calcula uma posição ligeiramente acima do centro do objeto para o efeito de impacto
+                Vector3 impactPosition = transform.position;
+
+                // Se tiver um renderer, ajusta a posição para o centro do objeto
+                if (_spriteRenderer != null)
+                {
+                    // Usa o ponto central do sprite e adiciona um pequeno deslocamento para cima
+                    impactPosition = _spriteRenderer.bounds.center + new Vector3(0, _spriteRenderer.bounds.extents.y * 0.5f, 0);
+                    // Garante que o efeito fique à frente do sprite
+                    impactPosition.z -= 0.5f;
+                }
+
+                Debug.Log($"DestructibleObject.TakeDamage: dano={actualDamage}, vida atual={_currentHealth}");
+                Debug.Log($"Criando efeito de impacto na posição {impactPosition}, objeto={gameObject.name}");
+
+                try
+                {
+                    // Primeira tentativa: usar o sistema padrão de efeito de impacto
+                    TheSlimeKing.Gameplay.SlimeAnimationController.CreateImpactEffect(impactPosition);
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"Erro ao criar efeito de impacto: {e.Message}\n{e.StackTrace}");
+
+                    try
+                    {
+                        // Segunda tentativa: usar o método simplificado
+                        Debug.LogWarning("Tentando criar efeito com método simplificado alternativo");
+                        TheSlimeKing.Gameplay.SlimeAnimationController.CreateSimpleImpactEffect(impactPosition);
+                    }
+                    catch (System.Exception e2)
+                    {
+                        Debug.LogError($"Erro também no método alternativo: {e2.Message}");
+
+                        // Terceira tentativa: instanciar diretamente um efeito padrão
+                        if (TheSlimeKing.Gameplay.SlimeAnimationController.GetInstance() != null &&
+                            TheSlimeKing.Gameplay.SlimeAnimationController.GetInstance().GetImpactPrefab() != null)
+                        {
+                            GameObject prefab = TheSlimeKing.Gameplay.SlimeAnimationController.GetInstance().GetImpactPrefab();
+                            GameObject effect = Instantiate(prefab, impactPosition, Quaternion.identity);
+                            Destroy(effect, 0.5f);
+                        }
+                        else
+                        {
+                            // Última tentativa: carregar um efeito padrão de Resources
+                            GameObject fallbackEffect = Resources.Load<GameObject>("Effects/DefaultImpact");
+                            if (fallbackEffect != null)
+                            {
+                                GameObject effect = Instantiate(fallbackEffect, impactPosition, Quaternion.identity);
+                                Destroy(effect, 0.5f);
+                            }
+                        }
+                    }
+                }
             }
 
             // Verifica se chegou à metade da vida e ainda não está rachado

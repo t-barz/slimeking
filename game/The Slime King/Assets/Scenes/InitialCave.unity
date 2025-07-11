@@ -28816,12 +28816,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
     - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: impactEffectPrefab
+      value: 
+      objectReference: {fileID: 2470941130706243547, guid: 4433bc71c40046b499409fc01bbb19ca, type: 3}
+    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
       propertyPath: attackSpawnOffset.y
       value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
       propertyPath: attackObjectDuration
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: impactEffectDuration
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

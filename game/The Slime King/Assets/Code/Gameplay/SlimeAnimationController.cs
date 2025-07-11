@@ -53,6 +53,14 @@ namespace TheSlimeKing.Gameplay
         [Tooltip("Quantidade inicial de objetos de ataque especial no pool")]
         [SerializeField] private int specialAttackPoolSize = 3;
 
+        [Header("Efeitos de Impacto")]
+        [Tooltip("Prefab para o efeito visual de impacto quando um objeto recebe dano")]
+        [SerializeField] private GameObject impactEffectPrefab;
+        [Tooltip("Duração em segundos até desativar o efeito de impacto")]
+        [SerializeField] private float impactEffectDuration = 0.3f;
+        [Tooltip("Quantidade inicial de objetos de efeito de impacto no pool")]
+        [SerializeField] private int impactEffectPoolSize = 10;
+
         // Controle de cooldown
         private float _attack01Timer = 0f;
         private float _attack02Timer = 0f;
@@ -70,13 +78,82 @@ namespace TheSlimeKing.Gameplay
         // Pools de objetos para ataques
         private ObjectPool _attackObjectPool;
         private ObjectPool _specialAttackObjectPool;
+        private ObjectPool _impactEffectPool;
         private Transform _poolContainer;
 
         private static readonly int IsHidingHash = Animator.StringToHash("isHiding");
 
+        // Variável estática para acesso global
+        private static SlimeAnimationController _instance;
+
+        /// <summary>
+        /// Retorna a instância estática do SlimeAnimationController
+        /// </summary>
+        /// <returns>A instância do SlimeAnimationController ou null se não existir</returns>
+        public static SlimeAnimationController GetInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = FindAnyObjectByType<SlimeAnimationController>();
+            }
+            return _instance;
+        }
+
+        /// <summary>
+        /// Retorna o prefab configurado para efeitos de impacto
+        /// </summary>
+        /// <returns>O prefab de efeito de impacto ou null se não estiver configurado</returns>
+        public GameObject GetImpactPrefab()
+        {
+            return impactEffectPrefab;
+        }
+
+        /// <summary>
+        /// Cria um efeito de impacto simples diretamente sem usar o pool
+        /// Utilizado como último recurso quando o sistema de pool falhar
+        /// </summary>
+        /// <param name="position">Posição onde criar o efeito</param>
+        public static void CreateSimpleImpactEffect(Vector3 position)
+        {
+            if (_instance == null || _instance.impactEffectPrefab == null)
+            {
+                Debug.LogWarning("Não é possível criar efeito simples - instância ou prefab não disponível");
+                return;
+            }
+
+            try
+            {
+                // Cria o objeto diretamente sem usar o pool
+                GameObject effect = Instantiate(_instance.impactEffectPrefab, position, Quaternion.identity);
+
+                // Configura tamanho e ordenação
+                effect.transform.localScale = Vector3.one * 1.5f;
+                ConfigureSortingOrderForEffect(effect);
+
+                // Ativa partículas se houver
+                ParticleSystem[] particleSystems = effect.GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    ps.Play(true);
+                }
+
+                // Destrói após a duração
+                Destroy(effect, _instance.impactEffectDuration);
+
+                Debug.Log($"Efeito simples criado na posição {position}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Erro ao criar efeito simples: {e.Message}");
+            }
+        }
+
 
         private void Awake()
         {
+            // Define a instância estática para acesso global
+            _instance = this;
+
             // Busca o controlador visual no mesmo GameObject
             _visualController = GetComponent<SlimeVisualController>();
             if (_visualController == null)
@@ -103,12 +180,50 @@ namespace TheSlimeKing.Gameplay
             // Inicializa o sistema de object pooling se estiver ativado
             if (useObjectPooling)
             {
+                // Verifica se o prefab de impacto está configurado
+                if (impactEffectPrefab == null)
+                {
+                    Debug.LogError("SlimeAnimationController: Prefab de efeito de impacto não configurado! Configure-o no Inspector.");
+
+                    // Tenta buscar um efeito padrão de Resources
+                    impactEffectPrefab = Resources.Load<GameObject>("Effects/DefaultImpact");
+                    if (impactEffectPrefab != null)
+                    {
+                        Debug.Log("Carregado prefab de efeito de impacto padrão dos Resources.");
+                    }
+                }
+
                 InitializeObjectPools();
+
+                // Verificação adicional após inicialização
+                if (_impactEffectPool == null && impactEffectPrefab != null)
+                {
+                    Debug.LogError("Falha ao inicializar o pool de efeitos de impacto. Tentando novamente...");
+
+                    // Tenta inicializar especificamente o pool de efeitos de impacto
+                    Transform impactPoolParent = new GameObject("ImpactEffectPool").transform;
+                    impactPoolParent.SetParent(_poolContainer != null ? _poolContainer : transform);
+                    _impactEffectPool = new ObjectPool(impactEffectPrefab, impactEffectPoolSize, impactPoolParent);
+                }
+            }
+
+            // Registra a instância estática
+            _instance = this;
+
+            // Log para confirmação
+            Debug.Log($"SlimeAnimationController inicializado. Object pooling: {(useObjectPooling ? "Ativado" : "Desativado")}, " +
+                      $"Pool de impacto: {(_impactEffectPool != null ? "Inicializado" : "Não inicializado")}, " +
+                      $"Prefab de impacto: {(impactEffectPrefab != null ? impactEffectPrefab.name : "Não configurado")}");
+
+            // Pré-aquece o método estático
+            if (impactEffectPrefab != null)
+            {
+                Invoke("PrewarmImpactEffect", 0.5f);
             }
         }
 
         /// <summary>
-        /// Inicializa os pools de objetos para os ataques
+        /// Inicializa os pools de objetos para os ataques e efeitos
         /// </summary>
         private void InitializeObjectPools()
         {
@@ -131,6 +246,254 @@ namespace TheSlimeKing.Gameplay
                 Transform specialPoolParent = new GameObject("SpecialAttackPool").transform;
                 specialPoolParent.SetParent(_poolContainer);
                 _specialAttackObjectPool = new ObjectPool(specialAttackPrefab, specialAttackPoolSize, specialPoolParent);
+            }
+
+            // Inicializa o pool para efeitos de impacto
+            if (impactEffectPrefab != null)
+            {
+                Transform impactPoolParent = new GameObject("ImpactEffectPool").transform;
+                impactPoolParent.SetParent(_poolContainer);
+                _impactEffectPool = new ObjectPool(impactEffectPrefab, impactEffectPoolSize, impactPoolParent);
+
+                // Verifica se o prefab tem os componentes visuais necessários
+                bool hasRenderer = impactEffectPrefab.GetComponent<Renderer>() != null ||
+                                   impactEffectPrefab.GetComponentInChildren<Renderer>() != null;
+                bool hasParticles = impactEffectPrefab.GetComponent<ParticleSystem>() != null ||
+                                   impactEffectPrefab.GetComponentInChildren<ParticleSystem>() != null;
+                bool hasAnimator = impactEffectPrefab.GetComponent<Animator>() != null;
+
+                if (!hasRenderer && !hasParticles && !hasAnimator)
+                {
+                    Debug.LogWarning("O prefab de efeito de impacto não possui componentes de renderização visíveis (Renderer, ParticleSystem ou Animator).");
+                }
+
+                Debug.Log($"Pool de efeitos de impacto inicializado com {impactEffectPoolSize} objetos. " +
+                          $"Renderer: {(hasRenderer ? "Sim" : "Não")}, " +
+                          $"Particles: {(hasParticles ? "Sim" : "Não")}, " +
+                          $"Animator: {(hasAnimator ? "Sim" : "Não")}");
+            }
+            else
+            {
+                Debug.LogWarning("impactEffectPrefab não configurado. Efeitos de impacto não serão exibidos.");
+            }
+        }
+
+        /// <summary>
+        /// Cria um efeito visual de impacto na posição especificada
+        /// </summary>
+        /// <param name="position">Posição onde o efeito será exibido</param>
+        public static void CreateImpactEffect(Vector3 position)
+        {
+            // Verificação da instância do SlimeAnimationController
+            if (_instance == null)
+            {
+                Debug.LogError("CreateImpactEffect: Instância do SlimeAnimationController é null!");
+
+                // Tenta encontrar uma instância ativa na cena se não houver referência
+                _instance = FindAnyObjectByType<SlimeAnimationController>();
+
+                if (_instance == null)
+                {
+                    Debug.LogError("CreateImpactEffect: Não foi possível encontrar uma instância de SlimeAnimationController na cena!");
+                    return;
+                }
+            }
+
+            // Verificação do prefab de efeito de impacto
+            if (_instance.impactEffectPrefab == null)
+            {
+                Debug.LogError("CreateImpactEffect: Prefab de efeito de impacto não está configurado no SlimeAnimationController!");
+                return;
+            }
+
+            GameObject impactEffect = null;
+
+            // Tenta obter um objeto do pool
+            if (_instance._impactEffectPool != null)
+            {
+                impactEffect = _instance._impactEffectPool.GetObject();
+            }
+
+            // Se não conseguiu obter do pool, instancia diretamente (fallback)
+            if (impactEffect == null)
+            {
+                Debug.LogWarning("CreateImpactEffect: Usando instanciação direta como fallback (o pool pode não estar funcionando).");
+                impactEffect = Instantiate(_instance.impactEffectPrefab);
+
+                // Destrói o objeto após o tempo especificado
+                Destroy(impactEffect, _instance.impactEffectDuration);
+            }
+
+            // Garante que o objeto existe
+            if (impactEffect == null)
+            {
+                Debug.LogError("CreateImpactEffect: Falha ao criar efeito de impacto!");
+                return;
+            }
+
+            // Ajusta a posição Z para garantir que fique visível na frente
+            Vector3 adjustedPosition = new Vector3(position.x, position.y, position.z - 0.5f);
+            impactEffect.transform.position = adjustedPosition;
+            impactEffect.transform.rotation = Quaternion.identity;
+            impactEffect.transform.localScale = Vector3.one * 1.5f; // Aumenta o tamanho para melhor visibilidade
+
+            // Configura a ordem de camada para ficar na frente
+            ConfigureSortingOrderForEffect(impactEffect);
+
+            // Força o objeto a ficar ativo
+            impactEffect.SetActive(true);
+
+            // Registra a hierarquia do objeto para depuração
+            Debug.Log($"Hierarquia do efeito de impacto:");
+            foreach (Transform child in impactEffect.transform)
+            {
+                Debug.Log($"- Filho: {child.name}, Ativo: {child.gameObject.activeSelf}");
+
+                // Verifica componentes de renderização nos filhos
+                Renderer childRenderer = child.GetComponent<Renderer>();
+                if (childRenderer != null)
+                {
+                    Debug.Log($"  - Renderer: {childRenderer.enabled}, Visível: {childRenderer.isVisible}");
+                }
+
+                // Verifica sistemas de partículas nos filhos
+                ParticleSystem childPS = child.GetComponent<ParticleSystem>();
+                if (childPS != null)
+                {
+                    Debug.Log($"  - ParticleSystem: Ativo: {childPS.isPlaying}");
+                }
+            }
+
+            // Ativa explicitamente todos os renderers
+            Renderer[] renderers = impactEffect.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.enabled = true;
+            }
+
+            // Ativa todos os sistemas de partículas
+            ParticleSystem[] particleSystems = impactEffect.GetComponentsInChildren<ParticleSystem>(true);
+            if (particleSystems.Length > 0)
+            {
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    ps.Stop(true);
+                    ps.Clear(true);
+                    ps.Play(true);
+                }
+                Debug.Log($"Ativados {particleSystems.Length} sistemas de partículas");
+            }
+            else
+            {
+                Debug.LogWarning("Nenhum ParticleSystem encontrado no efeito de impacto!");
+            }
+
+            // Reinicia qualquer animator
+            Animator anim = impactEffect.GetComponent<Animator>();
+            if (anim != null)
+            {
+                anim.enabled = true;
+                anim.Rebind();
+                anim.Update(0f);
+            }
+
+            // Verifica se há um MonoBehaviour no objeto para usar coroutines
+            MonoBehaviour monoBehaviour = impactEffect.GetComponent<MonoBehaviour>();
+            bool canUseCoroutine = (monoBehaviour != null);
+
+            // Se estiver usando o pool e puder usar coroutine, programa o retorno através do pool
+            if (_instance._impactEffectPool != null && canUseCoroutine)
+            {
+                _instance._impactEffectPool.ReturnObject(impactEffect, _instance.impactEffectDuration);
+                Debug.Log($"Objeto programado para retornar ao pool após {_instance.impactEffectDuration} segundos");
+            }
+            else
+            {
+                // Usa a coroutine do próprio SlimeAnimationController ou Destroy diretamente
+                if (_instance != null)
+                {
+                    _instance.StartCoroutine(_instance.DeactivateAndDestroy(impactEffect, _instance.impactEffectDuration));
+                    Debug.Log("Usando coroutine do SlimeAnimationController para destruir o efeito");
+                }
+                else
+                {
+                    Debug.LogWarning("Usando Destroy direto como último recurso");
+                    Destroy(impactEffect, _instance != null ? _instance.impactEffectDuration : 0.5f);
+                }
+            }
+
+            Debug.Log($"Efeito de impacto criado na posição {adjustedPosition} (original: {position})");
+        }
+
+        /// <summary>
+        /// Desativa um gameObject após um determinado tempo
+        /// </summary>
+        /// <param name="obj">Objeto a ser desativado</param>
+        /// <param name="delay">Tempo em segundos até a desativação</param>
+        /// <returns>IEnumerator para uso com Coroutines</returns>
+        private IEnumerator DeactivateAfterDelay(GameObject obj, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (obj != null && obj.activeSelf)
+            {
+                obj.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Desativa um gameObject e depois o destrói após um determinado tempo
+        /// </summary>
+        /// <param name="obj">Objeto a ser desativado e destruído</param>
+        /// <param name="delay">Tempo em segundos até a desativação</param>
+        /// <returns>IEnumerator para uso com Coroutines</returns>
+        private IEnumerator DeactivateAndDestroy(GameObject obj, float delay)
+        {
+            Debug.Log($"DeactivateAndDestroy: Objeto {obj?.name} será destruído em {delay} segundos");
+
+            // Espera o tempo especificado
+            yield return new WaitForSeconds(delay);
+
+            // Verifica se o objeto ainda existe antes de manipulá-lo
+            if (obj != null)
+            {
+                Debug.Log($"DeactivateAndDestroy: Destruindo objeto {obj.name}");
+                Destroy(obj);
+            }
+        }
+
+        /// <summary>
+        /// Configura a ordem de camada para o efeito de impacto ficar visível na frente
+        /// </summary>
+        /// <param name="effectObject">O objeto de efeito a ser configurado</param>
+        private static void ConfigureSortingOrderForEffect(GameObject effectObject)
+        {
+            const int EFFECT_SORTING_ORDER = 500;  // Ordem de camada alta para ficar na frente
+
+            // Ajusta SpriteRenderers
+            SpriteRenderer[] spriteRenderers = effectObject.GetComponentsInChildren<SpriteRenderer>(true);
+            foreach (SpriteRenderer sr in spriteRenderers)
+            {
+                sr.sortingOrder = EFFECT_SORTING_ORDER;
+                Debug.Log($"SpriteRenderer '{sr.name}' configurado com sortingOrder={sr.sortingOrder}");
+            }
+
+            // Ajusta Particle Systems
+            ParticleSystemRenderer[] psRenderers = effectObject.GetComponentsInChildren<ParticleSystemRenderer>(true);
+            foreach (ParticleSystemRenderer psr in psRenderers)
+            {
+                psr.sortingOrder = EFFECT_SORTING_ORDER;
+                Debug.Log($"ParticleSystemRenderer '{psr.name}' configurado com sortingOrder={psr.sortingOrder}");
+            }
+
+            // Outros tipos de renderer que possam existir
+            Renderer[] renderers = effectObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer r in renderers)
+            {
+                if (!(r is SpriteRenderer) && !(r is ParticleSystemRenderer))
+                {
+                    r.sortingOrder = EFFECT_SORTING_ORDER;
+                    Debug.Log($"Renderer '{r.name}' configurado com sortingOrder={r.sortingOrder}");
+                }
             }
         }
 
@@ -801,6 +1164,30 @@ namespace TheSlimeKing.Gameplay
                 {
                     childRenderer.enabled = true;
                 }
+
+                // Garante que todos os sistemas de partículas sejam redefinidos
+                ParticleSystem[] particleSystems = pooledObject.GetComponentsInChildren<ParticleSystem>(true);
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    ps.Stop(true);
+                    ps.Clear(true);
+                    ps.time = 0f;
+                }
+
+                // Reset any animator if present
+                Animator animator = pooledObject.GetComponent<Animator>();
+                if (animator != null)
+                {
+                    animator.Rebind();
+                    animator.Update(0f);
+                }
+
+                // Desative qualquer corrotina ou comportamento contínuo que possa estar em execução
+                MonoBehaviour[] behaviors = pooledObject.GetComponents<MonoBehaviour>();
+                foreach (MonoBehaviour behavior in behaviors)
+                {
+                    behavior.StopAllCoroutines();
+                }
             }
 
             /// <summary>
@@ -855,17 +1242,88 @@ namespace TheSlimeKing.Gameplay
 
         private void OnDestroy()
         {
+            Debug.Log("SlimeAnimationController sendo destruído, limpando pools de objetos...");
+
+            // Verifica se esta é a instância registrada
+            if (_instance == this)
+            {
+                _instance = null;
+                Debug.Log("Instância estática do SlimeAnimationController foi removida");
+            }
+
             // Limpa os pools ao destruir o controlador
             if (useObjectPooling)
             {
                 if (_attackObjectPool != null)
+                {
                     _attackObjectPool.ClearPool();
+                    Debug.Log("Pool de objetos de ataque básico limpo");
+                }
 
                 if (_specialAttackObjectPool != null)
+                {
                     _specialAttackObjectPool.ClearPool();
+                    Debug.Log("Pool de objetos de ataque especial limpo");
+                }
+
+                if (_impactEffectPool != null)
+                {
+                    _impactEffectPool.ClearPool();
+                    Debug.Log("Pool de efeitos de impacto limpo");
+                }
 
                 if (_poolContainer != null)
+                {
                     Destroy(_poolContainer.gameObject);
+                    Debug.Log("Container de pools destruído");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Método para pré-aquecer o efeito de impacto
+        /// </summary>
+        private void PrewarmImpactEffect()
+        {
+            if (impactEffectPrefab != null)
+            {
+                // Cria e imediatamente esconde um efeito de impacto para garantir que tudo esteja carregado
+                Vector3 hiddenPosition = new Vector3(1000, 1000, 1000); // Fora da visão
+                GameObject effect = CreateSimpleImpactEffectInternal(hiddenPosition);
+                if (effect != null)
+                {
+                    effect.SetActive(false);
+                    Destroy(effect, 0.1f);
+                    Debug.Log("Sistema de efeitos de impacto pré-aquecido com sucesso");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Versão interna do CreateSimpleImpactEffect que retorna o GameObject criado
+        /// </summary>
+        private static GameObject CreateSimpleImpactEffectInternal(Vector3 position)
+        {
+            if (_instance == null || _instance.impactEffectPrefab == null)
+                return null;
+
+            try
+            {
+                GameObject effect = Instantiate(_instance.impactEffectPrefab, position, Quaternion.identity);
+                effect.transform.localScale = Vector3.one * 1.5f;
+                ConfigureSortingOrderForEffect(effect);
+
+                ParticleSystem[] particleSystems = effect.GetComponentsInChildren<ParticleSystem>();
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    ps.Play(true);
+                }
+
+                return effect;
+            }
+            catch
+            {
+                return null;
             }
         }
     }
