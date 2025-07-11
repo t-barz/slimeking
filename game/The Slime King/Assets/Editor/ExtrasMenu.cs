@@ -11,6 +11,69 @@ using System.Linq;
 
 public static class ExtrasMenu
 {
+
+    /// <summary>
+    /// Adiciona as tags essenciais do projeto conforme o GDD.
+    /// </summary>
+    [MenuItem("Extras/The Slime King/Configurar Tags do Projeto")]
+    public static void SetupProjectTags()
+    {
+        // Tags essenciais conforme o GDD (ajuste conforme necessário)
+        string[] requiredTags = new string[]
+        {
+            "Player",
+            "Enemy",
+            "Destructible",
+            "Attack",
+            "SpecialAttack",
+            "EnemyAttack",
+            "EnemySpecialAttack",
+            "Interactable",
+            "Follower",
+            "Item",
+            "Platform",
+            "Projectile"
+        };
+
+        // Caminho do TagManager
+        string tagManagerPath = "ProjectSettings/TagManager.asset";
+        SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(tagManagerPath)[0]);
+        SerializedProperty tagsProp = tagManager.FindProperty("tags");
+
+        bool changed = false;
+
+        foreach (string tag in requiredTags)
+        {
+            bool exists = false;
+            for (int i = 0; i < tagsProp.arraySize; i++)
+            {
+                SerializedProperty t = tagsProp.GetArrayElementAtIndex(i);
+                if (t.stringValue == tag)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists)
+            {
+                tagsProp.InsertArrayElementAtIndex(0);
+                tagsProp.GetArrayElementAtIndex(0).stringValue = tag;
+                Debug.Log($"Tag adicionada: {tag}");
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            tagManager.ApplyModifiedProperties();
+            EditorUtility.DisplayDialog("Tags do Projeto", "Tags essenciais configuradas com sucesso!", "OK");
+        }
+        else
+        {
+            EditorUtility.DisplayDialog("Tags do Projeto", "Todas as tags essenciais já estavam configuradas.", "OK");
+        }
+    }
+
     /// <summary>
     /// Adiciona um item de menu "Extras > The Slime King > Verificar CSV Localização" para validar o arquivo de localização.
     /// </summary>
@@ -226,344 +289,6 @@ public static class ExtrasMenu
         Selection.activeGameObject = groupObj;
     }
 
-    /// <summary>
-    /// Cria rapidamente um prefab básico do Slime em seu estágio inicial
-    /// </summary>
-    [MenuItem("Extras/The Slime King/Criar Prefab de Slime Básico")]
-    public static void CreateBasicSlimePrefab()
-    {
-        // Cria o GameObject base
-        GameObject slimeObj = new GameObject("BabySlime");
-
-        // Adiciona componentes básicos
-        slimeObj.AddComponent<SpriteRenderer>();
-        slimeObj.AddComponent<Rigidbody2D>().gravityScale = 0f; // Zero gravity para movimento top-down
-
-        // Adiciona collider circular (apropriado para um slime)
-        CircleCollider2D collider = slimeObj.AddComponent<CircleCollider2D>();
-        collider.radius = 0.5f;
-
-        // Cria o prefab
-        string prefabPath = "Assets/Prefabs/Characters/Player/BabySlime.prefab";
-
-        // Garante que o diretório existe
-        string directory = Path.GetDirectoryName(prefabPath);
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        // Cria o prefab
-        PrefabUtility.SaveAsPrefabAsset(slimeObj, prefabPath);
-
-        // Destrói o objeto temporário
-        Object.DestroyImmediate(slimeObj);
-
-        Debug.Log($"✅ Prefab do Baby Slime criado em: {prefabPath}");
-
-        // Seleciona e destaca o prefab no Project
-        Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(prefabPath);
-        EditorGUIUtility.PingObject(Selection.activeObject);
-    }
-
-    /// <summary>
-    /// Cria uma cena para cada região do jogo
-    /// </summary>
-    [MenuItem("Extras/The Slime King/Criar Cenas para Regiões")]
-    public static void CreateRegionScenes()
-    {
-        // Lista de regiões do jogo conforme o GDD
-        string[] regions = new string[] {
-            "Caverna_Inicial",
-            "Floresta_Sussurrante",
-            "Cavernas_Cristalinas",
-            "Lagos_Serenos",
-            "Picos_Ventosos",
-            "Nucleo_Elemental"
-        };
-
-        // Garante que o diretório existe
-        string directory = "Assets/Scenes/Regions";
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        // Cria uma cena para cada região
-        foreach (string region in regions)
-        {
-            string scenePath = $"{directory}/{region}.unity";
-
-            // Cria uma nova cena vazia
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // Adiciona componentes básicos comuns em todas as cenas
-            GameObject globalLight = new GameObject("Global Light");
-            globalLight.AddComponent<Light2D>().lightType = Light2D.LightType.Global;
-
-            GameObject cameraObj = new GameObject("Main Camera");
-            cameraObj.AddComponent<Camera>();
-            cameraObj.tag = "MainCamera";
-
-            // Salva a cena
-            EditorSceneManager.SaveScene(scene, scenePath);
-            Debug.Log($"✅ Cena {region} criada em: {scenePath}");
-        }
-
-        AssetDatabase.Refresh();
-        Debug.Log("✅ Todas as cenas de regiões foram criadas!");
-    }
-
-    /// <summary>
-    /// Cria scriptable objects para os quatro elementos básicos do jogo
-    /// </summary>
-    [MenuItem("Extras/The Slime King/Criar Elementos Básicos")]
-    public static void CreateElementalScriptableObjects()
-    {
-        // Garante que o diretório existe
-        string directory = "Assets/ScriptableObjects/Elements";
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        // Informações dos elementos conforme o GDD
-        (string name, Color color)[] elements = new[] {
-            ("Terra", new Color(0.5f, 0.3f, 0.1f)), // Marrom
-            ("Agua", new Color(0.2f, 0.5f, 0.9f)),  // Azul
-            ("Fogo", new Color(0.9f, 0.2f, 0.1f)),  // Vermelho
-            ("Ar", new Color(0.9f, 0.9f, 0.9f))     // Branco
-        };
-
-        // Para cada elemento, cria um scriptable object
-        foreach (var element in elements)
-        {
-            // Verifica se já existe o script ElementalType
-            MonoScript script = AssetDatabase.FindAssets("ElementalType t:MonoScript")
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Select(path => AssetDatabase.LoadAssetAtPath<MonoScript>(path))
-                .FirstOrDefault();
-
-            if (script == null)
-            {
-                // Cria o script se não existir
-                CreateElementalTypeScript();
-                AssetDatabase.Refresh();
-
-                // Tenta encontrar novamente
-                script = AssetDatabase.FindAssets("ElementalType t:MonoScript")
-                    .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                    .Select(path => AssetDatabase.LoadAssetAtPath<MonoScript>(path))
-                    .FirstOrDefault();
-
-                if (script == null)
-                {
-                    Debug.LogError("❌ Não foi possível criar o script ElementalType.");
-                    return;
-                }
-            }
-
-            // Cria o scriptable object
-            string assetPath = $"{directory}/{element.name}.asset";
-
-            // Cria a instância do scriptable object
-            var scriptableObj = ScriptableObject.CreateInstance(script.GetClass());
-
-            // Define as propriedades (usando reflexão)
-            var nameProperty = scriptableObj.GetType().GetProperty("ElementName");
-            if (nameProperty != null) nameProperty.SetValue(scriptableObj, element.name);
-
-            var colorProperty = scriptableObj.GetType().GetProperty("ElementColor");
-            if (colorProperty != null) colorProperty.SetValue(scriptableObj, element.color);
-
-            // Salva o asset
-            AssetDatabase.CreateAsset(scriptableObj, assetPath);
-            Debug.Log($"✅ Elemento {element.name} criado em: {assetPath}");
-        }
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        Debug.Log("✅ Todos os elementos elementais foram criados!");
-    }
-
-    /// <summary>
-    /// Cria o script ElementalType para os scriptable objects elementais
-    /// </summary>
-    private static void CreateElementalTypeScript()
-    {
-        string directory = "Assets/Code/ElementSystem";
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        string scriptPath = $"{directory}/ElementalType.cs";
-        string scriptContent = @"using UnityEngine;
-
-/// <summary>
-/// Representa um tipo elemental no jogo The Slime King
-/// </summary>
-[CreateAssetMenu(fileName = ""NewElement"", menuName = ""The Slime King/Elemental Type"")]
-public class ElementalType : ScriptableObject
-{
-    [SerializeField] private string elementName;
-    [SerializeField] private Color elementColor;
-    [SerializeField] [TextArea(3, 5)] private string description;
-    [SerializeField] private float damageModifier = 1.0f;
-    [SerializeField] private float absorptionRate = 1.0f;
-    
-    // Propriedades públicas
-    public string ElementName => elementName;
-    public Color ElementColor => elementColor;
-    public string Description => description;
-    public float DamageModifier => damageModifier;
-    public float AbsorptionRate => absorptionRate;
-    
-    // Métodos que podem ser implementados posteriormente
-    public ParticleSystem GetAbsorptionEffect() 
-    {
-        // Implementação futura
-        return null;
-    }
-    
-    public AudioClip GetAbsorptionSound()
-    {
-        // Implementação futura
-        return null;
-    }
-}
-";
-
-        File.WriteAllText(scriptPath, scriptContent);
-        Debug.Log($"✅ Script ElementalType criado em: {scriptPath}");
-    }
-
-    /// <summary>
-    /// Cria a estrutura de pastas para os códigos relacionados aos inimigos
-    /// </summary>
-    [MenuItem("Extras/The Slime King/Criar Estrutura de Inimigos")]
-    public static void CreateEnemyCodeStructure()
-    {
-        // Lista de pastas específicas para inimigos
-        List<string> enemyFolders = new List<string>
-        {
-            "Code/Gameplay/Enemies",
-            "Code/Gameplay/Enemies/Basic",
-            "Code/Gameplay/Enemies/Bosses",
-            "Code/Gameplay/Enemies/AI",
-            "Code/Gameplay/Enemies/Behaviors",
-            "ScriptableObjects/Enemies/Common",
-            "ScriptableObjects/Enemies/Bosses",
-            "ScriptableObjects/Enemies/Behaviors",
-            "Art/Characters/Enemies/Animations",
-            "Art/Characters/Enemies/SpriteSheets",
-            "Prefabs/Characters/Enemies/Common",
-            "Prefabs/Characters/Enemies/Bosses",
-            "Audio/SFX/Enemies"
-        };
-
-        // Cria as pastas
-        foreach (string folder in enemyFolders)
-        {
-            string path = $"Assets/{folder}";
-            CreateFolderRecursive(path);
-        }
-
-        // Cria alguns arquivos básicos de exemplo
-        CreateEnemyScripts();
-
-        AssetDatabase.Refresh();
-        Debug.Log("✅ Estrutura de pastas para inimigos criada!");
-    }
-
-    /// <summary>
-    /// Cria scripts básicos para inimigos
-    /// </summary>
-    private static void CreateEnemyScripts()
-    {
-        // Script base para comportamentos de inimigos
-        string baseEnemyBehaviorPath = "Assets/Code/Gameplay/Enemies/Behaviors/BaseEnemyBehavior.cs";
-        string baseEnemyBehaviorContent = @"using UnityEngine;
-using TheSlimeKing.Gameplay;
-
-namespace TheSlimeKing.Gameplay.Enemies
-{
-    /// <summary>
-    /// Classe base para comportamentos de inimigos
-    /// </summary>
-    public abstract class BaseEnemyBehavior : MonoBehaviour
-    {
-        [SerializeField] protected EnemyStats enemyStats;
-
-        protected virtual void Awake()
-        {
-            if (enemyStats == null)
-                enemyStats = GetComponent<EnemyStats>();
-        }
-
-        protected virtual void OnEnable()
-        {
-            if (enemyStats != null)
-                enemyStats.OnAggroStateChanged += HandleAggroChanged;
-        }
-
-        protected virtual void OnDisable()
-        {
-            if (enemyStats != null)
-                enemyStats.OnAggroStateChanged -= HandleAggroChanged;
-        }
-
-        protected virtual void HandleAggroChanged(bool isAggroed)
-        {
-            // Implementação específica em subclasses
-        }
-
-        public abstract void PerformBehavior();
-    }
-}";
-        // Criar script de comportamento de patrulha
-        string patrolBehaviorPath = "Assets/Code/Gameplay/Enemies/Behaviors/PatrolBehavior.cs";
-        string patrolBehaviorContent = @"using UnityEngine;
-
-namespace TheSlimeKing.Gameplay.Enemies
-{
-    /// <summary>
-    /// Comportamento de patrulha para inimigos
-    /// </summary>
-    public class PatrolBehavior : BaseEnemyBehavior
-    {
-        [SerializeField] private Transform[] waypoints;
-        [SerializeField] private float waypointPauseTime = 1f;
-        
-        private int currentWaypointIndex;
-        private bool isWaiting;
-        private float waitTimer;
-        
-        public override void PerformBehavior()
-        {
-            if (waypoints == null || waypoints.Length == 0)
-                return;
-                
-            // Lógica de patrulha a ser implementada
-        }
-        
-        protected override void HandleAggroChanged(bool isAggroed)
-        {
-            // Quando aggro muda, ajusta o comportamento
-            enabled = !isAggroed; // Desativa patrulha quando agressivo
-        }
-    }
-}";
-        // Garantir diretorios existam
-        Directory.CreateDirectory(Path.GetDirectoryName(baseEnemyBehaviorPath));
-        Directory.CreateDirectory(Path.GetDirectoryName(patrolBehaviorPath));
-
-        // Escrever arquivos
-        File.WriteAllText(baseEnemyBehaviorPath, baseEnemyBehaviorContent);
-        File.WriteAllText(patrolBehaviorPath, patrolBehaviorContent);
-
-        Debug.Log($"✅ Scripts de exemplo para inimigos criados!");
-    }
 
     /// <summary>
     /// Reorganiza a estrutura de pastas e arquivos existentes
