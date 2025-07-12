@@ -30,11 +30,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 437ceac0c6ea85542afec1b3145bb43e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.827
+      value: 1.12886
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 437ceac0c6ea85542afec1b3145bb43e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.02
+      value: 3.71408
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 437ceac0c6ea85542afec1b3145bb43e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -77,7 +77,7 @@ PrefabInstance:
       addedObject: {fileID: 7189045971269839782}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 437ceac0c6ea85542afec1b3145bb43e, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1303572905419396030}
+      addedObject: {fileID: -2058823665758131003}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 437ceac0c6ea85542afec1b3145bb43e, type: 3}
 --- !u!1 &4114844486984369459 stripped
 GameObject:
@@ -130,7 +130,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.3, y: 0.1}
   m_EdgeRadius: 0
---- !u!114 &1303572905419396030
+--- !u!114 &-2058823665758131003
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,42 +139,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4114844486984369459}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 189c76d6db496c044985b13014cc7325, type: 3}
+  m_Script: {fileID: 11500000, guid: 77b55e496c42a424e8502bb3dce62a24, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  _maxHealth: 4
-  _defense: 0
-  _hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
-  _flashDuration: 0.15
-  _checkTagOnStart: 1
-  _fadeOutDuration: 1.5
-  _fadeOutCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _dropItems:
-  - itemPrefab: {fileID: 7759879522171318051, guid: e5cad4ec28a542d48accb1be777dcde7, type: 3}
-    itemName: 
-  _minDropCount: 1
-  _maxDropCount: 3
-  _dropRadius: 0.2
+  m_EditorClassIdentifier: Assembly-CSharp::EntityStatus
+  baseHP: 4
+  baseDefense: 0
+  baseAttack: 0
+  baseSpecialAttack: 0
+  baseLevel: 1
+  currentHP: 0
+  currentLevel: 1
+  modifiers: []

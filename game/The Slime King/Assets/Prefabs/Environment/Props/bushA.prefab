@@ -4870,11 +4870,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.127
+      value: 1.12886
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.118
+      value: 3.71408
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4920,10 +4920,7 @@ PrefabInstance:
       addedObject: {fileID: 1719133320925952764}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 9059265287160669577}
-    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 560580267193406045}
+      addedObject: {fileID: 8559332482062913826}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: a0afc2d9b034f0d488b31f31f84a3b56, type: 3}
 --- !u!4 &1374776129184451567 stripped
 Transform:
@@ -4971,7 +4968,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0.2}
   m_Radius: 0.16
---- !u!114 &9059265287160669577
+--- !u!114 &8559332482062913826
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4980,67 +4977,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2232049374899102602}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfbc5dcdc4f46e64b93055fb9f46ee08, type: 3}
+  m_Script: {fileID: 11500000, guid: 77b55e496c42a424e8502bb3dce62a24, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.Gameplay.Interactive.ContactAnimator
-  _reactToTags:
-  - Player
-  - Enemy
-  - Nature
-  _reactOnEnter: 1
-  _reactOnExit: 0
-  _animationTriggerName: Shake
-  _contactSounds:
-  - {fileID: 8300000, guid: 1b288af6c26da024896f355f65e43314, type: 3}
-  - {fileID: 8300000, guid: 669749a64283b764c9137586c18c241f, type: 3}
-  _soundVolume: 0.7
-  _contactParticles: {fileID: 4738593946478236763}
-  _showDebugMessages: 0
---- !u!114 &560580267193406045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2232049374899102602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 189c76d6db496c044985b13014cc7325, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.Gameplay.Interactive.DestructibleObject
-  _maxHealth: 1
-  _defense: 0
-  _hitFlashColor: {r: 1, g: 1, b: 1, a: 1}
-  _flashDuration: 0.15
-  _checkTagOnStart: 1
-  _fadeOutDuration: 1.5
-  _fadeOutCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _dropItems:
-  - itemPrefab: {fileID: 7759879522171318051, guid: e5cad4ec28a542d48accb1be777dcde7, type: 3}
-    itemName: 
-  _minDropCount: 1
-  _maxDropCount: 2
-  _dropRadius: 0.2
+  m_EditorClassIdentifier: Assembly-CSharp::EntityStatus
+  baseHP: 1
+  baseDefense: 0
+  baseAttack: 0
+  baseSpecialAttack: 0
+  baseLevel: 1
+  currentHP: 0
+  currentLevel: 1
+  modifiers: []

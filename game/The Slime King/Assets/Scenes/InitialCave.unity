@@ -486,12 +486,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c694c2ef54dde94b8a7d16d1b068932, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.Core.Portal.PortalController
-  targetSceneName: InitialForest
-  useVignetteEffect: 1
-  vignetteController: {fileID: 0}
-  vignetteTransitionDuration: 1
-  immediateVignetteEffect: 0
-  showDebugMessages: 1
 --- !u!70 &232525128
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -4432,7 +4426,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 8cb593d128a383b4d9c5f52fa68977a6, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 8cb593d128a383b4d9c5f52fa68977a6, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.25
@@ -28809,27 +28803,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3018953440086048136, guid: 043175d29a434a44e881163a34861afe, type: 3}
       propertyPath: m_Name
-      value: slimeBaby
+      value: Slime
       objectReference: {fileID: 0}
-    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: attackPrefab
-      value: 
-      objectReference: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
-    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: impactEffectPrefab
-      value: 
-      objectReference: {fileID: 2470941130706243547, guid: 4433bc71c40046b499409fc01bbb19ca, type: 3}
-    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: attackSpawnOffset.y
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: attackObjectDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8827055214659405866, guid: 043175d29a434a44e881163a34861afe, type: 3}
-      propertyPath: impactEffectDuration
-      value: 10
+    - target: {fileID: 8673092799854235456, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: baseSpeed
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
