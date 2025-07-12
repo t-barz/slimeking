@@ -74,6 +74,8 @@ public class PlayerInputHandler : MonoBehaviour
     /// </summary>
     private SpriteRenderer vfxSideRenderer;
 
+    private bool isAttacking = false;
+
     /// <summary>
     /// Inicializa os componentes necessários e referências para o personagem.
     /// </summary>
@@ -88,6 +90,9 @@ public class PlayerInputHandler : MonoBehaviour
         // Busca SpriteRenderers para flip lateral
         if (side != null) sideRenderer = side.GetComponent<SpriteRenderer>();
         if (vfx_side != null) vfxSideRenderer = vfx_side.GetComponent<SpriteRenderer>();
+
+        // Inicializa olhando para o sul (front ativo)
+        UpdateSpriteDirection(Vector2.zero);
     }
 
     /// <summary>
@@ -182,6 +187,12 @@ public class PlayerInputHandler : MonoBehaviour
     private void OnAttackPerformed(InputAction.CallbackContext ctx)
     {
         animator.SetTrigger("Attack01");
+        isAttacking = true;
+    }
+
+    public void ResetAttack()
+    {
+        isAttacking = false;
     }
 
     /// <summary>
@@ -206,7 +217,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     /// <summary>
     /// Atualiza a posição do personagem com base no input de movimento e velocidade.
-    /// Não movimenta o personagem se estiver agachado/escondido.
+    /// Não movimenta o personagem se estiver agachado/escondido ou atacando.
     /// Tenta inicializar o input se ainda não estiver inicializado.
     /// </summary>
     private void Update()
@@ -217,9 +228,16 @@ public class PlayerInputHandler : MonoBehaviour
             TryInitializeInput();
         }
 
-        // Não movimenta se estiver escondido
-        if (animator.GetBool("isHiding"))
+        // Não movimenta se estiver escondido ou atacando
+        if (animator.GetBool("isHiding") || isAttacking)
+        {
+            // Para o movimento imediatamente se estiver atacando
+            if (isAttacking && rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
             return;
+        }
 
         float speed = entityStatus != null ? entityStatus.GetSpeed() : 0f;
 

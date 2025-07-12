@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 8673092799854235456}
   - component: {fileID: 5602365468296143244}
   - component: {fileID: 3452587223168100441}
+  - component: {fileID: 8399835198756755340}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Player
@@ -414,6 +415,30 @@ MonoBehaviour:
   side: {fileID: 6348536971146426712}
   vfx_side: {fileID: 6134169658500841801}
   shadow: {fileID: 1205285456547601663}
+--- !u!114 &8399835198756755340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3018953440086048136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8616d0f4daaf7ca4392bc58c5798a71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntitySoundHandler
+  damageSound: {fileID: 0}
+  deathSound: {fileID: 0}
+  footstepSounds:
+  - {fileID: 8300000, guid: 85d90e9e85b3c3d4eac5266b4e1c9a13, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: f083b2157a380aa47afca42043b46dc4, type: 3}
+  specialAttackSounds: []
+  hideSound: {fileID: 0}
+  buffSound: {fileID: 0}
+  debuffSound: {fileID: 0}
+  footstepInterval: 0.3
+  randomPitchVariation: 0.1
 --- !u!1 &5042679139804512791
 GameObject:
   m_ObjectHideFlags: 0
