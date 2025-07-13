@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: e7db6359f37bd344691e60990b8fc4f7
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: uii_inputAct2_Clip
+    second: {fileID: 7400000, guid: df2609ded66c6be478879950151148a6, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -24,7 +29,7 @@ ScriptedImporter:
     normalMapFilter: 0
     flipGreenChannel: 0
     swizzle: 50462976
-    isReadable: 0
+    isReadable: 1
     streamingMipmaps: 0
     streamingMipmapsPriority: 0
     vTOnly: 0
@@ -102,7 +107,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638863163713337281
+  platformSettingsDirtyTick: 638880344600847293
   textureAssetName: 
   singleSpriteImportData:
   - name: 
