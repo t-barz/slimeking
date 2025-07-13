@@ -3,151 +3,95 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Responsável por conectar os inputs do InputManager ao Animator do personagem.
-/// Gerencia os parâmetros de animação de movimento, ataque e esconder/abaixar,
-/// reagindo aos eventos de input do jogador, movimentando o personagem e exibindo os sprites corretos.
+/// Responsável por processar os inputs do jogador e gerenciar o movimento e animações do personagem.
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public class PlayerInputHandler : MonoBehaviour
 {
-    /// <summary>
-    /// Referência ao componente Animator para controlar as animações do personagem.
-    /// </summary>
+    #region Componentes e Referências
     private Animator animator;
-
-    /// <summary>
-    /// Direção atual do movimento do personagem.
-    /// </summary>
-    private Vector2 moveInput = Vector2.zero;
-    
-    /// <summary>
-    /// Última direção de movimento válida (não-zero) para manter a orientação visual quando parado.
-    /// </summary>
-    private Vector2 lastDirection = Vector2.down; // Começa olhando para baixo (sul)
-
-    /// <summary>
-    /// Referência ao componente Rigidbody2D para movimentação física.
-    /// </summary>
     private Rigidbody2D rb;
-
-    /// <summary>
-    /// Referência ao componente EntityStatus para obter atributos como velocidade.
-    /// </summary>
     private EntityStatus entityStatus;
+    private float cachedSpeed;
+    #endregion
 
-    /// <summary>
-    /// Indica se os eventos de input já foram registrados.
-    /// </summary>
-    private bool isInputInitialized = false;
-
-    /// <summary>
-    /// Timestamp da próxima tentativa de inicialização do input.
-    /// </summary>
-    private float nextInputInitAttempt = 0f;
-
-    // Referências aos sub-objetos de sprites
-    [Header("Referências dos Sprites do Slime")]
-    [Tooltip("GameObject com o sprite frontal do slime")]
-    [SerializeField] private GameObject front;
-
-    [Tooltip("GameObject com os efeitos visuais frontais")]
-    [SerializeField] private GameObject vfx_front;
-
-    [Tooltip("GameObject com o sprite traseiro do slime")]
-    [SerializeField] private GameObject back;
-
-    [Tooltip("GameObject com os efeitos visuais traseiros")]
-    [SerializeField] private GameObject vfx_back;
-
-    [Tooltip("GameObject com o sprite lateral do slime")]
-    [SerializeField] private GameObject side;
-
-    [Tooltip("GameObject com os efeitos visuais laterais")]
-    [SerializeField] private GameObject vfx_side;
-
-    [Tooltip("GameObject com a sombra do slime")]
-    [SerializeField] private GameObject shadow;
-
-    [Header("Referências de Ataque")]
-    [Tooltip("Prefab do objeto de ataque a ser instanciado")]
-    [SerializeField] private GameObject attackPrefab;
-
-    [Header("Configurações de Ataque")]
-    [Tooltip("Distância do ataque em relação ao jogador (frente)")]
-    [SerializeField] private Vector2 attackOffsetFront = new Vector2(0f, 0.5f);
-
-    [Tooltip("Distância do ataque em relação ao jogador (costas)")]
-    [SerializeField] private Vector2 attackOffsetBack = new Vector2(0f, 0.5f);
-
-    [Tooltip("Distância do ataque em relação ao jogador (lateral)")]
-    [SerializeField] private Vector2 attackOffsetSide = new Vector2(0.5f, 0f);
-
-    // Para flip lateral
-    /// <summary>
-    /// Referência ao SpriteRenderer do sprite lateral para flip horizontal.
-    /// </summary>
-    private SpriteRenderer sideRenderer;
-
-    /// <summary>
-    /// Referência ao SpriteRenderer dos efeitos visuais laterais para flip horizontal.
-    /// </summary>
-    private SpriteRenderer vfxSideRenderer;
-
+    #region Estado do Movimento
+    private Vector2 moveInput = Vector2.zero;
+    private Vector2 lastDirection = Vector2.down; // Sul por padrão
     private bool isAttacking = false;
+    #endregion
 
-    /// <summary>
-    /// Inicializa os componentes necessários e referências para o personagem.
-    /// </summary>
+    #region Inicialização de Input
+    private bool isInputInitialized = false;
+    private float nextInputInitAttempt = 0f;
+    private const float INPUT_RETRY_INTERVAL = 0.5f;
+    #endregion
+
+    #region Configurações de Sprites
+    [Header("Referências dos Sprites")]
+    [SerializeField] private GameObject front;
+    [SerializeField] private GameObject vfx_front;
+    [SerializeField] private GameObject back;
+    [SerializeField] private GameObject vfx_back;
+    [SerializeField] private GameObject side;
+    [SerializeField] private GameObject vfx_side;
+    [SerializeField] private GameObject shadow;
+    
+    // Cache para evitar GetComponent repetidos
+    private SpriteRenderer sideRenderer;
+    private SpriteRenderer vfxSideRenderer;
+    #endregion
+
+    #region Configurações de Ataque
+    [Header("Ataque")]
+    [SerializeField] private GameObject attackPrefab;
+    [SerializeField] private Vector2 attackOffsetFront = new Vector2(0f, 0.5f);
+    [SerializeField] private Vector2 attackOffsetBack = new Vector2(0f, 0.5f);
+    [SerializeField] private Vector2 attackOffsetSide = new Vector2(0.5f, 0f);
+    #endregion
+
+    #region Inicialização e Ciclo de Vida
     private void Awake()
     {
+        // Obtém referências de componentes
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         entityStatus = GetComponent<EntityStatus>();
-        if (entityStatus == null)
-            Debug.LogWarning("EntityStatus não encontrado no GameObject. O movimento usará velocidade 0.");
-
-        // Busca SpriteRenderers para flip lateral
+        
+        // Cache de componentes para performance
         if (side != null) sideRenderer = side.GetComponent<SpriteRenderer>();
         if (vfx_side != null) vfxSideRenderer = vfx_side.GetComponent<SpriteRenderer>();
-
-        // Inicializa olhando para o sul (front ativo)
-        UpdateSpriteDirection(Vector2.zero);
+        
+        // Configura direção inicial
+        UpdateSpriteDirection(lastDirection);
+        
+        // Cache da velocidade inicial
+        UpdateSpeedCache();
     }
 
-    /// <summary>
-    /// Registra os callbacks para os eventos de input quando o objeto é habilitado.
-    /// </summary>
     private void OnEnable()
     {
         TryInitializeInput();
     }
 
-    /// <summary>
-    /// Remove os callbacks dos eventos de input quando o objeto é desabilitado.
-    /// </summary>
     private void OnDisable()
     {
         UnsubscribeInputEvents();
         isInputInitialized = false;
     }
+    #endregion
 
-    /// <summary>
-    /// Tenta inicializar e registrar os callbacks de input.
-    /// </summary>
-    /// <returns>True se inicializou com sucesso, False se falhou</returns>
+    #region Gerenciamento de Input
     private bool TryInitializeInput()
     {
         if (InputManager.Instance == null)
         {
-            Debug.LogWarning("InputManager.Instance não encontrado! Tentando novamente em breve...");
-            nextInputInitAttempt = Time.time + 0.5f;
+            nextInputInitAttempt = Time.time + INPUT_RETRY_INTERVAL;
             return false;
         }
 
-        // Remove callbacks antigos para evitar duplicação
         UnsubscribeInputEvents();
 
-        // Registra novos callbacks
         InputManager.Instance.MoveAction.performed += OnMovePerformed;
         InputManager.Instance.MoveAction.canceled += OnMoveCanceled;
         InputManager.Instance.AttackAction.performed += OnAttackPerformed;
@@ -155,17 +99,12 @@ public class PlayerInputHandler : MonoBehaviour
         InputManager.Instance.CrouchAction.canceled += OnCrouchCanceled;
 
         isInputInitialized = true;
-        Debug.Log("Input inicializado com sucesso!");
         return true;
     }
 
-    /// <summary>
-    /// Remove todos os callbacks de eventos de input.
-    /// </summary>
     private void UnsubscribeInputEvents()
     {
-        if (InputManager.Instance == null)
-            return;
+        if (InputManager.Instance == null) return;
 
         InputManager.Instance.MoveAction.performed -= OnMovePerformed;
         InputManager.Instance.MoveAction.canceled -= OnMoveCanceled;
@@ -173,162 +112,80 @@ public class PlayerInputHandler : MonoBehaviour
         InputManager.Instance.CrouchAction.performed -= OnCrouchPerformed;
         InputManager.Instance.CrouchAction.canceled -= OnCrouchCanceled;
     }
+    #endregion
 
-    /// <summary>
-    /// Callback executado quando o jogador inicia um movimento.
-    /// Atualiza a direção do movimento, ativa a animação de caminhada e atualiza os sprites visíveis.
-    /// </summary>
-    /// <param name="ctx">Contexto do evento de input</param>
+    #region Callbacks de Input
     private void OnMovePerformed(InputAction.CallbackContext ctx)
     {
         moveInput = ctx.ReadValue<Vector2>();
-        animator.SetBool("isWalking", moveInput.sqrMagnitude > 0.01f);
+        bool isMoving = moveInput.sqrMagnitude > 0.01f;
+        animator.SetBool("isWalking", isMoving);
         
-        // Se o movimento tiver uma magnitude significativa, atualize a última direção
-        if (moveInput.sqrMagnitude > 0.01f)
+        // Atualiza a direção apenas se estiver realmente movendo
+        if (isMoving)
         {
             lastDirection = moveInput.normalized;
+            UpdateSpriteDirection(lastDirection);
         }
-        
-        // Usa a última direção válida para atualizar os sprites
-        UpdateSpriteDirection(lastDirection);
     }
 
-    /// <summary>
-    /// Callback executado quando o jogador para de se movimentar.
-    /// Reseta a direção do movimento, desativa a animação de caminhada mas mantém a direção visual.
-    /// </summary>
-    /// <param name="ctx">Contexto do evento de input</param>
     private void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
         moveInput = Vector2.zero;
         animator.SetBool("isWalking", false);
-        
-        // Importante: NÃO muda a direção visual, mantém a última direção
-        // NÃO chamamos UpdateSpriteDirection(Vector2.zero) para manter a orientação
+        // Mantém a última direção visual
     }
 
-    /// <summary>
-    /// Callback executado quando o jogador realiza um ataque.
-    /// Ativa a trigger de ataque no Animator e instancia o objeto de ataque.
-    /// </summary>
-    /// <param name="ctx">Contexto do evento de input</param>
     private void OnAttackPerformed(InputAction.CallbackContext ctx)
     {
         animator.SetTrigger("Attack01");
         isAttacking = true;
         
-        // Instancia o objeto de ataque
         if (attackPrefab != null)
         {
-            // Usa a última direção válida em vez do moveInput
-            Vector2 direction = lastDirection;
-            
-            // Calcula a posição de spawn com o offset apropriado
-            Vector3 spawnPosition = transform.position;
-            
-            // Parado ou Sul (baixo)
-            if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y <= 0)
-            {
-                spawnPosition += new Vector3(attackOffsetFront.x, attackOffsetFront.y, 0);
-            }
-            // Norte (cima)
-            else if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y > 0)
-            {
-                spawnPosition += new Vector3(attackOffsetBack.x, attackOffsetBack.y, 0);
-            }
-            // Lateral (esquerda/direita)
-            else
-            {
-                // Inverte o offset X se estiver olhando para a esquerda
-                float offsetX = direction.x < 0 ? -attackOffsetSide.x : attackOffsetSide.x;
-                spawnPosition += new Vector3(offsetX, attackOffsetSide.y, 0);
-            }
-            
-            // Instancia o objeto na posição calculada
-            GameObject attackObj = Instantiate(attackPrefab, spawnPosition, Quaternion.identity);
-            
-            // Obtém referências para os sub-objetos de ataque
-            Transform attackBack = attackObj.transform.Find("attack_back");
-            Transform attackSide = attackObj.transform.Find("attack_side");
-            Transform attackFront = attackObj.transform.Find("attack_front");
-            
-            // Ativa/desativa os sub-objetos de acordo com a direção atual do slime
-            if (attackBack != null) attackBack.gameObject.SetActive(false);
-            if (attackSide != null) attackSide.gameObject.SetActive(false);
-            if (attackFront != null) attackFront.gameObject.SetActive(false);
-            
-            // Parado ou Sul (baixo)
-            if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y <= 0)
-            {
-                if (attackFront != null) attackFront.gameObject.SetActive(true);
-            }
-            // Norte (cima)
-            else if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y > 0)
-            {
-                if (attackBack != null) attackBack.gameObject.SetActive(true);
-            }
-            // Lateral (esquerda/direita)
-            else
-            {
-                if (attackSide != null) 
-                {
-                    attackSide.gameObject.SetActive(true);
-                    
-                    // Flip horizontal se for para esquerda
-                    bool isLeft = direction.x < 0;
-                    SpriteRenderer attackSideRenderer = attackSide.GetComponent<SpriteRenderer>();
-                    if (attackSideRenderer != null)
-                    {
-                        attackSideRenderer.flipX = !isLeft;
-                    }
-                }
-            }
+            SpawnAttack();
         }
     }
-    
-    public void ResetAttack()
-    {
-        isAttacking = false;
-    }
 
-    /// <summary>
-    /// Callback executado quando o jogador pressiona o botão de agachar/esconder.
-    /// Ativa o parâmetro isHiding no Animator.
-    /// </summary>
-    /// <param name="ctx">Contexto do evento de input</param>
     private void OnCrouchPerformed(InputAction.CallbackContext ctx)
     {
         animator.SetBool("isHiding", true);
     }
 
-    /// <summary>
-    /// Callback executado quando o jogador solta o botão de agachar/esconder.
-    /// Desativa o parâmetro isHiding no Animator.
-    /// </summary>
-    /// <param name="ctx">Contexto do evento de input</param>
     private void OnCrouchCanceled(InputAction.CallbackContext ctx)
     {
         animator.SetBool("isHiding", false);
     }
+    #endregion
 
-    /// <summary>
-    /// Atualiza a posição do personagem com base no input de movimento e velocidade.
-    /// Não movimenta o personagem se estiver agachado/escondido ou atacando.
-    /// Tenta inicializar o input se ainda não estiver inicializado.
-    /// </summary>
+    #region Atualização e Movimento
     private void Update()
     {
-        // Tenta inicializar o input se não estiver inicializado ainda
+        // Tenta inicializar input se necessário
         if (!isInputInitialized && Time.time >= nextInputInitAttempt)
         {
             TryInitializeInput();
         }
 
-        // Não movimenta se estiver escondido ou atacando
+        // Atualiza cache de velocidade a cada segundo
+        if (Time.frameCount % 30 == 0)
+        {
+            UpdateSpeedCache();
+        }
+
+        UpdateMovement();
+    }
+
+    private void UpdateSpeedCache()
+    {
+        cachedSpeed = entityStatus != null ? entityStatus.GetSpeed() : 0f;
+    }
+
+    private void UpdateMovement()
+    {
+        // Não move se estiver escondido ou atacando
         if (animator.GetBool("isHiding") || isAttacking)
         {
-            // Para o movimento imediatamente se estiver atacando
             if (isAttacking && rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
@@ -336,62 +193,46 @@ public class PlayerInputHandler : MonoBehaviour
             return;
         }
 
-        float speed = entityStatus != null ? entityStatus.GetSpeed() : 0f;
-
-        // Movimento via Rigidbody2D (se existir)
+        // Move o personagem
         if (rb != null)
         {
-            rb.linearVelocity = moveInput * speed;
+            rb.linearVelocity = moveInput * cachedSpeed;
         }
-        else // Movimento via Transform (fallback)
-        {
-            transform.position += (Vector3)(moveInput * speed * Time.deltaTime);
-        }
-    }
-
-    /// <summary>
-    /// Ativa/desativa os sprites corretos conforme a direção do movimento.
-    /// Controla qual conjunto de sprites deve estar visível (frontal, traseiro ou lateral)
-    /// e aplica flip horizontal quando movendo para a esquerda.
-    /// </summary>
-    /// <param name="direction">Direção do movimento</param>
-    private void UpdateSpriteDirection(Vector2 direction)
-    {
-        // Sempre exibe a sombra
-        if (shadow != null) shadow.SetActive(true);
-
-        // Parado ou Sul (baixo)
-        if (direction == Vector2.zero || Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y <= 0)
-        {
-            SetActiveSprites(front: true, vfxFront: true, back: false, vfxBack: false, side: false, vfxSide: false);
-        }
-        // Norte (cima)
-        else if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y > 0)
-        {
-            SetActiveSprites(front: false, vfxFront: false, back: true, vfxBack: true, side: false, vfxSide: false);
-        }
-        // Lateral (esquerda/direita)
         else
         {
-            SetActiveSprites(front: false, vfxFront: false, back: false, vfxBack: false, side: true, vfxSide: true);
+            transform.position += (Vector3)(moveInput * cachedSpeed * Time.deltaTime);
+        }
+    }
+    #endregion
 
-            // Flip horizontal se for para esquerda
-            bool isLeft = direction.x < 0;
-            if (sideRenderer != null) sideRenderer.flipX = isLeft;
-            if (vfxSideRenderer != null) vfxSideRenderer.flipX = isLeft;
+    #region Gerenciamento Visual
+    private void UpdateSpriteDirection(Vector2 direction)
+    {
+        if (shadow != null) shadow.SetActive(true);
+
+        FacingDirection facing = GetFacingDirection(direction);
+        
+        switch (facing)
+        {
+            case FacingDirection.South:
+                SetActiveSprites(front: true, vfxFront: true, back: false, vfxBack: false, side: false, vfxSide: false);
+                break;
+            case FacingDirection.North:
+                SetActiveSprites(front: false, vfxFront: false, back: true, vfxBack: true, side: false, vfxSide: false);
+                break;
+            case FacingDirection.East:
+                SetActiveSprites(front: false, vfxFront: false, back: false, vfxBack: false, side: true, vfxSide: true);
+                if (sideRenderer != null) sideRenderer.flipX = false;
+                if (vfxSideRenderer != null) vfxSideRenderer.flipX = false;
+                break;
+            case FacingDirection.West:
+                SetActiveSprites(front: false, vfxFront: false, back: false, vfxBack: false, side: true, vfxSide: true);
+                if (sideRenderer != null) sideRenderer.flipX = true;
+                if (vfxSideRenderer != null) vfxSideRenderer.flipX = true;
+                break;
         }
     }
 
-    /// <summary>
-    /// Ativa/desativa os sub-objetos de sprites conforme a direção.
-    /// Método utilitário para gerenciar a visibilidade dos sprites.
-    /// </summary>
-    /// <param name="front">Se o sprite frontal deve estar visível</param>
-    /// <param name="vfxFront">Se os efeitos visuais frontais devem estar visíveis</param>
-    /// <param name="back">Se o sprite traseiro deve estar visível</param>
-    /// <param name="vfxBack">Se os efeitos visuais traseiros devem estar visíveis</param>
-    /// <param name="side">Se o sprite lateral deve estar visível</param>
-    /// <param name="vfxSide">Se os efeitos visuais laterais devem estar visíveis</param>
     private void SetActiveSprites(bool front, bool vfxFront, bool back, bool vfxBack, bool side, bool vfxSide)
     {
         if (this.front != null) this.front.SetActive(front);
@@ -401,4 +242,121 @@ public class PlayerInputHandler : MonoBehaviour
         if (this.side != null) this.side.SetActive(side);
         if (this.vfx_side != null) this.vfx_side.SetActive(vfxSide);
     }
+    #endregion
+
+    #region Sistema de Ataque
+    private void SpawnAttack()
+    {
+        Vector3 spawnPosition = CalculateAttackPosition();
+        
+        // Instancia o ataque
+        GameObject attackObj = Instantiate(attackPrefab, spawnPosition, Quaternion.identity);
+        
+        // Configura a visualização do ataque
+        SetupAttackVisuals(attackObj);
+    }
+
+    private Vector3 CalculateAttackPosition()
+    {
+        Vector3 position = transform.position;
+        FacingDirection facing = GetFacingDirection(lastDirection);
+        
+        switch (facing)
+        {
+            case FacingDirection.South:
+                position += new Vector3(attackOffsetFront.x, attackOffsetFront.y, 0);
+                break;
+            case FacingDirection.North:
+                position += new Vector3(attackOffsetBack.x, attackOffsetBack.y, 0);
+                break;
+            case FacingDirection.East:
+                position += new Vector3(attackOffsetSide.x, attackOffsetSide.y, 0);
+                break;
+            case FacingDirection.West:
+                position += new Vector3(-attackOffsetSide.x, attackOffsetSide.y, 0);
+                break;
+        }
+        
+        return position;
+    }
+
+    private void SetupAttackVisuals(GameObject attackObj)
+    {
+        // Obtém sub-objetos do ataque
+        Transform attackBack = attackObj.transform.Find("attack_back");
+        Transform attackSide = attackObj.transform.Find("attack_side");
+        Transform attackFront = attackObj.transform.Find("attack_front");
+        
+        // Desativa todos inicialmente
+        if (attackBack != null) attackBack.gameObject.SetActive(false);
+        if (attackSide != null) attackSide.gameObject.SetActive(false);
+        if (attackFront != null) attackFront.gameObject.SetActive(false);
+        
+        // Ativa apenas o correto para a direção atual
+        FacingDirection facing = GetFacingDirection(lastDirection);
+        
+        switch (facing)
+        {
+            case FacingDirection.South:
+                if (attackFront != null) attackFront.gameObject.SetActive(true);
+                break;
+            case FacingDirection.North:
+                if (attackBack != null) attackBack.gameObject.SetActive(true);
+                break;
+            case FacingDirection.East:
+            case FacingDirection.West:
+                if (attackSide != null)
+                {
+                    attackSide.gameObject.SetActive(true);
+                    SpriteRenderer attackSideRenderer = attackSide.GetComponent<SpriteRenderer>();
+                    if (attackSideRenderer != null)
+                    {
+                        attackSideRenderer.flipX = facing == FacingDirection.West;
+                    }
+                }
+                break;
+        }
+    }
+    #endregion
+
+    #region Utilidades de Direção
+    /// <summary>
+    /// Direções possíveis para o personagem.
+    /// </summary>
+    private enum FacingDirection
+    {
+        North,
+        South,
+        East,
+        West
+    }
+
+    /// <summary>
+    /// Determina a direção que o personagem está olhando com base no vetor de direção.
+    /// </summary>
+    private FacingDirection GetFacingDirection(Vector2 direction)
+    {
+        if (direction == Vector2.zero) return FacingDirection.South; // Padrão
+        
+        // Verifica se é movimento vertical ou horizontal
+        if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x))
+        {
+            return direction.y > 0 ? FacingDirection.North : FacingDirection.South;
+        }
+        else
+        {
+            return direction.x > 0 ? FacingDirection.East : FacingDirection.West;
+        }
+    }
+    #endregion
+
+    #region Métodos Públicos
+    /// <summary>
+    /// Reseta o estado de ataque. Deve ser chamado por eventos de animação.
+    /// </summary>
+    public void ResetAttack()
+    {
+        isAttacking = false;
+    }
+    #endregion
 }

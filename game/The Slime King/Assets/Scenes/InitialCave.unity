@@ -28805,6 +28805,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slime
       objectReference: {fileID: 0}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackPrefab
+      value: 
+      objectReference: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackOffsetBack.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackOffsetSide.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackOffsetSide.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackOffsetFront.y
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
