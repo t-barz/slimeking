@@ -4916,6 +4916,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3808c87608b8674b9aaa4fe2f8be00f, type: 3}
+--- !u!1 &863709712 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 642944124420479412, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
+  m_PrefabInstance: {fileID: 1101398164}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &864878671 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2174044444490441782, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
@@ -4926,6 +4931,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 360790214081671633, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
   m_PrefabInstance: {fileID: 1101398164}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &892875668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863709712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c2c471c04ace7442af81ed4fbd1d7d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHandler
+  logMessage: "A\xE7\xE3o de intera\xE7\xE3o detectada!"
+  detailedLog: 1
+  logOnlyOnce: 0
 --- !u!1 &924459939
 GameObject:
   m_ObjectHideFlags: 0
@@ -25396,7 +25416,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 642944124420479412, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 892875668}
   m_SourcePrefab: {fileID: 100100000, guid: ebefc293dca0db44c9c9b987d440a7b8, type: 3}
 --- !u!1 &1117345743
 GameObject:

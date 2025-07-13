@@ -9,19 +9,19 @@ public class TriggerDetector : MonoBehaviour
 {
     [Header("Configurações de Log")]
     [Tooltip("Mensagem personalizada para exibir no log")]
-    [SerializeField] private string mensagemLog = "Player detectado na área!";
+    [SerializeField] private string logMessage = "Player detectado na área!";
 
     [Tooltip("Registrar quando o player entra na área")]
-    [SerializeField] private bool logarNaEntrada = false;
+    [SerializeField] private bool logOnEnter = false;
 
     [Tooltip("Registrar enquanto o player permanece na área")]
-    [SerializeField] private bool logarNaPermanencia = false;
+    [SerializeField] private bool logOnStay = false;
 
     [Tooltip("Registrar quando o player sai da área")]
-    [SerializeField] private bool logarNaSaida = false;
+    [SerializeField] private bool logOnExit = false;
 
     [Tooltip("Intervalo em segundos entre logs durante permanência (0 = todo frame)")]
-    [SerializeField] private float intervaloLogPermanencia = 1.0f;
+    [SerializeField] private float logStayInterval = 1.0f;
 
     [Header("Referências de Plataformas")]
     [Tooltip("GameObject representando controle genérico")]
@@ -63,10 +63,10 @@ public class TriggerDetector : MonoBehaviour
     private Vector3 keyboardOriginalPos;
 
     // Controle de tempo para os logs de permanência
-    private float ultimoLogTime = 0f;
+    private float lastLogTime = 0f;
 
     // Controle se o player está na área
-    private bool playerNaArea = false;
+    private bool playerInArea = false;
 
     private void Start()
     {
@@ -78,7 +78,7 @@ public class TriggerDetector : MonoBehaviour
         if (keyboardObj != null) keyboardOriginalPos = keyboardObj.transform.localPosition;
 
         // Inicialmente, desativa todos os objetos de plataforma
-        DesativarTodasPlataformas();
+        DeactivateAllPlatforms();
     }
 
     /// <summary>
@@ -89,15 +89,15 @@ public class TriggerDetector : MonoBehaviour
         // Verifica se o objeto que colidiu tem a tag "Player"
         if (other.CompareTag("Player"))
         {
-            playerNaArea = true;
+            playerInArea = true;
 
-            if (logarNaEntrada)
+            if (logOnEnter)
             {
-                Debug.Log($"{mensagemLog} (Entrada)");
+                Debug.Log($"{logMessage} (Entrada)");
             }
 
             // Ativa apenas o objeto correspondente à plataforma atual
-            AtivarPlataformaCorreta();
+            ActivateCorrectPlatform();
         }
     }
 
@@ -107,20 +107,20 @@ public class TriggerDetector : MonoBehaviour
     private void OnTriggerStay2D(Collider2D other)
     {
         // Verifica se é o Player e se deve logar na permanência
-        if (other.CompareTag("Player") && logarNaPermanencia)
+        if (other.CompareTag("Player") && logOnStay)
         {
             // Verifica se já passou o intervalo desde o último log
-            if (Time.time >= ultimoLogTime + intervaloLogPermanencia)
+            if (Time.time >= lastLogTime + logStayInterval)
             {
-                Debug.Log($"{mensagemLog} (Permanência)");
-                ultimoLogTime = Time.time;
+                Debug.Log($"{logMessage} (Permanência)");
+                lastLogTime = Time.time;
             }
 
             // Verifica periodicamente a plataforma para casos onde o jogador muda de controle
             // durante o gameplay (a cada 1 segundo)
-            if (Time.time >= ultimoLogTime + 1.0f)
+            if (Time.time >= lastLogTime + 1.0f)
             {
-                AtivarPlataformaCorreta();
+                ActivateCorrectPlatform();
             }
         }
     }
@@ -133,31 +133,31 @@ public class TriggerDetector : MonoBehaviour
         // Verifica se o objeto que saiu tem a tag "Player"
         if (other.CompareTag("Player"))
         {
-            playerNaArea = false;
+            playerInArea = false;
 
-            if (logarNaSaida)
+            if (logOnExit)
             {
-                Debug.Log($"{mensagemLog} (Saída)");
+                Debug.Log($"{logMessage} (Saída)");
             }
 
             // Desativa todos os objetos de plataforma
-            DesativarTodasPlataformas();
+            DeactivateAllPlatforms();
         }
     }
 
     /// <summary>
     /// Detecta qual plataforma está sendo usada e ativa apenas o objeto correspondente
     /// </summary>
-    private void AtivarPlataformaCorreta()
+    private void ActivateCorrectPlatform()
     {
         // Primeiro desativa todos
-        DesativarTodasPlataformas();
+        DeactivateAllPlatforms();
 
         // Detecta a plataforma atual
-        string plataformaAtual = DetectarPlataformaAtual();
+        string currentPlatform = DetectCurrentPlatform();
 
         // Ativa apenas o objeto correspondente e aplica offset
-        switch (plataformaAtual)
+        switch (currentPlatform)
         {
             case "playstation":
                 if (playstationObj != null)
@@ -202,28 +202,27 @@ public class TriggerDetector : MonoBehaviour
         }
 
         // Após ativar o objeto, verifique seus renderers
-        switch (plataformaAtual)
+        switch (currentPlatform)
         {
             case "playstation":
-                VerificarECorrigirVisibilidade(playstationObj);
+                CheckAndFixVisibility(playstationObj);
                 break;
-
             case "xbox":
-                VerificarECorrigirVisibilidade(xboxObj);
+                CheckAndFixVisibility(xboxObj);
                 break;
             case "switch":
-                VerificarECorrigirVisibilidade(switchObj);
+                CheckAndFixVisibility(switchObj);
                 break;
             case "gamepad":
-                VerificarECorrigirVisibilidade(gamepadObj);
+                CheckAndFixVisibility(gamepadObj);
                 break;
             case "keyboard":
-                VerificarECorrigirVisibilidade(keyboardObj);
+                CheckAndFixVisibility(keyboardObj);
                 break;
         }
     }
 
-    private void VerificarECorrigirVisibilidade(GameObject obj)
+    private void CheckAndFixVisibility(GameObject obj)
     {
         if (obj == null) return;
 
@@ -240,12 +239,12 @@ public class TriggerDetector : MonoBehaviour
                 Debug.LogError($"Renderer {renderer.name} não tem sprite atribuído!");
 
             // Verifica cor/transparência
-            Color cor = renderer.color;
-            if (cor.a < 0.1f)
+            Color color = renderer.color;
+            if (color.a < 0.1f)
             {
-                Debug.LogWarning($"Renderer {renderer.name} está quase transparente (alpha={cor.a}), corrigindo...");
-                cor.a = 1.0f;
-                renderer.color = cor;
+                Debug.LogWarning($"Renderer {renderer.name} está quase transparente (alpha={color.a}), corrigindo...");
+                color.a = 1.0f;
+                renderer.color = color;
             }
         }
     }
@@ -253,7 +252,7 @@ public class TriggerDetector : MonoBehaviour
     /// <summary>
     /// Desativa todos os objetos de plataforma e restaura suas posições originais
     /// </summary>
-    private void DesativarTodasPlataformas()
+    private void DeactivateAllPlatforms()
     {
         if (gamepadObj != null)
         {
@@ -290,7 +289,7 @@ public class TriggerDetector : MonoBehaviour
     /// Detecta qual plataforma de controle está sendo usada atualmente
     /// </summary>
     /// <returns>Nome da plataforma: "keyboard", "playstation", "xbox", "switch" ou "gamepad"</returns>
-    private string DetectarPlataformaAtual()
+    private string DetectCurrentPlatform()
     {
         // Usando o novo Input System para detectar qual dispositivo está ativo
         if (Gamepad.current == null)
@@ -324,11 +323,11 @@ public class TriggerDetector : MonoBehaviour
     /// Ativa manualmente um dos objetos para testes
     /// </summary>
     /// <param name="plataforma">Nome da plataforma: "keyboard", "playstation", "xbox", "switch" ou "gamepad"</param>
-    public void AtivarPlataformaManualmente(string plataforma)
+    public void ActivatePlatformManually(string plataforma)
     {
-        if (!playerNaArea) return; // Só ativa se o player estiver na área
+        if (!playerInArea) return; // Só ativa se o player estiver na área
 
-        DesativarTodasPlataformas();
+        DeactivateAllPlatforms();
 
         switch (plataforma.ToLower())
         {
