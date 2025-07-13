@@ -19,6 +19,11 @@ public class PlayerInputHandler : MonoBehaviour
     /// Direção atual do movimento do personagem.
     /// </summary>
     private Vector2 moveInput = Vector2.zero;
+    
+    /// <summary>
+    /// Última direção de movimento válida (não-zero) para manter a orientação visual quando parado.
+    /// </summary>
+    private Vector2 lastDirection = Vector2.down; // Começa olhando para baixo (sul)
 
     /// <summary>
     /// Referência ao componente Rigidbody2D para movimentação física.
@@ -62,6 +67,20 @@ public class PlayerInputHandler : MonoBehaviour
 
     [Tooltip("GameObject com a sombra do slime")]
     [SerializeField] private GameObject shadow;
+
+    [Header("Referências de Ataque")]
+    [Tooltip("Prefab do objeto de ataque a ser instanciado")]
+    [SerializeField] private GameObject attackPrefab;
+
+    [Header("Configurações de Ataque")]
+    [Tooltip("Distância do ataque em relação ao jogador (frente)")]
+    [SerializeField] private Vector2 attackOffsetFront = new Vector2(0f, 0.5f);
+
+    [Tooltip("Distância do ataque em relação ao jogador (costas)")]
+    [SerializeField] private Vector2 attackOffsetBack = new Vector2(0f, 0.5f);
+
+    [Tooltip("Distância do ataque em relação ao jogador (lateral)")]
+    [SerializeField] private Vector2 attackOffsetSide = new Vector2(0.5f, 0f);
 
     // Para flip lateral
     /// <summary>
@@ -164,32 +183,110 @@ public class PlayerInputHandler : MonoBehaviour
     {
         moveInput = ctx.ReadValue<Vector2>();
         animator.SetBool("isWalking", moveInput.sqrMagnitude > 0.01f);
-        UpdateSpriteDirection(moveInput);
+        
+        // Se o movimento tiver uma magnitude significativa, atualize a última direção
+        if (moveInput.sqrMagnitude > 0.01f)
+        {
+            lastDirection = moveInput.normalized;
+        }
+        
+        // Usa a última direção válida para atualizar os sprites
+        UpdateSpriteDirection(lastDirection);
     }
 
     /// <summary>
     /// Callback executado quando o jogador para de se movimentar.
-    /// Reseta a direção do movimento, desativa a animação de caminhada e atualiza os sprites visíveis.
+    /// Reseta a direção do movimento, desativa a animação de caminhada mas mantém a direção visual.
     /// </summary>
     /// <param name="ctx">Contexto do evento de input</param>
     private void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
         moveInput = Vector2.zero;
         animator.SetBool("isWalking", false);
-        UpdateSpriteDirection(Vector2.zero);
+        
+        // Importante: NÃO muda a direção visual, mantém a última direção
+        // NÃO chamamos UpdateSpriteDirection(Vector2.zero) para manter a orientação
     }
 
     /// <summary>
     /// Callback executado quando o jogador realiza um ataque.
-    /// Ativa a trigger de ataque no Animator.
+    /// Ativa a trigger de ataque no Animator e instancia o objeto de ataque.
     /// </summary>
     /// <param name="ctx">Contexto do evento de input</param>
     private void OnAttackPerformed(InputAction.CallbackContext ctx)
     {
         animator.SetTrigger("Attack01");
         isAttacking = true;
+        
+        // Instancia o objeto de ataque
+        if (attackPrefab != null)
+        {
+            // Usa a última direção válida em vez do moveInput
+            Vector2 direction = lastDirection;
+            
+            // Calcula a posição de spawn com o offset apropriado
+            Vector3 spawnPosition = transform.position;
+            
+            // Parado ou Sul (baixo)
+            if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y <= 0)
+            {
+                spawnPosition += new Vector3(attackOffsetFront.x, attackOffsetFront.y, 0);
+            }
+            // Norte (cima)
+            else if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y > 0)
+            {
+                spawnPosition += new Vector3(attackOffsetBack.x, attackOffsetBack.y, 0);
+            }
+            // Lateral (esquerda/direita)
+            else
+            {
+                // Inverte o offset X se estiver olhando para a esquerda
+                float offsetX = direction.x < 0 ? -attackOffsetSide.x : attackOffsetSide.x;
+                spawnPosition += new Vector3(offsetX, attackOffsetSide.y, 0);
+            }
+            
+            // Instancia o objeto na posição calculada
+            GameObject attackObj = Instantiate(attackPrefab, spawnPosition, Quaternion.identity);
+            
+            // Obtém referências para os sub-objetos de ataque
+            Transform attackBack = attackObj.transform.Find("attack_back");
+            Transform attackSide = attackObj.transform.Find("attack_side");
+            Transform attackFront = attackObj.transform.Find("attack_front");
+            
+            // Ativa/desativa os sub-objetos de acordo com a direção atual do slime
+            if (attackBack != null) attackBack.gameObject.SetActive(false);
+            if (attackSide != null) attackSide.gameObject.SetActive(false);
+            if (attackFront != null) attackFront.gameObject.SetActive(false);
+            
+            // Parado ou Sul (baixo)
+            if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y <= 0)
+            {
+                if (attackFront != null) attackFront.gameObject.SetActive(true);
+            }
+            // Norte (cima)
+            else if (Mathf.Abs(direction.y) >= Mathf.Abs(direction.x) && direction.y > 0)
+            {
+                if (attackBack != null) attackBack.gameObject.SetActive(true);
+            }
+            // Lateral (esquerda/direita)
+            else
+            {
+                if (attackSide != null) 
+                {
+                    attackSide.gameObject.SetActive(true);
+                    
+                    // Flip horizontal se for para esquerda
+                    bool isLeft = direction.x < 0;
+                    SpriteRenderer attackSideRenderer = attackSide.GetComponent<SpriteRenderer>();
+                    if (attackSideRenderer != null)
+                    {
+                        attackSideRenderer.flipX = !isLeft;
+                    }
+                }
+            }
+        }
     }
-
+    
     public void ResetAttack()
     {
         isAttacking = false;
