@@ -118,7 +118,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.94375
+      value: 2.72
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -162,6 +162,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3576409320944578700}
+    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3829462053920992766}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
 --- !u!1 &203358094375533656 stripped
 GameObject:
@@ -226,16 +229,68 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cad1b308d75c2f8449ddbccf50462e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TriggerDetector
-  mensagemLog: "Player detectado na \xE1rea!"
-  logarNaEntrada: 0
-  logarNaPermanencia: 0
-  logarNaSaida: 0
-  intervaloLogPermanencia: 1
+  logMessage: "Player detectado na \xE1rea!"
+  logOnEnter: 0
+  logOnStay: 0
+  logOnExit: 0
+  logStayInterval: 1
   gamepadObj: {fileID: 3689204336921236732}
   playstationObj: {fileID: 6272002310897228937}
   switchObj: {fileID: 203358094375533656}
   xboxObj: {fileID: 3498384350893773468}
   keyboardObj: {fileID: 305399609810026778}
+  gamepadOffset: {x: 0, y: 0, z: 0}
+  playstationOffset: {x: 0, y: 0, z: 0}
+  switchOffset: {x: 0, y: 0, z: 0}
+  xboxOffset: {x: 0, y: 0, z: 0}
+  keyboardOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &3829462053920992766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642944124420479412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b13f3b15903104c98afed4bbf90b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShrinkInteractionHandler
+  logMessage: "A\xE7\xE3o de intera\xE7\xE3o detectada!"
+  detailedLog: 0
+  logOnlyOnce: 0
+  logRangeEvents: 0
+  forceCollisionCheck: 1
+  detectionRadius: 0.4
+  allowMultipleActivations: 1
+  autoResetTime: 0.2
+  triggerName: Shrink
+  destinationPoint: {fileID: 0}
+  movementDuration: 1
+  movementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3498384350893773468 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6402024229338946624, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}
