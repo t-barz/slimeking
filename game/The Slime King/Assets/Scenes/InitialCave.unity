@@ -396,6 +396,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bushA (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 8036685538178463531, guid: 8e4e0734e3cf88f4dbd483f926c8f4aa, type: 3}
+      propertyPath: enableDebugLogs
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -470,8 +474,9 @@ GameObject:
   - component: {fileID: 232525126}
   - component: {fileID: 232525128}
   - component: {fileID: 232525129}
+  - component: {fileID: 232525130}
   m_Layer: 0
-  m_Name: pixel_circle_0
+  m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -580,7 +585,7 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -635,6 +640,22 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   autoStartTransition: 1
+--- !u!114 &232525130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232525124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4916aa14b809d64eb8fa9e650e531c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PortalManager
+  portalActive: 1
+  portalRadius: 0.5
+  targetSceneName: InitialForest
+  targetPosition: {x: 0, y: 0}
 --- !u!1 &240995298
 GameObject:
   m_ObjectHideFlags: 0
