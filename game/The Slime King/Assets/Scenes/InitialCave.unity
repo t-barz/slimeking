@@ -28662,6 +28662,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 735420043}
     m_Modifications:
+    - target: {fileID: -6040014658944941199, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
+      propertyPath: baseDefense
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1424891653218634835, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
       propertyPath: m_Name
       value: env_brown_rockD
@@ -28740,18 +28744,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 735420043}
     m_Modifications:
-    - target: {fileID: 5875791583112244041, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
-      propertyPath: _dropRadius
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5875791583112244041, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
-      propertyPath: _maxDropCount
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5875791583112244041, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
-      propertyPath: _minDropCount
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6944734215652908270, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.123
@@ -28852,6 +28844,10 @@ PrefabInstance:
     - target: {fileID: 3018953440086048136, guid: 043175d29a434a44e881163a34861afe, type: 3}
       propertyPath: m_Name
       value: Slime
+      objectReference: {fileID: 0}
+    - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
+      propertyPath: attackObject
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3452587223168100441, guid: 043175d29a434a44e881163a34861afe, type: 3}
       propertyPath: attackPrefab

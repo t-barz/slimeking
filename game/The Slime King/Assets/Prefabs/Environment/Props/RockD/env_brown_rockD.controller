@@ -61,7 +61,7 @@ AnimatorController:
   m_Name: env_brown_rockD
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: isCracked
+  - m_Name: isDamaged
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -202,7 +202,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isCracked
+    m_ConditionEvent: isDamaged
     m_EventTreshold: 0
   - m_ConditionMode: 2
     m_ConditionEvent: isDestroyed

@@ -29,6 +29,13 @@ public class EntityStatus : MonoBehaviour
     [Tooltip("Velocidade base de deslocamento da entidade.")]
     public float baseSpeed = 0f;
 
+    [Header("Configurações de Cooldown")]
+    [Tooltip("Tempo de espera entre ataques básicos (em segundos)")]
+    public float basicAttackCooldown = 0.5f;
+
+    [Tooltip("Tempo de espera entre ataques especiais (em segundos)")]
+    public float specialAttackCooldown = 3f;
+
     [Header("Atributos Atuais")]
     [Tooltip("Vida atual da entidade.")]
     public int currentHP;
@@ -45,6 +52,10 @@ public class EntityStatus : MonoBehaviour
     /// </summary>
     public event Action OnDeath;
 
+    // Variáveis de controle de cooldown
+    private float lastBasicAttackTime = -9999f;
+    private float lastSpecialAttackTime = -9999f;
+
     private void Awake()
     {
         ResetStatus();
@@ -57,6 +68,60 @@ public class EntityStatus : MonoBehaviour
     {
         currentLevel = Mathf.Max(1, baseLevel);
         currentHP = GetMaxHP();
+    }
+
+    /// <summary>
+    /// Verifica se o ataque básico está disponível (cooldown terminou).
+    /// </summary>
+    /// <returns>True se o ataque básico pode ser usado</returns>
+    public bool IsBasicAttackAvailable()
+    {
+        return Time.time >= lastBasicAttackTime + basicAttackCooldown;
+    }
+
+    /// <summary>
+    /// Verifica se o ataque especial está disponível (cooldown terminou).
+    /// </summary>
+    /// <returns>True se o ataque especial pode ser usado</returns>
+    public bool IsSpecialAttackAvailable()
+    {
+        return Time.time >= lastSpecialAttackTime + specialAttackCooldown;
+    }
+
+    /// <summary>
+    /// Marca o ataque básico como usado, iniciando seu cooldown.
+    /// </summary>
+    public void UseBasicAttack()
+    {
+        lastBasicAttackTime = Time.time;
+    }
+
+    /// <summary>
+    /// Marca o ataque especial como usado, iniciando seu cooldown.
+    /// </summary>
+    public void UseSpecialAttack()
+    {
+        lastSpecialAttackTime = Time.time;
+    }
+
+    /// <summary>
+    /// Retorna o tempo restante de cooldown do ataque básico em segundos.
+    /// </summary>
+    /// <returns>Tempo de cooldown restante (0 se estiver disponível)</returns>
+    public float GetBasicAttackCooldownRemaining()
+    {
+        float remaining = (lastBasicAttackTime + basicAttackCooldown) - Time.time;
+        return Mathf.Max(0, remaining);
+    }
+
+    /// <summary>
+    /// Retorna o tempo restante de cooldown do ataque especial em segundos.
+    /// </summary>
+    /// <returns>Tempo de cooldown restante (0 se estiver disponível)</returns>
+    public float GetSpecialAttackCooldownRemaining()
+    {
+        float remaining = (lastSpecialAttackTime + specialAttackCooldown) - Time.time;
+        return Mathf.Max(0, remaining);
     }
 
     /// <summary>

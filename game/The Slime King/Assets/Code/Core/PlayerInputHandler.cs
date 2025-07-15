@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Responsável por processar os inputs do jogador e gerenciar o movimento e animações do personagem.
-/// Gerencia a visualização dos sprites do personagem de acordo com a direção, movimentação, ataques e agachamento.
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public class PlayerInputHandler : MonoBehaviour
@@ -115,10 +114,15 @@ public class PlayerInputHandler : MonoBehaviour
 
     #region Configurações de Ataque
     /// <summary>
-    /// Prefab do objeto de ataque a ser instanciado.
+    /// Prefab do objeto de ataque a ser instanciado
     /// </summary>
     [Header("Ataque")]
     [SerializeField] private GameObject attackPrefab;
+
+    /// <summary>
+    /// Duração do ataque em segundos
+    /// </summary>
+    [SerializeField] private float attackDuration = 0.5f;
 
     /// <summary>
     /// Offset de posicionamento do ataque em relação ao jogador quando olhando para frente.
@@ -250,17 +254,48 @@ public class PlayerInputHandler : MonoBehaviour
 
     /// <summary>
     /// Callback executado quando o jogador realiza um ataque.
-    /// Ativa a trigger de ataque no Animator e instancia o objeto de ataque.
+    /// Verifica o cooldown, ativa a trigger de ataque no Animator e instancia o objeto de ataque.
     /// </summary>
     /// <param name="ctx">Contexto do evento de input</param>
     private void OnAttackPerformed(InputAction.CallbackContext ctx)
     {
+        // Verifica se já tem um ataque em andamento
+        if (isAttacking)
+            return;
+
+        // Verifica se o EntityStatus existe
+        if (entityStatus == null)
+        {
+            Debug.LogWarning("EntityStatus não encontrado no PlayerInputHandler");
+            return;
+        }
+
+        // Verifica se o ataque está disponível (cooldown)
+        if (!entityStatus.IsBasicAttackAvailable())
+        {
+            // Opcional: Feedback visual/sonoro de que o ataque está em cooldown
+            float remainingCooldown = entityStatus.GetBasicAttackCooldownRemaining();
+            Debug.Log($"Ataque em cooldown: {remainingCooldown:F1}s restantes");
+
+            // Aqui poderia mostrar um efeito visual para o jogador
+            // Ex: animator.SetTrigger("AttackBlocked");
+
+            return;
+        }
+
+        // Se chegou aqui, pode atacar
         animator.SetTrigger("Attack01");
-        isAttacking = true;
 
         if (attackPrefab != null)
         {
+            // Marca o início do ataque
+            isAttacking = true;
+
+            // Instancia o ataque
             SpawnAttack();
+
+            // Inicia o cooldown no EntityStatus
+            entityStatus.UseBasicAttack();
         }
     }
 
@@ -399,17 +434,41 @@ public class PlayerInputHandler : MonoBehaviour
 
     #region Sistema de Ataque
     /// <summary>
-    /// Cria um objeto de ataque na direção que o jogador está olhando.
+    /// Instancia o objeto de ataque na direção que o jogador está olhando.
     /// </summary>
     private void SpawnAttack()
     {
-        Vector3 spawnPosition = CalculateAttackPosition();
+        // Verifica se o prefab de ataque existe
+        if (attackPrefab == null)
+        {
+            Debug.LogWarning("Prefab de ataque não configurado!");
+            isAttacking = false;
+            return;
+        }
 
-        // Instancia o ataque
-        GameObject attackObj = Instantiate(attackPrefab, spawnPosition, Quaternion.identity);
+        // Calcula a posição do ataque baseada na direção
+        Vector3 attackPosition = CalculateAttackPosition();
+
+        // Instancia o objeto de ataque
+        GameObject attackObject = Instantiate(attackPrefab, attackPosition, Quaternion.identity);
 
         // Configura a visualização do ataque
-        SetupAttackVisuals(attackObj);
+        SetupAttackVisuals(attackObject);
+
+        // Destrói o objeto após a duração especificada
+        Destroy(attackObject, attackDuration);
+
+        // Agenda a liberação do estado de ataque
+        StartCoroutine(ResetAttackStateAfterDelay());
+    }
+
+    /// <summary>
+    /// Reseta o estado de ataque após um período determinado.
+    /// </summary>
+    private IEnumerator ResetAttackStateAfterDelay()
+    {
+        yield return new WaitForSeconds(attackDuration);
+        isAttacking = false;
     }
 
     /// <summary>
@@ -468,15 +527,28 @@ public class PlayerInputHandler : MonoBehaviour
             case FacingDirection.North:
                 if (attackBack != null) attackBack.gameObject.SetActive(true);
                 break;
-            case FacingDirection.East:
             case FacingDirection.West:
+            case FacingDirection.East:
                 if (attackSide != null)
                 {
                     attackSide.gameObject.SetActive(true);
                     SpriteRenderer attackSideRenderer = attackSide.GetComponent<SpriteRenderer>();
+                    CapsuleCollider2D attackSideCollider = attackSide.GetComponent<CapsuleCollider2D>();
+
+                    bool isFlipped = facing == FacingDirection.East;
+
+                    // Configura o flip do sprite
                     if (attackSideRenderer != null)
                     {
-                        attackSideRenderer.flipX = facing == FacingDirection.East;
+                        attackSideRenderer.flipX = isFlipped;
+                    }
+
+                    // Ajusta o collider para acompanhar o flip
+                    if (attackSideCollider != null && isFlipped)
+                    {
+                        // Inverte a posição do offset no eixo X quando virado
+                        Vector2 currentOffset = attackSideCollider.offset;
+                        attackSideCollider.offset = new Vector2(-currentOffset.x, currentOffset.y);
                     }
                 }
                 break;
@@ -520,7 +592,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     #region Métodos Públicos
     /// <summary>
-    /// Reseta o estado de ataque. Deve ser chamado por eventos de animação
+    /// Reseta o estado de ataque. Pode ser chamado por eventos de animação
     /// quando a animação de ataque terminar para permitir novos movimentos.
     /// </summary>
     public void ResetAttack()
