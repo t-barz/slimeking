@@ -67,16 +67,8 @@ public class DamageHandler : MonoBehaviour
     /// <summary>
     /// Chamado quando outro collider entra na área de trigger deste objeto.
     /// </summary>
-    private void OnTriggerEnter2D(Collider2D other)
+    public void ProcessHit()
     {
-        // Verifica primeiro se o collider que entrou já é o jogador
-        if (other.CompareTag("Player"))
-        {
-            ProcessPlayerCollision(other.gameObject);
-            return;
-        }
-
-        // Se não for, busca o jogador nas proximidades
         FindAndProcessNearestPlayer();
     }
 
@@ -163,6 +155,16 @@ public class DamageHandler : MonoBehaviour
             if (enableDebugLogs)
                 Debug.Log($"{gameObject.name} entrou no estado de destruído");
 
+            // Processa os drops se tiver um DropManager
+            DropManager dropManager = GetComponent<DropManager>();
+            if (dropManager != null)
+            {
+                if (enableDebugLogs)
+                    Debug.Log($"Gerando drops para {gameObject.name}");
+
+                dropManager.DropItems();
+            }
+
             // Inicia o efeito de fade-out e destruição
             StartCoroutine(FadeOutAndDestroy());
         }
@@ -178,7 +180,8 @@ public class DamageHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// Realiza o fade-out gradual de todos os sprites e destrói o objeto ao final
+    /// Realiza o fade-out gradual de todos os sprites e destrói o objeto ao final.
+    /// Remove todos os colliders para evitar interações durante o desaparecimento.
     /// </summary>
     private IEnumerator FadeOutAndDestroy()
     {
@@ -191,6 +194,9 @@ public class DamageHandler : MonoBehaviour
             Destroy(gameObject);
             yield break;
         }
+
+        // NOVO: Remover todos os colliders do objeto e seus filhos
+        RemoveAllColliders();
 
         // Guarda as cores originais de cada sprite
         Color[] originalColors = new Color[sprites.Length];
@@ -239,6 +245,39 @@ public class DamageHandler : MonoBehaviour
             Debug.Log($"{gameObject.name} foi destruído");
 
         Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// Remove todos os colliders do objeto e seus filhos para evitar interações durante o fade-out.
+    /// </summary>
+    private void RemoveAllColliders()
+    {
+        // Remove colliders 2D
+        Collider2D[] colliders2D = GetComponentsInChildren<Collider2D>();
+        foreach (Collider2D collider in colliders2D)
+        {
+            if (enableDebugLogs)
+                Debug.Log($"Removendo collider: {collider.name}");
+
+            Destroy(collider);
+        }
+
+        // Remove também colliders 3D caso existam
+        Collider[] colliders3D = GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders3D)
+        {
+            if (enableDebugLogs)
+                Debug.Log($"Removendo collider 3D: {collider.name}");
+
+            Destroy(collider);
+        }
+
+        // Se o objeto tiver Rigidbody, podemos também desativá-lo para evitar física
+        Rigidbody2D rb2d = GetComponent<Rigidbody2D>();
+        if (rb2d != null)
+        {
+            rb2d.simulated = false;
+        }
     }
 
     /// <summary>
