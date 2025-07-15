@@ -19,7 +19,14 @@ public class AttackTrigger : MonoBehaviour
             // Se encontrou um DamageHandler, chama o ProcessHit
             if (damageHandler != null)
             {
-                damageHandler.ProcessHit();
+                if (damageHandler.ProcessHit() > 0)
+                {
+                    Debug.Log($"{other.name} recebeu dano!");
+                }
+                else
+                {
+                    Debug.Log($"{other.name} não pôde receber dano.");
+                }
             }
             else
             {

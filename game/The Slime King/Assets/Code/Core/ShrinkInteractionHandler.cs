@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -28,6 +29,18 @@ public class ShrinkInteractionHandler : InteractionHandler
     [Tooltip("Curva de interpolação para o movimento (opcional)")]
     [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
+    [Header("Configurações de Som")]
+    [Tooltip("Lista de sons possíveis para o efeito de encolhimento")]
+    [SerializeField] private List<AudioClip> shrinkSounds = new List<AudioClip>();
+
+    [Tooltip("Volume dos sons de encolhimento")]
+    [Range(0f, 1f)]
+    [SerializeField] private float shrinkSoundVolume = 0.7f;
+
+    [Tooltip("Variação de pitch para sons (±)")]
+    [Range(0f, 0.3f)]
+    [SerializeField] private float pitchVariation = 0.1f;
+
     // Controla se a trigger já foi ativada
     private bool triggerActivated = false;
 
@@ -42,6 +55,9 @@ public class ShrinkInteractionHandler : InteractionHandler
     // Controle da coroutine de movimento
     private Coroutine movementCoroutine = null;
 
+    // AudioSource para efeitos sonoros
+    private AudioSource audioSource;
+
     /// <summary>
     /// Verifica se o ponto de destino está configurado
     /// </summary>
@@ -50,6 +66,27 @@ public class ShrinkInteractionHandler : InteractionHandler
         if (destinationPoint == null)
         {
             Debug.LogWarning("Ponto de destino não configurado. O player não será movido após encolher.");
+        }
+
+        // Configura o AudioSource para os efeitos sonoros
+        SetupAudioSource();
+    }
+
+    /// <summary>
+    /// Configura o AudioSource para tocar os sons
+    /// </summary>
+    private void SetupAudioSource()
+    {
+        // Busca AudioSource existente ou cria um novo
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+            // Configura o AudioSource para sons de efeito
+            audioSource.playOnAwake = false;
+            audioSource.loop = false;
+            audioSource.spatialBlend = 1f; // Som 3D
         }
     }
 
@@ -92,6 +129,9 @@ public class ShrinkInteractionHandler : InteractionHandler
         playerAnimator.SetTrigger(triggerName);
         Debug.Log($"Trigger '{triggerName}' ativada no Animator do Player.");
 
+        // Toca som de encolhimento
+        PlayRandomShrinkSound();
+
         // Atualiza estado
         triggerActivated = true;
 
@@ -124,6 +164,31 @@ public class ShrinkInteractionHandler : InteractionHandler
                 InvokeRepeating(nameof(CheckResetTimer), 0.1f, 0.1f);
             }
         }
+    }
+
+    /// <summary>
+    /// Seleciona e toca um som aleatório da lista de sons de encolhimento
+    /// </summary>
+    private void PlayRandomShrinkSound()
+    {
+        // Verifica se temos sons para tocar
+        if (shrinkSounds == null || shrinkSounds.Count == 0 || audioSource == null)
+            return;
+
+        // Seleciona um som aleatório da lista
+        AudioClip selectedSound = shrinkSounds[Random.Range(0, shrinkSounds.Count)];
+
+        // Verifica se o som selecionado é válido
+        if (selectedSound == null)
+            return;
+
+        // Aplica uma pequena variação aleatória no pitch para evitar monotonia
+        audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+
+        // Toca o som no volume configurado
+        audioSource.PlayOneShot(selectedSound, shrinkSoundVolume);
+
+        Debug.Log($"Tocando som de encolhimento: {selectedSound.name}");
     }
 
     /// <summary>

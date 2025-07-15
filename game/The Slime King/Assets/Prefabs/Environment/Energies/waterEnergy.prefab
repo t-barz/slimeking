@@ -277,7 +277,17 @@ MonoBehaviour:
   elementType: 1
   pointValue: 1
   collectEffect: {fileID: 0}
+  moveSpeed: 5
+  acceleration: 1.5
+  collectDistance: 0.5
+  initialDelay: 0.2
   hueVariation: 0.05
   saturationVariation: 0.1
   valueVariation: 0.1
+  absorbSounds:
+  - {fileID: 8300000, guid: 003d7775da09bec4bb2a42be4b10d3ef, type: 3}
+  - {fileID: 8300000, guid: 928e7e2f1414e3d45bdde47c90eef0f1, type: 3}
+  - {fileID: 8300000, guid: 6e5ad61934a8ce947878244a41ee7261, type: 3}
+  absorbSoundVolume: 0.7
+  pitchVariation: 0.1
   enableDebugLogs: 0

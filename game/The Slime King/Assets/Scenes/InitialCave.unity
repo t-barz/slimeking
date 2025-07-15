@@ -28662,6 +28662,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 735420043}
     m_Modifications:
+    - target: {fileID: -7557097566683157086, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
+      propertyPath: hitEffectPrefab
+      value: 
+      objectReference: {fileID: 2470941130706243547, guid: 4433bc71c40046b499409fc01bbb19ca, type: 3}
+    - target: {fileID: -7557097566683157086, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
+      propertyPath: blockEffectPrefab
+      value: 
+      objectReference: {fileID: 1146781344090228459, guid: a2772a67a2a6f0d41823ec2ed9fd7f47, type: 3}
     - target: {fileID: -6040014658944941199, guid: 670796603f22cdc4c99b9d81a785330f, type: 3}
       propertyPath: baseDefense
       value: 5
@@ -28744,6 +28752,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 735420043}
     m_Modifications:
+    - target: {fileID: -3677396799992117045, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
+      propertyPath: baseDefense
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 499624682837339900, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
+      propertyPath: hitEffectPrefab
+      value: 
+      objectReference: {fileID: 2470941130706243547, guid: 4433bc71c40046b499409fc01bbb19ca, type: 3}
+    - target: {fileID: 499624682837339900, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
+      propertyPath: blockEffectPrefab
+      value: 
+      objectReference: {fileID: 1146781344090228459, guid: a2772a67a2a6f0d41823ec2ed9fd7f47, type: 3}
     - target: {fileID: 6944734215652908270, guid: 2a23dc2b362214b4fa92d54b9fb53582, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.123

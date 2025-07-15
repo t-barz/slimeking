@@ -202,6 +202,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  hitEffectPrefab: {fileID: 2470941130706243547, guid: 4433bc71c40046b499409fc01bbb19ca, type: 3}
+  blockEffectPrefab: {fileID: 1146781344090228459, guid: a2772a67a2a6f0d41823ec2ed9fd7f47, type: 3}
+  knockbackMultiplier: 0.5
+  blockRepulsionMultiplier: 0.8
+  knockbackDuration: 0.2
 --- !u!114 &-5914849465124075437
 MonoBehaviour:
   m_ObjectHideFlags: 0

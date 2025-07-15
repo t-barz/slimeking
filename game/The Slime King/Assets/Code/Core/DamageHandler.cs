@@ -21,6 +21,23 @@ public class DamageHandler : MonoBehaviour
 
     [Tooltip("Curva de animação para o fade-out (0,0 a 1,1)")]
     [SerializeField] private AnimationCurve fadeOutCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
+
+    [Header("Configurações de Feedback Visual")]
+    [Tooltip("Efeito visual quando o ataque causa dano")]
+    [SerializeField] private GameObject hitEffectPrefab;
+
+    [Tooltip("Efeito visual quando o ataque é bloqueado")]
+    [SerializeField] private GameObject blockEffectPrefab;
+
+    [Header("Configurações de Knockback")]
+    [Tooltip("Multiplicador de força do knockback quando recebe dano")]
+    [SerializeField] private float knockbackMultiplier = 0.5f;
+
+    [Tooltip("Multiplicador de força do knockback quando bloqueia ataque")]
+    [SerializeField] private float blockRepulsionMultiplier = 0.8f;
+
+    [Tooltip("Duração do efeito de knockback em segundos")]
+    [SerializeField] private float knockbackDuration = 0.2f;
     #endregion
 
     #region Variáveis Privadas
@@ -30,11 +47,19 @@ public class DamageHandler : MonoBehaviour
     // Cache do componente Animator
     private Animator animator;
 
+    // Cache do Rigidbody2D para aplicar knockback
+    private Rigidbody2D rb;
+
     // Controla se o objeto já entrou no estado de dano
     private bool isDamagedStateActivated = false;
 
     // Controla se o objeto já entrou no estado de destruído
     private bool isDestroyedStateActivated = false;
+
+    // Controla se o objeto está atualmente em knockback
+    private bool isInKnockback = false;
+
+    private int damageDealt = 0;
     #endregion
 
     #region Inicialização
@@ -60,6 +85,9 @@ public class DamageHandler : MonoBehaviour
                 Debug.LogWarning($"DamageHandler em {gameObject.name} não tem Animator associado");
             }
         }
+
+        // Inicializa o Rigidbody para aplicar knockback
+        rb = GetComponent<Rigidbody2D>();
     }
     #endregion
 
@@ -67,9 +95,10 @@ public class DamageHandler : MonoBehaviour
     /// <summary>
     /// Chamado quando outro collider entra na área de trigger deste objeto.
     /// </summary>
-    public void ProcessHit()
+    public int ProcessHit()
     {
         FindAndProcessNearestPlayer();
+        return damageDealt;
     }
 
     /// <summary>
@@ -93,7 +122,7 @@ public class DamageHandler : MonoBehaviour
     }
 
     /// <summary>
-    /// Processa a colisão com o jogador, aplicando dano se possível
+    /// Processa a colisão com o ataque do jogador, aplicando dano se possível
     /// </summary>
     private void ProcessPlayerCollision(GameObject player)
     {
@@ -122,13 +151,29 @@ public class DamageHandler : MonoBehaviour
         }
 
         // Agora que verificamos que ambos são válidos, podemos aplicar o dano
-        int damageDealt = myEntityStatus.TakeDamage(playerStatus.GetAttack());
-
+        damageDealt = myEntityStatus.TakeDamage(playerStatus.GetAttack());
+        if (damageDealt <= 0)
+        {
+            Instantiate(blockEffectPrefab, transform.position, Quaternion.identity);
+            ApplyKnockbackToAttacker(player, playerStatus.GetAttack() * blockRepulsionMultiplier);
+            if (enableDebugLogs)
+                Debug.Log($"{gameObject.name} não recebeu dano (dano recebido: {damageDealt})");
+            return;
+        }
         // Log de dano
         if (enableDebugLogs)
         {
             Debug.Log($"{gameObject.name} recebeu {damageDealt} de dano. HP restante: {myEntityStatus.currentHP}");
         }
+
+        // Instancia o efeito visual de acerto
+        if (hitEffectPrefab != null)
+        {
+            Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        // Aplica knockback no alvo (este objeto)
+        ApplyKnockback(player.transform.position, damageDealt * knockbackMultiplier);
 
         // Atualiza o estado de animação com base na saúde atual
         UpdateAnimationState();
@@ -290,6 +335,142 @@ public class DamageHandler : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, detectionRadius);
         }
+    }
+    #endregion
+
+    #region Processamento de Dano
+    /// <summary>
+    /// Processa um acerto recebido e retorna o dano causado (0 se bloqueado)
+    /// </summary>
+    /// <param name="attacker">Objeto que causou o ataque</param>
+    /// <returns>Quantidade de dano causado (0 se bloqueado)</returns>
+    public int ProcessHit(GameObject attacker)
+    {
+        if (enableDebugLogs)
+        {
+            Debug.Log($"{gameObject.name} recebeu um acerto de {attacker.name}");
+        }
+
+        // Verifica se o EntityStatus existe
+        if (myEntityStatus == null)
+        {
+            Debug.LogWarning($"Objeto {gameObject.name} não possui EntityStatus");
+            return 0;
+        }
+
+        // Obtém o EntityStatus do atacante
+        EntityStatus attackerStatus = attacker.GetComponent<EntityStatus>();
+        if (attackerStatus == null)
+        {
+            Debug.LogWarning($"Atacante {attacker.name} não possui EntityStatus");
+            return 0;
+        }
+
+        // Calcula o dano baseado no ataque do atacante e defesa do alvo
+        int attackPower = attackerStatus.GetAttack();
+        int damage = Mathf.Max(0, attackPower - myEntityStatus.GetDefense());
+
+        // Define a posição para instanciar o efeito visual
+        Vector3 hitPosition = transform.position;
+
+        if (damage > 0)
+        {
+            // CAUSA DANO: Aplica o dano e instancia efeito de acerto
+            int damageDealt = myEntityStatus.TakeDamage(damage);
+
+            // Instancia o efeito visual de acerto
+            if (hitEffectPrefab != null)
+            {
+                Instantiate(hitEffectPrefab, hitPosition, Quaternion.identity);
+            }
+
+            // Aplica knockback no alvo (este objeto)
+            ApplyKnockback(attacker.transform.position, damage * knockbackMultiplier);
+
+            // Atualiza o estado de animação
+            UpdateAnimationState();
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"{gameObject.name} recebeu {damageDealt} de dano. HP restante: {myEntityStatus.currentHP}");
+            }
+
+            return damageDealt;
+        }
+        else
+        {
+            // NÃO CAUSA DANO: Instancia efeito de bloqueio e aplica knockback no atacante
+            if (blockEffectPrefab != null)
+            {
+                Instantiate(blockEffectPrefab, hitPosition, Quaternion.identity);
+            }
+
+            // Tenta aplicar knockback no atacante (objeto que atacou)
+            ApplyKnockbackToAttacker(attacker, attackPower * blockRepulsionMultiplier);
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"{gameObject.name} bloqueou o ataque de {attacker.name}");
+            }
+
+            return 0;
+        }
+    }
+
+    /// <summary>
+    /// Aplica knockback neste objeto quando recebe dano
+    /// </summary>
+    /// <param name="attackerPosition">Posição do atacante</param>
+    /// <param name="force">Força do knockback</param>
+    private void ApplyKnockback(Vector3 attackerPosition, float force)
+    {
+        if (rb == null || isInKnockback)
+            return;
+
+        // Calcula direção do knockback (afasta do atacante)
+        Vector2 direction = (transform.position - attackerPosition).normalized;
+
+        // Inicia a coroutine de knockback
+        StartCoroutine(KnockbackCoroutine(direction, force));
+    }
+
+    /// <summary>
+    /// Aplica knockback no atacante quando seu ataque é bloqueado
+    /// </summary>
+    /// <param name="attacker">Objeto atacante</param>
+    /// <param name="force">Força do knockback</param>
+    private void ApplyKnockbackToAttacker(GameObject attacker, float force)
+    {
+        // Busca o Rigidbody2D do atacante
+        Rigidbody2D attackerRb = attacker.GetComponent<Rigidbody2D>();
+        if (attackerRb == null)
+            return;
+
+        // Calcula direção do knockback (afasta do defensor/este objeto)
+        Vector2 direction = (attacker.transform.position - transform.position).normalized;
+
+        // Aplica o impulso de knockback
+        attackerRb.AddForce(direction * force, ForceMode2D.Impulse);
+    }
+
+    /// <summary>
+    /// Aplica um impulso de knockback por uma duração específica
+    /// </summary>
+    private IEnumerator KnockbackCoroutine(Vector2 direction, float force)
+    {
+        isInKnockback = true;
+
+        // Aplica o impulso inicial
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(direction * force, ForceMode2D.Impulse);
+
+        // Aguarda a duração do knockback
+        yield return new WaitForSeconds(knockbackDuration);
+
+        // Para o movimento
+        rb.linearVelocity = Vector2.zero;
+
+        isInKnockback = false;
     }
     #endregion
 }
