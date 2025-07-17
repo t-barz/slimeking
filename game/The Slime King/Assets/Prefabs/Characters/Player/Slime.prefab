@@ -380,6 +380,8 @@ MonoBehaviour:
   baseSpecialAttack: 0
   baseLevel: 1
   baseSpeed: 2
+  basicAttackCooldown: 0.5
+  specialAttackCooldown: 3
   currentHP: 0
   currentLevel: 1
   modifiers: []
@@ -415,6 +417,11 @@ MonoBehaviour:
   side: {fileID: 6348536971146426712}
   vfx_side: {fileID: 6134169658500841801}
   shadow: {fileID: 1205285456547601663}
+  attackPrefab: {fileID: 3723958096913988103, guid: dbac10e17ade7a64a85210f404b52ca3, type: 3}
+  attackDuration: 0.5
+  attackOffsetFront: {x: 0, y: 0.1}
+  attackOffsetBack: {x: 0, y: 0.1}
+  attackOffsetSide: {x: 0, y: 0.1}
 --- !u!114 &8399835198756755340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,7 +444,6 @@ MonoBehaviour:
   hideSound: {fileID: 0}
   buffSound: {fileID: 0}
   debuffSound: {fileID: 0}
-  footstepInterval: 0.3
   randomPitchVariation: 0.1
 --- !u!1 &5042679139804512791
 GameObject:
