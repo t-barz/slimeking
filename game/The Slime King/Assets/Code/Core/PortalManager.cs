@@ -7,13 +7,6 @@ using System.Collections;
 /// </summary>
 public class PortalManager : MonoBehaviour
 {
-    [Header("Configurações do Portal")]
-    [Tooltip("Define se o portal está ativo ou não")]
-    [SerializeField] private bool portalActive = true;
-
-    [Tooltip("Raio do portal para colisões e visualização")]
-    [SerializeField] private float portalRadius = 1f;
-
     [Header("Configurações de Destino")]
     [Tooltip("Nome da cena para onde o portal leva (deixe vazio para permanecer na mesma cena)")]
     [SerializeField] private string targetSceneName = "";
@@ -21,81 +14,24 @@ public class PortalManager : MonoBehaviour
     [Tooltip("Posição X,Y de destino após atravessar o portal")]
     [SerializeField] private Vector2 targetPosition = Vector2.zero;
 
+    [Header("Configurações de Transição")]
+    [Tooltip("Referência ao componente SquareTransition para efeito visual")]
+    [SerializeField] private SquareTransition transitionEffect;
+
     // Flag que indica se uma transição está em andamento
     private static bool isTransitioning = false;
-
-    /// <summary>
-    /// Propriedade para ativar/desativar o portal externamente
-    /// </summary>
-    public bool IsActive
-    {
-        get { return portalActive; }
-        set { SetPortalActive(value); }
-    }
 
     /// <summary>
     /// Configura a inicialização do portal
     /// </summary>
     private void Start()
     {
-        UpdatePortalState();
 
-        // Adiciona um trigger collider se não tiver nenhum collider
-        if (GetComponent<Collider2D>() == null)
+        // Busca o componente de transição se não estiver configurado
+        if (transitionEffect == null)
         {
-            CircleCollider2D collider = gameObject.AddComponent<CircleCollider2D>();
-            collider.radius = portalRadius;
-            collider.isTrigger = true;
-        }
-    }
-
-    /// <summary>
-    /// Ativa ou desativa o portal
-    /// </summary>
-    public void SetPortalActive(bool active)
-    {
-        if (portalActive != active)
-        {
-            portalActive = active;
-            UpdatePortalState();
-        }
-    }
-
-    /// <summary>
-    /// Alterna o estado do portal (ativo/inativo)
-    /// </summary>
-    public void TogglePortalActive()
-    {
-        SetPortalActive(!portalActive);
-    }
-
-    /// <summary>
-    /// Atualiza o estado visual e funcional do portal
-    /// </summary>
-    private void UpdatePortalState()
-    {
-        // Ativa/desativa os colliders
-        Collider2D portalCollider = GetComponent<Collider2D>();
-        if (portalCollider != null)
-        {
-            portalCollider.enabled = portalActive;
-        }
-
-        // Atualiza visuais do portal (se houver)
-        Renderer portalRenderer = GetComponent<Renderer>();
-        if (portalRenderer != null)
-        {
-            portalRenderer.enabled = portalActive;
-        }
-
-        // Aqui você pode adicionar efeitos visuais ou sonoros quando o estado muda
-        if (portalActive)
-        {
-            Debug.Log("Portal ativado");
-        }
-        else
-        {
-            Debug.Log("Portal desativado");
+            // Procura no mesmo objeto
+            transitionEffect = GetComponent<SquareTransition>();
         }
     }
 
@@ -105,7 +41,7 @@ public class PortalManager : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         // Verifica se o portal está ativo e se o objeto que entrou é o jogador
-        if (portalActive && other.CompareTag("Player") && !isTransitioning)
+        if (other.CompareTag("Player") && !isTransitioning)
         {
             // Transporta o jogador para o destino
             TransportPlayer(other.gameObject);
@@ -149,6 +85,20 @@ public class PortalManager : MonoBehaviour
         // Marca que estamos em transição
         isTransitioning = true;
 
+        // Inicia o efeito de transição visual se disponível
+        bool transitionCompleted = false;
+        if (transitionEffect != null)
+        {
+            // Inscreve no evento de conclusão
+            void OnTransitionCompleted()
+            {
+                transitionCompleted = true;
+            }
+            // Aguarda o evento de conclusão
+            while (!transitionCompleted)
+                yield return null;
+        }
+
         // Carrega a nova cena
         SceneManager.LoadScene(targetSceneName);
 
@@ -169,7 +119,18 @@ public class PortalManager : MonoBehaviour
             );
         }
 
-        // Finaliza a transição
+        // Se temos um efeito de transição, inicia o efeito reverso para revelar a cena
+        transitionCompleted = false;
+        if (transitionEffect != null)
+        {
+            void OnTransitionCompletedReverse()
+            {
+                transitionCompleted = true;
+            }
+            while (!transitionCompleted)
+                yield return null;
+        }
+
         isTransitioning = false;
     }
 }
