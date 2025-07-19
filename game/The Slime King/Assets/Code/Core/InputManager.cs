@@ -47,7 +47,7 @@ public class InputManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         // Inicializa as ações de input
         InitializeActions();

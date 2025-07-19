@@ -500,51 +500,6 @@ Transform:
   - {fileID: 999979429}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &358848329
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 358848331}
-  - component: {fileID: 358848330}
-  m_Layer: 0
-  m_Name: PortalSpawnManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &358848330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358848329}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45712940cf9c59e43b43b5f51b3b3968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PortalSpawnManager
-  enableDebugLogs: 1
---- !u!4 &358848331
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358848329}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &379576448
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4550,54 +4505,6 @@ Transform:
   - {fileID: 460156484}
   m_Father: {fileID: 1308789430}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &743316900
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 743316902}
-  - component: {fileID: 743316901}
-  m_Layer: 0
-  m_Name: SavePlayerManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &743316901
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 743316900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dee1a60404f4024ca5488003b641142, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SavePlayerManager
-  enableAutoSave: 1
-  autoSaveInterval: 300
-  playerTag: Player
-  enableDebugLogs: 1
---- !u!4 &743316902
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 743316900}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &751136811 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4223563639213755225, guid: 1774255a17b3c4f4f8ab6d2e361419b1, type: 3}
@@ -4616,7 +4523,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PortalManager
   destinationScene: InitialForest
-  spawnPosition: {x: 0, y: 0}
+  spawnPosition: {x: 9.86, y: 5.75}
   transitionEffect: {fileID: 776772101707680991}
 --- !u!1001 &849267105
 PrefabInstance:
@@ -30766,5 +30673,3 @@ SceneRoots:
   - {fileID: 1552127508}
   - {fileID: 1350507914}
   - {fileID: 1027868428}
-  - {fileID: 743316902}
-  - {fileID: 358848331}

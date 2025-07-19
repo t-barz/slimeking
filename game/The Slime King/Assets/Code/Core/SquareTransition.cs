@@ -29,6 +29,11 @@ public class SquareTransition : MonoBehaviour
     [Tooltip("Direção de onde os quadrados começam a aparecer")]
     [SerializeField] private TransitionDirection direction = TransitionDirection.LeftToRight;
 
+    [Header("Configurações de Timing")]
+    [Tooltip("Delay em segundos antes de iniciar o efeito de transição")]
+    [Range(0f, 5f)]
+    [SerializeField] private float startDelay = 0f;
+
     [Header("Configurações de Performance")]
     [Tooltip("Tamanho do pool de objetos para reutilização")]
     [Range(50, 500)]
@@ -223,6 +228,15 @@ public class SquareTransition : MonoBehaviour
             return;
         }
 
+        // Inicia a corrotina com delay
+        StartTransitionWithDelay();
+    }
+
+    /// <summary>
+    /// Inicia a transição após o delay configurado
+    /// </summary>
+    private void StartTransitionWithDelay()
+    {
         // Limpa quadrados anteriores
         ClearSquares();
 
@@ -336,6 +350,12 @@ public class SquareTransition : MonoBehaviour
 
         // Preenche toda a tela primeiro
         FillEntireScreenOptimized();
+
+        // Aguarda o delay configurado antes de iniciar
+        if (startDelay > 0f)
+        {
+            yield return new WaitForSeconds(startDelay);
+        }
 
         int startColumn = (direction == TransitionDirection.LeftToRight) ? 0 : gridSize.x - 1;
         int endColumn = (direction == TransitionDirection.LeftToRight) ? gridSize.x : 0;
