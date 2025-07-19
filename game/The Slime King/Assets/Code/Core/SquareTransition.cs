@@ -38,6 +38,15 @@ public class SquareTransition : MonoBehaviour
     [Range(5, 50)]
     [SerializeField] private int batchSize = 20;
 
+    [Header("Configurações de Aparência")]
+    [Tooltip("Fator de sobreposição entre quadrados (0.95 = 5% de sobreposição)")]
+    [Range(-1f, 1.0f)]
+    [SerializeField] private float overlapFactor = 0.98f;
+
+    [Tooltip("Margem extra de quadrados nas bordas da tela")]
+    [Range(-6, 6)]
+    [SerializeField] private int edgeMargin = 2;
+
     // Cache de valores calculados
     private Vector2Int gridSize;
     private float squareWidth, squareHeight;
@@ -147,21 +156,17 @@ public class SquareTransition : MonoBehaviour
         squareWidth *= squareScale.x;
         squareHeight *= squareScale.y;
 
-        // Para evitar espaçamentos, usamos o tamanho real do quadrado como espaçamento
-        // mas criamos uma pequena sobreposição para garantir cobertura total
-        float overlapFactor = 0.98f; // 2% de sobreposição
+        // Usa o fator de sobreposição configurável para eliminar espaçamentos
         effectiveWidth = squareWidth * overlapFactor;
         effectiveHeight = squareHeight * overlapFactor;
 
         // Calcula quantos quadrados são necessários para cobrir completamente a tela
-        // Adicionamos margem extra para garantir cobertura nas bordas
-        int horizontalCount = Mathf.CeilToInt(cameraWidth / effectiveWidth) + 4;
-        int verticalCount = Mathf.CeilToInt(cameraHeight / effectiveHeight) + 4;
+        int horizontalCount = Mathf.CeilToInt(cameraWidth / effectiveWidth) + (edgeMargin * 2);
+        int verticalCount = Mathf.CeilToInt(cameraHeight / effectiveHeight) + (edgeMargin * 2);
 
         gridSize = new Vector2Int(horizontalCount, verticalCount);
 
         // Calcula a posição inicial para centralizar o grid na tela
-        // Posiciona o centro do grid no centro da câmera
         float totalGridWidth = (gridSize.x - 1) * effectiveWidth;
         float totalGridHeight = (gridSize.y - 1) * effectiveHeight;
 
@@ -171,7 +176,8 @@ public class SquareTransition : MonoBehaviour
         startY = cameraCenter.y - (totalGridHeight * 0.5f);
 
         Debug.Log($"SquareTransition: Grid calculado: {horizontalCount}x{verticalCount} quadrados");
-        Debug.Log($"Tamanho do quadrado: {squareWidth}x{squareHeight}, Espaçamento: {effectiveWidth}x{effectiveHeight}");
+        Debug.Log($"Tamanho do quadrado: {squareWidth:F2}x{squareHeight:F2}, Espaçamento efetivo: {effectiveWidth:F2}x{effectiveHeight:F2}");
+        Debug.Log($"Fator de sobreposição: {overlapFactor:F2} ({(1f - overlapFactor) * 100f:F1}% de sobreposição)");
     }
 
     /// <summary>
