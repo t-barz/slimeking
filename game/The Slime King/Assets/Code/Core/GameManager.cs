@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Gerenciador principal do jogo - Singleton que persiste entre cenas
@@ -10,6 +11,17 @@ public class GameManager : MonoBehaviour
     /// Instância única do GameManager
     /// </summary>
     public static GameManager Instance { get; private set; }
+    #endregion
+
+    #region Configurações
+    [Header("Configurações de Transição")]
+    [Tooltip("Duração do efeito de fade-in ao escurecer a cena (em segundos)")]
+    [Range(0.1f, 3.0f)]
+    [SerializeField] private float fadeDuration = 0.25f;
+
+    [Tooltip("Tempo de espera com a tela escura após o fade-in (em segundos)")]
+    [Range(0.1f, 2.0f)]
+    [SerializeField] private float darkScreenDuration = 0.5f;
     #endregion
 
     #region Unity Lifecycle
@@ -103,15 +115,145 @@ public class GameManager : MonoBehaviour
         return Time.timeScale == 0f;
     }
 
-    public void ChangeScene(string sceneName, Vector2 targetPosition)
+    /// <summary>
+    /// Muda para uma nova cena escurecendo a atual primeiro
+    /// </summary>
+    public void ChangeScene(string sceneName, Vector2 targetPosition = default, Color darkenColor = default)
     {
-        // Aqui você pode adicionar lógica para carregar uma nova cena
+        // Define cor padrão como preto se não especificada
+        if (darkenColor == default)
+            darkenColor = Color.black;
+
         Debug.Log($"[GameManager] Mudando para a cena: {sceneName} na posição {targetPosition}");
-        // Escurece a cena atual
-        // Exibe UI de carregamento
-        // Salva o jogo
-        // Destroy o GameObject do Player
-        // Carrega a nova cena em asynchronous mode
+        StartCoroutine(ChangeSceneCoroutine(sceneName, targetPosition, darkenColor));
+
+        // 2. Exibe UI de carregamento
+        // 3. Salva o jogo
+        // 4. Destroy o GameObject do Player
+        // 5. Carrega a nova cena em asynchronous mode
+    }
+
+    /// <summary>
+    /// Corrotina para mudança de cena com escurecimento
+    /// </summary>
+    private IEnumerator ChangeSceneCoroutine(string sceneName, Vector2 targetPosition, Color darkenColor)
+    {
+        // 1. Escurece a cena atual
+        yield return StartCoroutine(DarkenScene(darkenColor));
+
+        Debug.Log("[GameManager] Cena escurecida com sucesso");
+    }
+
+    /// <summary>
+    /// Escurece a cena atual com a cor especificada
+    /// </summary>
+    private IEnumerator DarkenScene(Color color)
+    {
+        Debug.Log($"[GameManager] Escurecendo cena com a cor: {color}");
+
+        // Cria um overlay que cobre toda a tela
+        GameObject darkenOverlay = new GameObject("DarkenOverlay");
+        SpriteRenderer overlayRenderer = darkenOverlay.AddComponent<SpriteRenderer>();
+
+        // Cria uma textura 1x1 com a cor especificada
+        Texture2D darkenTexture = new Texture2D(1, 1);
+        darkenTexture.SetPixel(0, 0, color);
+        darkenTexture.Apply();
+
+        // Cria o sprite a partir da textura
+        Sprite darkenSprite = Sprite.Create(darkenTexture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f);
+        overlayRenderer.sprite = darkenSprite;
+
+        // Busca a câmera ativa (funciona com CinemachineCamera)
+        Camera activeCamera = Camera.main;
+        if (activeCamera == null)
+        {
+            activeCamera = FindAnyObjectByType<Camera>();
+        }
+
+        if (activeCamera != null)
+        {
+            // Usa orthographicSize para calcular o tamanho correto
+            float cameraHeight = activeCamera.orthographicSize * 2f;
+            float cameraWidth = cameraHeight * activeCamera.aspect;
+
+            // Posiciona no centro da câmera
+            darkenOverlay.transform.position = new Vector3(
+                activeCamera.transform.position.x,
+                activeCamera.transform.position.y,
+                0f
+            );
+
+            // Escala muito maior para garantir cobertura total
+            darkenOverlay.transform.localScale = new Vector3(cameraWidth * 200f, cameraHeight * 200f, 1f);
+
+            Debug.Log($"[GameManager] Overlay dimensionado - CameraSize: {activeCamera.orthographicSize}, Scale: {cameraWidth * 200f}x{cameraHeight * 200f}");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] Nenhuma câmera encontrada - usando escala muito grande");
+            // Fallback com escala muito grande
+            darkenOverlay.transform.localScale = new Vector3(50000f, 50000f, 1f);
+        }
+
+        // Configura a sorting layer e order
+        overlayRenderer.sortingLayerName = "UIGamePlay";
+        overlayRenderer.sortingOrder = 9999;
+
+        // Efeito de Fade-In
+        Color targetColor = color;
+        Color transparentColor = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
+        overlayRenderer.color = transparentColor; // Começa transparente
+
+        Debug.Log($"[GameManager] Iniciando fade-in do overlay para cor {targetColor} (duração: {fadeDuration}s)");
+
+        // Usa a duração configurável do fade-in
+        float elapsedTime = 0f;
+
+        // Loop do fade-in
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
+
+            // Interpola a cor de transparente para opaca
+            Color currentColor = Color.Lerp(transparentColor, targetColor, alpha);
+            overlayRenderer.color = currentColor;
+
+            yield return null;
+        }
+
+        // Garante que a cor final seja exatamente a desejada
+        overlayRenderer.color = targetColor;
+
+        Debug.Log($"[GameManager] Fade-in concluído - Overlay de escurecimento criado com cor {color} na sorting layer UIGamePlay");
+
+        // Aguarda um tempo adicional configurável com a tela completamente escura
+        yield return new WaitForSeconds(darkScreenDuration);
+
+        Debug.Log("[GameManager] Escurecimento da cena concluído");
+
+        // Nota: O overlay será destruído automaticamente quando a cena mudar
+    }
+
+    /// <summary>
+    /// Configura a duração do fade-in programaticamente
+    /// </summary>
+    /// <param name="duration">Nova duração em segundos</param>
+    public void SetFadeDuration(float duration)
+    {
+        fadeDuration = Mathf.Clamp(duration, 0.1f, 3.0f);
+        Debug.Log($"[GameManager] Duração do fade ajustada para: {fadeDuration}s");
+    }
+
+    /// <summary>
+    /// Configura o tempo de tela escura programaticamente
+    /// </summary>
+    /// <param name="duration">Nova duração em segundos</param>
+    public void SetDarkScreenDuration(float duration)
+    {
+        darkScreenDuration = Mathf.Clamp(duration, 0.1f, 2.0f);
+        Debug.Log($"[GameManager] Duração da tela escura ajustada para: {darkScreenDuration}s");
     }
     #endregion
 }
