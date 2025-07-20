@@ -20,7 +20,7 @@ public class PortalManager : MonoBehaviour
         if (other.CompareTag("Player") && !isTransitioning)
         {
             //StartCoroutine(LoadSceneAsync());
-            GameManager.Instance.ChangeScene(destinationScene, Vector2.zero, Color.black);
+            GameManager.Instance.ChangeScene(destinationScene, Vector2.zero, Color.white);
         }
     }
 

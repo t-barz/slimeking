@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 /// <summary>
@@ -126,11 +127,6 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"[GameManager] Mudando para a cena: {sceneName} na posição {targetPosition}");
         StartCoroutine(ChangeSceneCoroutine(sceneName, targetPosition, darkenColor));
-
-        // 2. Exibe UI de carregamento
-        // 3. Salva o jogo
-        // 4. Destroy o GameObject do Player
-        // 5. Carrega a nova cena em asynchronous mode
     }
 
     /// <summary>
@@ -142,6 +138,94 @@ public class GameManager : MonoBehaviour
         yield return StartCoroutine(DarkenScene(darkenColor));
 
         Debug.Log("[GameManager] Cena escurecida com sucesso");
+
+        // 2. Exibe UI de carregamento
+        // 3. Salva o jogo
+        // 4. Carrega a nova cena em asynchronous mode
+        yield return StartCoroutine(LoadSceneAsync(sceneName));
+    }
+
+    /// <summary>
+    /// Carrega a nova cena de forma assíncrona
+    /// </summary>
+    private IEnumerator LoadSceneAsync(string sceneName)
+    {
+        Debug.Log($"[GameManager] Iniciando carregamento assíncrono da cena: {sceneName}");
+
+        // Inicia o carregamento assíncrono da nova cena
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+
+        // Aguarda o carregamento completar
+        while (!asyncLoad.isDone)
+        {
+            // Opcionalmente, pode exibir progresso do carregamento
+            float progress = Mathf.Clamp01(asyncLoad.progress / 0.9f);
+            Debug.Log($"[GameManager] Progresso do carregamento: {progress * 100:F1}%");
+
+            yield return null;
+        }
+
+        Debug.Log($"[GameManager] Cena {sceneName} carregada com sucesso!");
+
+        // Aguarda alguns frames para garantir que a nova cena esteja sendo exibida
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+
+        // Sempre executa fade-out na nova cena
+        yield return StartCoroutine(FadeOutScene());
+    }
+
+    /// <summary>
+    /// Executa fade-out para remover o overlay escuro da nova cena
+    /// </summary>
+    private IEnumerator FadeOutScene()
+    {
+        Debug.Log("[GameManager] Iniciando fade-out da nova cena");
+
+        // Procura por overlay escuro existente
+        GameObject existingOverlay = GameObject.Find("DarkenOverlay");
+
+        if (existingOverlay != null)
+        {
+            SpriteRenderer overlayRenderer = existingOverlay.GetComponent<SpriteRenderer>();
+
+            if (overlayRenderer != null)
+            {
+                Color currentColor = overlayRenderer.color;
+                Color transparentColor = new Color(currentColor.r, currentColor.g, currentColor.b, 0f);
+
+                Debug.Log($"[GameManager] Fazendo fade-out do overlay (duração: {fadeDuration}s)");
+
+                float elapsedTime = 0f;
+
+                // Loop do fade-out
+                while (elapsedTime < fadeDuration)
+                {
+                    elapsedTime += Time.deltaTime;
+                    float alpha = 1f - Mathf.Clamp01(elapsedTime / fadeDuration);
+
+                    // Interpola a cor de opaca para transparente
+                    Color fadeColor = Color.Lerp(transparentColor, currentColor, alpha);
+                    overlayRenderer.color = fadeColor;
+
+                    yield return null;
+                }
+
+                // Garante que seja completamente transparente
+                overlayRenderer.color = transparentColor;
+
+                Debug.Log("[GameManager] Fade-out concluído - removendo overlay");
+
+                // Remove o overlay da cena
+                Destroy(existingOverlay);
+            }
+        }
+        else
+        {
+            Debug.Log("[GameManager] Nenhum overlay encontrado para fade-out - nova cena já visível");
+        }
+
+        Debug.Log("[GameManager] Transição de cena completamente finalizada!");
     }
 
     /// <summary>

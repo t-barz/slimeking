@@ -4523,8 +4523,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PortalManager
   destinationScene: InitialForest
-  spawnPosition: {x: 9.86, y: 5.75}
-  transitionEffect: {fileID: 776772101707680991}
 --- !u!1001 &849267105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30142,6 +30140,52 @@ Transform:
   - {fileID: 1615837963}
   m_Father: {fileID: 1308789430}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2130908789
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130908791}
+  - component: {fileID: 2130908790}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2130908790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130908789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fa2c9782f84d6549ab875c32d1bf98b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  fadeDuration: 0.25
+  darkScreenDuration: 0.5
+--- !u!4 &2130908791
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130908789}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2131201027 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1374776129184451567, guid: 8e4e0734e3cf88f4dbd483f926c8f4aa, type: 3}
@@ -30257,6 +30301,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2881662405035467980, guid: 1774255a17b3c4f4f8ab6d2e361419b1, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2881662405035467980, guid: 1774255a17b3c4f4f8ab6d2e361419b1, type: 3}
       propertyPath: edgeMargin
       value: 1
       objectReference: {fileID: 0}
@@ -30284,17 +30332,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 751136815}
   m_SourcePrefab: {fileID: 100100000, guid: 1774255a17b3c4f4f8ab6d2e361419b1, type: 3}
---- !u!114 &776772101707680991 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2881662405035467980, guid: 1774255a17b3c4f4f8ab6d2e361419b1, type: 3}
-  m_PrefabInstance: {fileID: 776772101707680990}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 751136811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a2f0407fdccac642a50f307a479f9a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SquareTransition
 --- !u!1001 &5030732287623012135
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30673,3 +30710,4 @@ SceneRoots:
   - {fileID: 1552127508}
   - {fileID: 1350507914}
   - {fileID: 1027868428}
+  - {fileID: 2130908791}
