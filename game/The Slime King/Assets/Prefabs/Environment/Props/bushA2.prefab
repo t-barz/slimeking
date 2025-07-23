@@ -4882,11 +4882,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1ab07e8be26fe08499abd57fae799f0c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.4840798
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1ab07e8be26fe08499abd57fae799f0c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.60183465
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1ab07e8be26fe08499abd57fae799f0c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5091,7 +5091,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShakeHandler
   triggerName: Shake
   targetTag: Player
-  particleEffect: {fileID: 0}
+  particleEffect: {fileID: 498066275281609246}
   shakeSounds:
   - {fileID: 8300000, guid: 1b288af6c26da024896f355f65e43314, type: 3}
   - {fileID: 8300000, guid: 669749a64283b764c9137586c18c241f, type: 3}
