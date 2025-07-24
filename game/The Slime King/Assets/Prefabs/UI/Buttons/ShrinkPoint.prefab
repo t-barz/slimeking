@@ -295,6 +295,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: dd79efde1615066409e757858fc4ccbb, type: 3}
   shrinkSoundVolume: 0.7
   pitchVariation: 0.1
+  showGizmo: 1
+  gizmoColor: {r: 1, g: 0, b: 1, a: 1}
+  gizmoRadius: 0.25
+  showDestinationLine: 1
+  destinationLineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &3498384350893773468 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6402024229338946624, guid: e7db6359f37bd344691e60990b8fc4f7, type: 3}

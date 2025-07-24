@@ -41,6 +41,23 @@ public class ShrinkInteractionHandler : InteractionHandler
     [Range(0f, 0.3f)]
     [SerializeField] private float pitchVariation = 0.1f;
 
+    [Header("Configurações de Gizmo")]
+    [Tooltip("Exibir gizmo circular no editor")]
+    [SerializeField] private bool showGizmo = true;
+
+    [Tooltip("Cor do gizmo circular")]
+    [SerializeField] private Color gizmoColor = Color.magenta;
+
+    [Tooltip("Raio do gizmo circular")]
+    [Range(0.1f, 5.0f)]
+    [SerializeField] private float gizmoRadius = 1.0f;
+
+    [Tooltip("Mostrar linha até o ponto de destino")]
+    [SerializeField] private bool showDestinationLine = true;
+
+    [Tooltip("Cor da linha até o destino")]
+    [SerializeField] private Color destinationLineColor = Color.yellow;
+
     // Controla se a trigger já foi ativada
     private bool triggerActivated = false;
 
@@ -308,5 +325,108 @@ public class ShrinkInteractionHandler : InteractionHandler
         playerAnimator = null;
         playerObject = null;
         playerColliders = null;
+    }
+
+    /// <summary>
+    /// Desenha gizmos no editor para visualização
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        if (!showGizmo) return;
+
+        // Desenha círculo na posição do objeto
+        Gizmos.color = gizmoColor;
+        DrawWireCircle(transform.position, gizmoRadius);
+
+        // Desenha círculo preenchido com transparência
+        Color fillColor = gizmoColor;
+        fillColor.a = 0.1f;
+        Gizmos.color = fillColor;
+        Gizmos.DrawSphere(transform.position, gizmoRadius);
+
+        // Desenha linha até o ponto de destino se configurado
+        if (showDestinationLine && destinationPoint != null)
+        {
+            Gizmos.color = destinationLineColor;
+            Gizmos.DrawLine(transform.position, destinationPoint.position);
+
+            // Desenha uma pequena esfera no destino
+            Gizmos.DrawWireSphere(destinationPoint.position, 0.2f);
+        }
+    }
+
+    /// <summary>
+    /// Desenha gizmos apenas quando o objeto está selecionado
+    /// </summary>
+    private void OnDrawGizmosSelected()
+    {
+        if (!showGizmo) return;
+
+        // Desenha versão mais destacada quando selecionado
+        Gizmos.color = gizmoColor;
+        Gizmos.DrawSphere(transform.position, gizmoRadius * 0.1f); // Centro
+
+        // Desenha raios indicando direção
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * 45f * Mathf.Deg2Rad;
+            Vector3 direction = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
+            Vector3 rayEnd = transform.position + direction * gizmoRadius;
+
+            Gizmos.color = Color.Lerp(gizmoColor, Color.white, 0.5f);
+            Gizmos.DrawLine(transform.position, rayEnd);
+        }
+
+        // Informações adicionais no destino
+        if (destinationPoint != null)
+        {
+#if UNITY_EDITOR
+            UnityEditor.Handles.Label(destinationPoint.position + Vector3.up * 0.5f,
+                $"Destino\nDuração: {movementDuration}s");
+#endif
+        }
+    }
+
+    /// <summary>
+    /// Atualiza a cor do gizmo programaticamente
+    /// </summary>
+    public void SetGizmoColor(Color newColor)
+    {
+        gizmoColor = newColor;
+    }
+
+    /// <summary>
+    /// Atualiza o raio do gizmo programaticamente
+    /// </summary>
+    public void SetGizmoRadius(float newRadius)
+    {
+        gizmoRadius = Mathf.Clamp(newRadius, 0.1f, 5.0f);
+    }
+
+    /// <summary>
+    /// Liga/desliga a exibição do gizmo
+    /// </summary>
+    public void SetGizmoVisibility(bool visible)
+    {
+        showGizmo = visible;
+    }
+
+    /// <summary>
+    /// Helper method to draw a wire circle in the XY plane
+    /// </summary>
+    private void DrawWireCircle(Vector3 center, float radius, int segments = 36)
+    {
+        float angleStep = 360f / segments;
+
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * angleStep * Mathf.Deg2Rad;
+            float angle2 = (i + 1) * angleStep * Mathf.Deg2Rad;
+
+            Vector3 point1 = center + new Vector3(Mathf.Cos(angle1), Mathf.Sin(angle1), 0) * radius;
+            Vector3 point2 = center + new Vector3(Mathf.Cos(angle2), Mathf.Sin(angle2), 0) * radius;
+
+            Gizmos.DrawLine(point1, point2);
+        }
     }
 }
