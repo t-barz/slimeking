@@ -75,15 +75,19 @@ namespace VFX.Wind
         private Coroutine proximityCheckCoroutine;
         private WaitForSeconds checkInterval;
 
-        // Cache para otimização
+        // Cache para otimização - evita GetComponent repetidos
         private readonly Dictionary<GameObject, Animator> animatorCache = new Dictionary<GameObject, Animator>();
 
-        // Movimento
+        // Movimento - cache para performance
         private Vector3 movementVector;
         private SpriteRenderer spriteRenderer;
         private bool originalSpriteFlipX;
         private Vector3 originalScale;
         private bool lastMoveDirection;
+
+        // Cache adicional para otimização
+        private Transform cachedTransform;
+        private const float TIME_DELTA_THRESHOLD = 0.001f; // Threshold para otimização de Time.deltaTime
         #endregion
 
         #region Constants
@@ -128,6 +132,9 @@ namespace VFX.Wind
         #region Unity Lifecycle
         private void Awake()
         {
+            // Cache do Transform para evitar chamadas repetidas
+            cachedTransform = transform;
+
             ValidateConfiguration();
             InitializeSystem();
             InitializeMovement();
@@ -319,8 +326,13 @@ namespace VFX.Wind
         /// </summary>
         private void UpdateMovement()
         {
-            Vector3 movement = movementVector * movementSpeed * Time.deltaTime;
-            transform.position += movement;
+            float deltaTime = Time.deltaTime;
+
+            // Otimização: evita cálculos se deltaTime é muito pequeno
+            if (deltaTime < TIME_DELTA_THRESHOLD) return;
+
+            Vector3 movement = movementVector * (movementSpeed * deltaTime);
+            cachedTransform.position += movement;
         }
 
         /// <summary>
@@ -575,8 +587,11 @@ namespace VFX.Wind
             // Limpa buffer e detecta novos objetos
             detectionBuffer.Clear();
 
+            // Cache da posição para evitar múltiplas chamadas a transform.position
+            Vector2 currentPosition = cachedTransform.position;
+
             var detected = Physics2D.OverlapCircleAll(
-                transform.position,
+                currentPosition,
                 detectionRadius,
                 objectLayerMask
             );

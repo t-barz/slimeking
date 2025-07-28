@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Gerencia portais para transição entre cenas
+/// Versão otimizada com cache de componentes e validações melhoradas
+/// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class PortalManager : MonoBehaviour
 {
@@ -17,6 +21,13 @@ public class PortalManager : MonoBehaviour
 
     private bool isTransitioning = false;
 
+    // Cache para otimização
+    private Collider2D cachedCollider;
+    private GameManager cachedGameManager;
+
+    // Constantes para evitar string allocations
+    private const string PLAYER_TAG = "Player";
+
     #region Unity Lifecycle
     private void Start()
     {
@@ -25,7 +36,7 @@ public class PortalManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !isTransitioning && CanUsePortal())
+        if (other.CompareTag(PLAYER_TAG) && !isTransitioning && CanUsePortal())
         {
             StartCoroutine(UsePortal());
         }
@@ -42,12 +53,13 @@ public class PortalManager : MonoBehaviour
 
     #region Portal Logic
     /// <summary>
-    /// Inicializa o portal
+    /// Inicializa o portal com cache de componentes
     /// </summary>
     private void InitializePortal()
     {
-        Collider2D portalCollider = GetComponent<Collider2D>();
-        portalCollider.isTrigger = true;
+        // Cache do Collider2D
+        cachedCollider = GetComponent<Collider2D>();
+        cachedCollider.isTrigger = true;
 
         // Gera ID automaticamente se não estiver definido
         if (string.IsNullOrEmpty(portalID))
@@ -55,7 +67,23 @@ public class PortalManager : MonoBehaviour
             portalID = $"Portal_{gameObject.name}_{GetInstanceID()}";
         }
 
+        // Cache do GameManager
+        cachedGameManager = GameManager.Instance;
+
+        ValidateConfiguration();
+
         Debug.Log($"[PortalManager] Portal '{portalID}' inicializado - Destino: {destinationScene} | Posição: {targetPosition}");
+    }
+
+    /// <summary>
+    /// Valida a configuração do portal
+    /// </summary>
+    private void ValidateConfiguration()
+    {
+        if (string.IsNullOrEmpty(destinationScene))
+        {
+            Debug.LogWarning($"[PortalManager] Portal '{portalID}' não tem cena de destino configurada!");
+        }
     }
 
     /// <summary>
@@ -63,8 +91,13 @@ public class PortalManager : MonoBehaviour
     /// </summary>
     private bool CanUsePortal()
     {
-        // Verifica se GameManager existe
-        if (GameManager.Instance == null)
+        // Usa cache do GameManager
+        if (cachedGameManager == null)
+        {
+            cachedGameManager = GameManager.Instance;
+        }
+
+        if (cachedGameManager == null)
         {
             Debug.LogError($"[PortalManager] GameManager não encontrado! Portal: {portalID}");
             return false;
@@ -91,8 +124,8 @@ public class PortalManager : MonoBehaviour
 
         try
         {
-            // Chama GameManager para fazer a transição
-            GameManager.Instance.ChangeScene(destinationScene, targetPosition, portalColor);
+            // Usa cache do GameManager para melhor performance
+            cachedGameManager.ChangeScene(destinationScene, targetPosition, portalColor);
         }
         catch (System.Exception e)
         {

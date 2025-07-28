@@ -5,6 +5,7 @@ using Unity.Cinemachine;
 
 /// <summary>
 /// Gerenciador principal do jogo - Singleton que persiste entre cenas
+/// Otimizado para performance com cache de objetos e minimização de alocações
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -35,6 +36,22 @@ public class GameManager : MonoBehaviour
     /// Overlay persistente que se mantém entre as cenas
     /// </summary>
     private GameObject persistentOverlay;
+
+    // Cache para otimização de performance
+    private Camera cachedCamera;
+    private GameObject cachedPlayer;
+    private Rigidbody2D cachedPlayerRigidbody;
+    private SpriteRenderer overlayRenderer;
+
+    // WaitForSeconds cache para evitar alocações desnecessárias
+    private WaitForSeconds cachedDarkScreenWait;
+    private WaitForSeconds cachedFadeOutDelayWait;
+    private WaitForEndOfFrame cachedEndOfFrame;
+
+    // Strings em cache para evitar concatenações repetidas
+    private const string PLAYER_TAG = "Player";
+    private const string OVERLAY_NAME = "PersistentDarkenOverlay";
+    private const string UI_GAMEPLAY_LAYER = "UIGamePlay";
     #endregion
 
     #region Unity Lifecycle
@@ -54,6 +71,9 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        // Inicializa cache de WaitForSeconds para evitar alocações durante runtime
+        InitializeCache();
+
         Debug.Log("[GameManager] Singleton inicializado");
     }
 
@@ -63,14 +83,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         InitializeGame();
-    }
-
-    /// <summary>
-    /// Atualização por frame
-    /// </summary>
-    void Update()
-    {
-
     }
 
     /// <summary>
@@ -86,11 +98,44 @@ public class GameManager : MonoBehaviour
                 Destroy(persistentOverlay);
             }
             Instance = null;
+
+            // Limpa cache
+            ClearCache();
         }
     }
     #endregion
 
     #region Initialization
+    /// <summary>
+    /// Inicializa cache de objetos para otimização de performance
+    /// </summary>
+    private void InitializeCache()
+    {
+        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
+        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
+        cachedEndOfFrame = new WaitForEndOfFrame();
+    }
+
+    /// <summary>
+    /// Limpa o cache de objetos
+    /// </summary>
+    private void ClearCache()
+    {
+        cachedCamera = null;
+        cachedPlayer = null;
+        cachedPlayerRigidbody = null;
+        overlayRenderer = null;
+    }
+
+    /// <summary>
+    /// Atualiza cache de WaitForSeconds quando valores mudam
+    /// </summary>
+    private void UpdateWaitCache()
+    {
+        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
+        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
+    }
+
     /// <summary>
     /// Inicializa o jogo
     /// </summary>
@@ -183,9 +228,9 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"[GameManager] Cena {sceneName} carregada com sucesso!");
 
-        // Aguarda alguns frames para garantir que a nova cena esteja sendo exibida
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForEndOfFrame();
+        // Aguarda alguns frames para garantir que a nova cena esteja sendo exibida (usa cache)
+        yield return cachedEndOfFrame;
+        yield return cachedEndOfFrame;
 
         // Posiciona o Player na posição de destino
         PositionPlayerAtTarget(targetPosition);
@@ -193,11 +238,11 @@ public class GameManager : MonoBehaviour
         // Reposiciona o overlay para a nova câmera
         UpdateOverlayPosition();
 
-        // Aguarda o delay configurado antes de iniciar o fade-out
+        // Aguarda o delay configurado antes de iniciar o fade-out (usa cache)
         if (fadeOutDelay > 0f)
         {
             Debug.Log($"[GameManager] Aguardando {fadeOutDelay}s antes do fade-out");
-            yield return new WaitForSeconds(fadeOutDelay);
+            yield return cachedFadeOutDelayWait;
         }
 
         // Sempre executa fade-out na nova cena
@@ -209,29 +254,36 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void PositionPlayerAtTarget(Vector2 targetPosition)
     {
-        // Procura o objeto com tag "Player"
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        // Usa cache ou busca o Player se não estiver em cache
+        if (cachedPlayer == null)
+        {
+            cachedPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG);
+        }
 
-        if (player != null)
+        if (cachedPlayer != null)
         {
             // Define a posição do Player (mantém Z original)
-            Vector3 newPosition = new Vector3(targetPosition.x, targetPosition.y, player.transform.position.z);
-            player.transform.position = newPosition;
+            Vector3 currentPos = cachedPlayer.transform.position;
+            Vector3 newPosition = new Vector3(targetPosition.x, targetPosition.y, currentPos.z);
+            cachedPlayer.transform.position = newPosition;
 
             Debug.Log($"[GameManager] Player posicionado na posição: {newPosition}");
 
-            // Para qualquer movimento residual se houver Rigidbody2D
-            Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
-            if (playerRb != null)
+            // Para qualquer movimento residual se houver Rigidbody2D (usa cache)
+            if (cachedPlayerRigidbody == null)
             {
-                playerRb.linearVelocity = Vector2.zero;
-                Debug.Log("[GameManager] Velocidade do Player resetada");
+                cachedPlayerRigidbody = cachedPlayer.GetComponent<Rigidbody2D>();
             }
 
+            if (cachedPlayerRigidbody != null)
+            {
+                cachedPlayerRigidbody.linearVelocity = Vector2.zero;
+                Debug.Log("[GameManager] Velocidade do Player resetada");
+            }
         }
         else
         {
-            Debug.LogWarning("[GameManager] Objeto com tag 'Player' não encontrado na nova cena");
+            Debug.LogWarning($"[GameManager] Objeto com tag '{PLAYER_TAG}' não encontrado na nova cena");
         }
     }
 
@@ -245,7 +297,11 @@ public class GameManager : MonoBehaviour
         // Usa o overlay persistente
         if (persistentOverlay != null)
         {
-            SpriteRenderer overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
+            // Usa cache do SpriteRenderer
+            if (overlayRenderer == null)
+            {
+                overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
+            }
 
             if (overlayRenderer != null)
             {
@@ -261,13 +317,13 @@ public class GameManager : MonoBehaviour
 
                 float elapsedTime = 0f;
 
-                // Loop do fade-out - vai de opaco para transparente
+                // Loop do fade-out - vai de opaco para transparente (otimizado)
                 while (elapsedTime < fadeDuration)
                 {
                     elapsedTime += Time.deltaTime;
                     float alpha = 1f - Mathf.Clamp01(elapsedTime / fadeDuration);
 
-                    // Interpola a cor de opaca para transparente
+                    // Interpola a cor de opaca para transparente (evita Color.Lerp)
                     Color fadeColor = new Color(opaqueColor.r, opaqueColor.g, opaqueColor.b, alpha);
                     overlayRenderer.color = fadeColor;
 
@@ -291,30 +347,41 @@ public class GameManager : MonoBehaviour
     {
         if (persistentOverlay == null) return;
 
-        // Busca a câmera ativa na nova cena
-        Camera activeCamera = Camera.main;
-        if (activeCamera == null)
+        // Busca a câmera ativa na nova cena (usa cache quando possível)
+        if (cachedCamera == null)
         {
-            activeCamera = FindAnyObjectByType<Camera>();
+            cachedCamera = Camera.main;
+            if (cachedCamera == null)
+            {
+                cachedCamera = FindAnyObjectByType<Camera>();
+            }
         }
 
-        if (activeCamera != null)
+        if (cachedCamera != null)
         {
             // Usa orthographicSize para calcular o tamanho correto
-            float cameraHeight = activeCamera.orthographicSize * 2f;
-            float cameraWidth = cameraHeight * activeCamera.aspect;
+            float cameraHeight = cachedCamera.orthographicSize * 2f;
+            float cameraWidth = cameraHeight * cachedCamera.aspect;
+
+            // Cache da posição da câmera
+            Vector3 cameraPos = cachedCamera.transform.position;
 
             // Posiciona no centro da nova câmera
             persistentOverlay.transform.position = new Vector3(
-                activeCamera.transform.position.x,
-                activeCamera.transform.position.y,
+                cameraPos.x,
+                cameraPos.y,
                 0f
             );
 
             // Atualiza a escala para a nova câmera
-            persistentOverlay.transform.localScale = new Vector3(cameraWidth * 1000f, cameraHeight * 1000f, 1f);
+            float scaleMultiplier = 1000f;
+            persistentOverlay.transform.localScale = new Vector3(
+                cameraWidth * scaleMultiplier,
+                cameraHeight * scaleMultiplier,
+                1f
+            );
 
-            Debug.Log($"[GameManager] Overlay reposicionado para nova câmera - Scale: {cameraWidth * 1000f}x{cameraHeight * 1000f}");
+            Debug.Log($"[GameManager] Overlay reposicionado para nova câmera - Scale: {cameraWidth * scaleMultiplier}x{cameraHeight * scaleMultiplier}");
         }
     }
 
@@ -329,11 +396,16 @@ public class GameManager : MonoBehaviour
         if (persistentOverlay == null)
         {
             persistentOverlay = CreatePersistentOverlay(color);
+            overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
         }
         else
         {
             // Atualiza a cor do overlay existente
-            SpriteRenderer overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
+            if (overlayRenderer == null)
+            {
+                overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
+            }
+
             if (overlayRenderer != null)
             {
                 // Atualiza a textura com a nova cor
@@ -346,38 +418,36 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        SpriteRenderer renderer = persistentOverlay.GetComponent<SpriteRenderer>();
-
         // Efeito de Fade-In
         Color targetColor = color;
         Color transparentColor = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
-        renderer.color = transparentColor; // Começa transparente
+        overlayRenderer.color = transparentColor; // Começa transparente
 
         Debug.Log($"[GameManager] Iniciando fade-in do overlay persistente para cor {targetColor} (duração: {fadeDuration}s)");
 
         // Usa a duração configurável do fade-in
         float elapsedTime = 0f;
 
-        // Loop do fade-in
+        // Loop do fade-in otimizado
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
             float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
 
-            // Interpola a cor de transparente para opaca
-            Color currentColor = Color.Lerp(transparentColor, targetColor, alpha);
-            renderer.color = currentColor;
+            // Interpola a cor de transparente para opaca (evita Color.Lerp para melhor performance)
+            Color currentColor = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+            overlayRenderer.color = currentColor;
 
             yield return null;
         }
 
         // Garante que a cor final seja exatamente a desejada
-        renderer.color = targetColor;
+        overlayRenderer.color = targetColor;
 
         Debug.Log($"[GameManager] Fade-in concluído - Overlay persistente escuro");
 
-        // Aguarda um tempo adicional configurável com a tela completamente escura
-        yield return new WaitForSeconds(darkScreenDuration);
+        // Aguarda um tempo adicional configurável com a tela completamente escura (usa cache)
+        yield return cachedDarkScreenWait;
 
         Debug.Log("[GameManager] Escurecimento da cena concluído");
     }
@@ -388,7 +458,7 @@ public class GameManager : MonoBehaviour
     private GameObject CreatePersistentOverlay(Color color)
     {
         // Cria um overlay que cobre toda a tela
-        GameObject overlay = new GameObject("PersistentDarkenOverlay");
+        GameObject overlay = new GameObject(OVERLAY_NAME);
         SpriteRenderer overlayRenderer = overlay.AddComponent<SpriteRenderer>();
 
         // Torna o overlay persistente entre cenas
@@ -416,17 +486,25 @@ public class GameManager : MonoBehaviour
             float cameraHeight = activeCamera.orthographicSize * 2f;
             float cameraWidth = cameraHeight * activeCamera.aspect;
 
+            // Cache da posição da câmera
+            Vector3 cameraPos = activeCamera.transform.position;
+
             // Posiciona no centro da câmera
             overlay.transform.position = new Vector3(
-                activeCamera.transform.position.x,
-                activeCamera.transform.position.y,
+                cameraPos.x,
+                cameraPos.y,
                 0f
             );
 
-            // Escala muito maior para garantir cobertura total
-            overlay.transform.localScale = new Vector3(cameraWidth * 200f, cameraHeight * 200f, 1f);
+            // Escala otimizada para garantir cobertura total
+            const float scaleMultiplier = 200f;
+            overlay.transform.localScale = new Vector3(
+                cameraWidth * scaleMultiplier,
+                cameraHeight * scaleMultiplier,
+                1f
+            );
 
-            Debug.Log($"[GameManager] Overlay persistente criado - CameraSize: {activeCamera.orthographicSize}, Scale: {cameraWidth * 200f}x{cameraHeight * 200f}");
+            Debug.Log($"[GameManager] Overlay persistente criado - CameraSize: {activeCamera.orthographicSize}, Scale: {cameraWidth * scaleMultiplier}x{cameraHeight * scaleMultiplier}");
         }
         else
         {
@@ -436,7 +514,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Configura a sorting layer e order
-        overlayRenderer.sortingLayerName = "UIGamePlay";
+        overlayRenderer.sortingLayerName = UI_GAMEPLAY_LAYER;
         overlayRenderer.sortingOrder = 9999;
 
         Debug.Log($"[GameManager] Overlay persistente criado com cor {color}");
@@ -461,6 +539,8 @@ public class GameManager : MonoBehaviour
     public void SetDarkScreenDuration(float duration)
     {
         darkScreenDuration = Mathf.Clamp(duration, 0.1f, 2.0f);
+        // Atualiza cache de WaitForSeconds
+        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
         Debug.Log($"[GameManager] Duração da tela escura ajustada para: {darkScreenDuration}s");
     }
 
@@ -471,7 +551,21 @@ public class GameManager : MonoBehaviour
     public void SetFadeOutDelay(float delay)
     {
         fadeOutDelay = Mathf.Clamp(delay, 0.0f, 5.0f);
+        // Atualiza cache de WaitForSeconds
+        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
         Debug.Log($"[GameManager] Delay do fade-out ajustado para: {fadeOutDelay}s");
+    }
+
+    /// <summary>
+    /// Força a limpeza do cache de objetos (útil para transições de cena)
+    /// </summary>
+    public void ClearObjectCache()
+    {
+        cachedCamera = null;
+        cachedPlayer = null;
+        cachedPlayerRigidbody = null;
+        overlayRenderer = null;
+        Debug.Log("[GameManager] Cache de objetos limpo");
     }
     #endregion
 }

@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Responsável por processar os inputs do jogador e gerenciar o movimento e animações do personagem.
+/// Versão otimizada com cache de componentes e minimização de allocações.
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public class PlayerInputHandler : MonoBehaviour
@@ -28,6 +29,10 @@ public class PlayerInputHandler : MonoBehaviour
     /// Cache da velocidade do personagem, atualizado periodicamente para otimização.
     /// </summary>
     private float cachedSpeed;
+
+    // Cache adicional para otimização
+    private Transform cachedTransform;
+    private InputManager cachedInputManager;
     #endregion
 
     #region Estado do Movimento
@@ -62,6 +67,10 @@ public class PlayerInputHandler : MonoBehaviour
     /// Intervalo entre tentativas de inicialização do input em segundos.
     /// </summary>
     private const float INPUT_RETRY_INTERVAL = 0.5f;
+
+    // Constantes para otimização
+    private const float SPEED_UPDATE_INTERVAL = 0.1f;
+    private float lastSpeedUpdate = 0f;
     #endregion
 
     #region Configurações de Sprites

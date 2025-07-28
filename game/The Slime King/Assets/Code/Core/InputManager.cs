@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 /// Gerencia os inputs do jogador, centralizando o acesso aos comandos principais do jogo.
 /// Permite fácil integração com sistemas de combate, movimentação, inventário e menus.
 /// Utiliza o padrão Singleton para acesso global.
+/// Versão otimizada com cache de ações para melhor performance.
 /// </summary>
 public class InputManager : MonoBehaviour
 {
@@ -35,6 +36,21 @@ public class InputManager : MonoBehaviour
     /// <summary>Usar itens rápidos (atalhos).</summary>
     public InputAction[] UseItemActions { get; private set; } = new InputAction[4];
 
+    // Cache para otimização
+    private InputActionMap cachedGameplayMap;
+    private bool isInitialized = false;
+
+    // Constantes para evitar string allocations
+    private const string GAMEPLAY_MAP_NAME = "Gameplay";
+    private const string MOVE_ACTION_NAME = "Move";
+    private const string ATTACK_ACTION_NAME = "Attack";
+    private const string SPECIAL_ATTACK_ACTION_NAME = "SpecialAttack";
+    private const string CROUCH_ACTION_NAME = "Crouch";
+    private const string INTERACT_ACTION_NAME = "Interact";
+    private const string MENU_ACTION_NAME = "Menu";
+    private const string INVENTORY_ACTION_NAME = "Inventory";
+    private static readonly string[] USE_ITEM_ACTION_NAMES = { "UseItem1", "UseItem2", "UseItem3", "UseItem4" };
+
     /// <summary>
     /// Inicializa o Singleton e as ações de input.
     /// </summary>
@@ -55,30 +71,41 @@ public class InputManager : MonoBehaviour
 
     /// <summary>
     /// Busca e armazena as ações do mapa "Gameplay" do InputActionAsset.
+    /// Versão otimizada com cache e validação melhorada.
     /// </summary>
     private void InitializeActions()
     {
         if (inputActions == null)
         {
-            Debug.LogError("InputActionAsset não atribuído no InputManager!");
+            Debug.LogError("[InputManager] InputActionAsset não atribuído!");
             return;
         }
 
-        var gameplayMap = inputActions.FindActionMap("Gameplay", true);
+        // Cache do mapa Gameplay
+        cachedGameplayMap = inputActions.FindActionMap(GAMEPLAY_MAP_NAME, true);
+        if (cachedGameplayMap == null)
+        {
+            Debug.LogError($"[InputManager] Mapa '{GAMEPLAY_MAP_NAME}' não encontrado!");
+            return;
+        }
 
-        MoveAction = gameplayMap.FindAction("Move", true);
-        AttackAction = gameplayMap.FindAction("Attack", true);
-        SpecialAttackAction = gameplayMap.FindAction("SpecialAttack", true);
-        CrouchAction = gameplayMap.FindAction("Crouch", true);
-        InteractAction = gameplayMap.FindAction("Interact", true);
-        MenuAction = gameplayMap.FindAction("Menu", true);
-        InventoryAction = gameplayMap.FindAction("Inventory", true);
+        // Inicializa ações principais com cache
+        MoveAction = cachedGameplayMap.FindAction(MOVE_ACTION_NAME, true);
+        AttackAction = cachedGameplayMap.FindAction(ATTACK_ACTION_NAME, true);
+        SpecialAttackAction = cachedGameplayMap.FindAction(SPECIAL_ATTACK_ACTION_NAME, true);
+        CrouchAction = cachedGameplayMap.FindAction(CROUCH_ACTION_NAME, true);
+        InteractAction = cachedGameplayMap.FindAction(INTERACT_ACTION_NAME, true);
+        MenuAction = cachedGameplayMap.FindAction(MENU_ACTION_NAME, true);
+        InventoryAction = cachedGameplayMap.FindAction(INVENTORY_ACTION_NAME, true);
 
-        // Itens rápidos (LB, LT, RB, RT)
-        UseItemActions[0] = gameplayMap.FindAction("UseItem1", false);
-        UseItemActions[1] = gameplayMap.FindAction("UseItem2", false);
-        UseItemActions[2] = gameplayMap.FindAction("UseItem3", false);
-        UseItemActions[3] = gameplayMap.FindAction("UseItem4", false);
+        // Itens rápidos usando loop otimizado
+        for (int i = 0; i < USE_ITEM_ACTION_NAMES.Length; i++)
+        {
+            UseItemActions[i] = cachedGameplayMap.FindAction(USE_ITEM_ACTION_NAMES[i], false);
+        }
+
+        isInitialized = true;
+        Debug.Log("[InputManager] Ações de input inicializadas com sucesso");
     }
 
     /// <summary>
@@ -86,7 +113,10 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        inputActions?.Enable();
+        if (isInitialized)
+        {
+            inputActions?.Enable();
+        }
     }
 
     /// <summary>
@@ -103,9 +133,30 @@ public class InputManager : MonoBehaviour
     /// <param name="enabled">Se true, ativa os inputs; se false, desativa.</param>
     public void SetInputEnabled(bool enabled)
     {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("[InputManager] Tentando alterar estado antes da inicialização");
+            return;
+        }
+
         if (enabled)
             inputActions?.Enable();
         else
             inputActions?.Disable();
+    }
+
+    /// <summary>
+    /// Verifica se o InputManager está devidamente inicializado
+    /// </summary>
+    public bool IsInitialized => isInitialized;
+
+    /// <summary>
+    /// Força reinicialização das ações (útil para debugging)
+    /// </summary>
+    [ContextMenu("Reinitialize Actions")]
+    public void ReinitializeActions()
+    {
+        isInitialized = false;
+        InitializeActions();
     }
 }

@@ -42,6 +42,12 @@ public class WindCreator : MonoBehaviour
     private WaitForSeconds spawnInterval;
     private readonly List<GameObject> activeInstances = new List<GameObject>();
     private float lastSpawnFrequency;
+
+    // Cache para otimização de performance
+    private Transform cachedTransform;
+    private Vector2 cachedBasePosition;
+    private const float MINIMUM_SPAWN_FREQUENCY = 0.1f;
+    private const float MAXIMUM_SPAWN_FREQUENCY = 10f;
     #endregion
 
     #region Constants
@@ -63,7 +69,7 @@ public class WindCreator : MonoBehaviour
     /// <summary>
     /// Posição base para spawn (sempre a posição deste objeto)
     /// </summary>
-    public Vector2 BaseSpawnPosition => transform.position;
+    public Vector2 BaseSpawnPosition => cachedBasePosition;
 
     /// <summary>
     /// Intervalo atual entre spawns
@@ -74,6 +80,10 @@ public class WindCreator : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
+        // Cache do Transform para evitar chamadas repetidas
+        cachedTransform = transform;
+        UpdateCachedPosition();
+
         ValidateConfiguration();
         InitializeSystem();
     }
@@ -81,6 +91,16 @@ public class WindCreator : MonoBehaviour
     private void Start()
     {
         StartAutoSpawn();
+    }
+
+    private void Update()
+    {
+        // Atualiza posição em cache se o transform mudou
+        Vector2 currentPos = cachedTransform.position;
+        if (Vector2.Distance(currentPos, cachedBasePosition) > 0.01f)
+        {
+            UpdateCachedPosition();
+        }
     }
 
     private void OnDestroy()
@@ -107,6 +127,14 @@ public class WindCreator : MonoBehaviour
     #endregion
 
     #region Initialization
+    /// <summary>
+    /// Atualiza a posição em cache
+    /// </summary>
+    private void UpdateCachedPosition()
+    {
+        cachedBasePosition = cachedTransform.position;
+    }
+
     /// <summary>
     /// Valida a configuração inicial
     /// </summary>
@@ -284,7 +312,7 @@ public class WindCreator : MonoBehaviour
     /// </summary>
     public void SetSpawnFrequency(float newFrequency)
     {
-        spawnFrequency = Mathf.Max(0.1f, newFrequency);
+        spawnFrequency = Mathf.Clamp(newFrequency, MINIMUM_SPAWN_FREQUENCY, MAXIMUM_SPAWN_FREQUENCY);
         UpdateSpawnInterval();
 
         if (showSpawnLogs)
@@ -358,19 +386,19 @@ public class WindCreator : MonoBehaviour
     }
 
     /// <summary>
-    /// Calcula posição aleatória para spawn em 2D
+    /// Calcula posição aleatória para spawn em 2D (otimizado)
     /// </summary>
     private Vector2 CalculateRandomSpawnPosition()
     {
-        Vector2 basePosition = BaseSpawnPosition;
+        // Usa posição em cache para evitar acesso ao Transform
+        Vector2 basePosition = cachedBasePosition;
 
-        // Adiciona variação aleatória apenas nos eixos X e Y
+        // Calcula variação aleatória de uma vez só para melhor performance
         float randomX = Random.Range(-randomRangeX, randomRangeX);
         float randomY = Random.Range(-randomRangeY, randomRangeY);
 
-        Vector2 randomOffset = new Vector2(randomX, randomY);
-
-        return basePosition + randomOffset;
+        // Retorna diretamente sem criar Vector2 intermediário
+        return new Vector2(basePosition.x + randomX, basePosition.y + randomY);
     }
 
     /// <summary>
