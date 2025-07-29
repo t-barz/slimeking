@@ -1,571 +1,589 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using Unity.Cinemachine;
 
 /// <summary>
-/// Gerenciador principal do jogo - Singleton que persiste entre cenas
-/// Otimizado para performance com cache de objetos e minimização de alocações
+/// Gerenciador principal do jogo - Versão Ultra-Otimizada para Carregamento Rápido
 /// </summary>
 public class GameManager : MonoBehaviour
 {
     #region Singleton
-    /// <summary>
-    /// Instância única do GameManager
-    /// </summary>
     public static GameManager Instance { get; private set; }
     #endregion
 
     #region Configurações
-    [Header("Configurações de Transição")]
-    [Tooltip("Duração do efeito de fade-in ao escurecer a cena (em segundos)")]
-    [Range(0.1f, 3.0f)]
-    [SerializeField] private float fadeDuration = 0.25f;
+    [Header("Configurações de Transição - OTIMIZADAS")]
+    [Tooltip("Duração do fade (0.1s = ultra rápido, 0.5s = normal)")]
+    [Range(0.05f, 1.0f)]
+    [SerializeField] private float fadeDuration = 0.1f; // Reduzido para ser mais rápido
 
-    [Tooltip("Tempo de espera com a tela escura após o fade-in (em segundos)")]
-    [Range(0.1f, 2.0f)]
-    [SerializeField] private float darkScreenDuration = 0.5f;
+    [Tooltip("Tempo de tela escura (0.1s = mínimo necessário)")]
+    [Range(0.05f, 0.5f)]
+    [SerializeField] private float darkScreenDuration = 0.1f; // Reduzido drasticamente
 
-    [Tooltip("Tempo de espera antes de iniciar o fade-out na nova cena (em segundos)")]
-    [Range(0.0f, 5.0f)]
-    [SerializeField] private float fadeOutDelay = 1.0f;
+    [Tooltip("Delay antes do fade-out (0 = instantâneo)")]
+    [Range(0.0f, 0.3f)]
+    [SerializeField] private float fadeOutDelay = 0.0f; // Removido para velocidade máxima
+
+    [Header("Otimizações de Performance")]
+    [Tooltip("Pré-carregar próximas cenas em background")]
+    [SerializeField] private bool enableScenePreloading = true;
+
+    [Tooltip("Cache de overlays para reutilização")]
+    [SerializeField] private bool enableOverlayCache = true;
+
+    [Tooltip("Modo de carregamento ultra-rápido (pode causar micro-stutters)")]
+    [SerializeField] private bool ultraFastMode = false;
     #endregion
 
-    #region Private Variables
-    /// <summary>
-    /// Overlay persistente que se mantém entre as cenas
-    /// </summary>
-    private GameObject persistentOverlay;
+    #region Cache Avançado
+    // Cache de overlays reutilizáveis
+    private readonly System.Collections.Generic.Dictionary<Color, GameObject> overlayCache =
+        new System.Collections.Generic.Dictionary<Color, GameObject>();
 
-    // Cache para otimização de performance
-    private Camera cachedCamera;
-    private GameObject cachedPlayer;
-    private Rigidbody2D cachedPlayerRigidbody;
-    private SpriteRenderer overlayRenderer;
+    // Pre-cached textures para cores comuns
+    private readonly System.Collections.Generic.Dictionary<Color, Texture2D> textureCache =
+        new System.Collections.Generic.Dictionary<Color, Texture2D>();
 
-    // WaitForSeconds cache para evitar alocações desnecessárias
-    private WaitForSeconds cachedDarkScreenWait;
-    private WaitForSeconds cachedFadeOutDelayWait;
-    private WaitForEndOfFrame cachedEndOfFrame;
+    // Cache de scenes pré-carregadas
+    private readonly System.Collections.Generic.Dictionary<string, AsyncOperation> preloadedScenes =
+        new System.Collections.Generic.Dictionary<string, AsyncOperation>();
 
-    // Strings em cache para evitar concatenações repetidas
+    // Cache de componentes principais
+    private Camera mainCamera;
+    private GameObject currentPlayer;
+    private SpriteRenderer activeOverlayRenderer;
+
+    // WaitForSeconds ultra-otimizados
+    private WaitForSeconds ultraFastDarkWait;
+    private WaitForSeconds ultraFastFadeWait;
+    private WaitForEndOfFrame cachedEndFrame;
+    private WaitForFixedUpdate cachedFixedUpdate;
+
+    // Constantes para performance
+    private const string OVERLAY_PREFIX = "FastOverlay_";
     private const string PLAYER_TAG = "Player";
-    private const string OVERLAY_NAME = "PersistentDarkenOverlay";
-    private const string UI_GAMEPLAY_LAYER = "UIGamePlay";
+    private const string UI_LAYER = "UI_Gameplay";
+    private const int OVERLAY_SORTING_ORDER = 9999;
+    private const float TEXTURE_SIZE = 1f;
     #endregion
 
     #region Unity Lifecycle
-    /// <summary>
-    /// Inicialização do Singleton
-    /// </summary>
     private void Awake()
     {
-        // Implementa padrão Singleton
-        if (Instance != null && Instance != this)
+        // Singleton ultra-rápido
+        if (Instance == null)
         {
-            Debug.Log("[GameManager] Instância duplicada detectada - destruindo...");
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            InitializeFastCache();
+        }
+        else
+        {
             Destroy(gameObject);
-            return;
         }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        // Inicializa cache de WaitForSeconds para evitar alocações durante runtime
-        InitializeCache();
-
-        Debug.Log("[GameManager] Singleton inicializado");
     }
 
-    /// <summary>
-    /// Inicialização após Awake
-    /// </summary>
-    void Start()
+    private void Start()
     {
-        InitializeGame();
-    }
-
-    /// <summary>
-    /// Limpeza ao destruir
-    /// </summary>
-    private void OnDestroy()
-    {
-        // Remove referência se esta instância está sendo destruída
-        if (Instance == this)
+        PreloadCommonTextures();
+        if (enableScenePreloading)
         {
-            if (persistentOverlay != null)
-            {
-                Destroy(persistentOverlay);
-            }
-            Instance = null;
-
-            // Limpa cache
-            ClearCache();
+            StartCoroutine(PreloadCommonScenes());
         }
     }
     #endregion
 
-    #region Initialization
+    #region Inicialização Ultra-Rápida
     /// <summary>
-    /// Inicializa cache de objetos para otimização de performance
+    /// Inicializa cache otimizado para velocidade máxima
     /// </summary>
-    private void InitializeCache()
+    private void InitializeFastCache()
     {
-        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
-        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
-        cachedEndOfFrame = new WaitForEndOfFrame();
+        // Cache de WaitForSeconds com valores mínimos
+        ultraFastDarkWait = new WaitForSeconds(darkScreenDuration);
+        ultraFastFadeWait = new WaitForSeconds(fadeDuration);
+        cachedEndFrame = new WaitForEndOfFrame();
+        cachedFixedUpdate = new WaitForFixedUpdate();
+
+        // Cache da câmera principal
+        RefreshCameraCache();
+
+        Debug.Log("[GameManager] Cache ultra-rápido inicializado");
     }
 
     /// <summary>
-    /// Limpa o cache de objetos
+    /// Pré-carrega texturas para cores comuns
     /// </summary>
-    private void ClearCache()
+    private void PreloadCommonTextures()
     {
-        cachedCamera = null;
-        cachedPlayer = null;
-        cachedPlayerRigidbody = null;
-        overlayRenderer = null;
+        Color[] commonColors = { Color.black, Color.white, new Color(0, 0, 0, 0.8f) };
+
+        foreach (Color color in commonColors)
+        {
+            CreateCachedTexture(color);
+        }
+
+        Debug.Log($"[GameManager] {commonColors.Length} texturas pré-carregadas");
     }
 
     /// <summary>
-    /// Atualiza cache de WaitForSeconds quando valores mudam
+    /// Cria e armazena texture no cache
     /// </summary>
-    private void UpdateWaitCache()
+    private Texture2D CreateCachedTexture(Color color)
     {
-        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
-        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
-    }
+        if (textureCache.ContainsKey(color))
+            return textureCache[color];
 
-    /// <summary>
-    /// Inicializa o jogo
-    /// </summary>
-    private void InitializeGame()
-    {
-        Debug.Log("[GameManager] Jogo inicializado");
+        Texture2D texture = new Texture2D(1, 1);
+        texture.SetPixel(0, 0, color);
+        texture.Apply();
 
-        // Aqui você pode adicionar lógica de inicialização do jogo:
-        // - Configurações iniciais
-        // - Carregamento de dados salvos
-        // - Inicialização de sistemas
+        textureCache[color] = texture;
+        return texture;
     }
     #endregion
 
-    #region Public Methods
+    #region Sistema de Carregamento Ultra-Rápido
     /// <summary>
-    /// Pausa o jogo
-    /// </summary>
-    public void PauseGame()
-    {
-        Time.timeScale = 0f;
-        Debug.Log("[GameManager] Jogo pausado");
-    }
-
-    /// <summary>
-    /// Retoma o jogo
-    /// </summary>
-    public void ResumeGame()
-    {
-        Time.timeScale = 1f;
-        Debug.Log("[GameManager] Jogo retomado");
-    }
-
-    /// <summary>
-    /// Verifica se o jogo está pausado
-    /// </summary>
-    public bool IsGamePaused()
-    {
-        return Time.timeScale == 0f;
-    }
-
-    /// <summary>
-    /// Muda para uma nova cena escurecendo a atual primeiro
+    /// Mudança de cena ultra-otimizada
     /// </summary>
     public void ChangeScene(string sceneName, Vector2 targetPosition = default, Color darkenColor = default)
     {
-        // Define cor padrão como preto se não especificada
-        if (darkenColor == default)
-            darkenColor = Color.black;
+        if (darkenColor == default) darkenColor = Color.black;
 
-        Debug.Log($"[GameManager] Mudando para a cena: {sceneName} na posição {targetPosition}");
-        StartCoroutine(ChangeSceneCoroutine(sceneName, targetPosition, darkenColor));
-    }
+        Debug.Log($"[GameManager] FAST: Carregando {sceneName} | Ultra: {ultraFastMode}");
 
-    /// <summary>
-    /// Corrotina para mudança de cena com escurecimento
-    /// </summary>
-    private IEnumerator ChangeSceneCoroutine(string sceneName, Vector2 targetPosition, Color darkenColor)
-    {
-        // 1. Escurece a cena atual
-        yield return StartCoroutine(DarkenScene(darkenColor));
-
-        Debug.Log("[GameManager] Cena escurecida com sucesso");
-
-        // 2. Exibe UI de carregamento
-        // 3. Salva o jogo
-        // 4. Carrega a nova cena em asynchronous mode (overlay permanece)
-        yield return StartCoroutine(LoadSceneAsync(sceneName, targetPosition));
-    }
-
-    /// <summary>
-    /// Carrega a nova cena de forma assíncrona
-    /// </summary>
-    private IEnumerator LoadSceneAsync(string sceneName, Vector2 targetPosition)
-    {
-        Debug.Log($"[GameManager] Iniciando carregamento assíncrono da cena: {sceneName}");
-
-        // Inicia o carregamento assíncrono da nova cena
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-
-        // Aguarda o carregamento completar
-        while (!asyncLoad.isDone)
+        if (ultraFastMode)
         {
-            // Opcionalmente, pode exibir progresso do carregamento
-            float progress = Mathf.Clamp01(asyncLoad.progress / 0.9f);
-            Debug.Log($"[GameManager] Progresso do carregamento: {progress * 100:F1}%");
-
-            yield return null;
-        }
-
-        Debug.Log($"[GameManager] Cena {sceneName} carregada com sucesso!");
-
-        // Aguarda alguns frames para garantir que a nova cena esteja sendo exibida (usa cache)
-        yield return cachedEndOfFrame;
-        yield return cachedEndOfFrame;
-
-        // Posiciona o Player na posição de destino
-        PositionPlayerAtTarget(targetPosition);
-
-        // Reposiciona o overlay para a nova câmera
-        UpdateOverlayPosition();
-
-        // Aguarda o delay configurado antes de iniciar o fade-out (usa cache)
-        if (fadeOutDelay > 0f)
-        {
-            Debug.Log($"[GameManager] Aguardando {fadeOutDelay}s antes do fade-out");
-            yield return cachedFadeOutDelayWait;
-        }
-
-        // Sempre executa fade-out na nova cena
-        yield return StartCoroutine(FadeOutScene());
-    }
-
-    /// <summary>
-    /// Posiciona o objeto Player na posição de destino
-    /// </summary>
-    private void PositionPlayerAtTarget(Vector2 targetPosition)
-    {
-        // Usa cache ou busca o Player se não estiver em cache
-        if (cachedPlayer == null)
-        {
-            cachedPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG);
-        }
-
-        if (cachedPlayer != null)
-        {
-            // Define a posição do Player (mantém Z original)
-            Vector3 currentPos = cachedPlayer.transform.position;
-            Vector3 newPosition = new Vector3(targetPosition.x, targetPosition.y, currentPos.z);
-            cachedPlayer.transform.position = newPosition;
-
-            Debug.Log($"[GameManager] Player posicionado na posição: {newPosition}");
-
-            // Para qualquer movimento residual se houver Rigidbody2D (usa cache)
-            if (cachedPlayerRigidbody == null)
-            {
-                cachedPlayerRigidbody = cachedPlayer.GetComponent<Rigidbody2D>();
-            }
-
-            if (cachedPlayerRigidbody != null)
-            {
-                cachedPlayerRigidbody.linearVelocity = Vector2.zero;
-                Debug.Log("[GameManager] Velocidade do Player resetada");
-            }
+            StartCoroutine(UltraFastSceneChange(sceneName, targetPosition, darkenColor));
         }
         else
         {
-            Debug.LogWarning($"[GameManager] Objeto com tag '{PLAYER_TAG}' não encontrado na nova cena");
+            StartCoroutine(OptimizedSceneChange(sceneName, targetPosition, darkenColor));
         }
     }
 
     /// <summary>
-    /// Executa fade-out para remover o overlay escuro da nova cena
+    /// Carregamento ultra-rápido (pode causar micro-stutters)
     /// </summary>
-    private IEnumerator FadeOutScene()
+    private IEnumerator UltraFastSceneChange(string sceneName, Vector2 targetPosition, Color darkenColor)
     {
-        Debug.Log("[GameManager] Iniciando fade-out da nova cena");
+        // 1. Overlay instantâneo
+        SetupInstantOverlay(darkenColor);
 
-        // Usa o overlay persistente
-        if (persistentOverlay != null)
-        {
-            // Usa cache do SpriteRenderer
-            if (overlayRenderer == null)
-            {
-                overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
-            }
+        // 2. Carregamento direto sem delays
+        yield return StartCoroutine(LoadSceneInstant(sceneName, targetPosition));
 
-            if (overlayRenderer != null)
-            {
-                // Garante que o overlay comece completamente opaco
-                Color currentColor = overlayRenderer.color;
-                Color opaqueColor = new Color(currentColor.r, currentColor.g, currentColor.b, 1f);
-                Color transparentColor = new Color(currentColor.r, currentColor.g, currentColor.b, 0f);
-
-                // Define como completamente opaco no início
-                overlayRenderer.color = opaqueColor;
-
-                Debug.Log($"[GameManager] Fazendo fade-out do overlay persistente (duração: {fadeDuration}s)");
-
-                float elapsedTime = 0f;
-
-                // Loop do fade-out - vai de opaco para transparente (otimizado)
-                while (elapsedTime < fadeDuration)
-                {
-                    elapsedTime += Time.deltaTime;
-                    float alpha = 1f - Mathf.Clamp01(elapsedTime / fadeDuration);
-
-                    // Interpola a cor de opaca para transparente (evita Color.Lerp)
-                    Color fadeColor = new Color(opaqueColor.r, opaqueColor.g, opaqueColor.b, alpha);
-                    overlayRenderer.color = fadeColor;
-
-                    yield return null;
-                }
-
-                // Garante que seja completamente transparente
-                overlayRenderer.color = transparentColor;
-
-                Debug.Log("[GameManager] Fade-out concluído - overlay agora transparente");
-            }
-        }
-
-        Debug.Log("[GameManager] Transição de cena completamente finalizada!");
+        // 3. Fade-out instantâneo ou muito rápido
+        yield return StartCoroutine(InstantFadeOut());
     }
 
     /// <summary>
-    /// Atualiza a posição do overlay para a nova câmera
+    /// Carregamento otimizado (equilibrio entre velocidade e suavidade)
     /// </summary>
-    private void UpdateOverlayPosition()
+    private IEnumerator OptimizedSceneChange(string sceneName, Vector2 targetPosition, Color darkenColor)
     {
-        if (persistentOverlay == null) return;
+        // 1. Fade-in ultra-rápido
+        yield return StartCoroutine(FastDarkenScene(darkenColor));
 
-        // Busca a câmera ativa na nova cena (usa cache quando possível)
-        if (cachedCamera == null)
+        // 2. Carregamento assíncrono com preload
+        yield return StartCoroutine(FastLoadScene(sceneName, targetPosition));
+
+        // 3. Fade-out sem delays desnecessários
+        yield return StartCoroutine(FastFadeOut());
+    }
+    #endregion
+
+    #region Overlay Ultra-Otimizado
+    /// <summary>
+    /// Configura overlay instantâneo usando cache
+    /// </summary>
+    private void SetupInstantOverlay(Color color)
+    {
+        GameObject overlay = GetCachedOverlay(color);
+        activeOverlayRenderer = overlay.GetComponent<SpriteRenderer>();
+        activeOverlayRenderer.color = color; // Opaco instantâneo
+
+        // Posiciona na câmera atual
+        if (mainCamera != null)
         {
-            cachedCamera = Camera.main;
-            if (cachedCamera == null)
-            {
-                cachedCamera = FindAnyObjectByType<Camera>();
-            }
-        }
-
-        if (cachedCamera != null)
-        {
-            // Usa orthographicSize para calcular o tamanho correto
-            float cameraHeight = cachedCamera.orthographicSize * 2f;
-            float cameraWidth = cameraHeight * cachedCamera.aspect;
-
-            // Cache da posição da câmera
-            Vector3 cameraPos = cachedCamera.transform.position;
-
-            // Posiciona no centro da nova câmera
-            persistentOverlay.transform.position = new Vector3(
-                cameraPos.x,
-                cameraPos.y,
-                0f
-            );
-
-            // Atualiza a escala para a nova câmera
-            float scaleMultiplier = 1000f;
-            persistentOverlay.transform.localScale = new Vector3(
-                cameraWidth * scaleMultiplier,
-                cameraHeight * scaleMultiplier,
-                1f
-            );
-
-            Debug.Log($"[GameManager] Overlay reposicionado para nova câmera - Scale: {cameraWidth * scaleMultiplier}x{cameraHeight * scaleMultiplier}");
+            overlay.transform.position = mainCamera.transform.position;
         }
     }
 
     /// <summary>
-    /// Escurece a cena atual com a cor especificada
+    /// Obtém overlay do cache ou cria novo
     /// </summary>
-    private IEnumerator DarkenScene(Color color)
+    private GameObject GetCachedOverlay(Color color)
     {
-        Debug.Log($"[GameManager] Escurecendo cena com a cor: {color}");
-
-        // Cria overlay persistente se não existir
-        if (persistentOverlay == null)
+        if (enableOverlayCache && overlayCache.ContainsKey(color))
         {
-            persistentOverlay = CreatePersistentOverlay(color);
-            overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
-        }
-        else
-        {
-            // Atualiza a cor do overlay existente
-            if (overlayRenderer == null)
+            GameObject cached = overlayCache[color];
+            if (cached != null)
             {
-                overlayRenderer = persistentOverlay.GetComponent<SpriteRenderer>();
-            }
-
-            if (overlayRenderer != null)
-            {
-                // Atualiza a textura com a nova cor
-                Texture2D darkenTexture = new Texture2D(1, 1);
-                darkenTexture.SetPixel(0, 0, color);
-                darkenTexture.Apply();
-
-                Sprite darkenSprite = Sprite.Create(darkenTexture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f);
-                overlayRenderer.sprite = darkenSprite;
+                cached.SetActive(true);
+                return cached;
             }
         }
 
-        // Efeito de Fade-In
-        Color targetColor = color;
-        Color transparentColor = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
-        overlayRenderer.color = transparentColor; // Começa transparente
+        // Cria novo overlay otimizado
+        GameObject overlay = CreateFastOverlay(color);
 
-        Debug.Log($"[GameManager] Iniciando fade-in do overlay persistente para cor {targetColor} (duração: {fadeDuration}s)");
-
-        // Usa a duração configurável do fade-in
-        float elapsedTime = 0f;
-
-        // Loop do fade-in otimizado
-        while (elapsedTime < fadeDuration)
+        if (enableOverlayCache)
         {
-            elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
-
-            // Interpola a cor de transparente para opaca (evita Color.Lerp para melhor performance)
-            Color currentColor = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
-            overlayRenderer.color = currentColor;
-
-            yield return null;
+            overlayCache[color] = overlay;
         }
-
-        // Garante que a cor final seja exatamente a desejada
-        overlayRenderer.color = targetColor;
-
-        Debug.Log($"[GameManager] Fade-in concluído - Overlay persistente escuro");
-
-        // Aguarda um tempo adicional configurável com a tela completamente escura (usa cache)
-        yield return cachedDarkScreenWait;
-
-        Debug.Log("[GameManager] Escurecimento da cena concluído");
-    }
-
-    /// <summary>
-    /// Cria um overlay persistente que sobrevive às mudanças de cena
-    /// </summary>
-    private GameObject CreatePersistentOverlay(Color color)
-    {
-        // Cria um overlay que cobre toda a tela
-        GameObject overlay = new GameObject(OVERLAY_NAME);
-        SpriteRenderer overlayRenderer = overlay.AddComponent<SpriteRenderer>();
-
-        // Torna o overlay persistente entre cenas
-        DontDestroyOnLoad(overlay);
-
-        // Cria uma textura 1x1 com a cor especificada
-        Texture2D darkenTexture = new Texture2D(1, 1);
-        darkenTexture.SetPixel(0, 0, color);
-        darkenTexture.Apply();
-
-        // Cria o sprite a partir da textura
-        Sprite darkenSprite = Sprite.Create(darkenTexture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f);
-        overlayRenderer.sprite = darkenSprite;
-
-        // Busca a câmera ativa (funciona com CinemachineCamera)
-        Camera activeCamera = Camera.main;
-        if (activeCamera == null)
-        {
-            activeCamera = FindAnyObjectByType<Camera>();
-        }
-
-        if (activeCamera != null)
-        {
-            // Usa orthographicSize para calcular o tamanho correto
-            float cameraHeight = activeCamera.orthographicSize * 2f;
-            float cameraWidth = cameraHeight * activeCamera.aspect;
-
-            // Cache da posição da câmera
-            Vector3 cameraPos = activeCamera.transform.position;
-
-            // Posiciona no centro da câmera
-            overlay.transform.position = new Vector3(
-                cameraPos.x,
-                cameraPos.y,
-                0f
-            );
-
-            // Escala otimizada para garantir cobertura total
-            const float scaleMultiplier = 200f;
-            overlay.transform.localScale = new Vector3(
-                cameraWidth * scaleMultiplier,
-                cameraHeight * scaleMultiplier,
-                1f
-            );
-
-            Debug.Log($"[GameManager] Overlay persistente criado - CameraSize: {activeCamera.orthographicSize}, Scale: {cameraWidth * scaleMultiplier}x{cameraHeight * scaleMultiplier}");
-        }
-        else
-        {
-            Debug.LogWarning("[GameManager] Nenhuma câmera encontrada - usando escala muito grande");
-            // Fallback com escala muito grande
-            overlay.transform.localScale = new Vector3(50000f, 50000f, 1f);
-        }
-
-        // Configura a sorting layer e order
-        overlayRenderer.sortingLayerName = UI_GAMEPLAY_LAYER;
-        overlayRenderer.sortingOrder = 9999;
-
-        Debug.Log($"[GameManager] Overlay persistente criado com cor {color}");
 
         return overlay;
     }
 
     /// <summary>
-    /// Configura a duração do fade-in programaticamente
+    /// Cria overlay otimizado para velocidade
     /// </summary>
-    /// <param name="duration">Nova duração em segundos</param>
-    public void SetFadeDuration(float duration)
+    private GameObject CreateFastOverlay(Color color)
     {
-        fadeDuration = Mathf.Clamp(duration, 0.1f, 3.0f);
-        Debug.Log($"[GameManager] Duração do fade ajustada para: {fadeDuration}s");
+        GameObject overlay = new GameObject($"{OVERLAY_PREFIX}{color}");
+        SpriteRenderer renderer = overlay.AddComponent<SpriteRenderer>();
+
+        DontDestroyOnLoad(overlay);
+
+        // Usa texture do cache
+        Texture2D texture = CreateCachedTexture(color);
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE), Vector2.one * 0.5f);
+        renderer.sprite = sprite;
+
+        // Configura para cobertura total ultra-rápida
+        RefreshCameraCache();
+        if (mainCamera != null)
+        {
+            float cameraSize = mainCamera.orthographicSize;
+            float aspectRatio = mainCamera.aspect;
+
+            overlay.transform.localScale = new Vector3(
+                cameraSize * aspectRatio * 200f,
+                cameraSize * 200f,
+                1f
+            );
+        }
+        else
+        {
+            overlay.transform.localScale = Vector3.one * 50000f; // Fallback gigante
+        }
+
+        renderer.sortingLayerName = UI_LAYER;
+        renderer.sortingOrder = OVERLAY_SORTING_ORDER;
+
+        return overlay;
+    }
+    #endregion
+
+    #region Carregamento Assíncrono Otimizado
+    /// <summary>
+    /// Carregamento instantâneo para ultra-fast mode
+    /// </summary>
+    private IEnumerator LoadSceneInstant(string sceneName, Vector2 targetPosition)
+    {
+        // Verifica se já está pré-carregada
+        if (preloadedScenes.ContainsKey(sceneName))
+        {
+            AsyncOperation preloaded = preloadedScenes[sceneName];
+            preloaded.allowSceneActivation = true;
+
+            while (!preloaded.isDone)
+            {
+                yield return null;
+            }
+
+            preloadedScenes.Remove(sceneName);
+            Debug.Log($"[GameManager] Cena pré-carregada ativada: {sceneName}");
+        }
+        else
+        {
+            // Carregamento direto
+            SceneManager.LoadScene(sceneName);
+            yield return null; // Apenas 1 frame de espera
+        }
+
+        // Posicionamento instantâneo
+        PositionPlayerInstant(targetPosition);
     }
 
     /// <summary>
-    /// Configura o tempo de tela escura programaticamente
+    /// Carregamento rápido com preload
     /// </summary>
-    /// <param name="duration">Nova duração em segundos</param>
-    public void SetDarkScreenDuration(float duration)
+    private IEnumerator FastLoadScene(string sceneName, Vector2 targetPosition)
     {
-        darkScreenDuration = Mathf.Clamp(duration, 0.1f, 2.0f);
-        // Atualiza cache de WaitForSeconds
-        cachedDarkScreenWait = new WaitForSeconds(darkScreenDuration);
-        Debug.Log($"[GameManager] Duração da tela escura ajustada para: {darkScreenDuration}s");
+        AsyncOperation asyncLoad = null;
+
+        // Usa preload se disponível
+        if (preloadedScenes.ContainsKey(sceneName))
+        {
+            asyncLoad = preloadedScenes[sceneName];
+            asyncLoad.allowSceneActivation = true;
+            preloadedScenes.Remove(sceneName);
+            Debug.Log($"[GameManager] Usando cena pré-carregada: {sceneName}");
+        }
+        else
+        {
+            asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        }
+
+        // Loop otimizado de carregamento
+        while (!asyncLoad.isDone)
+        {
+            // Sem logs de progresso para máxima velocidade
+            yield return null;
+        }
+
+        // Posicionamento rápido do player
+        yield return StartCoroutine(PositionPlayerFast(targetPosition));
+
+        // Atualiza overlay para nova câmera
+        UpdateOverlayForNewScene();
     }
 
     /// <summary>
-    /// Configura o delay antes do fade-out programaticamente
+    /// Posicionamento instantâneo do player
     /// </summary>
-    /// <param name="delay">Novo delay em segundos</param>
-    public void SetFadeOutDelay(float delay)
+    private void PositionPlayerInstant(Vector2 targetPosition)
     {
-        fadeOutDelay = Mathf.Clamp(delay, 0.0f, 5.0f);
-        // Atualiza cache de WaitForSeconds
-        cachedFadeOutDelayWait = new WaitForSeconds(fadeOutDelay);
-        Debug.Log($"[GameManager] Delay do fade-out ajustado para: {fadeOutDelay}s");
+        if (targetPosition == Vector2.zero) return;
+
+        // Cache do player
+        if (currentPlayer == null)
+        {
+            currentPlayer = GameObject.FindGameObjectWithTag(PLAYER_TAG);
+        }
+
+        if (currentPlayer != null)
+        {
+            currentPlayer.transform.position = targetPosition;
+
+            // Desabilita física temporariamente para evitar conflitos
+            Rigidbody2D rb = currentPlayer.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+            }
+        }
     }
 
     /// <summary>
-    /// Força a limpeza do cache de objetos (útil para transições de cena)
+    /// Posicionamento rápido com validações
     /// </summary>
-    public void ClearObjectCache()
+    private IEnumerator PositionPlayerFast(Vector2 targetPosition)
     {
-        cachedCamera = null;
-        cachedPlayer = null;
-        cachedPlayerRigidbody = null;
-        overlayRenderer = null;
-        Debug.Log("[GameManager] Cache de objetos limpo");
+        if (targetPosition == Vector2.zero) yield break;
+
+        // Aguarda 1 frame para nova cena estar ativa
+        yield return null;
+
+        PositionPlayerInstant(targetPosition);
+
+        Debug.Log($"[GameManager] Player posicionado em: {targetPosition}");
+    }
+    #endregion
+
+    #region Fade Otimizado
+    /// <summary>
+    /// Escurecimento ultra-rápido
+    /// </summary>
+    private IEnumerator FastDarkenScene(Color color)
+    {
+        SetupInstantOverlay(Color.clear); // Começa transparente
+
+        Color targetColor = color;
+        float elapsed = 0f;
+
+        // Loop de fade otimizado
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime; // Usa unscaled para ignorar timeScale
+            float alpha = elapsed / fadeDuration;
+
+            activeOverlayRenderer.color = new Color(targetColor.r, targetColor.g, targetColor.b, alpha);
+            yield return null;
+        }
+
+        activeOverlayRenderer.color = targetColor;
+        yield return ultraFastDarkWait; // Mínimo necessário
+    }
+
+    /// <summary>
+    /// Fade-out ultra-rápido
+    /// </summary>
+    private IEnumerator FastFadeOut()
+    {
+        if (activeOverlayRenderer == null) yield break;
+
+        Color startColor = activeOverlayRenderer.color;
+        Color targetColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
+
+        float elapsed = 0f;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = 1f - (elapsed / fadeDuration);
+
+            activeOverlayRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        activeOverlayRenderer.color = targetColor;
+
+        // Desativa overlay se usando cache
+        if (enableOverlayCache && activeOverlayRenderer.gameObject != null)
+        {
+            activeOverlayRenderer.gameObject.SetActive(false);
+        }
+
+        Debug.Log("[GameManager] Transição ultra-rápida concluída!");
+    }
+
+    /// <summary>
+    /// Fade-out instantâneo para ultra-fast mode
+    /// </summary>
+    private IEnumerator InstantFadeOut()
+    {
+        yield return null; // 1 frame mínimo
+
+        if (activeOverlayRenderer != null)
+        {
+            activeOverlayRenderer.color = Color.clear;
+
+            if (enableOverlayCache)
+            {
+                activeOverlayRenderer.gameObject.SetActive(false);
+            }
+        }
+
+        Debug.Log("[GameManager] Fade instantâneo concluído!");
+    }
+    #endregion
+
+    #region Sistema de Preload
+    /// <summary>
+    /// Pré-carrega cenas comuns em background
+    /// </summary>
+    private IEnumerator PreloadCommonScenes()
+    {
+        string[] commonScenes = { "MainMenu", "GameScene", "Level1", "Level2" }; // Configure conforme necessário
+
+        foreach (string sceneName in commonScenes)
+        {
+            if (!preloadedScenes.ContainsKey(sceneName) && sceneName != SceneManager.GetActiveScene().name)
+            {
+                AsyncOperation preload = SceneManager.LoadSceneAsync(sceneName);
+                preload.allowSceneActivation = false; // Não ativa automaticamente
+
+                preloadedScenes[sceneName] = preload;
+
+                Debug.Log($"[GameManager] Pré-carregando: {sceneName}");
+
+                // Aguarda um frame entre preloads para não travar
+                yield return null;
+            }
+        }
+
+        Debug.Log($"[GameManager] {preloadedScenes.Count} cenas pré-carregadas");
+    }
+
+    /// <summary>
+    /// Pré-carrega uma cena específica
+    /// </summary>
+    public void PreloadScene(string sceneName)
+    {
+        if (!preloadedScenes.ContainsKey(sceneName))
+        {
+            StartCoroutine(PreloadSpecificScene(sceneName));
+        }
+    }
+
+    private IEnumerator PreloadSpecificScene(string sceneName)
+    {
+        AsyncOperation preload = SceneManager.LoadSceneAsync(sceneName);
+        preload.allowSceneActivation = false;
+
+        preloadedScenes[sceneName] = preload;
+
+        Debug.Log($"[GameManager] Cena {sceneName} pré-carregada");
+        yield return null;
+    }
+    #endregion
+
+    #region Métodos Utilitários
+    /// <summary>
+    /// Atualiza cache da câmera
+    /// </summary>
+    private void RefreshCameraCache()
+    {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                mainCamera = FindAnyObjectByType<Camera>();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Atualiza overlay para nova cena
+    /// </summary>
+    private void UpdateOverlayForNewScene()
+    {
+        RefreshCameraCache();
+        currentPlayer = null; // Reset player cache
+
+        if (activeOverlayRenderer != null && mainCamera != null)
+        {
+            activeOverlayRenderer.transform.position = mainCamera.transform.position;
+        }
+    }
+
+    /// <summary>
+    /// Limpa caches desnecessários
+    /// </summary>
+    public void ClearCaches()
+    {
+        // Limpa preloads antigos
+        foreach (var kvp in preloadedScenes)
+        {
+            if (kvp.Value.isDone)
+            {
+                preloadedScenes.Remove(kvp.Key);
+            }
+        }
+
+        // Reset cache de objetos
+        currentPlayer = null;
+        mainCamera = null;
+
+        Debug.Log("[GameManager] Caches limpos");
+    }
+    #endregion
+
+    #region Configuração Dinâmica
+    /// <summary>
+    /// Ativa modo ultra-rápido (pode causar stutters)
+    /// </summary>
+    public void EnableUltraFastMode(bool enable)
+    {
+        ultraFastMode = enable;
+        Debug.Log($"[GameManager] Modo ultra-rápido: {(enable ? "ATIVADO" : "DESATIVADO")}");
+    }
+
+    /// <summary>
+    /// Configura velocidade de fade dinamicamente
+    /// </summary>
+    public void SetFadeSpeed(float duration)
+    {
+        fadeDuration = Mathf.Clamp(duration, 0.05f, 1.0f);
+        ultraFastFadeWait = new WaitForSeconds(fadeDuration);
+        Debug.Log($"[GameManager] Velocidade de fade: {fadeDuration}s");
     }
     #endregion
 }

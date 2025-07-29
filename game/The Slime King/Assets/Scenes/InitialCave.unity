@@ -4525,8 +4525,10 @@ MonoBehaviour:
   portalID: 
   destinationScene: InitialForest
   targetPosition: {x: -0.146, y: 0.131}
+  preloadOnStart: 1
+  preloadOnPlayerNear: 1
+  preloadDistance: 5
   portalColor: {r: 0, g: 0, b: 0, a: 1}
-  showGizmos: 1
 --- !u!1001 &849267105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30459,15 +30461,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1509300485410401135, guid: c9c425d0a20ff9f4f9c32bb100911df2, type: 3}
       propertyPath: fadeDuration
-      value: 0.25
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 1509300485410401135, guid: c9c425d0a20ff9f4f9c32bb100911df2, type: 3}
       propertyPath: fadeOutDelay
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1509300485410401135, guid: c9c425d0a20ff9f4f9c32bb100911df2, type: 3}
+      propertyPath: ultraFastMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1509300485410401135, guid: c9c425d0a20ff9f4f9c32bb100911df2, type: 3}
       propertyPath: darkScreenDuration
-      value: 1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 4251510910305642981, guid: c9c425d0a20ff9f4f9c32bb100911df2, type: 3}
       propertyPath: m_LocalPosition.x
