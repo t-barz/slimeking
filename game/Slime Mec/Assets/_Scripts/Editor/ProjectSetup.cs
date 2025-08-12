@@ -93,16 +93,16 @@ public class ProjectSetup : EditorWindow
         Dictionary<string, string[]> folderStructure = new Dictionary<string, string[]>
         {
             { "_Scenes", new string[] { "Levels", "MainMenu", "Test" } },
-            { "Animation", new string[] { "Controllers", "Clips" } },
-            { "Art/Sprites", new string[] { "Characters", "Environment", "Items", "UI" } },
-            { "Art", new string[] { "Materials" } },
-            { "Audio", new string[] { "Music", "SFX" } },
-            { "Fonts", new string[] { } },
-            { "Prefabs", new string[] { "Characters", "Environment", "UI", "Systems" } },
-            { "Resources", new string[] { } },
-            { "ScriptableObjects", new string[] { "Characters", "Items", "GameSettings" } },
-            { "Scripts", new string[] { "Core", "Editor", "Managers", "Gameplay", "UI", "Utils" } },
-            { "Settings", new string[] { } },
+            { "_Animation", new string[] { "Controllers", "Clips" } },
+            { "_Art/Sprites", new string[] { "Characters", "Environment", "Items", "UI" } },
+            { "_Art", new string[] { "Materials" } },
+            { "_Audio", new string[] { "Music", "SFX" } },
+            { "_Fonts", new string[] { } },
+            { "_Prefabs", new string[] { "Characters", "Environment", "UI", "Systems" } },
+            { "_Resources", new string[] { } },
+            { "_ScriptableObjects", new string[] { "Characters", "Items", "GameSettings" } },
+            { "_Scripts", new string[] { "Core", "Editor", "Managers", "Gameplay", "UI", "Utils" } },
+            { "_Settings", new string[] { } },
             { "ThirdParty", new string[] { } }
         };
 
