@@ -61,7 +61,7 @@ public class ProjectSetup : EditorWindow
         EditorGUILayout.Space(20);
         GUILayout.Label("Renomeação Padronizada", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
-        EditorGUILayout.HelpBox("Renomeia arquivos seguindo padrão de prefixos baseado nas pastas.\nExemplo: monstroAzul.png → ART_monstroAzul.png", MessageType.Info);
+        EditorGUILayout.HelpBox("Renomeia arquivos seguindo padrão de prefixos baseado nas pastas.\nExemplo: monstroAzul.png → art_monstroAzul.png", MessageType.Info);
         EditorGUILayout.Space(10);
 
         // Botão para renomear arquivos com prefixos
@@ -776,51 +776,51 @@ public class ProjectSetup : EditorWindow
         Dictionary<string, string> folderPrefixes = new Dictionary<string, string>
         {
             // Scenes
-            { "Assets/_Scenes", "SCN" },
+            { "Assets/_Scenes", "scn" },
             
             // Animation
-            { "Assets/Animation/Controllers", "ANM" },
-            { "Assets/Animation/Clips", "ANM" },
-            { "Assets/Animation", "ANM" },
-            
+            { "Assets/_Animation/Controllers", "anm" },
+            { "Assets/_Animation/Clips", "anm" },
+            { "Assets/_Animation", "anm" },
+
             // Art
-            { "Assets/Art/Sprites/Characters", "CHR" },
-            { "Assets/Art/Sprites/Environment", "ENV" },
-            { "Assets/Art/Sprites/Items", "ITM" },
-            { "Assets/Art/Sprites/UI", "GUI" },
-            { "Assets/Art/Sprites", "ART" },
-            { "Assets/Art/Materials", "MAT" },
-            { "Assets/Art", "ART" },
-            
+            { "Assets/_Art/Sprites/Characters", "chr" },
+            { "Assets/_Art/Sprites/Environment", "env" },
+            { "Assets/_Art/Sprites/Items", "itm" },
+            { "Assets/_Art/Sprites/UI", "gui" },
+            { "Assets/_Art/Sprites", "art" },
+            { "Assets/_Art/Materials", "mat" },
+            { "Assets/_Art", "art" },
+
             // Audio
-            { "Assets/Audio/Music", "MUS" },
-            { "Assets/Audio/SFX", "SFX" },
-            { "Assets/Audio", "AUD" },
-            
+            { "Assets/_Audio/Music", "mus" },
+            { "Assets/_Audio/SFX", "sfx" },
+            { "Assets/_Audio", "aud" },
+
             // Fonts
-            { "Assets/Fonts", "FNT" },
-            
+            { "Assets/_Fonts", "fnt" },
+
             // Prefabs
-            { "Assets/Prefabs/Characters", "CHR" },
-            { "Assets/Prefabs/Environment", "ENV" },
-            { "Assets/Prefabs/UI", "GUI" },
-            { "Assets/Prefabs/Systems", "SYS" },
-            { "Assets/Prefabs", "PRF" },
-            
+            { "Assets/_Prefabs/Characters", "chr" },
+            { "Assets/_Prefabs/Environment", "env" },
+            { "Assets/_Prefabs/UI", "gui" },
+            { "Assets/_Prefabs/Systems", "sys" },
+            { "Assets/_Prefabs", "prf" },
+
             // Resources
-            { "Assets/Resources", "RES" },
-            
+            { "Assets/_Resources", "res" },
+
             // ScriptableObjects
-            { "Assets/ScriptableObjects/Characters", "CHR" },
-            { "Assets/ScriptableObjects/Items", "ITM" },
-            { "Assets/ScriptableObjects/GameSettings", "CFG" },
-            { "Assets/ScriptableObjects", "SCO" },
+            { "Assets/_ScriptableObjects/Characters", "chr" },
+            { "Assets/_ScriptableObjects/Items", "itm" },
+            { "Assets/_ScriptableObjects/GameSettings", "cfg" },
+            { "Assets/_ScriptableObjects", "sco" },
             
             // Settings
-            { "Assets/Settings", "CFG" },
-            
+            { "Assets/_Settings", "cfg" },
+
             // ThirdParty
-            { "Assets/ThirdParty", "EXT" }
+            { "Assets/ThirdParty", "ext" }
         };
 
         // Procura o prefixo mais específico (caminho mais longo que coincide)
@@ -857,7 +857,7 @@ public class ProjectSetup : EditorWindow
         string folderName = Path.GetFileName(directory);
 
         if (string.IsNullOrEmpty(folderName))
-            return "GEN";
+            return "gen";
 
         return ExtractConsonants(folderName);
     }
@@ -871,11 +871,11 @@ public class ProjectSetup : EditorWindow
     string ExtractConsonants(string input)
     {
         if (string.IsNullOrEmpty(input))
-            return "GEN";
+            return "gen";
 
-        input = input.ToUpper();
+        input = input.ToLower();
         string consonants = "";
-        string vowels = "AEIOU";
+        string vowels = "aeiou";
 
         // Extrai consoantes
         foreach (char c in input)
@@ -905,7 +905,7 @@ public class ProjectSetup : EditorWindow
         // Se ainda não tem 3 caracteres, completa com números ou caracteres genéricos
         while (consonants.Length < 3)
         {
-            consonants += "X";
+            consonants += "x";
         }
 
         return consonants.Substring(0, 3);
