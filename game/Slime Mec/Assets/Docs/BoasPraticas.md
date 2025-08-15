@@ -1,7 +1,7 @@
 - Utilize o idioma inglês para nomes de arquivos, pastas, classes e variáveis.
 - Use camelCase para nomes de variáveis e métodos, e PascalCase para nomes de classes.
 - Utilize o idioma português para comentários e documentação, mantendo a clareza e a compreensão do código.
-- Priorize a legibilidade do código, evitando complexidade desnecessária e mantendo uma estrutura clara.
+- Priorize a performance seguida da legibilidade do código, evitando complexidade desnecessária e mantendo uma estrutura clara.
 - Sempre utilize as soluções com melhor performance, evitando soluções que possam impactar negativamente o desempenho do jogo.
 - Utilize o recurso de regiões para organizar o código em seções lógicas, facilitando a navegação e compreensão.
 - Sempre que possível, utilize o padrão de projeto Singleton para gerenciar instâncias únicas de classes.

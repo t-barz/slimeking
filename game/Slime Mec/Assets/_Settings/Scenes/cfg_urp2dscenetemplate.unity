@@ -348,6 +348,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6687381284756825785, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: fe1bfdd8-9f69-43ed-9f26-e4c41e0bde60
+      objectReference: {fileID: 0}
+    - target: {fileID: -4455612587817557720, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: MinDistance
+      value: 0.5286238
+      objectReference: {fileID: 0}
+    - target: {fileID: -4455612587817557720, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3219145590622283037, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: m_Radius
+      value: 0.12
+      objectReference: {fileID: 0}
     - target: {fileID: 4770894293968131866, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
       propertyPath: m_Name
       value: WhiteSlime
