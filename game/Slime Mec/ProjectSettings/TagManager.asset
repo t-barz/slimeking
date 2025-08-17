@@ -3,7 +3,15 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - InteractableCollect
+  - InteractablePush
+  - InteractableShrink
+  - InteractableJump
+  - InteractableTalk
+  - Destructable
+  - Enemy
+  - Wind
   layers:
   - Default
   - TransparentFX
@@ -12,7 +20,7 @@ TagManager:
   - Water
   - UI
   - Creatures
-  - 
+  - FX
   - 
   - 
   - 

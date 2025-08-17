@@ -1,17 +1,25 @@
 using UnityEngine;
 
+/// <summary>
+/// Script utilitário para autodestruição de GameObjects.
+/// Permite configurar delay opcional para destruição automática ou manual.
+/// </summary>
 public class SelfDestruct : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [Header("⏱️ Configuração Opcional de Delay")]
+    [Tooltip("Tempo em segundos para destruição automática (0 = apenas manual)")]
+    [SerializeField] private float autoDestroyDelay = 0f;
+
+    /// <summary>
+    /// Inicialização - configura destruição automática se delay for especificado
+    /// </summary>
     void Start()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        // Se foi configurado um delay, agenda a destruição automática
+        if (autoDestroyDelay > 0f)
+        {
+            Destroy(gameObject, autoDestroyDelay);
+        }
     }
 
     /// <summary>
@@ -21,5 +29,21 @@ public class SelfDestruct : MonoBehaviour
     public void DestroyObject()
     {
         Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// Destroi o objeto após um delay específico.
+    /// </summary>
+    /// <param name="delay">Tempo em segundos para aguardar antes da destruição</param>
+    public void DestroyObject(float delay)
+    {
+        if (delay <= 0f)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject, delay);
+        }
     }
 }

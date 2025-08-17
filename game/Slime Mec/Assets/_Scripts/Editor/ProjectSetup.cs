@@ -19,6 +19,9 @@ using System.Linq;
 /// </summary>
 public class ProjectSetup : EditorWindow
 {
+    // Variável para controlar a posição do scroll
+    private Vector2 scrollPosition = Vector2.zero;
+
     /// <summary>
     /// Abre a janela de ferramentas de aceleração de projeto.
     /// </summary>
@@ -26,7 +29,10 @@ public class ProjectSetup : EditorWindow
     public static void ShowWindow()
     {
         // Abre a janela de ferramentas personalizadas
-        GetWindow<ProjectSetup>("Aceleradores de Projeto");
+        ProjectSetup window = GetWindow<ProjectSetup>("Aceleradores de Projeto");
+
+        // Define tamanho mínimo da janela para melhor visualização
+        window.minSize = new Vector2(400, 600);
     }
 
     /// <summary>
@@ -35,6 +41,13 @@ public class ProjectSetup : EditorWindow
     /// </summary>
     void OnGUI()
     {
+        // Inicia o ScrollView
+        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+        // Adiciona margem interna para melhor aparência
+        EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+        EditorGUILayout.Space(10);
+
         GUILayout.Label("Gerador de Estrutura de Pastas para Projeto 2D", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
         EditorGUILayout.HelpBox("Este utilitário criará a estrutura de pastas recomendada para seu projeto 2D.", MessageType.Info);
@@ -81,6 +94,27 @@ public class ProjectSetup : EditorWindow
         {
             OptimizePixelArtSettings();
         }
+
+        EditorGUILayout.Space(20);
+        GUILayout.Label("Configuração de Tags do Projeto", EditorStyles.boldLabel);
+        EditorGUILayout.Space(10);
+        EditorGUILayout.HelpBox("Cria automaticamente as tags essenciais para o sistema de gameplay:\n• Wind, Enemy, Destructable\n• InteractableTalk, InteractableJump, InteractableShrink\n• InteractablePush, InteractableCollect", MessageType.Info);
+        EditorGUILayout.Space(10);
+
+        // Botão para criar tags do projeto
+        if (GUILayout.Button("Criar Tags do Projeto", GUILayout.Height(30)))
+        {
+            CreateProjectTags();
+        }
+
+        // Adiciona espaço extra no final para melhor visualização
+        EditorGUILayout.Space(20);
+
+        // Termina a margem interna
+        EditorGUILayout.EndVertical();
+
+        // Termina o ScrollView
+        EditorGUILayout.EndScrollView();
     }
 
     /// <summary>
@@ -472,6 +506,118 @@ public class ProjectSetup : EditorWindow
             "• Physics 2D otimizado\n" +
             "• V-Sync configurado\n" +
             "• Configurações de renderização ajustadas", "OK");
+    }
+
+    /// <summary>
+    /// Cria automaticamente as tags essenciais para o sistema de gameplay do projeto.
+    /// Adiciona tags para elementos do vento, inimigos, objetos destrutíveis e interações.
+    /// </summary>
+    void CreateProjectTags()
+    {
+        // Lista de tags essenciais para o projeto
+        string[] projectTags = {
+            "Wind",
+            "Enemy",
+            "Destructable",
+            "InteractableTalk",
+            "InteractableJump",
+            "InteractableShrink",
+            "InteractablePush",
+            "InteractableCollect"
+        };
+
+        int createdTags = 0;
+        int existingTags = 0;
+        List<string> createdList = new List<string>();
+        List<string> existingList = new List<string>();
+
+        try
+        {
+            foreach (string tagName in projectTags)
+            {
+                if (CreateTagIfNotExists(tagName))
+                {
+                    createdTags++;
+                    createdList.Add(tagName);
+                }
+                else
+                {
+                    existingTags++;
+                    existingList.Add(tagName);
+                }
+            }
+
+            // Exibe resultado
+            string message = $"Configuração de tags concluída!\n\n" +
+                           $"Tags criadas: {createdTags}\n" +
+                           $"Tags já existentes: {existingTags}\n\n" +
+                           "Verifique o Console para ver detalhes.";
+
+            Debug.Log("=== CRIAÇÃO DE TAGS DO PROJETO ===");
+
+            if (createdList.Count > 0)
+            {
+                Debug.Log($"Tags criadas ({createdTags}):");
+                foreach (string tag in createdList)
+                {
+                    Debug.Log($"  • {tag}");
+                }
+            }
+
+            if (existingList.Count > 0)
+            {
+                Debug.Log($"Tags já existentes ({existingTags}):");
+                foreach (string tag in existingList)
+                {
+                    Debug.Log($"  • {tag}");
+                }
+            }
+
+            EditorUtility.DisplayDialog("Concluído", message, "OK");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Erro durante a criação de tags: " + e.Message);
+            EditorUtility.DisplayDialog("Erro", "Ocorreu um erro durante a criação das tags. Verifique o Console.", "OK");
+        }
+    }
+
+    /// <summary>
+    /// Cria uma tag se ela não existir no projeto.
+    /// </summary>
+    /// <param name="tagName">Nome da tag a ser criada</param>
+    /// <returns>True se a tag foi criada, false se já existia</returns>
+    bool CreateTagIfNotExists(string tagName)
+    {
+        // Verifica se a tag já existe
+        bool tagExists = false;
+
+        // Obtém o objeto TagManager
+        SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+        SerializedProperty tagsProp = tagManager.FindProperty("tags");
+
+        // Verifica se a tag já existe
+        for (int i = 0; i < tagsProp.arraySize; i++)
+        {
+            SerializedProperty tagProp = tagsProp.GetArrayElementAtIndex(i);
+            if (tagProp.stringValue.Equals(tagName))
+            {
+                tagExists = true;
+                break;
+            }
+        }
+
+        // Se não existe, cria a tag
+        if (!tagExists)
+        {
+            tagsProp.InsertArrayElementAtIndex(0);
+            SerializedProperty newTagProp = tagsProp.GetArrayElementAtIndex(0);
+            newTagProp.stringValue = tagName;
+            tagManager.ApplyModifiedProperties();
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
