@@ -14,6 +14,7 @@ using System.Collections;
 /// • Gerencia sistema de direção visual com objetos direcionais (front/back/side)
 /// • Aplica flip automático em sprites laterais baseado na direção horizontal
 /// • Controla VFX direcionais independentemente dos sprites principais
+/// • Exibe VFX de ataque automaticamente durante ataques baseado na direção atual
 /// • Fornece sistema extensível para interações e uso de inventário
 /// 
 /// DEPENDÊNCIAS:
@@ -42,17 +43,27 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float deceleration = 10f;
 
     [Header("⚔️ Configurações de Combate")]
-    [Tooltip("Tempo em segundos entre ataques consecutivos")]
-    [SerializeField] private float attackCooldown = 0.5f;
-
-    [Tooltip("Transform que representa o ponto de origem do ataque (deve ser posicionado na frente do jogador)")]
-    [SerializeField] private Transform attackPoint;
-
     [Tooltip("Raio de detecção de inimigos para o ataque (em unidades do mundo)")]
     [SerializeField] private float attackRange = 1f;
 
     [Tooltip("Layers que contêm inimigos que podem ser atacados")]
     [SerializeField] private LayerMask enemyLayers;
+
+    [Tooltip("Prefab do GameObject que representa o ataque visual")]
+    [SerializeField] private GameObject attackPrefab;
+
+    [Tooltip("Duração do ataque em segundos")]
+    [SerializeField] private float attackDuration = 0.5f;
+
+    [Space]
+    [Tooltip("Offset da posição de ataque quando atacando para frente (South)")]
+    [SerializeField] private Vector2 attackOffsetFront = new Vector2(0f, -0.5f);
+
+    [Tooltip("Offset da posição de ataque quando atacando para trás (North)")]
+    [SerializeField] private Vector2 attackOffsetBack = new Vector2(0f, 0.5f);
+
+    [Tooltip("Offset da posição de ataque quando atacando para os lados (Side)")]
+    [SerializeField] private Vector2 attackOffsetSide = new Vector2(0.5f, 0f);
 
     [Header("🎨 Configurações Visuais")]
     [Tooltip("Referências aos GameObjects filhos para controle de direção visual")]
@@ -92,7 +103,8 @@ public class PlayerController : MonoBehaviour
     // Flags de controle que determinam o que o jogador pode fazer
     private bool _isMoving = false;              // Se o jogador está em movimento
     private bool _canMove = true;                // Se o movimento está habilitado
-    private bool _canAttack = true;              // Se o ataque está disponível (não em cooldown)
+    private bool _canAttack = true;              // Se o ataque está disponível (sem cooldown)
+    private bool _isHiding = false;              // Se o jogador está escondido (Crouch pressionado)
 
     // === OTIMIZAÇÃO DE PERFORMANCE ===
     // Usando StringToHash para evitar overhead de strings nas chamadas do Animator
@@ -119,16 +131,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private VisualDirection _currentVisualDirection = VisualDirection.South;
-    private bool _vfxEnabled = false; // Controla se os VFX estão ativos
-
-    // === SISTEMA DE INTERAÇÕES FUTURAS ===
-    // Preparado para implementação do sistema de interações contextuais
-    // private InteractableElement _nearbyInteractable;
-    // private bool _showingInteractionPrompt = false;
-    // private static readonly int Shrink = Animator.StringToHash("Shrink");
-    // private static readonly int Jump = Animator.StringToHash("Jump");
-    // private static readonly int Talk = Animator.StringToHash("Talk");
-    // private static readonly int CollectItem = Animator.StringToHash("CollectItem");
+    private bool _vfxEnabled = false;
 
     #endregion
 
@@ -209,10 +212,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        // FUTURO: Detecção de interatables próximos
-        // CheckForNearbyInteractables();
-
-        // Atualiza parâmetros do Animator baseado no estado atual
         UpdateAnimations();
     }
 
@@ -223,7 +222,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        // Todo movimento físico deve acontecer aqui para consistência
         HandleMovement();
     }
 
@@ -237,22 +235,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void ValidateRequiredComponents()
     {
-        if (_rigidbody == null)
-            Debug.LogError($"[PlayerController] Rigidbody2D não encontrado em '{gameObject.name}'! " +
-                          "Este componente é obrigatório para o movimento físico.", this);
-
-        if (_animator == null)
-            Debug.LogError($"[PlayerController] Animator não encontrado em '{gameObject.name}'! " +
-                          "Este componente é obrigatório para as animações.", this);
-
-        if (_spriteRenderer == null)
-            Debug.LogError($"[PlayerController] SpriteRenderer não encontrado em '{gameObject.name}'! " +
-                          "Este componente é obrigatório para o flip de sprite.", this);
-
-        // PlayerAttributesHandler é opcional, então apenas avisa
-        if (_attributesHandler == null && enableLogs)
-            Debug.LogWarning($"[PlayerController] PlayerAttributesHandler não encontrado em '{gameObject.name}'. " +
-                           "Funcionará com valores padrão, mas sem sistema de atributos dinâmicos.", this);
     }
 
     /// <summary>
@@ -264,13 +246,9 @@ public class PlayerController : MonoBehaviour
         try
         {
             _inputActions = new InputSystem_Actions();
-
-            if (enableLogs)
-                Debug.Log("[PlayerController] Sistema de Input inicializado com sucesso.", this);
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
-            Debug.LogError($"[PlayerController] Erro ao inicializar Input System: {e.Message}", this);
         }
     }
 
@@ -288,6 +266,10 @@ public class PlayerController : MonoBehaviour
         _inputActions.Gameplay.Attack.performed += OnAttackInput;
         _inputActions.Gameplay.Interact.performed += OnInteractInput;
         _inputActions.Gameplay.SpecialAttack.performed += OnSpecialAttackInput;
+
+        // Eventos de esconderijo - tanto performed quanto canceled para controle contínuo
+        _inputActions.Gameplay.Crouch.performed += OnCrouchInput;
+        _inputActions.Gameplay.Crouch.canceled += OnCrouchInput;
 
         // Eventos de uso de itens do inventário (slots 1-4)
         _inputActions.Gameplay.UseItem1.performed += OnUseItem1Input;
@@ -311,6 +293,10 @@ public class PlayerController : MonoBehaviour
         _inputActions.Gameplay.Interact.performed -= OnInteractInput;
         _inputActions.Gameplay.SpecialAttack.performed -= OnSpecialAttackInput;
 
+        // Remove eventos de esconderijo
+        _inputActions.Gameplay.Crouch.performed -= OnCrouchInput;
+        _inputActions.Gameplay.Crouch.canceled -= OnCrouchInput;
+
         // Remove eventos de uso de itens
         _inputActions.Gameplay.UseItem1.performed -= OnUseItem1Input;
         _inputActions.Gameplay.UseItem2.performed -= OnUseItem2Input;
@@ -326,12 +312,9 @@ public class PlayerController : MonoBehaviour
     {
         if (_attributesHandler != null)
         {
-            // Subscreve aos eventos importantes do sistema de atributos
             _attributesHandler.OnPlayerDied += OnPlayerDied;
             _attributesHandler.OnHealthChanged += OnHealthChanged;
 
-            if (enableLogs)
-                Debug.Log("[PlayerController] Conectado ao sistema de atributos.", this);
         }
     }
 
@@ -348,8 +331,6 @@ public class PlayerController : MonoBehaviour
             {
                 moveSpeed = attributeSpeed;
 
-                if (enableLogs)
-                    Debug.Log($"[PlayerController] Velocidade sincronizada com atributos: {moveSpeed}", this);
             }
         }
     }
@@ -360,12 +341,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void LogSuccessfulInitialization()
     {
-        if (enableLogs)
-        {
-            string attributeStatus = _attributesHandler != null ? "com sistema de atributos" : "com valores padrão";
-            Debug.Log($"[PlayerController] Inicialização completa {attributeStatus}. " +
-                     $"Velocidade: {moveSpeed}, Pode mover: {_canMove}, Pode atacar: {_canAttack}", this);
-        }
     }
 
     /// <summary>
@@ -377,7 +352,7 @@ public class PlayerController : MonoBehaviour
         if (_animator == null || _animator.runtimeAnimatorController == null) return;
 
         // Lista de parâmetros que devem existir no Animator Controller
-        string[] requiredBoolParams = { "isWalking", "FacingRight" };
+        string[] requiredBoolParams = { "isWalking", "isHiding", "FacingRight" };
         string[] requiredTriggerParams = { "Attack01" };
 
         // Verifica parâmetros bool
@@ -385,25 +360,16 @@ public class PlayerController : MonoBehaviour
         {
             if (!HasAnimatorParameter(paramName, AnimatorControllerParameterType.Bool))
             {
-                Debug.LogWarning($"[PlayerController] Parâmetro Bool '{paramName}' não encontrado no Animator Controller! " +
-                               "Verifique se o parâmetro está configurado corretamente.", this);
             }
         }
 
-        // Verifica parâmetros trigger
         foreach (string paramName in requiredTriggerParams)
         {
             if (!HasAnimatorParameter(paramName, AnimatorControllerParameterType.Trigger))
             {
-                Debug.LogWarning($"[PlayerController] Parâmetro Trigger '{paramName}' não encontrado no Animator Controller! " +
-                               "Verifique se o parâmetro está configurado corretamente.", this);
             }
         }
 
-        if (enableLogs)
-        {
-            Debug.Log("[PlayerController] Validação de parâmetros do Animator concluída.", this);
-        }
     }
 
     /// <summary>
@@ -457,15 +423,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void DrawAttackRange()
     {
-        if (attackPoint != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
-
-            // Desenha uma linha conectando o jogador ao ponto de ataque
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, attackPoint.position);
-        }
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
     /// <summary>
@@ -482,6 +441,7 @@ public class PlayerController : MonoBehaviour
                              $"Can Move: {_canMove}\n" +
                              $"Can Attack: {_canAttack}\n" +
                              $"Is Moving: {_isMoving}\n" +
+                             $"Is Hiding: {_isHiding}\n" +
                              $"Facing Right: {_facingRight}\n" +
                              $"Visual Dir: {_currentVisualDirection}";
 
@@ -553,10 +513,6 @@ public class PlayerController : MonoBehaviour
         _moveInput = context.ReadValue<Vector2>();
 
         // Debug detalhado do input
-        if (enableLogs)
-        {
-            Debug.Log($"[PlayerController] Input recebido: {_moveInput} | Magnitude: {_moveInput.magnitude:F3} | Fase: {context.phase}", this);
-        }
 
         // NOTA: _isMoving será atualizada em HandleMovement() para garantir consistência
         // Não atualizamos aqui para evitar problemas com input canceled
@@ -567,23 +523,18 @@ public class PlayerController : MonoBehaviour
     /// Inicia a corrotina de ataque se o jogador estiver apto a atacar.
     /// 
     /// CONDIÇÕES:
-    /// • _canAttack deve ser true (não está em cooldown)
+    /// • _canAttack deve ser true (ataque disponível)
     /// • Não verifica se está em movimento - pode atacar enquanto anda
     /// </summary>
     /// <param name="context">Contexto de input do botão de ataque</param>
     private void OnAttackInput(InputAction.CallbackContext context)
     {
+
         // Verifica se pode atacar (não está em cooldown)
         if (_canAttack)
         {
-            StartCoroutine(PerformAttack());
 
-            if (enableLogs)
-                Debug.Log("[PlayerController] Ataque iniciado", this);
-        }
-        else if (enableLogs)
-        {
-            Debug.Log("[PlayerController] Ataque bloqueado - em cooldown", this);
+            StartCoroutine(PerformAttack());
         }
     }
 
@@ -600,14 +551,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">Contexto de input da tecla de interação</param>
     private void OnInteractInput(InputAction.CallbackContext context)
     {
-        // TODO: Implementar detecção de interatables próximos
-        // TODO: Implementar coleta de itens
-        // TODO: Implementar diálogo com NPCs
 
-        if (enableLogs)
-        {
-            Debug.Log("[PlayerController] Input de interação/coleta recebido - funcionalidade futura", this);
-        }
     }
 
     /// <summary>
@@ -622,12 +566,36 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">Contexto de input do ataque especial</param>
     private void OnSpecialAttackInput(InputAction.CallbackContext context)
     {
-        // TODO: Implementar ataque especial
-        // TODO: Verificar condições (mana, cooldown especial, etc.)
 
-        if (enableLogs)
+    }
+
+    /// <summary>
+    /// Processa input de esconderijo via tecla de Crouch.
+    /// Ativa/desativa o estado de esconderijo baseado no estado da tecla.
+    /// 
+    /// COMPORTAMENTO:
+    /// • performed: Tecla pressionada - ativa esconderijo (_isHiding = true)
+    /// • canceled: Tecla solta - desativa esconderijo (_isHiding = false)
+    /// • Atualiza parâmetro do Animator para animações de esconderijo
+    /// </summary>
+    /// <param name="context">Contexto de input da tecla de esconderijo</param>
+    private void OnCrouchInput(InputAction.CallbackContext context)
+    {
+        if (context.performed)
         {
-            Debug.Log("[PlayerController] Input de ataque especial recebido - funcionalidade futura", this);
+            // Tecla pressionada - ativa esconderijo
+            _isHiding = true;
+        }
+        else if (context.canceled)
+        {
+            // Tecla solta - desativa esconderijo
+            _isHiding = false;
+        }
+
+        // Atualiza parâmetro do Animator
+        if (_animator != null)
+        {
+            _animator.SetBool(IsHiding, _isHiding);
         }
     }
 
@@ -679,15 +647,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="slotNumber">Número do slot do inventário (1-4)</param>
     private void UseInventoryItem(int slotNumber)
     {
-        // TODO: Implementar sistema de inventário
-        // TODO: Verificar se o slot tem item
-        // TODO: Aplicar efeito do item (cura, buff, etc.)
-        // TODO: Remover item do inventário após uso
 
-        if (enableLogs)
-        {
-            Debug.Log($"[PlayerController] Tentativa de usar item do slot {slotNumber} do inventário - funcionalidade futura", this);
-        }
     }
 
     #endregion
@@ -748,8 +708,6 @@ public class PlayerController : MonoBehaviour
             {
                 moveSpeed = attributeSpeed;
 
-                if (enableLogs)
-                    Debug.Log($"[PlayerController] Velocidade atualizada pelos atributos: {moveSpeed}", this);
             }
         }
     }
@@ -838,11 +796,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // Log para debug (apenas quando necessário)
-        if (enableLogs)
-        {
-            string direction = _facingRight ? "direita" : "esquerda";
-            Debug.Log($"[PlayerController] Sprite virado para {direction}", this);
-        }
     }
 
     /// <summary>
@@ -940,11 +893,6 @@ public class PlayerController : MonoBehaviour
             // Aplica flip: true quando facing left, false quando facing right
             sideSpriteRenderer.flipX = !_facingRight;
 
-            if (enableLogs)
-            {
-                string flipDirection = !_facingRight ? "espelhado (esquerda)" : "normal (direita)";
-                Debug.Log($"[PlayerController] Flip aplicado em '{sideObj.name}': {flipDirection}", this);
-            }
             return; // Encontrou e aplicou, pode retornar
         }
 
@@ -954,15 +902,6 @@ public class PlayerController : MonoBehaviour
         {
             sideSpriteRenderer.flipX = !_facingRight;
 
-            if (enableLogs)
-            {
-                string flipDirection = !_facingRight ? "espelhado (esquerda)" : "normal (direita)";
-                Debug.Log($"[PlayerController] Flip aplicado em filho de '{sideObj.name}': {flipDirection}", this);
-            }
-        }
-        else if (enableLogs)
-        {
-            Debug.LogWarning($"[PlayerController] SpriteRenderer não encontrado em '{sideObj.name}' ou seus filhos!", this);
         }
     }
 
@@ -999,12 +938,28 @@ public class PlayerController : MonoBehaviour
     {
         _canAttack = false;
 
+        // Ativa VFX de ataque baseado na direção atual
+        ShowAttackVfx();
+
+        // Instancia GameObject de ataque na posição calculada com offset (se o prefab estiver configurado)
+        GameObject attackInstance = null;
+        if (attackPrefab != null)
+        {
+            Vector3 attackPosition = GetAttackPosition();
+            attackInstance = Instantiate(attackPrefab, attackPosition, Quaternion.identity);
+
+            // Configura os visuais do ataque baseado na direção atual
+            SetupAttackVisuals(attackInstance);
+        }
+
         // Trigger da animação de ataque
         if (_animator != null)
+        {
             _animator.SetTrigger(Attack01);
+        }
 
-        // Detecta inimigos no range de ataque
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+        // Detecta inimigos no range de ataque ao redor do jogador
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
 
         // Aplica dano nos inimigos
         foreach (Collider2D enemy in hitEnemies)
@@ -1015,17 +970,20 @@ public class PlayerController : MonoBehaviour
             // {
             //     enemyHealth.TakeDamage(_attributesHandler.CurrentAttack);
             // }
-
-            // Por enquanto, só loga o ataque
-            if (enableLogs && _attributesHandler != null)
-            {
-                Debug.Log($"[PlayerController] Atacando {enemy.name} com {_attributesHandler.CurrentAttack} de dano");
-            }
         }
 
-        // Cooldown do ataque
-        yield return new WaitForSeconds(attackCooldown);
-        _canAttack = true;
+        // Aguarda a duração do ataque
+        yield return new WaitForSeconds(attackDuration);
+
+        // Destrói o GameObject de ataque após a duração
+        if (attackInstance != null)
+        {
+            Destroy(attackInstance);
+        }
+
+        ResetAttackState();
+
+        yield break;
     }
 
     #endregion
@@ -1048,14 +1006,8 @@ public class PlayerController : MonoBehaviour
         // Atualiza direção
         _animator.SetBool(FacingRight, _facingRight);
 
-        // Debug detalhado quando logs estão habilitados
-        if (enableLogs)
-        {
-            Debug.Log($"[PlayerController] Animação - Walking: {shouldBeWalking} | Input: {_moveInput} | IsMoving: {_isMoving} | CanMove: {_canMove} | Magnitude: {_moveInput.magnitude:F3}", this);
-        }
-
-        // TODO: Atualizar outros parâmetros quando implementados
-        // _animator.SetBool(IsHiding, _isHiding);
+        // Atualiza estado de esconderijo
+        _animator.SetBool(IsHiding, _isHiding);
     }
 
     #endregion
@@ -1070,12 +1022,7 @@ public class PlayerController : MonoBehaviour
         _canMove = false;
         _canAttack = false;
 
-        if (enableLogs)
-        {
-            Debug.Log("[PlayerController] Jogador morreu!");
-        }
 
-        // TODO: Implementar lógica de game over
     }
 
     /// <summary>
@@ -1083,39 +1030,67 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void OnHealthChanged(int currentHealth, int maxHealth)
     {
-        // TODO: Implementar feedback visual de dano
-        if (enableLogs)
-        {
-            Debug.Log($"[PlayerController] Vida alterada: {currentHealth}/{maxHealth}");
-        }
     }
 
     #endregion
 
-    #region Public Methods
+    #region Combat Helper Methods
+
+    /// <summary>
+    /// Calcula a posição onde o GameObject de ataque deve ser instanciado baseado na direção atual
+    /// </summary>
+    /// <returns>Posição final para instanciar o ataque</returns>
+    private Vector3 GetAttackPosition()
+    {
+        Vector3 basePosition = transform.position;
+        Vector2 offset = Vector2.zero;
+
+        switch (_currentVisualDirection)
+        {
+            case VisualDirection.South:
+                offset = attackOffsetFront;
+                break;
+            case VisualDirection.North:
+                offset = attackOffsetBack;
+                break;
+            case VisualDirection.Side:
+                // Para direção lateral, aplica o flip no offset baseado na direção do personagem
+                offset = new Vector2(
+                    _facingRight ? attackOffsetSide.x : -attackOffsetSide.x,
+                    attackOffsetSide.y
+                );
+                break;
+        }
+
+        return basePosition + (Vector3)offset;
+    }
+
+    #endregion
+
+    #region Private Methods
 
     /// <summary>
     /// Estado atual dos VFX (readonly)
+    /// IMPORTANTE: VFX de ataque são independentes do estado _vfxEnabled
+    /// e são controlados automaticamente durante ataques.
     /// </summary>
-    public bool VfxEnabled => _vfxEnabled;
+    private bool VfxEnabled => _vfxEnabled;
 
     /// <summary>
     /// Ativa os efeitos visuais (VFX) direcionais.
     /// Aplica os VFX baseado na direção visual atual.
     /// </summary>
-    public void EnableVfx()
+    private void EnableVfx()
     {
         _vfxEnabled = true;
         UpdateVfxVisibility();
 
-        if (enableLogs)
-            Debug.Log("[PlayerController] VFX ativados", this);
     }
 
     /// <summary>
     /// Desativa todos os efeitos visuais (VFX) direcionais.
     /// </summary>
-    public void DisableVfx()
+    private void DisableVfx()
     {
         _vfxEnabled = false;
 
@@ -1124,14 +1099,12 @@ public class PlayerController : MonoBehaviour
         if (vfxBackObject != null) vfxBackObject.SetActive(false);
         if (vfxSideObject != null) vfxSideObject.SetActive(false);
 
-        if (enableLogs)
-            Debug.Log("[PlayerController] VFX desativados", this);
     }
 
     /// <summary>
     /// Alterna o estado dos VFX (liga/desliga)
     /// </summary>
-    public void ToggleVfx()
+    private void ToggleVfx()
     {
         if (_vfxEnabled)
             DisableVfx();
@@ -1173,26 +1146,111 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
+    /// Exibe VFX de ataque baseado na direção visual atual
+    /// </summary>
+    private void ShowAttackVfx()
+    {
+        switch (_currentVisualDirection)
+        {
+            case VisualDirection.South:
+                if (vfxFrontObject != null)
+                {
+                    vfxFrontObject.SetActive(true);
+                }
+                break;
+
+            case VisualDirection.North:
+                if (vfxBackObject != null)
+                {
+                    vfxBackObject.SetActive(true);
+                }
+                break;
+
+            case VisualDirection.Side:
+                if (vfxSideObject != null)
+                {
+                    vfxSideObject.SetActive(true);
+                    ApplyFlipToSideObject(vfxSideObject);
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Configura os sprites do objeto de ataque de acordo com a direção atual do personagem.
+    /// Ativa apenas o sprite de ataque apropriado para a direção atual e aplica flip quando necessário.
+    /// </summary>
+    /// <param name="attackObj">Objeto de ataque recém-instanciado</param>
+    private void SetupAttackVisuals(GameObject attackObj)
+    {
+        // Obtém sub-objetos do ataque
+        Transform attackBack = attackObj.transform.Find("attack_back");
+        Transform attackSide = attackObj.transform.Find("attack_side");
+        Transform attackFront = attackObj.transform.Find("attack_front");
+
+        // Desativa todos inicialmente
+        if (attackBack != null) attackBack.gameObject.SetActive(false);
+        if (attackSide != null) attackSide.gameObject.SetActive(false);
+        if (attackFront != null) attackFront.gameObject.SetActive(false);
+
+        // Ativa apenas o correto para a direção atual
+        switch (_currentVisualDirection)
+        {
+            case VisualDirection.South:
+                if (attackFront != null) attackFront.gameObject.SetActive(true);
+                break;
+            case VisualDirection.North:
+                if (attackBack != null) attackBack.gameObject.SetActive(true);
+                break;
+            case VisualDirection.Side:
+                if (attackSide != null)
+                {
+                    attackSide.gameObject.SetActive(true);
+                    // Aplica o flip usando a mesma lógica dos VFX laterais
+                    ApplyFlipToSideObject(attackSide.gameObject);
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Esconde todos os VFX de ataque
+    /// </summary>
+    private void HideAttackVfx()
+    {
+        if (vfxFrontObject != null)
+        {
+            vfxFrontObject.SetActive(false);
+        }
+        if (vfxBackObject != null)
+        {
+            vfxBackObject.SetActive(false);
+        }
+        if (vfxSideObject != null)
+        {
+            vfxSideObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
     /// Direção visual atual do personagem (readonly)
     /// </summary>
-    public VisualDirection CurrentVisualDirection => _currentVisualDirection;
+    private VisualDirection CurrentVisualDirection => _currentVisualDirection;
 
     /// <summary>
     /// Define manualmente a direção visual (útil para cutscenes/animações)
     /// </summary>
     /// <param name="direction">Nova direção visual</param>
-    public void SetManualVisualDirection(VisualDirection direction)
+    private void SetManualVisualDirection(VisualDirection direction)
     {
         SetVisualDirection(direction);
 
-        if (enableLogs)
-            Debug.Log($"[PlayerController] Direção visual definida manualmente: {direction}", this);
     }
 
     /// <summary>
     /// Desabilita temporariamente o movimento do jogador.
     /// </summary>
-    public void DisableMovement(float duration = 0f)
+    private void DisableMovement(float duration = 0f)
     {
         _canMove = false;
         if (duration > 0f)
@@ -1204,7 +1262,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Habilita o movimento do jogador.
     /// </summary>
-    public void EnableMovement()
+    private void EnableMovement()
     {
         _canMove = true;
     }
@@ -1214,13 +1272,11 @@ public class PlayerController : MonoBehaviour
     /// Útil para depuração de problemas de animação e movimento.
     /// </summary>
     /// <param name="enable">True para ativar logs, false para desativar</param>
-    public void SetDebugLogs(bool enable)
+    private void SetDebugLogs(bool enable)
     {
         enableLogs = enable;
         if (enable)
         {
-            Debug.Log("[PlayerController] Logs de debug ativados para troubleshooting.", this);
-            Debug.Log($"[PlayerController] Estado atual - IsMoving: {_isMoving}, CanMove: {_canMove}, Input: {_moveInput}", this);
         }
     }
 
@@ -1236,12 +1292,27 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Força o jogador a olhar para uma direção específica.
     /// </summary>
-    public void FaceDirection(bool faceRight)
+    private void FaceDirection(bool faceRight)
     {
         if (_facingRight != faceRight)
         {
             FlipSprite();
         }
+    }
+
+    /// <summary>
+    /// Força o reset do sistema de ataque (útil para debug).
+    /// Use apenas se o ataque ficar "preso" e não funcionar mais.
+    /// </summary>
+    private void ResetAttackState()
+    {
+        _canAttack = true;
+
+        // Esconde VFX de ataque
+        HideAttackVfx();
+
+        // Para todas as corrotinas de ataque em execução
+        StopAllCoroutines();
     }
 
     #endregion
