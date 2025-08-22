@@ -52,22 +52,37 @@ public class RandomStyle : MonoBehaviour
     [Tooltip("Se true, mostra logs das alterações aplicadas")]
     [SerializeField] private bool enableLogs = false;
 
-    // Componentes necessários
+    // Componentes necessários (cache para performance)
     private SpriteRenderer spriteRenderer;
     private Renderer meshRenderer;
+    private bool hasValidRenderer = false;
 
     // Valores originais para referência
     private Vector3 originalScale;
     private Color originalColor;
 
+    // Cache de valores calculados para otimização
+    private Vector3 randomScaleVector;
+    private Color randomColorValue;
+
     /// <summary>
     /// Inicialização - guarda valores originais e aplica randomização se configurado
+    /// OTIMIZADO: Cache de componentes e validação única
     /// </summary>
     void Start()
     {
-        // Obtém componentes de renderização
+        // Cache componentes de renderização uma única vez
         spriteRenderer = GetComponent<SpriteRenderer>();
         meshRenderer = GetComponent<Renderer>();
+
+        // Valida se tem pelo menos um renderer
+        hasValidRenderer = (spriteRenderer != null || meshRenderer != null);
+
+        if (!hasValidRenderer)
+        {
+            Debug.LogWarning($"RandomStyle em '{gameObject.name}': Nenhum SpriteRenderer ou Renderer encontrado!");
+            return;
+        }
 
         // Guarda valores originais
         originalScale = transform.localScale;
@@ -82,9 +97,13 @@ public class RandomStyle : MonoBehaviour
 
     /// <summary>
     /// Aplica randomização de tamanho e cor baseada nas configurações
+    /// OTIMIZADO: Early exit se não tem renderer válido
     /// </summary>
     public void ApplyRandomStyle()
     {
+        // Early exit se não tem renderer válido
+        if (!hasValidRenderer) return;
+
         if (randomizeScale)
         {
             ApplyRandomScale();

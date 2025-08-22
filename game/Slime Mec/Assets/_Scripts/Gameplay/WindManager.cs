@@ -50,11 +50,23 @@ public class WindManager : MonoBehaviour
     // Lista para controle de objetos spawnados (opcional)
     private List<GameObject> spawnedObjects = new List<GameObject>();
 
+    // Cache para otimização de spawn
+    private WaitForSeconds windSpawnWait;
+    private WaitForSeconds otherObjectsSpawnWait;
+    private Vector3 worldSpawnCenter;
+
     /// <summary>
     /// Inicialização do manager
     /// </summary>
     void Start()
     {
+        // Pre-calcula WaitForSeconds para otimização
+        windSpawnWait = new WaitForSeconds(windSpawnFrequency);
+        otherObjectsSpawnWait = new WaitForSeconds(otherObjectsSpawnFrequency);
+
+        // Calcula posição mundial do centro do spawn
+        worldSpawnCenter = transform.position + (Vector3)spawnAreaCenter;
+
         if (autoStart)
         {
             StartSpawning();
@@ -122,25 +134,27 @@ public class WindManager : MonoBehaviour
 
     /// <summary>
     /// Corrotina responsável pelo spawn contínuo de objetos de vento
+    /// OTIMIZADO: Usa WaitForSeconds cacheado para evitar garbage collection
     /// </summary>
     private IEnumerator SpawnWindRoutine()
     {
         while (isSpawning)
         {
             SpawnWind();
-            yield return new WaitForSeconds(windSpawnFrequency);
+            yield return windSpawnWait; // Usa cache em vez de criar novo WaitForSeconds
         }
     }
 
     /// <summary>
     /// Corrotina responsável pelo spawn contínuo de outros objetos
+    /// OTIMIZADO: Usa WaitForSeconds cacheado para evitar garbage collection
     /// </summary>
     private IEnumerator SpawnOtherObjectsRoutine()
     {
         while (isSpawning)
         {
             SpawnRandomOtherObject();
-            yield return new WaitForSeconds(otherObjectsSpawnFrequency);
+            yield return otherObjectsSpawnWait; // Usa cache em vez de criar novo WaitForSeconds
         }
     }
 
@@ -198,21 +212,24 @@ public class WindManager : MonoBehaviour
 
     /// <summary>
     /// Calcula uma posição aleatória dentro da área de spawn configurada
+    /// OTIMIZADO: Usa centro mundial cacheado para evitar cálculos repetidos
     /// </summary>
     private Vector3 GetRandomSpawnPosition()
     {
-        // Calcula os limites da área de spawn
-        Vector3 worldCenter = transform.position + (Vector3)spawnAreaCenter;
-        float minX = worldCenter.x - spawnAreaSize.x * 0.5f;
-        float maxX = worldCenter.x + spawnAreaSize.x * 0.5f;
-        float minY = worldCenter.y - spawnAreaSize.y * 0.5f;
-        float maxY = worldCenter.y + spawnAreaSize.y * 0.5f;
+        // Usa centro mundial pré-calculado
+        float halfWidth = spawnAreaSize.x * 0.5f;
+        float halfHeight = spawnAreaSize.y * 0.5f;
+
+        float minX = worldSpawnCenter.x - halfWidth;
+        float maxX = worldSpawnCenter.x + halfWidth;
+        float minY = worldSpawnCenter.y - halfHeight;
+        float maxY = worldSpawnCenter.y + halfHeight;
 
         // Gera posição aleatória dentro dos limites
         float randomX = Random.Range(minX, maxX);
         float randomY = Random.Range(minY, maxY);
 
-        return new Vector3(randomX, randomY, worldCenter.z);
+        return new Vector3(randomX, randomY, worldSpawnCenter.z);
     }
 
     /// <summary>

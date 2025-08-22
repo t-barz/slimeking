@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Animations;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.Rendering;
@@ -98,13 +99,25 @@ public class ProjectSetup : EditorWindow
         EditorGUILayout.Space(20);
         GUILayout.Label("Configuração de Tags do Projeto", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
-        EditorGUILayout.HelpBox("Cria automaticamente as tags essenciais para o sistema de gameplay:\n• Wind, Enemy, Destructable\n• InteractableTalk, InteractableJump, InteractableShrink\n• InteractablePush, InteractableCollect", MessageType.Info);
+        EditorGUILayout.HelpBox("Cria automaticamente as tags essenciais para o sistema de gameplay:\n• Wind, Props, Enemy, Destructable\n• WindShaker, DestructibleShaker (para sistema de shake)\n• InteractableTalk, InteractableJump, InteractableShrink\n• InteractablePush, InteractableCollect", MessageType.Info);
         EditorGUILayout.Space(10);
 
         // Botão para criar tags do projeto
         if (GUILayout.Button("Criar Tags do Projeto", GUILayout.Height(30)))
         {
             CreateProjectTags();
+        }
+
+        EditorGUILayout.Space(20);
+        GUILayout.Label("Configuração de Props com Shaking", EditorStyles.boldLabel);
+        EditorGUILayout.Space(10);
+        EditorGUILayout.HelpBox("Configura props existentes para sistema de shaking:\n• Adiciona tag 'Props' aos objetos selecionados\n• Verifica se tem Animator e Controller existentes\n• Adiciona trigger 'Shake' se necessário\n• Cria states 'Idle' e 'Shaking' com transições (tempo 0f)\n\nUSO: Selecione objetos com Animator+Controller na hierarquia", MessageType.Info);
+        EditorGUILayout.Space(10);
+
+        // Botão para preparar prop shaking
+        if (GUILayout.Button("Preparar Prop Shaking", GUILayout.Height(30)))
+        {
+            PrepareShakingProps();
         }
 
         // Adiciona espaço extra no final para melhor visualização
@@ -517,7 +530,10 @@ public class ProjectSetup : EditorWindow
         // Lista de tags essenciais para o projeto
         string[] projectTags = {
             "Wind",
+            "Props",
             "Enemy",
+            "WindShaker",
+            "DestructibleShaker",
             "Destructable",
             "InteractableTalk",
             "InteractableJump",
@@ -618,6 +634,246 @@ public class ProjectSetup : EditorWindow
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Prepara props selecionados para sistema de shaking.
+    /// Adiciona a tag "Props" e configura trigger "Shake" no Animator.
+    /// </summary>
+    void PrepareShakingProps()
+    {
+        GameObject[] selectedObjects = Selection.gameObjects;
+
+        if (selectedObjects.Length == 0)
+        {
+            EditorUtility.DisplayDialog("Nenhum Objeto Selecionado",
+                "Selecione um ou mais objetos na hierarquia para configurar como props com shaking.", "OK");
+            return;
+        }
+
+        int configuredObjects = 0;
+        int skippedObjects = 0;
+        List<string> configuredList = new List<string>();
+        List<string> skippedList = new List<string>();
+
+        try
+        {
+            // Primeiro garante que a tag "Props" existe
+            CreateTagIfNotExists("Props");
+
+            foreach (GameObject obj in selectedObjects)
+            {
+                bool wasConfigured = false;
+
+                // Adiciona a tag "Props"
+                if (obj.tag == "Untagged" || obj.tag != "Props")
+                {
+                    obj.tag = "Props";
+                    wasConfigured = true;
+                }
+
+                // Verifica se tem Animator (não cria se não tiver)
+                Animator animator = obj.GetComponent<Animator>();
+                if (animator == null)
+                {
+                    Debug.LogWarning($"Objeto '{obj.name}': Não possui Animator. Adicione um Animator manualmente.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica se tem Animator Controller (não cria se não tiver)
+                if (animator.runtimeAnimatorController == null)
+                {
+                    Debug.LogWarning($"Objeto '{obj.name}': Animator não possui Controller. Crie um Animator Controller manualmente.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica se é um AnimatorController editável
+                UnityEditor.Animations.AnimatorController controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                if (controller == null)
+                {
+                    Debug.LogWarning($"Objeto '{obj.name}': Animator Controller não é editável.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica/adiciona o trigger "Shake"
+                bool hasShakeTrigger = false;
+                foreach (var parameter in controller.parameters)
+                {
+                    if (parameter.name == "Shake" && parameter.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hasShakeTrigger = true;
+                        break;
+                    }
+                }
+
+                if (!hasShakeTrigger)
+                {
+                    // Adiciona o trigger "Shake"
+                    controller.AddParameter("Shake", AnimatorControllerParameterType.Trigger);
+                    wasConfigured = true;
+                    Debug.Log($"Trigger 'Shake' adicionado ao Controller de '{obj.name}'");
+                }
+
+                // Configura os states e transições
+                ConfigureShakeStates(controller, obj.name, ref wasConfigured);
+
+                if (wasConfigured)
+                {
+                    configuredObjects++;
+                    configuredList.Add(obj.name);
+                }
+                else
+                {
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                }
+            }
+
+            // Exibe resultado
+            string message = $"Configuração de Props concluída!\n\n" +
+                           $"Objetos configurados: {configuredObjects}\n" +
+                           $"Objetos já configurados: {skippedObjects}\n\n" +
+                           "Verifique o Console para instruções adicionais.";
+
+            Debug.Log("=== CONFIGURAÇÃO DE PROPS SHAKING ===");
+            Debug.Log($"Tag 'Props' foi criada/verificada.");
+
+            if (configuredList.Count > 0)
+            {
+                Debug.Log($"Objetos configurados ({configuredObjects}):");
+                foreach (string objName in configuredList)
+                {
+                    Debug.Log($"  • {objName}");
+                }
+            }
+
+            if (skippedList.Count > 0)
+            {
+                Debug.Log($"Objetos já configurados ({skippedObjects}):");
+                foreach (string objName in skippedList)
+                {
+                    Debug.Log($"  • {objName}");
+                }
+            }
+
+            Debug.Log("\nPRÓXIMOS PASSOS:");
+            Debug.Log("1. ✅ Tag 'Props' foi configurada automaticamente");
+            Debug.Log("2. ✅ Trigger 'Shake' foi adicionado aos Animator Controllers existentes");
+            Debug.Log("3. ✅ States 'Idle' e 'Shaking' foram criados/configurados");
+            Debug.Log("4. ✅ Transições automáticas configuradas (tempo 0f)");
+            Debug.Log("5. 🎬 Adicione clips de animação aos states 'Idle' e 'Shaking'");
+            Debug.Log("6. 🎮 Use animator.SetTrigger(\"Shake\") no código para ativar");
+
+            EditorUtility.DisplayDialog("Concluído", message, "OK");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Erro durante a configuração de props: " + e.Message);
+            EditorUtility.DisplayDialog("Erro", "Ocorreu um erro durante a configuração. Verifique o Console.", "OK");
+        }
+    }
+
+    /// <summary>
+    /// Configura os states Idle e Shaking com transições automáticas.
+    /// </summary>
+    /// <param name="controller">Animator Controller para configurar</param>
+    /// <param name="objectName">Nome do objeto para logs</param>
+    /// <param name="wasConfigured">Referência para indicar se houve mudanças</param>
+    void ConfigureShakeStates(UnityEditor.Animations.AnimatorController controller, string objectName, ref bool wasConfigured)
+    {
+        // Obtém a layer base (primeira layer)
+        if (controller.layers.Length == 0)
+        {
+            Debug.LogWarning($"Objeto '{objectName}': Controller não possui layers.");
+            return;
+        }
+
+        var baseLayer = controller.layers[0];
+        var stateMachine = baseLayer.stateMachine;
+
+        // Procura pelos states Idle e Shaking
+        UnityEditor.Animations.AnimatorState idleState = null;
+        UnityEditor.Animations.AnimatorState shakingState = null;
+
+        foreach (var state in stateMachine.states)
+        {
+            if (state.state.name == "Idle")
+                idleState = state.state;
+            else if (state.state.name == "Shaking")
+                shakingState = state.state;
+        }
+
+        // Cria o state Idle se não existir
+        if (idleState == null)
+        {
+            idleState = stateMachine.AddState("Idle");
+            stateMachine.defaultState = idleState;
+            wasConfigured = true;
+            Debug.Log($"State 'Idle' criado para '{objectName}'");
+        }
+
+        // Cria o state Shaking se não existir  
+        if (shakingState == null)
+        {
+            shakingState = stateMachine.AddState("Shaking");
+            wasConfigured = true;
+            Debug.Log($"State 'Shaking' criado para '{objectName}'");
+        }
+
+        // Configura transição Idle -> Shaking
+        bool hasIdleToShaking = false;
+        foreach (var transition in idleState.transitions)
+        {
+            if (transition.destinationState == shakingState)
+            {
+                hasIdleToShaking = true;
+                break;
+            }
+        }
+
+        if (!hasIdleToShaking)
+        {
+            var idleToShaking = idleState.AddTransition(shakingState);
+            idleToShaking.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Shake");
+            idleToShaking.duration = 0f;
+            idleToShaking.exitTime = 0f;
+            idleToShaking.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Idle -> Shaking configurada para '{objectName}'");
+        }
+
+        // Configura transição Shaking -> Idle
+        bool hasShakingToIdle = false;
+        foreach (var transition in shakingState.transitions)
+        {
+            if (transition.destinationState == idleState)
+            {
+                hasShakingToIdle = true;
+                break;
+            }
+        }
+
+        if (!hasShakingToIdle)
+        {
+            var shakingToIdle = shakingState.AddTransition(idleState);
+            shakingToIdle.duration = 0f;
+            shakingToIdle.exitTime = 1f;
+            shakingToIdle.hasExitTime = true;
+            wasConfigured = true;
+            Debug.Log($"Transição Shaking -> Idle configurada para '{objectName}'");
+        }
+
+        // Salva as mudanças
+        if (wasConfigured)
+        {
+            EditorUtility.SetDirty(controller);
+        }
     }
 
     /// <summary>
