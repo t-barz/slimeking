@@ -2,70 +2,49 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Gerenciador responsável por spawnar objetos de vento e outros objetos em área configurável.
-/// Controla frequência de spawn e posicionamento aleatório dentro da área definida.
-/// </summary>
 public class WindManager : MonoBehaviour
 {
     [Header("🌪️ Configurações de Vento")]
-    [Tooltip("Prefab do GameObject que representa o vento")]
     [SerializeField] private GameObject windPrefab;
-
-    [Tooltip("Frequência de spawn do vento (segundos entre spawns)")]
     [SerializeField] private float windSpawnFrequency = 3f;
 
     [Header("📦 Outros Objetos")]
-    [Tooltip("Lista de prefabs opcionais para spawn")]
     [SerializeField] private GameObject[] otherObjectsPrefabs;
-
-    [Tooltip("Frequência de spawn dos outros objetos (segundos entre spawns)")]
     [SerializeField] private float otherObjectsSpawnFrequency = 5f;
 
     [Header("🎯 Configurações de Área")]
-    [Tooltip("Centro da área de spawn (relativo à posição deste objeto)")]
     [SerializeField] private Vector2 spawnAreaCenter = Vector2.zero;
-
-    [Tooltip("Tamanho da área de spawn (largura x altura)")]
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(10f, 6f);
 
     [Header("🔧 Opções Avançadas")]
-    [Tooltip("Se true, inicia o spawn automaticamente")]
     [SerializeField] private bool autoStart = true;
-
-    [Tooltip("Se true, spawna objetos como filhos deste GameObject")]
     [SerializeField] private bool spawnAsChildren = true;
-
-    [Tooltip("Se true, mostra a área de spawn no Scene View")]
     [SerializeField] private bool showSpawnArea = true;
-
-    [Tooltip("Se true, mostra logs de debug no console")]
     [SerializeField] private bool enableLogs = false;
 
-    // Controles internos de spawn
+    [Header("⚡ Performance")]
+    [SerializeField] private int maxActiveWinds = 5;
+    [SerializeField] private float cleanupInterval = 2f;
+
+    // OTIMIZADO: Pools para evitar garbage collection
+    private Queue<GameObject> windPool = new Queue<GameObject>();
+    private List<GameObject> activeWinds = new List<GameObject>();
+
     private Coroutine windSpawnCoroutine;
-    private Coroutine otherObjectsSpawnCoroutine;
+    private Coroutine cleanupCoroutine;
     private bool isSpawning = false;
 
-    // Lista para controle de objetos spawnados (opcional)
-    private List<GameObject> spawnedObjects = new List<GameObject>();
-
-    // Cache para otimização de spawn
+    // OTIMIZADO: Cache para otimização
     private WaitForSeconds windSpawnWait;
-    private WaitForSeconds otherObjectsSpawnWait;
+    private WaitForSeconds cleanupWait;
     private Vector3 worldSpawnCenter;
+    private Camera mainCamera;
 
-    /// <summary>
-    /// Inicialização do manager
-    /// </summary>
+    #region Unity Lifecycle
+
     void Start()
     {
-        // Pre-calcula WaitForSeconds para otimização
-        windSpawnWait = new WaitForSeconds(windSpawnFrequency);
-        otherObjectsSpawnWait = new WaitForSeconds(otherObjectsSpawnFrequency);
-
-        // Calcula posição mundial do centro do spawn
-        worldSpawnCenter = transform.position + (Vector3)spawnAreaCenter;
+        InitializeManager();
 
         if (autoStart)
         {
@@ -73,209 +52,244 @@ public class WindManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Initialization - OTIMIZADO
+
     /// <summary>
-    /// Inicia o sistema de spawn para vento e outros objetos
+    /// OTIMIZADO: Inicialização com pre-cache de componentes
     /// </summary>
+    private void InitializeManager()
+    {
+        // Cache de WaitForSeconds
+        windSpawnWait = new WaitForSeconds(windSpawnFrequency);
+        cleanupWait = new WaitForSeconds(cleanupInterval);
+
+        // Cache da camera principal
+        mainCamera = Camera.main;
+
+        // Calcula centro mundial
+        worldSpawnCenter = transform.position + (Vector3)spawnAreaCenter;
+
+        // NOVO: Pre-instancia alguns ventos no pool
+        PrewarmWindPool();
+    }
+
+    /// <summary>
+    /// NOVO: Pre-aquece o pool de ventos para melhor performance
+    /// </summary>
+    private void PrewarmWindPool()
+    {
+        if (windPrefab == null) return;
+
+        for (int i = 0; i < 3; i++) // Pre-instancia 3 objetos
+        {
+            GameObject pooledWind = Instantiate(windPrefab);
+            pooledWind.SetActive(false);
+            pooledWind.transform.SetParent(transform);
+            windPool.Enqueue(pooledWind);
+        }
+    }
+
+    #endregion
+
+    #region Spawn Control - OTIMIZADO
+
     public void StartSpawning()
     {
         if (isSpawning) return;
 
         isSpawning = true;
 
-        // Inicia spawn de vento se o prefab estiver configurado
         if (windPrefab != null && windSpawnFrequency > 0f)
         {
             windSpawnCoroutine = StartCoroutine(SpawnWindRoutine());
-            if (enableLogs)
-            {
-                Debug.Log($"WindManager: Iniciado spawn de vento (frequência: {windSpawnFrequency}s)");
-            }
         }
 
-        // Inicia spawn de outros objetos se houver prefabs configurados
-        if (otherObjectsPrefabs != null && otherObjectsPrefabs.Length > 0 && otherObjectsSpawnFrequency > 0f)
-        {
-            otherObjectsSpawnCoroutine = StartCoroutine(SpawnOtherObjectsRoutine());
-            if (enableLogs)
-            {
-                Debug.Log($"WindManager: Iniciado spawn de outros objetos (frequência: {otherObjectsSpawnFrequency}s)");
-            }
-        }
+        // NOVO: Inicia rotina de cleanup
+        cleanupCoroutine = StartCoroutine(CleanupRoutine());
     }
 
-    /// <summary>
-    /// Para o sistema de spawn
-    /// </summary>
     public void StopSpawning()
     {
         if (!isSpawning) return;
 
         isSpawning = false;
 
-        // Para spawn de vento
         if (windSpawnCoroutine != null)
         {
             StopCoroutine(windSpawnCoroutine);
             windSpawnCoroutine = null;
         }
 
-        // Para spawn de outros objetos
-        if (otherObjectsSpawnCoroutine != null)
+        if (cleanupCoroutine != null)
         {
-            StopCoroutine(otherObjectsSpawnCoroutine);
-            otherObjectsSpawnCoroutine = null;
-        }
-
-        if (enableLogs)
-        {
-            Debug.Log("WindManager: Sistema de spawn parado");
+            StopCoroutine(cleanupCoroutine);
+            cleanupCoroutine = null;
         }
     }
 
+    #endregion
+
+    #region Spawn Routines - OTIMIZADO
+
     /// <summary>
-    /// Corrotina responsável pelo spawn contínuo de objetos de vento
-    /// OTIMIZADO: Usa WaitForSeconds cacheado para evitar garbage collection
+    /// OTIMIZADO: Controla limite máximo de ventos ativos
     /// </summary>
     private IEnumerator SpawnWindRoutine()
     {
         while (isSpawning)
         {
-            SpawnWind();
-            yield return windSpawnWait; // Usa cache em vez de criar novo WaitForSeconds
+            // OTIMIZADO: Só spawna se não atingiu o limite
+            if (activeWinds.Count < maxActiveWinds)
+            {
+                SpawnWind();
+            }
+
+            yield return windSpawnWait;
         }
     }
 
     /// <summary>
-    /// Corrotina responsável pelo spawn contínuo de outros objetos
-    /// OTIMIZADO: Usa WaitForSeconds cacheado para evitar garbage collection
+    /// NOVO: Rotina de limpeza para objetos inativos
     /// </summary>
-    private IEnumerator SpawnOtherObjectsRoutine()
+    private IEnumerator CleanupRoutine()
     {
         while (isSpawning)
         {
-            SpawnRandomOtherObject();
-            yield return otherObjectsSpawnWait; // Usa cache em vez de criar novo WaitForSeconds
+            yield return cleanupWait;
+            CleanupInactiveWinds();
         }
     }
 
+    #endregion
+
+    #region Wind Management - OTIMIZADO
+
     /// <summary>
-    /// Spawna um objeto de vento em posição aleatória
+    /// OTIMIZADO: Usa object pooling para spawning
     /// </summary>
     public void SpawnWind()
     {
         if (windPrefab == null) return;
 
+        GameObject wind = GetPooledWind();
+        if (wind == null) return;
+
+        // Configura posição e ativa o objeto
         Vector3 spawnPosition = GetRandomSpawnPosition();
-        GameObject spawnedWind = Instantiate(windPrefab, spawnPosition, Quaternion.identity);
+        wind.transform.position = spawnPosition;
+        wind.SetActive(true);
 
-        if (spawnAsChildren)
-        {
-            spawnedWind.transform.SetParent(transform);
-        }
-
-        spawnedObjects.Add(spawnedWind);
+        // Adiciona à lista de ativos
+        activeWinds.Add(wind);
 
         if (enableLogs)
         {
-            Debug.Log($"WindManager: Vento spawnado em {spawnPosition}");
+            Debug.Log($"WindManager: Vento ativado em {spawnPosition}");
         }
     }
 
     /// <summary>
-    /// Spawna um objeto aleatório da lista de outros objetos
+    /// OTIMIZADO: Object pooling para reutilização de objetos
     /// </summary>
-    public void SpawnRandomOtherObject()
+    private GameObject GetPooledWind()
     {
-        if (otherObjectsPrefabs == null || otherObjectsPrefabs.Length == 0) return;
-
-        // Seleciona um prefab aleatório
-        int randomIndex = Random.Range(0, otherObjectsPrefabs.Length);
-        GameObject selectedPrefab = otherObjectsPrefabs[randomIndex];
-
-        if (selectedPrefab == null) return;
-
-        Vector3 spawnPosition = GetRandomSpawnPosition();
-        GameObject spawnedObject = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
-
-        if (spawnAsChildren)
+        // Tenta pegar do pool primeiro
+        if (windPool.Count > 0)
         {
-            spawnedObject.transform.SetParent(transform);
+            return windPool.Dequeue();
         }
 
-        spawnedObjects.Add(spawnedObject);
-
-        if (enableLogs)
+        // Se pool vazio, instancia novo
+        GameObject newWind = Instantiate(windPrefab);
+        if (spawnAsChildren)
         {
-            Debug.Log($"WindManager: Objeto '{selectedPrefab.name}' spawnado em {spawnPosition}");
+            newWind.transform.SetParent(transform);
+        }
+
+        return newWind;
+    }
+
+    /// <summary>
+    /// NOVO: Remove ventos inativos da lista e retorna ao pool
+    /// </summary>
+    private void CleanupInactiveWinds()
+    {
+        for (int i = activeWinds.Count - 1; i >= 0; i--)
+        {
+            if (activeWinds[i] == null || !activeWinds[i].activeInHierarchy)
+            {
+                if (activeWinds[i] != null)
+                {
+                    ReturnWindToPool(activeWinds[i]);
+                }
+                activeWinds.RemoveAt(i);
+            }
         }
     }
 
     /// <summary>
-    /// Calcula uma posição aleatória dentro da área de spawn configurada
-    /// OTIMIZADO: Usa centro mundial cacheado para evitar cálculos repetidos
+    /// NOVO: Retorna vento ao pool para reutilização
+    /// </summary>
+    private void ReturnWindToPool(GameObject wind)
+    {
+        wind.SetActive(false);
+        wind.transform.position = Vector3.zero;
+
+        // OTIMIZADO: Limita tamanho do pool
+        if (windPool.Count < 10)
+        {
+            windPool.Enqueue(wind);
+        }
+        else
+        {
+            Destroy(wind); // Destrói se pool cheio
+        }
+    }
+
+    #endregion
+
+    #region Utility Methods - OTIMIZADO
+
+    /// <summary>
+    /// OTIMIZADO: Usa centro mundial cacheado
     /// </summary>
     private Vector3 GetRandomSpawnPosition()
     {
-        // Usa centro mundial pré-calculado
         float halfWidth = spawnAreaSize.x * 0.5f;
         float halfHeight = spawnAreaSize.y * 0.5f;
 
-        float minX = worldSpawnCenter.x - halfWidth;
-        float maxX = worldSpawnCenter.x + halfWidth;
-        float minY = worldSpawnCenter.y - halfHeight;
-        float maxY = worldSpawnCenter.y + halfHeight;
-
-        // Gera posição aleatória dentro dos limites
-        float randomX = Random.Range(minX, maxX);
-        float randomY = Random.Range(minY, maxY);
+        float randomX = Random.Range(worldSpawnCenter.x - halfWidth, worldSpawnCenter.x + halfWidth);
+        float randomY = Random.Range(worldSpawnCenter.y - halfHeight, worldSpawnCenter.y + halfHeight);
 
         return new Vector3(randomX, randomY, worldSpawnCenter.z);
     }
 
     /// <summary>
-    /// Força o spawn imediato de um objeto de vento
+    /// OTIMIZADO: Cleanup melhorado
     /// </summary>
-    public void ForceSpawnWind()
+    public void ClearAllActiveWinds()
     {
-        SpawnWind();
-    }
-
-    /// <summary>
-    /// Força o spawn imediato de um objeto aleatório
-    /// </summary>
-    public void ForceSpawnOtherObject()
-    {
-        SpawnRandomOtherObject();
-    }
-
-    /// <summary>
-    /// Limpa todos os objetos spawnados
-    /// </summary>
-    public void ClearAllSpawnedObjects()
-    {
-        foreach (GameObject obj in spawnedObjects)
+        foreach (GameObject wind in activeWinds)
         {
-            if (obj != null)
+            if (wind != null)
             {
-                Destroy(obj);
+                ReturnWindToPool(wind);
             }
         }
-        spawnedObjects.Clear();
-
-        if (enableLogs)
-        {
-            Debug.Log("WindManager: Todos os objetos spawnados foram removidos");
-        }
+        activeWinds.Clear();
     }
 
-    /// <summary>
-    /// Altera a frequência de spawn do vento em tempo de execução
-    /// </summary>
+    #endregion
+
+    #region Public API
+
     public void SetWindSpawnFrequency(float newFrequency)
     {
         windSpawnFrequency = newFrequency;
+        windSpawnWait = new WaitForSeconds(windSpawnFrequency);
 
-        // Reinicia o spawn de vento se estiver ativo
         if (isSpawning && windSpawnCoroutine != null)
         {
             StopCoroutine(windSpawnCoroutine);
@@ -283,61 +297,43 @@ public class WindManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Altera a frequência de spawn dos outros objetos em tempo de execução
-    /// </summary>
-    public void SetOtherObjectsSpawnFrequency(float newFrequency)
-    {
-        otherObjectsSpawnFrequency = newFrequency;
+    public void ForceSpawnWind() => SpawnWind();
 
-        // Reinicia o spawn de outros objetos se estiver ativo
-        if (isSpawning && otherObjectsSpawnCoroutine != null)
-        {
-            StopCoroutine(otherObjectsSpawnCoroutine);
-            otherObjectsSpawnCoroutine = StartCoroutine(SpawnOtherObjectsRoutine());
-        }
-    }
+    #endregion
 
-    /// <summary>
-    /// Desenha a área de spawn no Scene View para visualização
-    /// </summary>
+    #region Properties
+
+    public bool IsSpawning => isSpawning;
+    public int ActiveWindsCount => activeWinds.Count;
+    public int PooledWindsCount => windPool.Count;
+    public float WindSpawnFrequency => windSpawnFrequency;
+
+    #endregion
+
+    #region Debug
+
     private void OnDrawGizmos()
     {
         if (!showSpawnArea) return;
 
-        // Calcula posição e tamanho da área
         Vector3 worldCenter = transform.position + (Vector3)spawnAreaCenter;
         Vector3 size = new Vector3(spawnAreaSize.x, spawnAreaSize.y, 0.1f);
 
-        // Desenha área de spawn
-        Gizmos.color = new Color(0f, 1f, 1f, 0.3f); // Cyan transparente
+        Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
         Gizmos.DrawCube(worldCenter, size);
-
-        // Desenha contorno da área
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireCube(worldCenter, size);
 
-        // Label com informações
 #if UNITY_EDITOR
-        Vector3 labelPos = worldCenter + Vector3.up * (spawnAreaSize.y * 0.5f + 1f);
-        string label = $"Wind Spawn Area\nWind: {windSpawnFrequency}s\nOthers: {otherObjectsSpawnFrequency}s";
-        UnityEditor.Handles.Label(labelPos, label);
+        string label = $"Wind Area\nActive: {(Application.isPlaying ? activeWinds.Count : 0)}\nPooled: {(Application.isPlaying ? windPool.Count : 0)}";
+        UnityEditor.Handles.Label(worldCenter + Vector3.up * (spawnAreaSize.y * 0.5f + 1f), label);
 #endif
     }
 
-    /// <summary>
-    /// Cleanup quando o objeto é destruído
-    /// </summary>
     private void OnDestroy()
     {
         StopSpawning();
     }
 
-    /// <summary>
-    /// Propriedades públicas para acesso externo
-    /// </summary>
-    public bool IsSpawning => isSpawning;
-    public int SpawnedObjectsCount => spawnedObjects.Count;
-    public float WindSpawnFrequency => windSpawnFrequency;
-    public float OtherObjectsSpawnFrequency => otherObjectsSpawnFrequency;
+    #endregion
 }

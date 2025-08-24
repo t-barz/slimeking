@@ -1,47 +1,37 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class WindController : MonoBehaviour
 {
     #region Inspector Configuration
 
     [Header("⚙️ Configurações de Movimento")]
-    [Tooltip("Velocidade de movimento horizontal (unidades por segundo)")]
     [SerializeField] private float moveSpeed = 5f;
-
-    [Tooltip("Direção do movimento horizontal")]
     [SerializeField] private MovementDirection direction = MovementDirection.Right;
 
     [Header("🌳 Detecção de Obstáculos")]
-    [Tooltip("Distância da detecção para obstáculos")]
     [SerializeField] private float detectionDistance = 2f;
-
-    [Tooltip("Tamanho da área de detecção")]
     [SerializeField] private Vector2 detectionBoxSize = new Vector2(0.5f, 1f);
-
-    [Tooltip("LayerMask para objetos WindShakers")]
-    [SerializeField] private LayerMask windShakersLayerMask = 1 << 6; // Default para layer WindShakers
+    [SerializeField] private LayerMask windShakersLayerMask = 1 << 6;
 
     [Header("🌊 Animação de Shake")]
-    [Tooltip("Nome do trigger do animator para ativar o shake")]
     [SerializeField] private string shakeTriggerName = "Shake";
 
     [Header("🎨 Configurações Visuais")]
-    [Tooltip("Aplica flip automático no sprite baseado na direção")]
     [SerializeField] private bool autoFlip = true;
 
     [Header("🔧 Debug")]
-    [Tooltip("Mostra informações de debug no Scene View")]
     [SerializeField] private bool showDebugInfo = false;
+
+    [Header("🗑️ Auto Destruição")]
+    [SerializeField] private float lifeTime = 10f;
+    [SerializeField] private bool destroyWhenOffScreen = true;
 
     #endregion
 
     #region Private Variables
 
-    public enum MovementDirection
-    {
-        Left,
-        Right
-    }
+    public enum MovementDirection { Left, Right }
 
     // Cached components
     private Transform cachedTransform;
@@ -52,14 +42,22 @@ public class WindController : MonoBehaviour
     private Vector2 movementDirection;
     private bool isMoving = true;
 
-    // Detection variables
-    private Collider2D[] overlapResults = new Collider2D[5]; // Pool de resultados para evitar GC
+    // Detection variables - OTIMIZADO: Reduzido tamanho do array
+    private Collider2D[] overlapResults = new Collider2D[3];
     private Vector2 detectionCenter;
     private ContactFilter2D contactFilter;
 
-    // Static vectors for performance (zero allocation)
+    // Shake tracking - OTIMIZADO: Evita triggers repetidos
+    private HashSet<int> shakenObjects = new HashSet<int>();
+    private float lastShakeCheck = 0f;
+    private const float SHAKE_CHECK_INTERVAL = 0.1f; // Reduz frequência de checks
+
+    // Static vectors for performance
     private static readonly Vector2 RightVector = Vector2.right;
     private static readonly Vector2 LeftVector = Vector2.left;
+
+    // Auto destroy
+    private float destroyTimer;
 
     #endregion
 
@@ -70,21 +68,27 @@ public class WindController : MonoBehaviour
         InitializeComponents();
         SetupMovement();
         ApplyVisualSettings();
+
+        // Inicializar timer de destruição
+        destroyTimer = lifeTime;
     }
 
     void Update()
     {
         if (isMoving && moveSpeed > 0f)
         {
-            // Sempre mover o objeto
             MoveObject();
 
-            // Verificar se há objetos para fazer shake
-            if (CheckForObstacle())
+            // OTIMIZADO: Reduz frequência de detecção de shake
+            if (Time.time >= lastShakeCheck + SHAKE_CHECK_INTERVAL)
             {
-                TriggerShakeOnDetectedObjects();
+                CheckAndTriggerShake();
+                lastShakeCheck = Time.time;
             }
         }
+
+        // OTIMIZADO: Auto destruição para evitar acúmulo de objetos
+        HandleAutoDestroy();
     }
 
     #endregion
@@ -93,19 +97,20 @@ public class WindController : MonoBehaviour
 
     private void InitializeComponents()
     {
-        // Cache components for performance
         cachedTransform = transform;
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        // Setup contact filter for collision detection
-        contactFilter = new ContactFilter2D();
-        contactFilter.SetLayerMask(windShakersLayerMask);
-        contactFilter.useTriggers = true;
+        // OTIMIZADO: Configuração mais eficiente do ContactFilter
+        contactFilter = new ContactFilter2D
+        {
+            layerMask = windShakersLayerMask,
+            useTriggers = true,
+            useLayerMask = true
+        };
     }
 
     private void SetupMovement()
     {
-        // Calculate movement vector and direction based on direction
         switch (direction)
         {
             case MovementDirection.Right:
@@ -123,7 +128,6 @@ public class WindController : MonoBehaviour
     {
         if (autoFlip && spriteRenderer != null)
         {
-            // Flip sprite based on direction
             spriteRenderer.flipX = (direction == MovementDirection.Left);
         }
     }
@@ -134,50 +138,18 @@ public class WindController : MonoBehaviour
 
     private void MoveObject()
     {
-        // Move using cached transform and pre-calculated vector
         cachedTransform.Translate(movementVector * Time.deltaTime);
     }
 
     #endregion
 
-    #region Obstacle Detection
-
-    private bool CheckForObstacle()
-    {
-        // Calculate detection box center position
-        detectionCenter = (Vector2)cachedTransform.position + movementDirection * (detectionDistance * 0.5f);
-
-        // Use OverlapBox com ContactFilter2D para evitar garbage collection
-        int hitCount = Physics2D.OverlapBox(
-            detectionCenter,
-            detectionBoxSize,
-            0f,
-            contactFilter,
-            overlapResults
-        );
-
-        return hitCount > 0;
-    }
-
-    private void HandleObstacleDetection()
-    {
-        // Ativar shake nos objetos detectados antes de reverter direção
-        TriggerShakeOnDetectedObjects();
-
-        // Reverter direção quando encontrar obstáculo WindShaker
-        ReverseDirection();
-    }
-
-    #endregion
-
-    #region Wind Shake System
+    #region Wind Shake System - OTIMIZADO
 
     /// <summary>
-    /// Ativa o trigger de shake em todos os objetos WindShakers detectados
+    /// OTIMIZADO: Verifica e ativa shake com controle de frequência
     /// </summary>
-    private void TriggerShakeOnDetectedObjects()
+    private void CheckAndTriggerShake()
     {
-        // Recalcular detecção para obter objetos atuais
         detectionCenter = (Vector2)cachedTransform.position + movementDirection * (detectionDistance * 0.5f);
 
         int hitCount = Physics2D.OverlapBox(
@@ -188,117 +160,132 @@ public class WindController : MonoBehaviour
             overlapResults
         );
 
-        // Ativar shake em cada objeto detectado
+        if (hitCount > 0)
+        {
+            TriggerShakeOnDetectedObjects(hitCount);
+        }
+    }
+
+    /// <summary>
+    /// OTIMIZADO: Evita triggers repetidos no mesmo objeto
+    /// </summary>
+    private void TriggerShakeOnDetectedObjects(int hitCount)
+    {
         for (int i = 0; i < hitCount; i++)
         {
             if (overlapResults[i] != null)
             {
-                TriggerShakeOnObject(overlapResults[i]);
+                int objectId = overlapResults[i].GetInstanceID();
+
+                // OTIMIZADO: Só ativa shake se ainda não foi ativado neste objeto
+                if (!shakenObjects.Contains(objectId))
+                {
+                    TriggerShakeOnObject(overlapResults[i]);
+                    shakenObjects.Add(objectId);
+                }
             }
         }
     }
 
     /// <summary>
-    /// Ativa o trigger de shake em um objeto específico
+    /// OTIMIZADO: Busca de animator mais eficiente
     /// </summary>
-    /// <param name="detectedCollider">Collider do objeto detectado</param>
     private void TriggerShakeOnObject(Collider2D detectedCollider)
     {
-        // Buscar animator no próprio objeto
-        Animator animator = detectedCollider.GetComponent<Animator>();
+        // OTIMIZADO: Busca hierárquica mais eficiente
+        Animator animator = detectedCollider.GetComponent<Animator>() ??
+                           detectedCollider.GetComponentInParent<Animator>();
 
-        // Se não encontrou, buscar nos objetos pai
-        if (animator == null)
-        {
-            animator = detectedCollider.GetComponentInParent<Animator>();
-        }
-
-        // Se não encontrou, buscar nos objetos filhos
-        if (animator == null)
-        {
-            animator = detectedCollider.GetComponentInChildren<Animator>();
-        }
-
-        // Ativar o trigger se animator foi encontrado
         if (animator != null && !string.IsNullOrEmpty(shakeTriggerName))
         {
-            try
-            {
-                animator.SetTrigger(shakeTriggerName);
+            animator.SetTrigger(shakeTriggerName);
 
-                // Debug info
-                if (showDebugInfo)
-                {
-                    Debug.Log($"[WindController] Shake trigger '{shakeTriggerName}' ativado em: {detectedCollider.name}");
-                }
-            }
-            catch (System.Exception e)
+            if (showDebugInfo)
             {
-                Debug.LogWarning($"[WindController] Erro ao ativar trigger '{shakeTriggerName}' em {detectedCollider.name}: {e.Message}");
+                Debug.Log($"[WindController] Shake ativado em: {detectedCollider.name}");
             }
-        }
-        else if (showDebugInfo)
-        {
-            Debug.LogWarning($"[WindController] Animator não encontrado em: {detectedCollider.name}");
         }
     }
 
     #endregion
 
-    #region Public Methods
+    #region Auto Destroy System - NOVO
 
     /// <summary>
-    /// Define a velocidade de movimento
+    /// NOVO: Sistema de auto destruição para evitar memory leaks
     /// </summary>
+    private void HandleAutoDestroy()
+    {
+        destroyTimer -= Time.deltaTime;
+
+        if (destroyTimer <= 0f)
+        {
+            DestroyWind();
+            return;
+        }
+
+        // OTIMIZADO: Destruir quando sair da tela (aproximação simples)
+        if (destroyWhenOffScreen && IsOffScreen())
+        {
+            DestroyWind();
+        }
+    }
+
+    /// <summary>
+    /// OTIMIZADO: Verificação simples se está fora da tela
+    /// </summary>
+    private bool IsOffScreen()
+    {
+        Vector3 screenPos = Camera.main.WorldToViewportPoint(cachedTransform.position);
+        return screenPos.x < -0.1f || screenPos.x > 1.1f || screenPos.y < -0.1f || screenPos.y > 1.1f;
+    }
+
+    /// <summary>
+    /// Destrói o objeto de vento de forma limpa
+    /// </summary>
+    private void DestroyWind()
+    {
+        // OTIMIZADO: Cleanup antes de destruir
+        shakenObjects.Clear();
+
+        if (showDebugInfo)
+        {
+            Debug.Log($"[WindController] Vento destruído: {gameObject.name}");
+        }
+
+        Destroy(gameObject);
+    }
+
+    #endregion
+
+    #region Public Methods - OTIMIZADO
+
     public void SetSpeed(float newSpeed)
     {
+        if (Mathf.Approximately(moveSpeed, newSpeed)) return; // Evita recálculos desnecessários
+
         moveSpeed = Mathf.Max(0f, newSpeed);
-        SetupMovement(); // Recalculate movement vector
+        SetupMovement();
     }
 
-    /// <summary>
-    /// Define a direção de movimento
-    /// </summary>
     public void SetDirection(MovementDirection newDirection)
     {
+        if (direction == newDirection) return; // Evita recálculos desnecessários
+
         direction = newDirection;
-        SetupMovement(); // Recalculate movement vector
-        ApplyVisualSettings(); // Update sprite flip
+        SetupMovement();
+        ApplyVisualSettings();
     }
 
-    /// <summary>
-    /// Para o movimento
-    /// </summary>
-    public void Stop()
-    {
-        isMoving = false;
-    }
+    public void Stop() => isMoving = false;
+    public void Resume() => isMoving = true;
 
-    /// <summary>
-    /// Retoma o movimento
-    /// </summary>
-    public void Resume()
-    {
-        isMoving = true;
-    }
-
-    /// <summary>
-    /// Inverte a direção atual
-    /// </summary>
     public void ReverseDirection()
     {
         MovementDirection newDirection = (direction == MovementDirection.Right)
             ? MovementDirection.Left
             : MovementDirection.Right;
         SetDirection(newDirection);
-    }
-
-    /// <summary>
-    /// Define o nome do trigger de shake
-    /// </summary>
-    public void SetShakeTriggerName(string triggerName)
-    {
-        shakeTriggerName = triggerName;
     }
 
     #endregion
@@ -308,65 +295,35 @@ public class WindController : MonoBehaviour
     public float Speed => moveSpeed;
     public MovementDirection Direction => direction;
     public bool IsMoving => isMoving;
-    public string ShakeTriggerName => shakeTriggerName;
+    public float RemainingLifeTime => destroyTimer;
 
     #endregion
 
-    #region Debug Visualization
+    #region Debug Visualization - OTIMIZADO
 
     void OnDrawGizmosSelected()
     {
         if (!showDebugInfo) return;
 
-        // Draw movement direction arrow
         Vector3 position = transform.position;
         Vector3 arrowDirection = (direction == MovementDirection.Right) ? Vector3.right : Vector3.left;
 
-        // Arrow color based on direction
+        // Arrow
         Gizmos.color = (direction == MovementDirection.Right) ? Color.green : Color.red;
-
-        // Draw arrow
         Vector3 arrowEnd = position + arrowDirection * 2f;
         Gizmos.DrawLine(position, arrowEnd);
-        Gizmos.DrawWireSphere(arrowEnd, 0.2f);
 
-        // Draw detection box
+        // Detection box
         if (Application.isPlaying)
         {
-            Gizmos.color = Color.yellow;
             Vector3 boxCenter = position + arrowDirection * (detectionDistance * 0.5f);
+            Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(boxCenter, detectionBoxSize);
-
-            // Show obstacle detection
-            if (CheckForObstacle())
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawCube(boxCenter, detectionBoxSize);
-
-                // Draw detected objects
-                detectionCenter = (Vector2)position + movementDirection * (detectionDistance * 0.5f);
-                int hitCount = Physics2D.OverlapBox(detectionCenter, detectionBoxSize, 0f, contactFilter, overlapResults);
-
-                Gizmos.color = Color.cyan;
-                for (int i = 0; i < hitCount; i++)
-                {
-                    if (overlapResults[i] != null)
-                    {
-                        Gizmos.DrawWireSphere(overlapResults[i].transform.position, 0.3f);
-                    }
-                }
-            }
         }
 
-        // Draw speed info
 #if UNITY_EDITOR
         UnityEditor.Handles.color = Color.white;
-        string info = $"Speed: {moveSpeed:F1}\nDirection: {direction}\nMoving: {isMoving}";
-        if (Application.isPlaying)
-        {
-            info += $"\nDetecting: {CheckForObstacle()}";
-        }
-        info += $"\nShake Trigger: {shakeTriggerName}";
+        string info = $"Speed: {moveSpeed:F1}\nLife: {destroyTimer:F1}s\nShaken: {shakenObjects.Count}";
         UnityEditor.Handles.Label(position + Vector3.up * 1.5f, info);
 #endif
     }
