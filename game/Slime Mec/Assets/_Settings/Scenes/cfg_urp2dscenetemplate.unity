@@ -128,16 +128,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -881936651771174391, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
-      propertyPath: attackOffsetBack.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -881936651771174391, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
-      propertyPath: attackOffsetSide.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1692881636651919560, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
-      propertyPath: m_SpriteSortPoint
-      value: 1
+      propertyPath: attackInstantiationOffset.y
+      value: -0.15
       objectReference: {fileID: 0}
     - target: {fileID: 4770894293968131866, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
       propertyPath: m_Name
@@ -269,7 +261,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.5529412, g: 0.9294118, b: 0.6509804, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

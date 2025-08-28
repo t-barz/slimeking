@@ -22,11 +22,11 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 8f569f69428dc894786200c4240a891a, type: 2}
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.19357
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.54216
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -393,9 +393,8 @@ MonoBehaviour:
     m_Bits: 1
   attackPrefab: {fileID: 764701950184065400, guid: 3854ef1d53461aa4a8bb7b66e70024b8, type: 3}
   attackDuration: 0.5
-  attackOffsetFront: {x: 0, y: 0}
-  attackOffsetBack: {x: 0, y: 0.2}
-  attackOffsetSide: {x: 0.2, y: 0}
+  lockMovementDuringAttack: 1
+  attackInstantiationOffset: {x: 0, y: -0.15}
   frontObject: {fileID: 0}
   backObject: {fileID: 0}
   sideObject: {fileID: 0}

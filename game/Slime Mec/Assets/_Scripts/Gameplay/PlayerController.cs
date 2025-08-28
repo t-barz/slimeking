@@ -15,6 +15,7 @@ using System.Collections;
 /// • Aplica flip automático em sprites laterais baseado na direção horizontal
 /// • Controla VFX direcionais independentemente dos sprites principais
 /// • Rotaciona objetos de ataque automaticamente baseado na direção atual (Sul = padrão)
+/// • Posiciona objetos de ataque com offset dinâmico baseado na direção
 /// • Fornece sistema extensível para interações e uso de inventário
 /// 
 /// DEPENDÊNCIAS:
@@ -57,6 +58,9 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("Se verdadeiro, impede movimento durante ataques")]
     [SerializeField] private bool lockMovementDuringAttack = true;
+
+    [Tooltip("Offset para posicionamento do objeto de ataque relativo ao transform do jogador")]
+    [SerializeField] private Vector2 attackInstantiationOffset = Vector2.zero;
 
     [Header("🎨 Configurações Visuais")]
     [Tooltip("Referências aos GameObjects filhos para controle de direção visual")]
@@ -405,6 +409,9 @@ public class PlayerController : MonoBehaviour
         // Desenha range de ataque se attackPoint estiver configurado
         DrawAttackRange();
 
+        // Desenha posição de instanciamento do objeto de ataque
+        DrawAttackInstantiationPosition();
+
         // FUTURO: Desenhar range de interação quando implementado
         // DrawInteractionRange();
 
@@ -419,6 +426,25 @@ public class PlayerController : MonoBehaviour
     {
         // Gizmos.color = Color.red;
         // Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
+    /// <summary>
+    /// Desenha a posição onde o objeto de ataque será instanciado.
+    /// Mostra um cubo pequeno na posição calculada com offset dinâmico.
+    /// </summary>
+    private void DrawAttackInstantiationPosition()
+    {
+        // Só desenha se houver offset configurado
+        if (attackInstantiationOffset.magnitude > 0.001f)
+        {
+            Gizmos.color = Color.cyan;
+            Vector3 instantiationPosition = GetAttackPosition();
+            Gizmos.DrawWireCube(instantiationPosition, Vector3.one * 0.2f);
+
+            // Desenha linha conectando o transform à posição de instanciamento
+            Gizmos.color = Color.cyan * 0.5f;
+            Gizmos.DrawLine(transform.position, instantiationPosition);
+        }
     }
 
     /// <summary>
@@ -960,12 +986,21 @@ public class PlayerController : MonoBehaviour
         // Ativa VFX de ataque baseado na direção atual
         ShowAttackVfx();
 
-        // Instancia GameObject de ataque na posição do transform (se o prefab estiver configurado)
+        // Instancia GameObject de ataque na posição calculada com offset (se o prefab estiver configurado)
         GameObject attackInstance = null;
         if (attackPrefab != null)
         {
             Vector3 attackPosition = GetAttackPosition();
             attackInstance = Instantiate(attackPrefab, attackPosition, Quaternion.identity);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (enableLogs)
+            {
+                Vector2 appliedOffset = GetDirectionalInstantiationOffset();
+                Debug.Log($"PlayerController: Instanciando ataque - Direção: {_currentVisualDirection}, " +
+                         $"FacingRight: {_facingRight}, Offset aplicado: {appliedOffset}, Posição final: {attackPosition}");
+            }
+#endif
 
             // Configura os visuais do ataque baseado na direção atual
             SetupAttackVisuals(attackInstance);
@@ -1071,13 +1106,58 @@ public class PlayerController : MonoBehaviour
     #region Combat Helper Methods
 
     /// <summary>
-    /// Calcula a posição onde o GameObject de ataque deve ser instanciado baseado na direção atual
+    /// Calcula a posição onde o GameObject de ataque deve ser instanciado baseado na direção atual.
+    /// Aplica offset dinâmico que se ajusta automaticamente conforme a direção do movimento.
+    /// Usa as mesmas regras de transformação do AttackHandler para consistência.
     /// </summary>
     /// <returns>Posição final para instanciar o ataque</returns>
     private Vector3 GetAttackPosition()
     {
-        // Agora que removemos offsets do AttackHandler, usa só a posição do transform
-        return transform.position;
+        Vector2 adjustedOffset = GetDirectionalInstantiationOffset();
+        return transform.position + (Vector3)adjustedOffset;
+    }
+
+    /// <summary>
+    /// Calcula o offset de instanciamento baseado na direção atual do ataque.
+    /// Aplica as mesmas transformações do AttackHandler para manter consistência:
+    /// • Sul: offset reduzido pela metade (50% do valor original)
+    /// • Norte: inverte Y
+    /// • Leste: troca X e Y
+    /// • Oeste: troca X e Y + inverte X
+    /// </summary>
+    /// <returns>Offset ajustado para a direção atual</returns>
+    private Vector2 GetDirectionalInstantiationOffset()
+    {
+        Vector2 adjustedOffset = attackInstantiationOffset;
+
+        switch (_currentVisualDirection)
+        {
+            case VisualDirection.South:
+                // Sul: reduz o offset pela metade
+                adjustedOffset = attackInstantiationOffset * 0.5f;
+                break;
+
+            case VisualDirection.North:
+                // Sul → Norte: inverte Y
+                adjustedOffset.y = -attackInstantiationOffset.y;
+                break;
+
+            case VisualDirection.Side:
+                // Vertical → Horizontal: troca X e Y
+                if (_facingRight)
+                {
+                    // Leste: troca X e Y
+                    adjustedOffset = new Vector2(-attackInstantiationOffset.y, attackInstantiationOffset.x);
+                }
+                else
+                {
+                    // Oeste: troca X e Y + inverte X
+                    adjustedOffset = new Vector2(attackInstantiationOffset.y, attackInstantiationOffset.x);
+                }
+                break;
+        }
+
+        return adjustedOffset;
     }
 
     #endregion
