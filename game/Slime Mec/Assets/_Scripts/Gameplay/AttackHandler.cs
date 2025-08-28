@@ -23,8 +23,15 @@ namespace SlimeMec.Gameplay
         private readonly Collider2D[] colliderCache = new Collider2D[8]; // Cache fixo para evitar allocations
         private Vector3[] gizmoPoints; // Cache dos pontos do gizmo
 
+        // Cache de componentes para evitar GetComponent repetidos
+        private readonly System.Collections.Generic.Dictionary<Collider2D, BushDestruct> componentCache =
+            new System.Collections.Generic.Dictionary<Collider2D, BushDestruct>();
+
         // Propriedade para calcular posição de ataque com offset
         private Vector2 AttackCenter => (Vector2)transform.position + attackOffset;
+
+        // Hash da tag para performance
+        private static readonly int DestructableTagHash = "Destructable".GetHashCode();
         #endregion
 
         #region Unity Lifecycle
@@ -32,7 +39,7 @@ namespace SlimeMec.Gameplay
         {
             CacheGizmoPoints();
 
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
                 Debug.Log($"AttackHandler: Inicializado em {gameObject.name} com raio de ataque {attackRadius}");
 #endif
@@ -56,11 +63,11 @@ namespace SlimeMec.Gameplay
 
         #region Public Methods
         /// <summary>
-        /// Executa o ataque, detectando e danificando objetos destrutíveis
+        /// Executa o ataque, detectando e danificando objetos destrutíveis.
+        /// Sistema otimizado com cache de componentes para evitar GetComponent repetidos.
         /// </summary>
         public void PerformAttack()
         {
-            Debug.Log($"AttackHandler: Ataque executado");
             // Usa ContactFilter2D para detecção otimizada
             var filter = new ContactFilter2D();
             filter.SetLayerMask(destructableLayerMask);
@@ -68,7 +75,7 @@ namespace SlimeMec.Gameplay
 
             int hitCount = Physics2D.OverlapCircle(AttackCenter, attackRadius, filter, colliderCache);
 
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
                 Debug.Log($"AttackHandler: Ataque executado, {hitCount} objetos detectados");
 #endif
@@ -82,14 +89,22 @@ namespace SlimeMec.Gameplay
                 Collider2D col = colliderCache[i];
                 if (col.gameObject == gameObject) continue; // Ignora o próprio atacante
 
-                // Verifica se tem a tag "Destructable"
+                // Verifica se tem a tag "Destructable" - usa CompareTag para performance
                 if (col.CompareTag("Destructable"))
                 {
-                    // Tenta obter componente que implementa TakeDamage
-                    var destructable = col.GetComponent<BushDestruct>();
+                    // Usa cache de componentes para evitar GetComponent repetidos
+                    if (!componentCache.TryGetValue(col, out BushDestruct destructable))
+                    {
+                        destructable = col.GetComponent<BushDestruct>();
+                        if (destructable != null)
+                        {
+                            componentCache[col] = destructable;
+                        }
+                    }
+
                     if (destructable != null)
                     {
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                         if (enableDebugLogs)
                             Debug.Log($"AttackHandler: Causando dano em '{col.name}'");
 #endif
@@ -97,13 +112,22 @@ namespace SlimeMec.Gameplay
                     }
                     else
                     {
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
                         if (enableDebugLogs)
                             Debug.LogWarning($"AttackHandler: Objeto '{col.name}' tem tag 'Destructable' mas não tem componente BushDestruct");
 #endif
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Limpa o cache de componentes para liberar memória.
+        /// Deve ser chamado quando objetos são destruídos ou a cena muda.
+        /// </summary>
+        public void ClearComponentCache()
+        {
+            componentCache.Clear();
         }
         #endregion
 

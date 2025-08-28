@@ -15,6 +15,9 @@ namespace SlimeMec.Gameplay
         #region Private Fields
         private Animator animator;
         private bool isDestroyed = false;
+
+        // Cache para performance - evita múltiplas chamadas GetComponent
+        private static readonly int DestroyTriggerHash = Animator.StringToHash("Destroy");
         #endregion
 
         #region Unity Lifecycle
@@ -39,7 +42,7 @@ namespace SlimeMec.Gameplay
             // Verifica se o trigger existe no Animator
             ValidateAnimatorTriggers();
 
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
                 Debug.Log($"BushDestruct: Inicializado em {gameObject.name}");
 #endif
@@ -51,12 +54,15 @@ namespace SlimeMec.Gameplay
 
             bool hasDestroy = false;
 
-            // Verifica se o trigger existe no Animator Controller
-            foreach (var parameter in animator.parameters)
+            // Verifica se o trigger existe no Animator Controller - otimizado para performance
+            var parameters = animator.parameters;
+            for (int i = 0; i < parameters.Length; i++)
             {
-                if (parameter.type == AnimatorControllerParameterType.Trigger)
+                if (parameters[i].type == AnimatorControllerParameterType.Trigger &&
+                    parameters[i].nameHash == DestroyTriggerHash)
                 {
-                    if (parameter.name == "Destroy") hasDestroy = true;
+                    hasDestroy = true;
+                    break; // Early exit para performance
                 }
             }
 
@@ -67,7 +73,8 @@ namespace SlimeMec.Gameplay
 
         #region Public Methods
         /// <summary>
-        /// Método público para receber dano de ataques
+        /// Método público para receber dano de ataques.
+        /// Implementa proteção contra destruição múltipla para evitar bugs.
         /// </summary>
         public void TakeDamage()
         {
@@ -75,12 +82,13 @@ namespace SlimeMec.Gameplay
 
             isDestroyed = true;
 
-#if UNITY_EDITOR && DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
                 Debug.Log($"BushDestruct: Ativando trigger 'Destroy' em {gameObject.name}");
 #endif
 
-            animator.SetTrigger("Destroy");
+            // Usa hash para performance em vez de string
+            animator.SetTrigger(DestroyTriggerHash);
         }
 
         /// <summary>

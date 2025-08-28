@@ -1178,38 +1178,30 @@ public class PlayerController : MonoBehaviour
 
     /// <summary>
     /// Configura a rotação do objeto de ataque de acordo com a direção atual do personagem.
-    /// A direção padrão (Sul) não aplica rotação. Rotaciona o objeto inteiro em vez de usar sub-objetos.
+    /// A direção padrão (Sul) não aplica rotação. Sistema otimizado com cálculo direto de rotação.
     /// </summary>
     /// <param name="attackObj">Objeto de ataque recém-instanciado</param>
     private void SetupAttackVisuals(GameObject attackObj)
     {
-        // A direção padrão é Sul (0 graus), então aplicamos rotação baseada na direção atual
-        float rotationZ = 0f;
-
-        switch (_currentVisualDirection)
+        // Cálculo otimizado de rotação baseado na direção atual
+        float rotationZ = _currentVisualDirection switch
         {
-            case VisualDirection.South:
-                rotationZ = 0f;   // Direção padrão - sem rotação
-                break;
+            VisualDirection.South => 0f,      // Direção padrão - sem rotação
+            VisualDirection.North => 180f,    // Rotaciona 180 graus para apontar para cima
+            VisualDirection.Side => _facingRight ? 90f : -90f, // 90 para direita, -90 para esquerda
+            _ => 0f // Fallback para direção padrão
+        };
 
-            case VisualDirection.North:
-                rotationZ = 180f; // Rotaciona 180 graus para apontar para cima
-                break;
+        // Aplica a rotação no eixo Z - usa Quaternion direto para performance
+        attackObj.transform.rotation = Quaternion.AngleAxis(rotationZ, Vector3.forward);
 
-            case VisualDirection.Side:
-                // Para lateral, aplica rotação baseada na direção horizontal atual
-                rotationZ = _facingRight ? 90f : -90f; // 90 para direita, -90 para esquerda
-                break;
-        }
-
-        // Aplica a rotação no eixo Z
-        attackObj.transform.rotation = Quaternion.Euler(0f, 0f, rotationZ);
-
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (enableLogs)
         {
             Debug.Log($"PlayerController: Configurando rotação de ataque - Direção: {_currentVisualDirection}, " +
                      $"FacingRight: {_facingRight}, Rotação Z: {rotationZ}°");
         }
+#endif
     }
 
     /// <summary>
