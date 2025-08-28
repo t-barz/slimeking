@@ -2,7 +2,22 @@ fileFormatVersion: 2
 guid: e7d4901c0eda545458c5a8e646a851fe
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Destroy
+    second: {fileID: 7400000, guid: 4736c89d11bd4a549b03a4dc38f856bc, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Idle
+    second: {fileID: 7400000, guid: ba11c90c3963b0b4ab74b1edf3a2ea0f, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Shake
+    second: {fileID: 7400000, guid: c3ae43f11b9d8b84980171c906180999, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +117,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638911143193827310
+  platformSettingsDirtyTick: 638919159659577940
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -676,7 +691,7 @@ ScriptedImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     androidETC2FallbackOverride: 0
-  generatePhysicsShape: 0
+  generatePhysicsShape: 1
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 32, y: 32}

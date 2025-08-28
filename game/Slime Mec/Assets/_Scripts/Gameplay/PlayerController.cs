@@ -11,10 +11,10 @@ using System.Collections;
 /// • Integra com PlayerAttributesHandler para atributos dinâmicos
 /// • Processa input através do novo Input System do Unity
 /// • Controla animações e flip de sprite baseado na direção
-/// • Gerencia sistema de direção visual com objetos direcionais (front/back/side)
+/// • Gerencia sistema de direção visual com rotação de objetos de ataque
 /// • Aplica flip automático em sprites laterais baseado na direção horizontal
 /// • Controla VFX direcionais independentemente dos sprites principais
-/// • Exibe VFX de ataque automaticamente durante ataques baseado na direção atual
+/// • Rotaciona objetos de ataque automaticamente baseado na direção atual (Sul = padrão)
 /// • Fornece sistema extensível para interações e uso de inventário
 /// 
 /// DEPENDÊNCIAS:
@@ -1177,39 +1177,38 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Configura os sprites do objeto de ataque de acordo com a direção atual do personagem.
-    /// Ativa apenas o sprite de ataque apropriado para a direção atual e aplica flip quando necessário.
+    /// Configura a rotação do objeto de ataque de acordo com a direção atual do personagem.
+    /// A direção padrão (Sul) não aplica rotação. Rotaciona o objeto inteiro em vez de usar sub-objetos.
     /// </summary>
     /// <param name="attackObj">Objeto de ataque recém-instanciado</param>
     private void SetupAttackVisuals(GameObject attackObj)
     {
-        // Obtém sub-objetos do ataque
-        Transform attackBack = attackObj.transform.Find("attack_back");
-        Transform attackSide = attackObj.transform.Find("attack_side");
-        Transform attackFront = attackObj.transform.Find("attack_front");
+        // A direção padrão é Sul (0 graus), então aplicamos rotação baseada na direção atual
+        float rotationZ = 0f;
 
-        // Desativa todos inicialmente
-        if (attackBack != null) attackBack.gameObject.SetActive(false);
-        if (attackSide != null) attackSide.gameObject.SetActive(false);
-        if (attackFront != null) attackFront.gameObject.SetActive(false);
-
-        // Ativa apenas o correto para a direção atual
         switch (_currentVisualDirection)
         {
             case VisualDirection.South:
-                if (attackFront != null) attackFront.gameObject.SetActive(true);
+                rotationZ = 0f;   // Direção padrão - sem rotação
                 break;
+
             case VisualDirection.North:
-                if (attackBack != null) attackBack.gameObject.SetActive(true);
+                rotationZ = 180f; // Rotaciona 180 graus para apontar para cima
                 break;
+
             case VisualDirection.Side:
-                if (attackSide != null)
-                {
-                    attackSide.gameObject.SetActive(true);
-                    // Aplica o flip usando a mesma lógica dos VFX laterais
-                    ApplyFlipToSideObject(attackSide.gameObject);
-                }
+                // Para lateral, aplica rotação baseada na direção horizontal atual
+                rotationZ = _facingRight ? 90f : -90f; // 90 para direita, -90 para esquerda
                 break;
+        }
+
+        // Aplica a rotação no eixo Z
+        attackObj.transform.rotation = Quaternion.Euler(0f, 0f, rotationZ);
+
+        if (enableLogs)
+        {
+            Debug.Log($"PlayerController: Configurando rotação de ataque - Direção: {_currentVisualDirection}, " +
+                     $"FacingRight: {_facingRight}, Rotação Z: {rotationZ}°");
         }
     }
 

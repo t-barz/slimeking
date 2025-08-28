@@ -120,6 +120,18 @@ public class ProjectSetup : EditorWindow
             PrepareShakingProps();
         }
 
+        EditorGUILayout.Space(20);
+        GUILayout.Label("Configuração de Moitas", EditorStyles.boldLabel);
+        EditorGUILayout.Space(10);
+        EditorGUILayout.HelpBox("Configura moitas para sistema de Shake e Destroy:\n• Adiciona tag 'Destructable' aos objetos selecionados\n• Verifica se tem Animator e Controller existentes\n• Adiciona triggers 'Shake' e 'Destroy' se necessário\n• Cria states 'Idle', 'Shaking' e 'Destroyed' com transições:\n  - Idle → Shake/Destroy (sem exit time, 0.1s duration)\n  - Shake → Destroy (sem exit time, 0.1s duration)\n  - Shake/Destroy → Idle (exit time 1f, 0.1s duration)\n\nUSO: Selecione moitas com Animator+Controller na hierarquia", MessageType.Info);
+        EditorGUILayout.Space(10);
+
+        // Botão para preparar objetos destrutíveis
+        if (GUILayout.Button("Preparar Moitas", GUILayout.Height(30)))
+        {
+            PrepareBushObjects();
+        }
+
         // Adiciona espaço extra no final para melhor visualização
         EditorGUILayout.Space(20);
 
@@ -867,6 +879,345 @@ public class ProjectSetup : EditorWindow
             shakingToIdle.hasExitTime = true;
             wasConfigured = true;
             Debug.Log($"Transição Shaking -> Idle configurada para '{objectName}'");
+        }
+
+        // Salva as mudanças
+        if (wasConfigured)
+        {
+            EditorUtility.SetDirty(controller);
+        }
+    }
+
+    /// <summary>
+    /// Prepara moitas selecionadas para sistema de Shake e Destroy.
+    /// Adiciona a tag "Destructable" e configura triggers "Shake" e "Destroy" no Animator.
+    /// </summary>
+    void PrepareBushObjects()
+    {
+        GameObject[] selectedObjects = Selection.gameObjects;
+
+        if (selectedObjects.Length == 0)
+        {
+            EditorUtility.DisplayDialog("Nenhuma Moita Selecionada",
+                "Selecione uma ou mais moitas na hierarquia para configurar.", "OK");
+            return;
+        }
+
+        int configuredObjects = 0;
+        int skippedObjects = 0;
+        List<string> configuredList = new List<string>();
+        List<string> skippedList = new List<string>();
+
+        try
+        {
+            // Primeiro garante que a tag "Destructable" existe
+            CreateTagIfNotExists("Destructable");
+
+            foreach (GameObject obj in selectedObjects)
+            {
+                bool wasConfigured = false;
+
+                // Adiciona a tag "Destructable"
+                if (obj.tag == "Untagged" || obj.tag != "Destructable")
+                {
+                    obj.tag = "Destructable";
+                    wasConfigured = true;
+                }
+
+                // Verifica se tem Animator (não cria se não tiver)
+                Animator animator = obj.GetComponent<Animator>();
+                if (animator == null)
+                {
+                    Debug.LogWarning($"Moita '{obj.name}': Não possui Animator. Adicione um Animator manualmente.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica se tem Animator Controller (não cria se não tiver)
+                if (animator.runtimeAnimatorController == null)
+                {
+                    Debug.LogWarning($"Moita '{obj.name}': Animator não possui Controller. Crie um Animator Controller manualmente.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica se é um AnimatorController editável
+                UnityEditor.Animations.AnimatorController controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                if (controller == null)
+                {
+                    Debug.LogWarning($"Moita '{obj.name}': Animator Controller não é editável.");
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                    continue;
+                }
+
+                // Verifica/adiciona o trigger "Shake"
+                bool hasShakeTrigger = false;
+                foreach (var parameter in controller.parameters)
+                {
+                    if (parameter.name == "Shake" && parameter.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hasShakeTrigger = true;
+                        break;
+                    }
+                }
+
+                if (!hasShakeTrigger)
+                {
+                    controller.AddParameter("Shake", AnimatorControllerParameterType.Trigger);
+                    wasConfigured = true;
+                    Debug.Log($"Trigger 'Shake' adicionado ao Controller da moita '{obj.name}'");
+                }
+
+                // Verifica/adiciona o trigger "Destroy"
+                bool hasDestroyTrigger = false;
+                foreach (var parameter in controller.parameters)
+                {
+                    if (parameter.name == "Destroy" && parameter.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hasDestroyTrigger = true;
+                        break;
+                    }
+                }
+
+                if (!hasDestroyTrigger)
+                {
+                    controller.AddParameter("Destroy", AnimatorControllerParameterType.Trigger);
+                    wasConfigured = true;
+                    Debug.Log($"Trigger 'Destroy' adicionado ao Controller da moita '{obj.name}'");
+                }
+
+                // Configura os states e transições para sistema destrutível
+                ConfigureDestructibleStates(controller, obj.name, ref wasConfigured);
+
+                if (wasConfigured)
+                {
+                    configuredObjects++;
+                    configuredList.Add(obj.name);
+                }
+                else
+                {
+                    skippedObjects++;
+                    skippedList.Add(obj.name);
+                }
+            }
+
+            // Exibe resultado
+            string message = $"Configuração de Moitas concluída!\n\n" +
+                           $"Moitas configuradas: {configuredObjects}\n" +
+                           $"Moitas já configuradas: {skippedObjects}\n\n" +
+                           "Verifique o Console para instruções adicionais.";
+
+            Debug.Log("=== CONFIGURAÇÃO DE MOITAS ===");
+            Debug.Log($"Tag 'Destructable' foi criada/verificada.");
+
+            if (configuredList.Count > 0)
+            {
+                Debug.Log($"Moitas configuradas ({configuredObjects}):");
+                foreach (string objName in configuredList)
+                {
+                    Debug.Log($"  • {objName}");
+                }
+            }
+
+            if (skippedList.Count > 0)
+            {
+                Debug.Log($"Moitas já configuradas ({skippedObjects}):");
+                foreach (string objName in skippedList)
+                {
+                    Debug.Log($"  • {objName}");
+                }
+            }
+
+            Debug.Log("\nPRÓXIMOS PASSOS:");
+            Debug.Log("1. ✅ Tag 'Destructable' foi configurada automaticamente");
+            Debug.Log("2. ✅ Triggers 'Shake' e 'Destroy' foram adicionados aos Animator Controllers");
+            Debug.Log("3. ✅ States 'Idle', 'Shaking' e 'Destroyed' foram criados/configurados");
+            Debug.Log("4. ✅ Transições configuradas com os tempos especificados:");
+            Debug.Log("   - Idle → Shake/Destroy (sem exit time, 0.1s duration)");
+            Debug.Log("   - Shake → Destroy (sem exit time, 0.1s duration)");
+            Debug.Log("   - Shake/Destroy → Idle (exit time 1f, 0.1s duration)");
+            Debug.Log("5. 🎬 Adicione clips de animação aos states 'Idle', 'Shaking' e 'Destroyed'");
+            Debug.Log("6. 🎮 Use animator.SetTrigger(\"Shake\") ou animator.SetTrigger(\"Destroy\") no código");
+
+            EditorUtility.DisplayDialog("Concluído", message, "OK");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Erro durante a configuração de moitas: " + e.Message);
+            EditorUtility.DisplayDialog("Erro", "Ocorreu um erro durante a configuração. Verifique o Console.", "OK");
+        }
+    }
+
+    /// <summary>
+    /// Configura os states Idle, Shake e Destroy com transições específicas.
+    /// Idle → Shake/Destroy (sem exit time, 0.1s duration)
+    /// Shake → Destroy (sem exit time, 0.1s duration)  
+    /// Shake/Destroy → Idle (exit time 1f, 0.1s duration)
+    /// </summary>
+    /// <param name="controller">Animator Controller para configurar</param>
+    /// <param name="objectName">Nome do objeto para logs</param>
+    /// <param name="wasConfigured">Referência para indicar se houve mudanças</param>
+    void ConfigureDestructibleStates(UnityEditor.Animations.AnimatorController controller, string objectName, ref bool wasConfigured)
+    {
+        // Obtém a layer base (primeira layer)
+        if (controller.layers.Length == 0)
+        {
+            Debug.LogWarning($"Objeto '{objectName}': Controller não possui layers.");
+            return;
+        }
+
+        var baseLayer = controller.layers[0];
+        var stateMachine = baseLayer.stateMachine;
+
+        // Procura pelos states Idle, Shake e Destroy
+        UnityEditor.Animations.AnimatorState idleState = null;
+        UnityEditor.Animations.AnimatorState shakeState = null;
+        UnityEditor.Animations.AnimatorState destroyState = null;
+
+        foreach (var state in stateMachine.states)
+        {
+            if (state.state.name == "Idle")
+                idleState = state.state;
+            else if (state.state.name == "Shake")
+                shakeState = state.state;
+            else if (state.state.name == "Destroy")
+                destroyState = state.state;
+        }
+
+        // Cria o state Idle se não existir
+        if (idleState == null)
+        {
+            idleState = stateMachine.AddState("Idle");
+            stateMachine.defaultState = idleState;
+            wasConfigured = true;
+            Debug.Log($"State 'Idle' criado para '{objectName}'");
+        }
+
+        // Cria o state Shake se não existir  
+        if (shakeState == null)
+        {
+            shakeState = stateMachine.AddState("Shake");
+            wasConfigured = true;
+            Debug.Log($"State 'Shake' criado para '{objectName}'");
+        }
+
+        // Cria o state Destroy se não existir
+        if (destroyState == null)
+        {
+            destroyState = stateMachine.AddState("Destroy");
+            wasConfigured = true;
+            Debug.Log($"State 'Destroy' criado para '{objectName}'");
+        }
+
+        // Configura transição Idle → Shake (sem exit time, 0.1s duration)
+        bool hasIdleToShaking = false;
+        foreach (var transition in idleState.transitions)
+        {
+            if (transition.destinationState == shakeState)
+            {
+                hasIdleToShaking = true;
+                break;
+            }
+        }
+
+        if (!hasIdleToShaking)
+        {
+            var idleToShaking = idleState.AddTransition(shakeState);
+            idleToShaking.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Shake");
+            idleToShaking.duration = 0.1f;
+            idleToShaking.exitTime = 0f;
+            idleToShaking.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Idle → Shake configurada para '{objectName}'");
+        }
+
+        // Configura transição Idle → Destroy (sem exit time, 0.1s duration)
+        bool hasIdleToDestroyed = false;
+        foreach (var transition in idleState.transitions)
+        {
+            if (transition.destinationState == destroyState)
+            {
+                hasIdleToDestroyed = true;
+                break;
+            }
+        }
+
+        if (!hasIdleToDestroyed)
+        {
+            var idleToDestroyed = idleState.AddTransition(destroyState);
+            idleToDestroyed.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Destroy");
+            idleToDestroyed.duration = 0.1f;
+            idleToDestroyed.exitTime = 0f;
+            idleToDestroyed.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Idle → Destroy configurada para '{objectName}'");
+        }
+
+        // Configura transição Shake → Destroy (sem exit time, 0.1s duration)
+        bool hasShakingToDestroyed = false;
+        foreach (var transition in shakeState.transitions)
+        {
+            if (transition.destinationState == destroyState)
+            {
+                hasShakingToDestroyed = true;
+                break;
+            }
+        }
+
+        if (!hasShakingToDestroyed)
+        {
+            var shakingToDestroyed = shakeState.AddTransition(destroyState);
+            shakingToDestroyed.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Destroy");
+            shakingToDestroyed.duration = 0.1f;
+            shakingToDestroyed.exitTime = 0f;
+            shakingToDestroyed.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Shake → Destroy configurada para '{objectName}'");
+        }
+
+        // Configura transição Shake → Idle (exit time 1f, 0.1s duration)
+        bool hasShakingToIdle = false;
+        foreach (var transition in shakeState.transitions)
+        {
+            if (transition.destinationState == idleState)
+            {
+                hasShakingToIdle = true;
+                break;
+            }
+        }
+
+        if (!hasShakingToIdle)
+        {
+            var shakingToIdle = shakeState.AddTransition(idleState);
+            shakingToIdle.duration = 0.1f;
+            shakingToIdle.exitTime = 1f;
+            shakingToIdle.hasExitTime = true;
+            wasConfigured = true;
+            Debug.Log($"Transição Shaking → Idle configurada para '{objectName}'");
+        }
+
+        // Configura transição Destroy → Idle (exit time 1f, 0.1s duration)
+        bool hasDestroyedToIdle = false;
+        foreach (var transition in destroyState.transitions)
+        {
+            if (transition.destinationState == idleState)
+            {
+                hasDestroyedToIdle = true;
+                break;
+            }
+        }
+
+        if (!hasDestroyedToIdle)
+        {
+            var destroyedToIdle = destroyState.AddTransition(idleState);
+            destroyedToIdle.duration = 0.1f;
+            destroyedToIdle.exitTime = 1f;
+            destroyedToIdle.hasExitTime = true;
+            wasConfigured = true;
+            Debug.Log($"Transição Destroyed → Idle configurada para '{objectName}'");
         }
 
         // Salva as mudanças
