@@ -8,3 +8,4 @@
 - Todas as classes devem ter a opção de ligar e desligar os logs e debug, permitindo que o desenvolvedor controle a verbosidade do log.
 - A utilização de gizmos deve ser feita sempre que possível, para facilitar a visualização de elementos no editor mas sempre com a opção de desativar.
 - Sempre que tiver sons, deve-se utilizar uma lista de sons possíveis e um sistema de seleção aleatória para evitar repetição excessiva dos mesmos sons.
+- Não gere classes ou métodos de teste a não ser que seja pedido.

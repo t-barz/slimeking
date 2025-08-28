@@ -55,15 +55,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Duração do ataque em segundos")]
     [SerializeField] private float attackDuration = 0.5f;
 
-    [Space]
-    [Tooltip("Offset da posição de ataque quando atacando para frente (South)")]
-    [SerializeField] private Vector2 attackOffsetFront = new Vector2(0f, -0.5f);
-
-    [Tooltip("Offset da posição de ataque quando atacando para trás (North)")]
-    [SerializeField] private Vector2 attackOffsetBack = new Vector2(0f, 0.5f);
-
-    [Tooltip("Offset da posição de ataque quando atacando para os lados (Side)")]
-    [SerializeField] private Vector2 attackOffsetSide = new Vector2(0.5f, 0f);
+    [Tooltip("Se verdadeiro, impede movimento durante ataques")]
+    [SerializeField] private bool lockMovementDuringAttack = true;
 
     [Header("🎨 Configurações Visuais")]
     [Tooltip("Referências aos GameObjects filhos para controle de direção visual")]
@@ -104,6 +97,7 @@ public class PlayerController : MonoBehaviour
     private bool _isMoving = false;              // Se o jogador está em movimento
     private bool _canMove = true;                // Se o movimento está habilitado
     private bool _canAttack = true;              // Se o ataque está disponível (sem cooldown)
+    private bool _isAttacking = false;           // Se o jogador está executando um ataque
     private bool _isHiding = false;              // Se o jogador está escondido (Crouch pressionado)
 
     // === OTIMIZAÇÃO DE PERFORMANCE ===
@@ -674,6 +668,24 @@ public class PlayerController : MonoBehaviour
         // Early exit se movimento estiver desabilitado (ex: cutscenes, morte, etc.)
         if (!_canMove) return;
 
+        // Se o jogador estiver atacando e movimento estiver bloqueado
+        if (_isAttacking && lockMovementDuringAttack)
+        {
+            // Define movimento como falso para animator
+            _isMoving = false;
+
+            // Aplica velocidade zero para parar imediatamente
+            _rigidbody.linearVelocity = Vector2.zero;
+
+            // Atualiza animator para mostrar estado parado
+            if (_animator != null)
+            {
+                _animator.SetBool(IsWalking, false);
+            }
+
+            return;
+        }
+
         // Atualiza estado de movimento baseado no input atual
         _isMoving = _moveInput.magnitude > MOVEMENT_THRESHOLD;
 
@@ -728,6 +740,12 @@ public class PlayerController : MonoBehaviour
     /// <param name="targetVelocity">Velocidade desejada</param>
     private void ApplySmoothMovement(Vector2 targetVelocity)
     {
+        // Se estiver atacando e movimento estiver bloqueado, força velocidade zero para parar o movimento
+        if (_isAttacking && lockMovementDuringAttack)
+        {
+            targetVelocity = Vector2.zero;
+        }
+
         // Escolhe taxa de interpolação baseada se está acelerando ou desacelerando
         float currentRate = _isMoving ? acceleration : deceleration;
 
@@ -937,11 +955,12 @@ public class PlayerController : MonoBehaviour
     private IEnumerator PerformAttack()
     {
         _canAttack = false;
+        _isAttacking = true; // Bloqueia movimento durante o ataque (se configurado)
 
         // Ativa VFX de ataque baseado na direção atual
         ShowAttackVfx();
 
-        // Instancia GameObject de ataque na posição calculada com offset (se o prefab estiver configurado)
+        // Instancia GameObject de ataque na posição do transform (se o prefab estiver configurado)
         GameObject attackInstance = null;
         if (attackPrefab != null)
         {
@@ -958,18 +977,33 @@ public class PlayerController : MonoBehaviour
             _animator.SetTrigger(Attack01);
         }
 
-        // Detecta inimigos no range de ataque ao redor do jogador
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
-
-        // Aplica dano nos inimigos
-        foreach (Collider2D enemy in hitEnemies)
+        // Executa ataque usando AttackHandler (se disponível)
+        SlimeMec.Gameplay.AttackHandler attackHandler = attackInstance?.GetComponent<SlimeMec.Gameplay.AttackHandler>();
+        if (attackHandler != null)
         {
-            // TODO: Criar classe EnemyHealth para gerenciar vida dos inimigos
-            // var enemyHealth = enemy.GetComponent<EnemyHealth>();
-            // if (enemyHealth != null && _attributesHandler != null)
-            // {
-            //     enemyHealth.TakeDamage(_attributesHandler.CurrentAttack);
-            // }
+            // Determina se é um ataque lateral baseado na direção visual atual
+            bool isAttackingSideways = (_currentVisualDirection == VisualDirection.Side);
+
+            // Determina a direção específica para ajuste do offset
+            SlimeMec.Gameplay.AttackDirection attackDirection = GetAttackDirection();
+
+            attackHandler.PerformAttack(isAttackingSideways, attackDirection);
+        }
+        else
+        {
+            // Fallback: sistema antigo de detecção (manter compatibilidade)
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
+
+            // Aplica dano nos inimigos
+            foreach (Collider2D enemy in hitEnemies)
+            {
+                // TODO: Criar classe EnemyHealth para gerenciar vida dos inimigos
+                // var enemyHealth = enemy.GetComponent<EnemyHealth>();
+                // if (enemyHealth != null && _attributesHandler != null)
+                // {
+                //     enemyHealth.TakeDamage(_attributesHandler.CurrentAttack);
+                // }
+            }
         }
 
         // Aguarda a duração do ataque
@@ -1042,27 +1076,8 @@ public class PlayerController : MonoBehaviour
     /// <returns>Posição final para instanciar o ataque</returns>
     private Vector3 GetAttackPosition()
     {
-        Vector3 basePosition = transform.position;
-        Vector2 offset = Vector2.zero;
-
-        switch (_currentVisualDirection)
-        {
-            case VisualDirection.South:
-                offset = attackOffsetFront;
-                break;
-            case VisualDirection.North:
-                offset = attackOffsetBack;
-                break;
-            case VisualDirection.Side:
-                // Para direção lateral, aplica o flip no offset baseado na direção do personagem
-                offset = new Vector2(
-                    _facingRight ? attackOffsetSide.x : -attackOffsetSide.x,
-                    attackOffsetSide.y
-                );
-                break;
-        }
-
-        return basePosition + (Vector3)offset;
+        // Agora que removemos offsets do AttackHandler, usa só a posição do transform
+        return transform.position;
     }
 
     #endregion
@@ -1298,12 +1313,38 @@ public class PlayerController : MonoBehaviour
     private void ResetAttackState()
     {
         _canAttack = true;
+        _isAttacking = false; // Libera movimento após ataque
 
         // Esconde VFX de ataque
         HideAttackVfx();
 
         // Para todas as corrotinas de ataque em execução
         StopAllCoroutines();
+    }
+
+    /// <summary>
+    /// Determina a direção específica do ataque baseada na direção visual atual e orientação do sprite.
+    /// Converte VisualDirection para AttackDirection considerando o flip horizontal.
+    /// </summary>
+    /// <returns>Direção específica para ajuste do offset no AttackHandler</returns>
+    private SlimeMec.Gameplay.AttackDirection GetAttackDirection()
+    {
+        switch (_currentVisualDirection)
+        {
+            case VisualDirection.South:
+                return SlimeMec.Gameplay.AttackDirection.South;
+
+            case VisualDirection.North:
+                return SlimeMec.Gameplay.AttackDirection.North;
+
+            case VisualDirection.Side:
+                // Para ataques laterais, considera a direção do flip
+                return _facingRight ? SlimeMec.Gameplay.AttackDirection.East : SlimeMec.Gameplay.AttackDirection.West;
+
+            default:
+                // Fallback para direção padrão
+                return SlimeMec.Gameplay.AttackDirection.South;
+        }
     }
 
     #endregion

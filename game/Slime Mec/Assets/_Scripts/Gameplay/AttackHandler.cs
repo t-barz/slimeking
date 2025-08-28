@@ -3,32 +3,75 @@ using UnityEngine;
 namespace SlimeMec.Gameplay
 {
     /// <summary>
-    /// Detecta objetos com tag "Destructable" e chama TakeDamage() neles durante ataques
+    /// Direções específicas para ajuste dinâmico do offset de ataque
+    /// </summary>
+    public enum AttackDirection
+    {
+        South,  // Sul - para baixo
+        North,  // Norte - para cima  
+        East,   // Leste - para direita
+        West    // Oeste - para esquerda
+    }
+
+    /// <summary>
+    /// Detecta objetos com tag "Destructable" e chama TakeDamage() neles durante ataques.
+    /// 
+    /// SISTEMA DE DETECÇÃO RETANGULAR:
+    /// • Usa Physics2D.OverlapBox para área de ataque em formato retangular
+    /// • Permite configurar largura e altura independentemente (attackSize)
+    /// • Mais preciso que círculo para ataques direcionais (espadas, machados, etc.)
+    /// • Melhor para ataques em linha reta ou áreas específicas
+    /// • Inversão automática de dimensões para ataques laterais vs frontais
+    /// 
+    /// SISTEMA DE OFFSET DINÂMICO:
+    /// • attackOffset permite posicionar a área de detecção relativa ao transform
+    /// • Offset ajusta automaticamente baseado na direção do ataque (Sul/Norte/Leste/Oeste)
+    /// • Regras de transformação:
+    ///   - Sul: offset original (referência)
+    ///   - Norte: inverte Y (Sul → Norte multiplica Y por -1)
+    ///   - Leste: troca X e Y (vertical → horizontal)
+    ///   - Oeste: troca X e Y + inverte X (Leste → Oeste multiplica X por -1)
+    /// • Offset é aplicado tanto na detecção quanto na visualização dos gizmos
+    /// • Coordenadas locais: X (direita/esquerda), Y (cima/baixo)
+    /// 
+    /// VANTAGENS DA DETECÇÃO RETANGULAR:
+    /// • Controle preciso da área de alcance horizontal vs vertical
+    /// • Melhor para armas alongadas (espadas, lanças, etc.)
+    /// • Evita hits acidentais em objetos muito acima/abaixo do jogador
+    /// • Adaptação automática baseada na direção do ataque
+    /// 
+    /// VISUALIZAÇÃO NO EDITOR:
+    /// • Gizmos retangulares mostram a área efetiva de ataque
+    /// • Verde no modo normal, vermelho quando selecionado
+    /// • Mostra dimensões adaptadas (horizontal vs vertical)
     /// </summary>
     public class AttackHandler : MonoBehaviour
     {
         #region Serialized Fields
         [Header("Attack Detection Settings")]
-        [SerializeField] private float attackRadius = 1.5f;
-        [SerializeField] private Vector2 attackOffset = Vector2.zero; // Offset do centro de ataque
+        [SerializeField] private Vector2 attackSize = new Vector2(2f, 1.5f); // Tamanho da área de ataque (largura x altura)
+        [SerializeField] private Vector2 attackOffset = Vector2.zero; // Offset da área de detecção em relação ao transform
         [SerializeField] private LayerMask destructableLayerMask = -1; // Layers dos objetos destrutíveis
 
         [Header("Debug")]
-        [SerializeField] private bool showDebugGizmos = true;
         [SerializeField] private bool enableDebugLogs = false;
+        [SerializeField] private bool showDebugGizmos = true;
         #endregion
 
         #region Private Fields
         // Cache para performance
         private readonly Collider2D[] colliderCache = new Collider2D[8]; // Cache fixo para evitar allocations
-        private Vector3[] gizmoPoints; // Cache dos pontos do gizmo
+
+        // Estado atual do ataque
+        private bool _lastAttackWasSideways = false; // Para inversão de tamanho
+        private AttackDirection _currentDirection = AttackDirection.South; // Direção atual para ajuste de offset
 
         // Cache de componentes para evitar GetComponent repetidos
         private readonly System.Collections.Generic.Dictionary<Collider2D, BushDestruct> componentCache =
             new System.Collections.Generic.Dictionary<Collider2D, BushDestruct>();
 
-        // Propriedade para calcular posição de ataque com offset
-        private Vector2 AttackCenter => (Vector2)transform.position + attackOffset;
+        // Propriedade para calcular centro da área de ataque com offset dinâmico
+        private Vector2 AttackCenter => (Vector2)transform.position + GetDirectionalOffset();
 
         // Hash da tag para performance
         private static readonly int DestructableTagHash = "Destructable".GetHashCode();
@@ -37,27 +80,49 @@ namespace SlimeMec.Gameplay
         #region Unity Lifecycle
         private void Start()
         {
-            CacheGizmoPoints();
-
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
-                Debug.Log($"AttackHandler: Inicializado em {gameObject.name} com raio de ataque {attackRadius}");
+                Debug.Log($"AttackHandler: Inicializado em {gameObject.name} com área de ataque {attackSize}");
 #endif
         }
         #endregion
 
-        #region Initialization
-        private void CacheGizmoPoints()
-        {
-            // Pre-calcula pontos do gizmo para evitar recálculo todo frame
-            const int segments = 32;
-            gizmoPoints = new Vector3[segments + 1];
+        #region Private Methods
 
-            for (int i = 0; i <= segments; i++)
+        /// <summary>
+        /// Calcula o offset da área de detecção baseado na direção atual do ataque.
+        /// Aplica as transformações necessárias conforme as regras:
+        /// • Vertical ↔ Horizontal: inverte X e Y
+        /// • Sul → Norte: multiplica Y por -1  
+        /// • Leste → Oeste: multiplica X por -1
+        /// </summary>
+        private Vector2 GetDirectionalOffset()
+        {
+            Vector2 adjustedOffset = attackOffset;
+
+            switch (_currentDirection)
             {
-                float angle = i * 2f * Mathf.PI / segments;
-                gizmoPoints[i] = new Vector3(Mathf.Cos(angle) * attackRadius, Mathf.Sin(angle) * attackRadius, 0);
+                case AttackDirection.South:
+                    // Mantém offset original (referência)
+                    break;
+
+                case AttackDirection.North:
+                    // Sul → Norte: inverte Y
+                    adjustedOffset.y = -attackOffset.y;
+                    break;
+
+                case AttackDirection.East:
+                    // Vertical → Horizontal: troca X e Y
+                    adjustedOffset = new Vector2(-attackOffset.y, attackOffset.x);
+                    break;
+
+                case AttackDirection.West:
+                    // Vertical → Horizontal + Leste → Oeste: troca X/Y e inverte X
+                    adjustedOffset = new Vector2(attackOffset.y, attackOffset.x);
+                    break;
             }
+
+            return adjustedOffset;
         }
         #endregion
 
@@ -65,19 +130,50 @@ namespace SlimeMec.Gameplay
         /// <summary>
         /// Executa o ataque, detectando e danificando objetos destrutíveis.
         /// Sistema otimizado com cache de componentes para evitar GetComponent repetidos.
+        /// Usa detecção retangular para área de ataque mais precisa.
         /// </summary>
-        public void PerformAttack()
+        /// <param name="isAttackingSideways">Se verdadeiro, inverte largura e altura da área de ataque</param>
+        public void PerformAttack(bool isAttackingSideways = false)
         {
+            // Mantém compatibilidade com código existente - usa direção padrão Sul
+            PerformAttack(isAttackingSideways, AttackDirection.South);
+        }
+
+        /// <summary>
+        /// Executa o ataque com direção específica para ajuste dinâmico do offset.
+        /// Sistema otimizado com cache de componentes para evitar GetComponent repetidos.
+        /// Usa detecção retangular para área de ataque mais precisa.
+        /// </summary>
+        /// <param name="isAttackingSideways">Se verdadeiro, inverte largura e altura da área de ataque</param>
+        /// <param name="direction">Direção específica para ajuste do offset</param>
+        public void PerformAttack(bool isAttackingSideways, AttackDirection direction)
+        {
+            // Atualiza a direção atual para cálculo do offset
+            _currentDirection = direction;
+
+            // Armazena o estado para inversão de tamanho
+            _lastAttackWasSideways = isAttackingSideways;
+
+            // Calcula o tamanho da área de ataque baseado na direção
+            Vector2 effectiveAttackSize = CalculateEffectiveAttackSize(isAttackingSideways);
+
+            // Usa a posição do transform mais o offset dinâmico como centro do ataque
+            Vector2 attackCenter = AttackCenter;
+
             // Usa ContactFilter2D para detecção otimizada
             var filter = new ContactFilter2D();
             filter.SetLayerMask(destructableLayerMask);
             filter.useTriggers = true;
 
-            int hitCount = Physics2D.OverlapCircle(AttackCenter, attackRadius, filter, colliderCache);
+            int hitCount = Physics2D.OverlapBox(attackCenter, effectiveAttackSize, 0f, filter, colliderCache);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
-                Debug.Log($"AttackHandler: Ataque executado, {hitCount} objetos detectados");
+            {
+                string attackType = isAttackingSideways ? "lateral" : "frontal";
+                string directionName = direction.ToString();
+                Debug.Log($"AttackHandler: Ataque {attackType} executado na direção {directionName}, área {effectiveAttackSize}, offset {GetDirectionalOffset()}, {hitCount} objetos detectados");
+            }
 #endif
 
             // Early exit se não há detecções
@@ -122,6 +218,24 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
+        /// Calcula o tamanho efetivo da área de ataque baseado na direção.
+        /// Para ataques laterais, inverte largura e altura para criar área vertical.
+        /// </summary>
+        /// <param name="isAttackingSideways">Se verdadeiro, inverte largura e altura</param>
+        /// <returns>Tamanho efetivo da área de ataque</returns>
+        private Vector2 CalculateEffectiveAttackSize(bool isAttackingSideways)
+        {
+            if (isAttackingSideways)
+            {
+                // Inverte largura e altura para ataques laterais
+                return new Vector2(attackSize.y, attackSize.x);
+            }
+
+            // Retorna tamanho normal para ataques frontais/traseiros
+            return attackSize;
+        }
+
+        /// <summary>
         /// Limpa o cache de componentes para liberar memória.
         /// Deve ser chamado quando objetos são destruídos ou a cena muda.
         /// </summary>
@@ -137,14 +251,7 @@ namespace SlimeMec.Gameplay
             if (!showDebugGizmos) return;
 
             Gizmos.color = Color.green;
-            DrawOptimizedCircleGizmo();
-
-            // Desenha o centro de ataque se há offset
-            if (attackOffset != Vector2.zero)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(AttackCenter, 0.1f);
-            }
+            DrawAttackAreaGizmo();
         }
 
         private void OnDrawGizmosSelected()
@@ -152,72 +259,49 @@ namespace SlimeMec.Gameplay
             if (!showDebugGizmos) return;
 
             Gizmos.color = Color.red;
-            DrawOptimizedCircleGizmo();
-
-            // Desenha o centro de ataque se há offset
-            if (attackOffset != Vector2.zero)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(AttackCenter, 0.1f);
-
-                // Desenha linha do transform até o centro de ataque
-                Gizmos.color = Color.white;
-                Gizmos.DrawLine(transform.position, AttackCenter);
-            }
+            DrawAttackAreaGizmo();
         }
 
-        private void DrawOptimizedCircleGizmo()
+        private void DrawAttackAreaGizmo()
         {
-            if (gizmoPoints == null || gizmoPoints.Length == 0)
-            {
-                // Fallback se cache não foi inicializado
-                DrawCircleGizmo(AttackCenter, attackRadius);
-                return;
-            }
+            // Calcula tamanho efetivo baseado no último ataque
+            Vector2 effectiveSize = CalculateEffectiveAttackSize(_lastAttackWasSideways);
+            Vector3 center = AttackCenter; // Usa a propriedade que inclui o offset
 
-            Vector3 attackCenter = AttackCenter;
-            Vector3 lastPoint = attackCenter + gizmoPoints[0];
-
-            for (int i = 1; i < gizmoPoints.Length; i++)
-            {
-                Vector3 newPoint = attackCenter + gizmoPoints[i];
-                Gizmos.DrawLine(lastPoint, newPoint);
-                lastPoint = newPoint;
-            }
+            // Desenha retângulo wireframe da área de ataque
+            DrawWireframeBox(center, effectiveSize);
         }
 
-        private void DrawCircleGizmo(Vector3 center, float radius)
+        private void DrawWireframeBox(Vector3 center, Vector2 size)
         {
-            const int segments = 32;
-            float angle = 0f;
-            Vector3 lastPoint = center + new Vector3(radius, 0, 0);
+            float halfWidth = size.x * 0.5f;
+            float halfHeight = size.y * 0.5f;
 
-            for (int i = 1; i <= segments; i++)
-            {
-                angle = i * 2f * Mathf.PI / segments;
-                Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0);
-                Gizmos.DrawLine(lastPoint, newPoint);
-                lastPoint = newPoint;
-            }
+            // Define os 4 cantos do retângulo
+            Vector3[] corners = new Vector3[4];
+            corners[0] = center + new Vector3(-halfWidth, -halfHeight, 0); // Inferior esquerdo
+            corners[1] = center + new Vector3(halfWidth, -halfHeight, 0);  // Inferior direito
+            corners[2] = center + new Vector3(halfWidth, halfHeight, 0);   // Superior direito
+            corners[3] = center + new Vector3(-halfWidth, halfHeight, 0);  // Superior esquerdo
+
+            // Desenha as 4 linhas do retângulo
+            Gizmos.DrawLine(corners[0], corners[1]); // Inferior
+            Gizmos.DrawLine(corners[1], corners[2]); // Direita
+            Gizmos.DrawLine(corners[2], corners[3]); // Superior
+            Gizmos.DrawLine(corners[3], corners[0]); // Esquerda
         }
         #endregion
 
         #region Context Menu (Editor Only)
-        [ContextMenu("Test Attack")]
-        private void TestAttack()
-        {
-            PerformAttack();
-        }
-
         [ContextMenu("Debug Info")]
         private void DebugInfo()
         {
             Debug.Log($"=== AttackHandler Debug Info ===");
             Debug.Log($"GameObject: {gameObject.name}");
             Debug.Log($"Position: {transform.position}");
-            Debug.Log($"Attack Center: {AttackCenter}");
-            Debug.Log($"Attack Offset: {attackOffset}");
-            Debug.Log($"Attack Radius: {attackRadius}");
+            Debug.Log($"Attack Size: {attackSize}");
+            Debug.Log($"Last Attack Sideways: {_lastAttackWasSideways}");
+            Debug.Log($"Effective Size: {CalculateEffectiveAttackSize(_lastAttackWasSideways)}");
             Debug.Log($"Layer Mask: {destructableLayerMask}");
 
             // Lista objetos detectados atualmente
@@ -225,7 +309,7 @@ namespace SlimeMec.Gameplay
             filter.SetLayerMask(destructableLayerMask);
             filter.useTriggers = true;
 
-            int hitCount = Physics2D.OverlapCircle(AttackCenter, attackRadius, filter, colliderCache);
+            int hitCount = Physics2D.OverlapBox(transform.position, attackSize, 0f, filter, colliderCache);
             Debug.Log($"Objetos destrutíveis detectados: {hitCount}");
 
             for (int i = 0; i < hitCount; i++)

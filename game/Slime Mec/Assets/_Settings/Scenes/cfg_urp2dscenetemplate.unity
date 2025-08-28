@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -881936651771174391, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: attackOffsetBack.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -881936651771174391, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
+      propertyPath: attackOffsetSide.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1692881636651919560, guid: 61918bcee8a581b4db511635f52e6b69, type: 3}
       propertyPath: m_SpriteSortPoint
       value: 1
