@@ -118,8 +118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ed7fb861bed378428e296858745dd28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BounceHandler
-  minLaunchForce: 2
-  maxLaunchForce: 5
+  minLaunchForce: 0.5
+  maxLaunchForce: 3
   verticalForceMultiplier: 1.2
   minAngle: 45
   maxAngle: 135
