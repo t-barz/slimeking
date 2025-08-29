@@ -89,6 +89,13 @@ namespace SlimeMec.Gameplay
 
             // Usa hash para performance em vez de string
             animator.SetTrigger(DestroyTriggerHash);
+
+            // Verifica se existe componente DropController e executa o drop
+            DropController dropController = GetComponent<DropController>();
+            if (dropController != null)
+            {
+                dropController.DropItems();
+            }
         }
 
         /// <summary>

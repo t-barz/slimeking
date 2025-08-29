@@ -1,394 +1,138 @@
 using UnityEngine;
 
 /// <summary>
-/// Controlador para simulação de efeito de drop de itens com sistema de quicadas.
-/// Quando instanciado, lança o objeto em uma direção aleatória com força variável,
-/// seguido por quicadas sequenciais com força e intervalo decrescentes.
+/// Controlador responsável pela instanciação aleatória de prefabs.
+/// Permite configurar uma lista de prefabs e sortear quantos e quais objetos serão criados.
 /// 
 /// FUNCIONALIDADES:
-/// • Lançamento automático em direção aleatória ao ser instanciado
-/// • Força aleatória entre valores mínimo e máximo configuráveis
-/// • Sistema de quicadas sequenciais com redução de força configurável
-/// • Intervalo decrescente entre quicadas (metade do tempo anterior)
-/// • Parada automática após todas as quicadas
-/// • Suporte a diferentes tipos de movimento (2D/3D)
-/// • Controle opcional de bounce e fricção
+/// • Lista configurável de prefabs para instanciação
+/// • Range configurável de quantidade de objetos a serem criados
+/// • Seleção aleatória de prefabs da lista
+/// • Instanciação na posição do objeto atual
+/// • Controle de debug para acompanhar o processo
 /// 
 /// EXEMPLO DE USO:
-/// • Objeto lançado com força 4 em 45°, 2 quicadas, intervalo inicial 0.1s, fator 0.8
-/// • T=0.0s: Lança com força 4
-/// • T=0.1s: Primeira quicada com força 3.2 (4 × 0.8¹)
-/// • T=0.15s: Segunda quicada com força 2.56 (4 × 0.8²)
-/// • T=0.175s: Para o movimento
+/// • Lista com 5 prefabs diferentes
+/// • Range de 2-4 objetos
+/// • Chama DropItems() -> sorteia 3 objetos e instancia 3 prefabs aleatórios
 /// 
 /// DEPENDÊNCIAS:
-/// • Rigidbody2D ou Rigidbody para física
-/// • Collider para interação com o ambiente
+/// • Prefabs configurados na lista devem existir no projeto
 /// </summary>
-[RequireComponent(typeof(Rigidbody2D))]
 public class DropController : MonoBehaviour
 {
     #region Serialized Fields
-    [Header("⚡ Configurações de Lançamento")]
-    [Tooltip("Força mínima do lançamento")]
-    [SerializeField] private float minLaunchForce = 2f;
+    [Header("🎁 Configurações de Drop")]
+    [Tooltip("Lista de prefabs que podem ser instanciados")]
+    [SerializeField] private GameObject[] prefabList;
 
-    [Tooltip("Força máxima do lançamento")]
-    [SerializeField] private float maxLaunchForce = 5f;
+    [Tooltip("Quantidade mínima de objetos a serem instanciados")]
+    [SerializeField] private int minDropCount = 1;
 
-    [Tooltip("Multiplicador de força vertical (para criar arco de lançamento)")]
-    [SerializeField] private float verticalForceMultiplier = 1.2f;
+    [Tooltip("Quantidade máxima de objetos a serem instanciados")]
+    [SerializeField] private int maxDropCount = 3;
 
-    [Header("🎯 Configurações de Direção")]
-    [Tooltip("Ângulo mínimo de lançamento em graus (0 = direita, 90 = cima)")]
-    [SerializeField] private float minAngle = 45f;
-
-    [Tooltip("Ângulo máximo de lançamento em graus (0 = direita, 90 = cima)")]
-    [SerializeField] private float maxAngle = 135f;
-
-    [Header("🏀 Configurações de Quicadas")]
-    [Tooltip("Número de quicadas que o objeto fará após o lançamento inicial")]
-    [SerializeField] private int bounceCount = 2;
-
-    [Tooltip("Tempo em segundos até a primeira quicada após o lançamento")]
-    [SerializeField] private float timeToBounce = 0.1f;
-
-    [Tooltip("Percentual de redução da força a cada quicada (0.8 = redução de 20%)")]
-    [SerializeField][Range(0.1f, 1.0f)] private float forceReductionFactor = 0.8f;
-
-    [Header("⚙️ Configurações Opcionais")]
-    [Tooltip("Se verdadeiro, executa o lançamento automaticamente no Start")]
-    [SerializeField] private bool launchOnStart = true;
-
-    [Tooltip("Tempo em segundos após o qual o objeto será destruído (0 = nunca)")]
-    [SerializeField] private float autoDestroyTime = 0f;
+    [Header("📍 Configurações de Posicionamento")]
+    [Tooltip("Se verdadeiro, instancia na posição deste objeto. Se falso, instancia na origem")]
+    [SerializeField] private bool useCurrentPosition = true;
 
     [Header("🔧 Debug")]
     [Tooltip("Mostra logs de debug no Console")]
     [SerializeField] private bool enableDebugLogs = false;
     #endregion
 
-    #region Private Variables
-    private Rigidbody2D _rigidbody2D;
-    private bool _hasBeenLaunched = false;
-
-    // Variáveis para controle de quicadas
-    private Vector2 _initialLaunchDirection;
-    private float _initialLaunchForce;
-    private int _currentBounceIndex = 0;
-    private float _currentBounceInterval;
-    #endregion
-
-    #region Unity Lifecycle
-    /// <summary>
-    /// Inicializa componentes e valida dependências.
-    /// </summary>
-    private void Awake()
-    {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-
-        // Validação de componente
-        if (_rigidbody2D == null)
-        {
-            Debug.LogError($"DropController em '{gameObject.name}': Rigidbody2D não encontrado!", this);
-        }
-    }
-
-    /// <summary>
-    /// Executa lançamento automático se configurado.
-    /// </summary>
-    private void Start()
-    {
-        if (launchOnStart)
-        {
-            LaunchItem();
-        }
-
-        // Configura auto-destruição se especificado
-        if (autoDestroyTime > 0f)
-        {
-            Destroy(gameObject, autoDestroyTime);
-        }
-    }
-    #endregion
-
     #region Public Methods
     /// <summary>
-    /// Lança o item em uma direção aleatória com força aleatória.
-    /// Pode ser chamado externamente ou automaticamente no Start.
+    /// Sorteia e instancia uma quantidade aleatória de prefabs da lista.
+    /// A quantidade é determinada pelo range configurado (minDropCount - maxDropCount).
+    /// Os prefabs são selecionados aleatoriamente da lista.
     /// </summary>
-    public void LaunchItem()
+    public void DropItems()
     {
-        // Evita múltiplos lançamentos
-        if (_hasBeenLaunched)
+        // Validação da lista de prefabs
+        if (prefabList == null || prefabList.Length == 0)
         {
-            if (enableDebugLogs)
-                Debug.LogWarning($"DropController: Item '{gameObject.name}' já foi lançado!", this);
+            Debug.LogError($"DropController em '{gameObject.name}': Lista de prefabs está vazia!", this);
             return;
         }
 
-        if (_rigidbody2D == null)
+        // Validação do range
+        if (minDropCount < 1)
         {
-            Debug.LogError($"DropController: Não é possível lançar '{gameObject.name}' - Rigidbody2D ausente!", this);
-            return;
+            Debug.LogWarning($"DropController em '{gameObject.name}': minDropCount deve ser pelo menos 1. Ajustando para 1.", this);
+            minDropCount = 1;
         }
 
-        // Gera valores aleatórios
-        float randomForce = Random.Range(minLaunchForce, maxLaunchForce);
-        float randomAngle = Random.Range(minAngle, maxAngle);
-
-        // Converte ângulo para direção vetorial
-        Vector2 launchDirection = AngleToVector2(randomAngle);
-
-        // Aplica multiplicador vertical para criar arco mais natural
-        launchDirection.y *= verticalForceMultiplier;
-
-        // Normaliza e aplica força
-        Vector2 launchVelocity = launchDirection.normalized * randomForce;
-
-        // Salva dados iniciais para o sistema de quicadas
-        _initialLaunchDirection = launchDirection.normalized;
-        _initialLaunchForce = randomForce;
-        _currentBounceIndex = 0;
-        _currentBounceInterval = timeToBounce;
-
-        // Aplica impulso ao Rigidbody2D
-        _rigidbody2D.AddForce(launchVelocity, ForceMode2D.Impulse);
-
-        // Marca como lançado
-        _hasBeenLaunched = true;
-
-        // Inicia sistema de quicadas se configurado
-        if (bounceCount > 0 && timeToBounce > 0f)
+        if (maxDropCount < minDropCount)
         {
-            Invoke(nameof(ProcessNextBounce), _currentBounceInterval);
+            Debug.LogWarning($"DropController em '{gameObject.name}': maxDropCount não pode ser menor que minDropCount. Ajustando.", this);
+            maxDropCount = minDropCount;
         }
 
-        // Log de debug
+        // Sorteia quantos objetos serão instanciados
+        int dropCount = Random.Range(minDropCount, maxDropCount + 1);
+
+        // Determina a posição de instanciação
+        Vector3 spawnPosition = useCurrentPosition ? transform.position : Vector3.zero;
+
+        // Log de debug inicial
         if (enableDebugLogs)
         {
-            Debug.Log($"DropController: '{gameObject.name}' lançado! " +
-                     $"Força: {randomForce:F2}, Ângulo: {randomAngle:F1}°, " +
-                     $"Direção: {launchDirection}, Velocidade: {launchVelocity}", this);
-        }
-    }
-
-    /// <summary>
-    /// Lança o item com parâmetros customizados.
-    /// </summary>
-    /// <param name="force">Força do lançamento</param>
-    /// <param name="angle">Ângulo em graus</param>
-    public void LaunchItem(float force, float angle)
-    {
-        if (_hasBeenLaunched)
-        {
-            if (enableDebugLogs)
-                Debug.LogWarning($"DropController: Item '{gameObject.name}' já foi lançado!", this);
-            return;
+            Debug.Log($"DropController: Iniciando drop de {dropCount} item(s) na posição {spawnPosition}", this);
         }
 
-        if (_rigidbody2D == null)
+        // Instancia os objetos sorteados
+        for (int i = 0; i < dropCount; i++)
         {
-            Debug.LogError($"DropController: Não é possível lançar '{gameObject.name}' - Rigidbody2D ausente!", this);
-            return;
-        }
+            // Seleciona um prefab aleatório da lista
+            int randomIndex = Random.Range(0, prefabList.Length);
+            GameObject selectedPrefab = prefabList[randomIndex];
 
-        // Converte ângulo para direção vetorial
-        Vector2 launchDirection = AngleToVector2(angle);
-        launchDirection.y *= verticalForceMultiplier;
+            // Validação do prefab selecionado
+            if (selectedPrefab == null)
+            {
+                Debug.LogWarning($"DropController: Prefab no índice {randomIndex} é nulo! Pulando...", this);
+                continue;
+            }
 
-        // Salva dados iniciais para o sistema de quicadas
-        _initialLaunchDirection = launchDirection.normalized;
-        _initialLaunchForce = force;
-        _currentBounceIndex = 0;
-        _currentBounceInterval = timeToBounce;
+            // Instancia o prefab
+            GameObject droppedItem = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
 
-        // Aplica força
-        Vector2 launchVelocity = launchDirection.normalized * force;
-        _rigidbody2D.AddForce(launchVelocity, ForceMode2D.Impulse);
-
-        _hasBeenLaunched = true;
-
-        // Inicia sistema de quicadas se configurado
-        if (bounceCount > 0 && timeToBounce > 0f)
-        {
-            Invoke(nameof(ProcessNextBounce), _currentBounceInterval);
-        }
-
-        if (enableDebugLogs)
-        {
-            Debug.Log($"DropController: '{gameObject.name}' lançado com parâmetros customizados! " +
-                     $"Força: {force:F2}, Ângulo: {angle:F1}°", this);
-        }
-    }
-
-    /// <summary>
-    /// Para manualmente o movimento do objeto.
-    /// Pode ser chamado a qualquer momento para interromper o movimento.
-    /// </summary>
-    public void StopMovementManually()
-    {
-        // Cancela o invoke automático se estiver agendado
-        CancelInvoke(nameof(ProcessNextBounce));
-
-        // Para o movimento imediatamente
-        StopMovement();
-    }
-
-    /// <summary>
-    /// Reseta o estado de lançamento, permitindo novo lançamento.
-    /// </summary>
-    public void ResetLaunch()
-    {
-        _hasBeenLaunched = false;
-
-        // Cancela invokes agendados
-        CancelInvoke(nameof(ProcessNextBounce));
-
-        // Reseta variáveis de quicada
-        _currentBounceIndex = 0;
-        _initialLaunchDirection = Vector2.zero;
-        _initialLaunchForce = 0f;
-        _currentBounceInterval = 0f;
-
-        // Restaura o corpo rígido para Dynamic se estava Kinematic
-        if (_rigidbody2D != null)
-        {
-            _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-            _rigidbody2D.linearVelocity = Vector2.zero;
-            _rigidbody2D.angularVelocity = 0f;
-        }
-
-        if (enableDebugLogs)
-            Debug.Log($"DropController: Estado de lançamento resetado para '{gameObject.name}'", this);
-    }
-    #endregion
-
-    #region Private Methods
-    /// <summary>
-    /// Processa a próxima quicada no sistema de quicadas sequenciais.
-    /// Cada quicada tem força reduzida conforme o fator configurável e ocorre na metade do tempo da anterior.
-    /// </summary>
-    private void ProcessNextBounce()
-    {
-        if (_rigidbody2D == null)
-            return;
-
-        _currentBounceIndex++;
-
-        // Verifica se ainda há quicadas para processar
-        if (_currentBounceIndex > bounceCount)
-        {
-            // Todas as quicadas foram processadas, para o movimento
-            StopMovement();
-            return;
-        }
-
-        // Calcula a força da quicada atual usando o fator de redução configurável
-        // Força atual = força inicial * (fator_de_redução)^índice_da_quicada
-        float currentBounceForce = _initialLaunchForce * Mathf.Pow(forceReductionFactor, _currentBounceIndex);
-
-        // Aplica a força na mesma direção do lançamento inicial
-        Vector2 bounceVelocity = _initialLaunchDirection * currentBounceForce;
-        _rigidbody2D.AddForce(bounceVelocity, ForceMode2D.Impulse);
-
-        // Calcula o próximo intervalo (metade do tempo anterior)
-        _currentBounceInterval = timeToBounce / Mathf.Pow(2f, _currentBounceIndex);
-
-        // Log de debug
-        if (enableDebugLogs)
-        {
-            float reductionPercentage = (1f - forceReductionFactor) * 100f;
-            Debug.Log($"DropController: Quicada {_currentBounceIndex}/{bounceCount} - " +
-                     $"Força: {currentBounceForce:F2} (redução {reductionPercentage:F0}%), " +
-                     $"Próximo intervalo: {_currentBounceInterval:F3}s", this);
-        }
-
-        // Agenda a próxima quicada ou para o movimento se for a última
-        if (_currentBounceIndex < bounceCount)
-        {
-            Invoke(nameof(ProcessNextBounce), _currentBounceInterval);
-        }
-        else
-        {
-            // Agenda a parada do movimento após o último intervalo
-            Invoke(nameof(StopMovement), _currentBounceInterval);
-        }
-    }
-
-    /// <summary>
-    /// Para completamente o movimento do objeto.
-    /// Chamado automaticamente após as quicadas ou manualmente.
-    /// </summary>
-    private void StopMovement()
-    {
-        if (_rigidbody2D != null)
-        {
-            // Para toda velocidade linear e angular
-            _rigidbody2D.linearVelocity = Vector2.zero;
-            _rigidbody2D.angularVelocity = 0f;
-
-            // Opcional: tornar o objeto kinematic para evitar que se mova novamente
-            _rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
-
+            // Log de debug para cada item
             if (enableDebugLogs)
             {
-                Debug.Log($"DropController: Movimento interrompido para '{gameObject.name}' após as quicadas", this);
+                Debug.Log($"DropController: Item {i + 1}/{dropCount} - " +
+                         $"Prefab '{selectedPrefab.name}' instanciado como '{droppedItem.name}'", this);
             }
         }
-    }
 
-    /// <summary>
-    /// Converte um ângulo em graus para um Vector2 direcionado.
-    /// </summary>
-    /// <param name="angleInDegrees">Ângulo em graus</param>
-    /// <returns>Vector2 normalizado na direção do ângulo</returns>
-    private Vector2 AngleToVector2(float angleInDegrees)
-    {
-        float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
-        return new Vector2(Mathf.Cos(angleInRadians), Mathf.Sin(angleInRadians));
+        // Log de debug final
+        if (enableDebugLogs)
+        {
+            Debug.Log($"DropController: Drop finalizado! {dropCount} item(s) instanciado(s).", this);
+        }
     }
     #endregion
 
     #region Properties
     /// <summary>
-    /// Verifica se o item já foi lançado.
+    /// Quantidade de prefabs disponíveis na lista.
     /// </summary>
-    public bool HasBeenLaunched => _hasBeenLaunched;
+    public int PrefabCount => prefabList != null ? prefabList.Length : 0;
 
     /// <summary>
-    /// Força mínima configurada para lançamento.
+    /// Quantidade mínima configurada para drop.
     /// </summary>
-    public float MinLaunchForce => minLaunchForce;
+    public int MinDropCount => minDropCount;
 
     /// <summary>
-    /// Força máxima configurada para lançamento.
+    /// Quantidade máxima configurada para drop.
     /// </summary>
-    public float MaxLaunchForce => maxLaunchForce;
+    public int MaxDropCount => maxDropCount;
 
     /// <summary>
-    /// Verifica se o movimento foi interrompido (objeto está kinematic).
+    /// Verifica se a lista de prefabs está válida.
     /// </summary>
-    public bool IsMovementStopped => _rigidbody2D != null && _rigidbody2D.bodyType == RigidbodyType2D.Kinematic;
-
-    /// <summary>
-    /// Número de quicadas configuradas.
-    /// </summary>
-    public int BounceCount => bounceCount;
-
-    /// <summary>
-    /// Tempo configurado até a primeira quicada.
-    /// </summary>
-    public float TimeToBounce => timeToBounce;
-
-    /// <summary>
-    /// Fator de redução da força a cada quicada (0.8 = redução de 20%).
-    /// </summary>
-    public float ForceReductionFactor => forceReductionFactor;
-
-    /// <summary>
-    /// Índice da quicada atual (0 = lançamento inicial).
-    /// </summary>
-    public int CurrentBounceIndex => _currentBounceIndex;
+    public bool HasValidPrefabs => prefabList != null && prefabList.Length > 0;
     #endregion
 }

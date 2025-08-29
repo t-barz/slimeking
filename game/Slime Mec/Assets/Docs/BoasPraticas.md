@@ -9,3 +9,4 @@
 - A utilização de gizmos deve ser feita sempre que possível, para facilitar a visualização de elementos no editor mas sempre com a opção de desativar.
 - Sempre que tiver sons, deve-se utilizar uma lista de sons possíveis e um sistema de seleção aleatória para evitar repetição excessiva dos mesmos sons.
 - Não gere classes ou métodos de teste a não ser que seja pedido.
+- Utilize números inteiros para contagem e iteração, evitando o uso de floats ou doubles quando não necessário.
