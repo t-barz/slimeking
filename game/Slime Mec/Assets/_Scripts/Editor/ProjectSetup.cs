@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine.Rendering;
 using System.Linq;
+using SlimeMec.Gameplay;
 
 /// <summary>
 /// Ferramenta de configuração e organização de projetos Unity 2D.
@@ -130,6 +131,18 @@ public class ProjectSetup : EditorWindow
         if (GUILayout.Button("Preparar Moitas", GUILayout.Height(30)))
         {
             PrepareBushObjects();
+        }
+
+        EditorGUILayout.Space(20);
+        GUILayout.Label("Configuração de Rochas", EditorStyles.boldLabel);
+        EditorGUILayout.Space(10);
+        EditorGUILayout.HelpBox("Configuração completa de rochas destrutíveis:\n• Adiciona tag 'Destructable' ao objeto\n• Marca o objeto como estático\n• Configura BoxCollider2D (offset: 0, 0.15 | size: 0.5, 0.25)\n• Adiciona componentes DropController e RockDestruct\n• Verifica Animator e Controller existentes\n• Adiciona triggers 'Crack' e 'Destroy' se necessário\n• Cria states 'Idle', 'Cracked' e 'Destroyed' com transições:\n  - Idle → Cracked (trigger 'Crack', transição imediata)\n  - Idle → Destroyed (trigger 'Destroy', transição imediata)\n  - Cracked → Destroyed (trigger 'Destroy', transição imediata)\n\nUSO: Selecione objetos de rocha na hierarquia", MessageType.Info);
+        EditorGUILayout.Space(10);
+
+        // Botão para preparar rochas
+        if (GUILayout.Button("Preparar Rochas", GUILayout.Height(30)))
+        {
+            PrepareRockObjects();
         }
 
         // Adiciona espaço extra no final para melhor visualização
@@ -1224,6 +1237,330 @@ public class ProjectSetup : EditorWindow
         if (wasConfigured)
         {
             EditorUtility.SetDirty(controller);
+        }
+    }
+
+    /// <summary>
+    /// Prepara rochas selecionadas para sistema de quebra.
+    /// Configura triggers "Crack" e "Destroy" no Animator com estados apropriados.
+    /// </summary>
+    void PrepareRockObjects()
+    {
+        GameObject[] selectedObjects = Selection.gameObjects;
+
+        if (selectedObjects.Length == 0)
+        {
+            EditorUtility.DisplayDialog("Nenhuma Rocha Selecionada",
+                "Selecione uma ou mais rochas na hierarquia para configurar.", "OK");
+            return;
+        }
+
+        int configuredObjects = 0;
+        int skippedObjects = 0;
+        List<string> configuredList = new List<string>();
+        List<string> skippedList = new List<string>();
+
+        try
+        {
+            foreach (GameObject obj in selectedObjects)
+            {
+                bool wasConfigured = false;
+                bool hasErrors = false;
+                List<string> objectErrors = new List<string>();
+
+                // 1. Configura tag como "Destructable"
+                if (obj.tag != "Destructable")
+                {
+                    obj.tag = "Destructable";
+                    wasConfigured = true;
+                }
+
+                // 2. Marca o objeto como estático
+                if (!obj.isStatic)
+                {
+                    obj.isStatic = true;
+                    wasConfigured = true;
+                }
+
+                // 3. Configura ou adiciona BoxCollider2D com settings específicos
+                BoxCollider2D boxCollider = obj.GetComponent<BoxCollider2D>();
+                if (boxCollider == null)
+                {
+                    boxCollider = obj.AddComponent<BoxCollider2D>();
+                    wasConfigured = true;
+                }
+
+                // Configura offset e size do BoxCollider2D
+                Vector2 targetOffset = new Vector2(0f, 0.15f);
+                Vector2 targetSize = new Vector2(0.5f, 0.25f);
+
+                if (boxCollider.offset != targetOffset)
+                {
+                    boxCollider.offset = targetOffset;
+                    wasConfigured = true;
+                }
+
+                if (boxCollider.size != targetSize)
+                {
+                    boxCollider.size = targetSize;
+                    wasConfigured = true;
+                }
+
+                // 4. Adiciona DropController se não existir
+                DropController dropController = obj.GetComponent<DropController>();
+                if (dropController == null)
+                {
+                    obj.AddComponent<DropController>();
+                    wasConfigured = true;
+                }
+
+                // 5. Adiciona RockDestruct se não existir
+                RockDestruct rockDestruct = obj.GetComponent<RockDestruct>();
+                if (rockDestruct == null)
+                {
+                    obj.AddComponent<RockDestruct>();
+                    wasConfigured = true;
+                }
+
+                // 6. Verifica Animator e Controller
+                Animator animator = obj.GetComponent<Animator>();
+                if (animator == null)
+                {
+                    hasErrors = true;
+                    objectErrors.Add("sem Animator");
+                }
+                else if (animator.runtimeAnimatorController == null)
+                {
+                    hasErrors = true;
+                    objectErrors.Add("sem Controller");
+                }
+                else
+                {
+                    var controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                    if (controller == null)
+                    {
+                        hasErrors = true;
+                        objectErrors.Add("Controller inválido");
+                    }
+                    else
+                    {
+                        // 7. Adiciona parâmetros necessários no Animator
+                        AddParameterIfNotExists(controller, "Crack", AnimatorControllerParameterType.Trigger, ref wasConfigured);
+                        AddParameterIfNotExists(controller, "Destroy", AnimatorControllerParameterType.Trigger, ref wasConfigured);
+
+                        // 8. Configura os estados e transições
+                        ConfigureRockStates(controller, obj.name, ref wasConfigured);
+                    }
+                }
+
+                // Classifica o resultado
+                if (hasErrors)
+                {
+                    skippedObjects++;
+                    skippedList.Add($"{obj.name} ({string.Join(", ", objectErrors)})");
+                }
+                else if (wasConfigured)
+                {
+                    configuredObjects++;
+                    configuredList.Add(obj.name);
+                }
+                else
+                {
+                    skippedObjects++;
+                    skippedList.Add($"{obj.name} (já configurado)");
+                }
+            }
+
+            string message = $"Configuração de Rochas Concluída!\n\n";
+
+            if (configuredList.Count > 0)
+            {
+                message += $"✅ Rochas configuradas ({configuredObjects}):\n";
+                foreach (string name in configuredList)
+                {
+                    message += $"• {name}\n";
+                }
+                message += "\n";
+            }
+
+            if (skippedList.Count > 0)
+            {
+                message += $"⚠️ Rochas ignoradas ({skippedObjects}):\n";
+                foreach (string reason in skippedList)
+                {
+                    message += $"• {reason}\n";
+                }
+            }
+
+            EditorUtility.DisplayDialog("Configuração Concluída", message, "OK");
+            Debug.Log($"Rochas configuradas: {configuredObjects} | Ignoradas: {skippedObjects}");
+        }
+        catch (System.Exception e)
+        {
+            EditorUtility.DisplayDialog("Erro", $"Erro durante configuração das rochas:\n{e.Message}", "OK");
+            Debug.LogError($"Erro ao configurar rochas: {e.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Configura os states Idle, Cracked e Destroyed com transições específicas para rochas.
+    /// Idle → Cracked (trigger 'Crack', transição imediata)
+    /// Idle → Destroyed (trigger 'Destroy', transição imediata)
+    /// Cracked → Destroyed (trigger 'Destroy', transição imediata)
+    /// </summary>
+    /// <param name="controller">Animator Controller para configurar</param>
+    /// <param name="objectName">Nome do objeto para logs</param>
+    /// <param name="wasConfigured">Referência para indicar se houve mudanças</param>
+    void ConfigureRockStates(UnityEditor.Animations.AnimatorController controller, string objectName, ref bool wasConfigured)
+    {
+        // Obtém a layer base (primeira layer)
+        if (controller.layers.Length == 0)
+        {
+            Debug.LogWarning($"Objeto '{objectName}': Controller não possui layers.");
+            return;
+        }
+
+        var baseLayer = controller.layers[0];
+        var stateMachine = baseLayer.stateMachine;
+
+        // Procura pelos states Idle, Cracked e Destroyed
+        UnityEditor.Animations.AnimatorState idleState = null;
+        UnityEditor.Animations.AnimatorState crackedState = null;
+        UnityEditor.Animations.AnimatorState destroyedState = null;
+
+        foreach (var state in stateMachine.states)
+        {
+            if (state.state.name == "Idle")
+                idleState = state.state;
+            else if (state.state.name == "Cracked")
+                crackedState = state.state;
+            else if (state.state.name == "Destroyed")
+                destroyedState = state.state;
+        }
+
+        // Cria o state Idle se não existir
+        if (idleState == null)
+        {
+            idleState = stateMachine.AddState("Idle");
+            stateMachine.defaultState = idleState;
+            wasConfigured = true;
+            Debug.Log($"State 'Idle' criado para '{objectName}'");
+        }
+
+        // Cria o state Cracked se não existir  
+        if (crackedState == null)
+        {
+            crackedState = stateMachine.AddState("Cracked");
+            wasConfigured = true;
+            Debug.Log($"State 'Cracked' criado para '{objectName}'");
+        }
+
+        // Cria o state Destroyed se não existir
+        if (destroyedState == null)
+        {
+            destroyedState = stateMachine.AddState("Destroyed");
+            wasConfigured = true;
+            Debug.Log($"State 'Destroyed' criado para '{objectName}'");
+        }
+
+        // Configura transição Idle → Cracked (trigger 'Crack', transição imediata)
+        bool hasIdleToCracked = false;
+        foreach (var transition in idleState.transitions)
+        {
+            if (transition.destinationState == crackedState)
+            {
+                hasIdleToCracked = true;
+                break;
+            }
+        }
+
+        if (!hasIdleToCracked)
+        {
+            var idleToCracked = idleState.AddTransition(crackedState);
+            idleToCracked.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Crack");
+            idleToCracked.duration = 0f;
+            idleToCracked.exitTime = 0f;
+            idleToCracked.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Idle → Cracked configurada para '{objectName}'");
+        }
+
+        // Configura transição Idle → Destroyed (trigger 'Destroy', transição imediata)
+        bool hasIdleToDestroyed = false;
+        foreach (var transition in idleState.transitions)
+        {
+            if (transition.destinationState == destroyedState)
+            {
+                hasIdleToDestroyed = true;
+                break;
+            }
+        }
+
+        if (!hasIdleToDestroyed)
+        {
+            var idleToDestroyed = idleState.AddTransition(destroyedState);
+            idleToDestroyed.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Destroy");
+            idleToDestroyed.duration = 0f;
+            idleToDestroyed.exitTime = 0f;
+            idleToDestroyed.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Idle → Destroyed configurada para '{objectName}'");
+        }
+
+        // Configura transição Cracked → Destroyed (trigger 'Destroy', transição imediata)
+        bool hasCrackedToDestroyed = false;
+        foreach (var transition in crackedState.transitions)
+        {
+            if (transition.destinationState == destroyedState)
+            {
+                hasCrackedToDestroyed = true;
+                break;
+            }
+        }
+
+        if (!hasCrackedToDestroyed)
+        {
+            var crackedToDestroyed = crackedState.AddTransition(destroyedState);
+            crackedToDestroyed.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, "Destroy");
+            crackedToDestroyed.duration = 0f;
+            crackedToDestroyed.exitTime = 0f;
+            crackedToDestroyed.hasExitTime = false;
+            wasConfigured = true;
+            Debug.Log($"Transição Cracked → Destroyed configurada para '{objectName}'");
+        }
+
+        // Salva as mudanças
+        if (wasConfigured)
+        {
+            EditorUtility.SetDirty(controller);
+        }
+    }
+
+    /// <summary>
+    /// Adiciona um parâmetro ao AnimatorController se ele não existir.
+    /// </summary>
+    /// <param name="controller">Controller onde adicionar o parâmetro</param>
+    /// <param name="parameterName">Nome do parâmetro</param>
+    /// <param name="parameterType">Tipo do parâmetro</param>
+    /// <param name="wasConfigured">Referência para indicar se houve mudanças</param>
+    void AddParameterIfNotExists(UnityEditor.Animations.AnimatorController controller, string parameterName,
+        AnimatorControllerParameterType parameterType, ref bool wasConfigured)
+    {
+        bool parameterExists = false;
+        foreach (var param in controller.parameters)
+        {
+            if (param.name == parameterName)
+            {
+                parameterExists = true;
+                break;
+            }
+        }
+
+        if (!parameterExists)
+        {
+            controller.AddParameter(parameterName, parameterType);
+            wasConfigured = true;
+            Debug.Log($"Parâmetro '{parameterName}' adicionado ao controller");
         }
     }
 

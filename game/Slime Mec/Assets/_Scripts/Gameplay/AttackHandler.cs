@@ -15,6 +15,7 @@ namespace SlimeMec.Gameplay
 
     /// <summary>
     /// Detecta objetos com tag "Destructable" e chama TakeDamage() neles durante ataques.
+    /// Suporta objetos com componentes BushDestruct e RockDestruct.
     /// 
     /// SISTEMA DE DETECÇÃO RETANGULAR:
     /// • Usa Physics2D.OverlapBox para área de ataque em formato retangular
@@ -22,6 +23,12 @@ namespace SlimeMec.Gameplay
     /// • Mais preciso que círculo para ataques direcionais (espadas, machados, etc.)
     /// • Melhor para ataques em linha reta ou áreas específicas
     /// • Inversão automática de dimensões para ataques laterais vs frontais
+    /// 
+    /// SISTEMA DE COMPONENTES DESTRUTÍVEIS:
+    /// • BushDestruct: Para moitas e objetos que são destruídos em 1 hit
+    /// • RockDestruct: Para rochas e objetos que requerem múltiplos hits
+    /// • Cache separado para cada tipo de componente (performance otimizada)
+    /// • Detecção automática do tipo de componente por objeto
     /// 
     /// SISTEMA DE OFFSET DINÂMICO:
     /// • attackOffset permite posicionar a área de detecção relativa ao transform
@@ -67,8 +74,10 @@ namespace SlimeMec.Gameplay
         private AttackDirection _currentDirection = AttackDirection.South; // Direção atual para ajuste de offset
 
         // Cache de componentes para evitar GetComponent repetidos
-        private readonly System.Collections.Generic.Dictionary<Collider2D, BushDestruct> componentCache =
+        private readonly System.Collections.Generic.Dictionary<Collider2D, BushDestruct> bushCache =
             new System.Collections.Generic.Dictionary<Collider2D, BushDestruct>();
+        private readonly System.Collections.Generic.Dictionary<Collider2D, RockDestruct> rockCache =
+            new System.Collections.Generic.Dictionary<Collider2D, RockDestruct>();
 
         // Propriedade para calcular centro da área de ataque com offset dinâmico
         private Vector2 AttackCenter => (Vector2)transform.position + GetDirectionalOffset();
@@ -188,29 +197,57 @@ namespace SlimeMec.Gameplay
                 // Verifica se tem a tag "Destructable" - usa CompareTag para performance
                 if (col.CompareTag("Destructable"))
                 {
-                    // Usa cache de componentes para evitar GetComponent repetidos
-                    if (!componentCache.TryGetValue(col, out BushDestruct destructable))
+                    bool damageDealt = false;
+
+                    // Tenta causar dano em BushDestruct
+                    if (!bushCache.TryGetValue(col, out BushDestruct bushDestructable))
                     {
-                        destructable = col.GetComponent<BushDestruct>();
-                        if (destructable != null)
+                        bushDestructable = col.GetComponent<BushDestruct>();
+                        if (bushDestructable != null)
                         {
-                            componentCache[col] = destructable;
+                            bushCache[col] = bushDestructable;
                         }
                     }
 
-                    if (destructable != null)
+                    if (bushDestructable != null)
                     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                         if (enableDebugLogs)
-                            Debug.Log($"AttackHandler: Causando dano em '{col.name}'");
+                            Debug.Log($"AttackHandler: Causando dano em moita '{col.name}'");
 #endif
-                        destructable.TakeDamage();
+                        bushDestructable.TakeDamage();
+                        damageDealt = true;
                     }
-                    else
+
+                    // Tenta causar dano em RockDestruct se não encontrou BushDestruct
+                    if (!damageDealt)
+                    {
+                        if (!rockCache.TryGetValue(col, out RockDestruct rockDestructable))
+                        {
+                            rockDestructable = col.GetComponent<RockDestruct>();
+                            if (rockDestructable != null)
+                            {
+                                rockCache[col] = rockDestructable;
+                            }
+                        }
+
+                        if (rockDestructable != null)
+                        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                            if (enableDebugLogs)
+                                Debug.Log($"AttackHandler: Causando dano em rocha '{col.name}'");
+#endif
+                            rockDestructable.TakeDamage();
+                            damageDealt = true;
+                        }
+                    }
+
+                    // Log de aviso se não encontrou nenhum componente destrutível
+                    if (!damageDealt)
                     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                         if (enableDebugLogs)
-                            Debug.LogWarning($"AttackHandler: Objeto '{col.name}' tem tag 'Destructable' mas não tem componente BushDestruct");
+                            Debug.LogWarning($"AttackHandler: Objeto '{col.name}' tem tag 'Destructable' mas não tem componente BushDestruct nem RockDestruct");
 #endif
                     }
                 }
@@ -241,7 +278,8 @@ namespace SlimeMec.Gameplay
         /// </summary>
         public void ClearComponentCache()
         {
-            componentCache.Clear();
+            bushCache.Clear();
+            rockCache.Clear();
         }
         #endregion
 
@@ -319,7 +357,9 @@ namespace SlimeMec.Gameplay
                 {
                     bool hasDestructableTag = col.CompareTag("Destructable");
                     bool hasBushDestruct = col.GetComponent<BushDestruct>() != null;
-                    Debug.Log($"  - {col.name} (Tag: {col.tag}, IsDestructable: {hasDestructableTag}, HasBushDestruct: {hasBushDestruct})");
+                    bool hasRockDestruct = col.GetComponent<RockDestruct>() != null;
+                    string destructType = hasBushDestruct ? "Bush" : (hasRockDestruct ? "Rock" : "None");
+                    Debug.Log($"  - {col.name} (Tag: {col.tag}, IsDestructable: {hasDestructableTag}, DestructType: {destructType})");
                 }
             }
         }
