@@ -124,7 +124,7 @@ public class ProjectSetup : EditorWindow
         EditorGUILayout.Space(20);
         GUILayout.Label("Configuração de Moitas", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
-        EditorGUILayout.HelpBox("Configura moitas para sistema de Shake e Destroy:\n• Adiciona tag 'Destructable' aos objetos selecionados\n• Verifica se tem Animator e Controller existentes\n• Adiciona triggers 'Shake' e 'Destroy' se necessário\n• Cria states 'Idle', 'Shaking' e 'Destroyed' com transições:\n  - Idle → Shake/Destroy (sem exit time, 0.1s duration)\n  - Shake → Destroy (sem exit time, 0.1s duration)\n  - Shake/Destroy → Idle (exit time 1f, 0.1s duration)\n\nUSO: Selecione moitas com Animator+Controller na hierarquia", MessageType.Info);
+        EditorGUILayout.HelpBox("Configuração completa de moitas destrutíveis (baseado em bushA2.prefab):\n• Adiciona tag 'Destructable' ao objeto\n• Adiciona SpriteRenderer se necessário\n• Configura CircleCollider2D (offset: 0, 0.15 | radius: 0.15 | trigger: true)\n• Adiciona componentes essenciais: Animator, BushDestruct, DropController\n• Adiciona componentes opcionais: WindEmulator, BushShake\n• Verifica Animator e Controller existentes\n• Adiciona triggers 'Shake' e 'Destroy' se necessário\n• Cria states 'Idle', 'Shaking' e 'Destroyed' com transições:\n  - Idle → Shake/Destroy (sem exit time, 0.1s duration)\n  - Shake → Destroy (sem exit time, 0.1s duration)\n  - Shake → Idle (exit time 1f, 0.1s duration)\n  - Destroyed é estado final (sem volta)\n\nUSO: Selecione objetos de moita na hierarquia", MessageType.Info);
         EditorGUILayout.Space(10);
 
         // Botão para preparar objetos destrutíveis
@@ -136,7 +136,7 @@ public class ProjectSetup : EditorWindow
         EditorGUILayout.Space(20);
         GUILayout.Label("Configuração de Rochas", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
-        EditorGUILayout.HelpBox("Configuração completa de rochas destrutíveis:\n• Adiciona tag 'Destructable' ao objeto\n• Marca o objeto como estático\n• Configura BoxCollider2D (offset: 0, 0.15 | size: 0.5, 0.25)\n• Adiciona componentes DropController e RockDestruct\n• Verifica Animator e Controller existentes\n• Adiciona triggers 'Crack' e 'Destroy' se necessário\n• Cria states 'Idle', 'Cracked' e 'Destroyed' com transições:\n  - Idle → Cracked (trigger 'Crack', transição imediata)\n  - Idle → Destroyed (trigger 'Destroy', transição imediata)\n  - Cracked → Destroyed (trigger 'Destroy', transição imediata)\n\nUSO: Selecione objetos de rocha na hierarquia", MessageType.Info);
+        EditorGUILayout.HelpBox("Configuração completa de rochas destrutíveis:\n• Adiciona tag 'Destructable' ao objeto\n• Marca o objeto como estático\n• Configura BoxCollider2D (offset: 0, 0.15 | size: 0.5, 0.25)\n• Adiciona componentes DropController e RockDestruct\n• Verifica Animator e Controller existentes\n• Adiciona triggers 'Crack' e 'Destroy' se necessário\n• Cria states 'Idle', 'Cracked' e 'Destroyed' com transições:\n  - Idle → Cracked (trigger 'Crack', transição imediata)\n  - Idle → Destroyed (trigger 'Destroy', transição imediata)\n  - Cracked → Destroyed (trigger 'Destroy', transição imediata)\n  - Destroyed é estado final (sem volta)\n\nUSO: Selecione objetos de rocha na hierarquia", MessageType.Info);
         EditorGUILayout.Space(10);
 
         // Botão para preparar rochas
@@ -555,6 +555,7 @@ public class ProjectSetup : EditorWindow
         // Lista de tags essenciais para o projeto
         string[] projectTags = {
             "Wind",
+            "Attack",
             "Props",
             "Enemy",
             "WindShaker",
@@ -902,8 +903,8 @@ public class ProjectSetup : EditorWindow
     }
 
     /// <summary>
-    /// Prepara moitas selecionadas para sistema de Shake e Destroy.
-    /// Adiciona a tag "Destructable" e configura triggers "Shake" e "Destroy" no Animator.
+    /// Prepara moitas selecionadas completamente com todos os componentes necessários.
+    /// Configuração baseada no prefab bushA2.prefab de referência.
     /// </summary>
     void PrepareBushObjects()
     {
@@ -929,83 +930,124 @@ public class ProjectSetup : EditorWindow
             foreach (GameObject obj in selectedObjects)
             {
                 bool wasConfigured = false;
+                bool hasErrors = false;
+                List<string> objectErrors = new List<string>();
 
-                // Adiciona a tag "Destructable"
-                if (obj.tag == "Untagged" || obj.tag != "Destructable")
+                // 1. Configura tag como "Destructable"
+                if (obj.tag != "Destructable")
                 {
                     obj.tag = "Destructable";
                     wasConfigured = true;
                 }
 
-                // Verifica se tem Animator (não cria se não tiver)
+                // 2. Adiciona SpriteRenderer se não existir
+                SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+                if (spriteRenderer == null)
+                {
+                    spriteRenderer = obj.AddComponent<SpriteRenderer>();
+                    wasConfigured = true;
+                }
+
+                // 3. Configura ou adiciona CircleCollider2D com settings específicos de moita
+                CircleCollider2D circleCollider = obj.GetComponent<CircleCollider2D>();
+                if (circleCollider == null)
+                {
+                    circleCollider = obj.AddComponent<CircleCollider2D>();
+                    wasConfigured = true;
+                }
+
+                // Configura propriedades específicas do CircleCollider2D para moitas
+                Vector2 targetOffset = new Vector2(0f, 0.15f);
+                float targetRadius = 0.15f;
+
+                if (circleCollider.offset != targetOffset)
+                {
+                    circleCollider.offset = targetOffset;
+                    wasConfigured = true;
+                }
+
+                if (Mathf.Abs(circleCollider.radius - targetRadius) > 0.001f)
+                {
+                    circleCollider.radius = targetRadius;
+                    wasConfigured = true;
+                }
+
+                if (!circleCollider.isTrigger)
+                {
+                    circleCollider.isTrigger = true;
+                    wasConfigured = true;
+                }
+
+                // 4. Adiciona Animator se não existir
                 Animator animator = obj.GetComponent<Animator>();
                 if (animator == null)
                 {
-                    Debug.LogWarning($"Moita '{obj.name}': Não possui Animator. Adicione um Animator manualmente.");
-                    skippedObjects++;
-                    skippedList.Add(obj.name);
-                    continue;
+                    animator = obj.AddComponent<Animator>();
+                    wasConfigured = true;
                 }
 
-                // Verifica se tem Animator Controller (não cria se não tiver)
+                // 5. Adiciona BushDestruct se não existir
+                BushDestruct bushDestruct = obj.GetComponent<BushDestruct>();
+                if (bushDestruct == null)
+                {
+                    obj.AddComponent<BushDestruct>();
+                    wasConfigured = true;
+                }
+
+                // 6. Adiciona DropController se não existir
+                DropController dropController = obj.GetComponent<DropController>();
+                if (dropController == null)
+                {
+                    obj.AddComponent<DropController>();
+                    wasConfigured = true;
+                }
+
+                // 7. Adiciona WindEmulator se não existir (componente opcional para efeito de vento)
+                if (obj.GetComponent<WindEmulator>() == null)
+                {
+                    obj.AddComponent<WindEmulator>();
+                    wasConfigured = true;
+                }
+
+                // 8. Adiciona BushShake se não existir (componente opcional para shake)
+                if (obj.GetComponent<BushShake>() == null)
+                {
+                    obj.AddComponent<BushShake>();
+                    wasConfigured = true;
+                }
+
+                // 9. Verifica se tem Animator Controller
                 if (animator.runtimeAnimatorController == null)
                 {
-                    Debug.LogWarning($"Moita '{obj.name}': Animator não possui Controller. Crie um Animator Controller manualmente.");
-                    skippedObjects++;
-                    skippedList.Add(obj.name);
-                    continue;
+                    hasErrors = true;
+                    objectErrors.Add("sem Controller no Animator");
                 }
-
-                // Verifica se é um AnimatorController editável
-                UnityEditor.Animations.AnimatorController controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
-                if (controller == null)
+                else
                 {
-                    Debug.LogWarning($"Moita '{obj.name}': Animator Controller não é editável.");
-                    skippedObjects++;
-                    skippedList.Add(obj.name);
-                    continue;
-                }
-
-                // Verifica/adiciona o trigger "Shake"
-                bool hasShakeTrigger = false;
-                foreach (var parameter in controller.parameters)
-                {
-                    if (parameter.name == "Shake" && parameter.type == AnimatorControllerParameterType.Trigger)
+                    var controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
+                    if (controller == null)
                     {
-                        hasShakeTrigger = true;
-                        break;
+                        hasErrors = true;
+                        objectErrors.Add("Controller não editável");
+                    }
+                    else
+                    {
+                        // 10. Adiciona parâmetros necessários no Animator
+                        AddParameterIfNotExists(controller, "Shake", AnimatorControllerParameterType.Trigger, ref wasConfigured);
+                        AddParameterIfNotExists(controller, "Destroy", AnimatorControllerParameterType.Trigger, ref wasConfigured);
+
+                        // 11. Configura os estados e transições
+                        ConfigureDestructibleStates(controller, obj.name, ref wasConfigured);
                     }
                 }
 
-                if (!hasShakeTrigger)
+                // Classifica o resultado
+                if (hasErrors)
                 {
-                    controller.AddParameter("Shake", AnimatorControllerParameterType.Trigger);
-                    wasConfigured = true;
-                    Debug.Log($"Trigger 'Shake' adicionado ao Controller da moita '{obj.name}'");
+                    skippedObjects++;
+                    skippedList.Add($"{obj.name} ({string.Join(", ", objectErrors)})");
                 }
-
-                // Verifica/adiciona o trigger "Destroy"
-                bool hasDestroyTrigger = false;
-                foreach (var parameter in controller.parameters)
-                {
-                    if (parameter.name == "Destroy" && parameter.type == AnimatorControllerParameterType.Trigger)
-                    {
-                        hasDestroyTrigger = true;
-                        break;
-                    }
-                }
-
-                if (!hasDestroyTrigger)
-                {
-                    controller.AddParameter("Destroy", AnimatorControllerParameterType.Trigger);
-                    wasConfigured = true;
-                    Debug.Log($"Trigger 'Destroy' adicionado ao Controller da moita '{obj.name}'");
-                }
-
-                // Configura os states e transições para sistema destrutível
-                ConfigureDestructibleStates(controller, obj.name, ref wasConfigured);
-
-                if (wasConfigured)
+                else if (wasConfigured)
                 {
                     configuredObjects++;
                     configuredList.Add(obj.name);
@@ -1013,54 +1055,38 @@ public class ProjectSetup : EditorWindow
                 else
                 {
                     skippedObjects++;
-                    skippedList.Add(obj.name);
+                    skippedList.Add($"{obj.name} (já configurado)");
                 }
             }
 
-            // Exibe resultado
-            string message = $"Configuração de Moitas concluída!\n\n" +
-                           $"Moitas configuradas: {configuredObjects}\n" +
-                           $"Moitas já configuradas: {skippedObjects}\n\n" +
-                           "Verifique o Console para instruções adicionais.";
-
-            Debug.Log("=== CONFIGURAÇÃO DE MOITAS ===");
-            Debug.Log($"Tag 'Destructable' foi criada/verificada.");
+            string message = $"Configuração de Moitas Concluída!\n\n";
 
             if (configuredList.Count > 0)
             {
-                Debug.Log($"Moitas configuradas ({configuredObjects}):");
-                foreach (string objName in configuredList)
+                message += $"✅ Moitas configuradas ({configuredObjects}):\n";
+                foreach (string name in configuredList)
                 {
-                    Debug.Log($"  • {objName}");
+                    message += $"• {name}\n";
                 }
+                message += "\n";
             }
 
             if (skippedList.Count > 0)
             {
-                Debug.Log($"Moitas já configuradas ({skippedObjects}):");
-                foreach (string objName in skippedList)
+                message += $"⚠️ Moitas ignoradas ({skippedObjects}):\n";
+                foreach (string reason in skippedList)
                 {
-                    Debug.Log($"  • {objName}");
+                    message += $"• {reason}\n";
                 }
             }
 
-            Debug.Log("\nPRÓXIMOS PASSOS:");
-            Debug.Log("1. ✅ Tag 'Destructable' foi configurada automaticamente");
-            Debug.Log("2. ✅ Triggers 'Shake' e 'Destroy' foram adicionados aos Animator Controllers");
-            Debug.Log("3. ✅ States 'Idle', 'Shaking' e 'Destroyed' foram criados/configurados");
-            Debug.Log("4. ✅ Transições configuradas com os tempos especificados:");
-            Debug.Log("   - Idle → Shake/Destroy (sem exit time, 0.1s duration)");
-            Debug.Log("   - Shake → Destroy (sem exit time, 0.1s duration)");
-            Debug.Log("   - Shake/Destroy → Idle (exit time 1f, 0.1s duration)");
-            Debug.Log("5. 🎬 Adicione clips de animação aos states 'Idle', 'Shaking' e 'Destroyed'");
-            Debug.Log("6. 🎮 Use animator.SetTrigger(\"Shake\") ou animator.SetTrigger(\"Destroy\") no código");
-
-            EditorUtility.DisplayDialog("Concluído", message, "OK");
+            EditorUtility.DisplayDialog("Configuração Concluída", message, "OK");
+            Debug.Log($"Moitas configuradas: {configuredObjects} | Ignoradas: {skippedObjects}");
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Erro durante a configuração de moitas: " + e.Message);
-            EditorUtility.DisplayDialog("Erro", "Ocorreu um erro durante a configuração. Verifique o Console.", "OK");
+            EditorUtility.DisplayDialog("Erro", $"Erro durante configuração das moitas:\n{e.Message}", "OK");
+            Debug.LogError($"Erro ao configurar moitas: {e.Message}");
         }
     }
 
@@ -1068,7 +1094,8 @@ public class ProjectSetup : EditorWindow
     /// Configura os states Idle, Shake e Destroy com transições específicas.
     /// Idle → Shake/Destroy (sem exit time, 0.1s duration)
     /// Shake → Destroy (sem exit time, 0.1s duration)  
-    /// Shake/Destroy → Idle (exit time 1f, 0.1s duration)
+    /// Shake → Idle (exit time 1f, 0.1s duration)
+    /// Destroyed é estado final (sem transições de saída)
     /// </summary>
     /// <param name="controller">Animator Controller para configurar</param>
     /// <param name="objectName">Nome do objeto para logs</param>
@@ -1213,6 +1240,8 @@ public class ProjectSetup : EditorWindow
         }
 
         // Configura transição Destroy → Idle (exit time 1f, 0.1s duration)
+        // REMOVIDO: Transição Destroyed → Idle para evitar que objetos destruídos voltem ao estado Idle
+        /*
         bool hasDestroyedToIdle = false;
         foreach (var transition in destroyState.transitions)
         {
@@ -1232,6 +1261,7 @@ public class ProjectSetup : EditorWindow
             wasConfigured = true;
             Debug.Log($"Transição Destroyed → Idle configurada para '{objectName}'");
         }
+        */
 
         // Salva as mudanças
         if (wasConfigured)

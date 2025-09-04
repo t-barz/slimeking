@@ -2,7 +2,22 @@ fileFormatVersion: 2
 guid: c77326906aa8f6d49a30eebfa1e134d7
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Destroy
+    second: {fileID: 7400000, guid: 2a5cced5bfe5b8542b7f8c5373d7be3d, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Idle
+    second: {fileID: 7400000, guid: ed80c6efe5a5abe4897ee3eb78b1c446, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Shake
+    second: {fileID: 7400000, guid: 2b2a299a3738685458421e1b796effab, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +117,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638911233898278111
+  platformSettingsDirtyTick: 638925721005654785
   textureAssetName: 
   singleSpriteImportData:
   - name: 
