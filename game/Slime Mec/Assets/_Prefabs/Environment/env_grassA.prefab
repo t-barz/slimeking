@@ -34,11 +34,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.0224108
+      value: 0.8731255
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0224108
+      value: 0.903249
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -169,7 +169,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea310a0ceb225445975f37a4ebe5c46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropController
-  prefabList: []
+  prefabList:
+  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
+  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
+  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
   minDropCount: 1
   maxDropCount: 3
   useCurrentPosition: 1
