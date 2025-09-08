@@ -43,6 +43,9 @@ namespace SlimeMec.Gameplay
         private bool _attractionEnabled = false;
         private Color _originalColor;
 
+        // Proteção contra múltiplas coletas
+        private bool _isCollected = false;
+
         // Cache de performance
         private static readonly string PLAYER_TAG = "Player";
         private static Transform s_cachedPlayerTransform;
@@ -238,7 +241,11 @@ namespace SlimeMec.Gameplay
             float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
             if (distanceToPlayer <= 0.2f)
             {
-                CollectItem();
+                // Evita múltiplas coletas por proximidade
+                if (!_isCollected)
+                {
+                    CollectItem();
+                }
             }
         }
 
@@ -251,6 +258,9 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
+            // Evita múltiplas coletas
+            if (_isCollected) return;
+
             if (other.CompareTag(PLAYER_TAG))
             {
                 CollectItem(other.gameObject);
@@ -262,7 +272,17 @@ namespace SlimeMec.Gameplay
         /// </summary>
         public void CollectItem(GameObject collector = null)
         {
-            if (itemData == null) return;
+            // Evita múltiplas coletas
+            if (_isCollected || itemData == null) return;
+
+            // Marca como coletado imediatamente
+            _isCollected = true;
+
+            // Desabilita collider para evitar novas colisões
+            if (_collider != null)
+            {
+                _collider.enabled = false;
+            }
 
             // Encontra o coletor (player)
             if (collector == null && _playerTransform != null)
@@ -339,8 +359,11 @@ namespace SlimeMec.Gameplay
             {
                 var vfx = Instantiate(itemData.vfxPrefab, transform.position, Quaternion.identity);
 
-                // Auto-destruição do VFX
-                Destroy(vfx, 2f);
+                // Auto-destruição do VFX (protegido para evitar null reference)
+                if (vfx != null)
+                {
+                    Destroy(vfx, 2f);
+                }
             }
 
             // Efeito sonoro
@@ -421,8 +444,16 @@ namespace SlimeMec.Gameplay
         /// </summary>
         public void ForceCollect()
         {
-            CollectItem();
+            if (!_isCollected)
+            {
+                CollectItem();
+            }
         }
+
+        /// <summary>
+        /// Verifica se o item já foi coletado
+        /// </summary>
+        public bool IsCollected => _isCollected;
 
         /// <summary>
         /// Pausa/retoma atração magnética
@@ -451,6 +482,9 @@ namespace SlimeMec.Gameplay
         /// </summary>
         public void RestartActivationDelay()
         {
+            // Não permitir reiniciar se já foi coletado
+            if (_isCollected) return;
+
             _spawnTime = Time.time;
             _attractionEnabled = false;
             _isBeingAttracted = false;
@@ -537,10 +571,12 @@ namespace SlimeMec.Gameplay
             if (!Application.isPlaying) return;
 
             string status = $"[ItemCollectable] {itemData?.itemName}\n";
+            status += $"Collected: {_isCollected}\n";
             status += $"Attraction Enabled: {enableAttraction}\n";
             status += $"Attraction Active: {IsAttractionActive}\n";
             status += $"Time Remaining: {GetRemainingActivationTime():F1}s\n";
-            status += $"Being Attracted: {_isBeingAttracted}";
+            status += $"Being Attracted: {_isBeingAttracted}\n";
+            status += $"Collider Enabled: {(_collider != null ? _collider.enabled : false)}";
 
             Debug.Log(status);
         }
