@@ -237,7 +237,8 @@ namespace SlimeMec.Gameplay
                             if (enableDebugLogs)
                                 Debug.Log($"AttackHandler: Causando dano em rocha '{col.name}'");
 #endif
-                            rockDestructable.TakeDamage();
+                            // Passa o centro do collider para posicionamento preciso do VFX
+                            rockDestructable.TakeDamage(col.bounds.center);
                             damageDealt = true;
                         }
                     }

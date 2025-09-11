@@ -34,11 +34,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 9809bce63c38d46438a4a0a4da71bf8b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7839345
+      value: 0.37767562
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 9809bce63c38d46438a4a0a4da71bf8b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.92206156
+      value: 0.44422102
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 9809bce63c38d46438a4a0a4da71bf8b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -178,6 +178,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.RockDestruct
   attacksToDestroy: 10
+  rockResistance: 5
+  vfxHit: {fileID: 972899578679645666, guid: fbbeb716243bbe141bccd72652834397, type: 3}
+  vfxFailHit: {fileID: 97848688705052570, guid: 295fce37116d4ff45862302952211f3b, type: 3}
   enableDebugLogs: 0
 --- !u!114 &-1479060635741323846
 MonoBehaviour:

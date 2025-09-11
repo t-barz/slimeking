@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: 0cbfe087f14d41e4ba455a80810d9fab
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: notHit01_vfx_Clip
+    second: {fileID: 7400000, guid: 2cc8b7a5836dc2f4ca465cf4ff14a568, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +107,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638910457470681755
+  platformSettingsDirtyTick: 638931790888149935
   textureAssetName: 
   singleSpriteImportData:
   - name: 
