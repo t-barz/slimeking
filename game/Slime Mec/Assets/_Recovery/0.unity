@@ -733,29 +733,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &653264415 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
-  m_PrefabInstance: {fileID: 7276404156438362683}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &653264425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 653264415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.5
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
-  enableOnStart: 0
-  createMaterialInstance: 1
-  enableDebugLogs: 0
 --- !u!1 &843391569 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 981683821645573240, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
@@ -774,8 +751,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.01
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
+  outlineSize: 0.1
+  outlineMaterial: {fileID: 2100000, guid: d81d891b4c0387f47a0df42dea7a69fb, type: 2}
   enableOnStart: 1
   createMaterialInstance: 1
   enableDebugLogs: 0
@@ -1840,14 +1817,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.77389956
-      objectReference: {fileID: 0}
-    - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.8005997
-      objectReference: {fileID: 0}
-    - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.246
       objectReference: {fileID: 0}
@@ -1894,10 +1863,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 653264425}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c87d440d8091ba14692b494f10114952, type: 3}
 --- !u!1001 &8018322588699472185
 PrefabInstance:

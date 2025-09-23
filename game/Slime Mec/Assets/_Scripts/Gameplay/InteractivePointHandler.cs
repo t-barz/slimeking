@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using SlimeMec.Visual;
 
 namespace SlimeMec.Gameplay
 {
@@ -48,6 +49,11 @@ namespace SlimeMec.Gameplay
         [SerializeField] private Transform xboxButtons;         // Botões de Xbox
         [SerializeField] private Transform switchButtons;       // Botões de Nintendo Switch
 
+        [Header("Outline Effect")]
+        [SerializeField] private OutlineShaderController outlineController; // Controlador de outline via shader
+        [SerializeField] private bool enableOutlineOnInteraction = true;    // Ativar outline quando player se aproxima
+        [SerializeField] private Color interactionOutlineColor = Color.cyan; // Cor do outline de interação
+
         [Header("Settings")]
         [SerializeField] private bool enableDebugLogs = false; // Para debug opcional
         [SerializeField] private float inputCheckInterval = 0.1f; // Intervalo para verificar mudanças de input
@@ -94,6 +100,12 @@ namespace SlimeMec.Gameplay
             if (xboxButtons == null) xboxButtons = transform.Find("xbox");
             if (switchButtons == null) switchButtons = transform.Find("switch");
 
+            // Auto-encontra o OutlineShaderController se não foi configurado
+            if (outlineController == null)
+            {
+                outlineController = GetComponent<OutlineShaderController>();
+            }
+
             // Valida que pelo menos keyboard existe (fallback obrigatório)
             if (keyboardButtons == null)
             {
@@ -116,6 +128,13 @@ namespace SlimeMec.Gameplay
                 Debug.LogError($"InteractivePointHandler: Renderer não encontrado no subobjeto 'keyboard' de '{gameObject.name}'");
                 enabled = false;
                 return;
+            }
+
+            // Configura o outline controller se disponível
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.SetOutlineColor(interactionOutlineColor);
+                outlineController.DisableOutline(); // Inicia desativado
             }
 
             // Desativa todos os renderers inicialmente
@@ -220,6 +239,15 @@ namespace SlimeMec.Gameplay
                     _isPlayerInRange = true;
                 }
             }
+
+            // Ativa o outline de interação
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.EnableOutline();
+
+                if (enableDebugLogs)
+                    Debug.Log($"InteractivePointHandler: Outline ativado para '{gameObject.name}'", this);
+            }
         }
 
         /// <summary>
@@ -229,6 +257,15 @@ namespace SlimeMec.Gameplay
         {
             HideAllButtons();
             _isPlayerInRange = false;
+
+            // Desativa o outline de interação
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.DisableOutline();
+
+                if (enableDebugLogs)
+                    Debug.Log($"InteractivePointHandler: Outline desativado para '{gameObject.name}'", this);
+            }
         }
 
         /// <summary>
@@ -315,7 +352,29 @@ namespace SlimeMec.Gameplay
                       $"\n• Keyboard: {(_keyboardRenderer != null ? (_keyboardRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
                       $"\n• PlayStation: {(_playstationRenderer != null ? (_playstationRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
                       $"\n• Xbox: {(_xboxRenderer != null ? (_xboxRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
+                      $"\n• Outline Controller: {(outlineController != null ? "FOUND" : "NULL")}" +
+                      $"\n• Outline Active: {(outlineController != null ? outlineController.IsOutlineActive : false)}" +
                       $"\n• Trigger: {(GetComponent<Collider2D>()?.isTrigger ?? false)}");
+        }
+
+        [ContextMenu("Test Enable Outline")]
+        private void TestEnableOutline()
+        {
+            if (Application.isPlaying && outlineController != null)
+            {
+                outlineController.EnableOutline();
+                Debug.Log("Outline forçado ON");
+            }
+        }
+
+        [ContextMenu("Test Disable Outline")]
+        private void TestDisableOutline()
+        {
+            if (Application.isPlaying && outlineController != null)
+            {
+                outlineController.DisableOutline();
+                Debug.Log("Outline forçado OFF");
+            }
         }
 #endif
         #endregion
