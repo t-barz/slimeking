@@ -1,6 +1,6 @@
 Shader "SlimeMec/SpriteOutline"
 {
-    // PIXEL ART Hard Edge Outline - v5.0
+    // PIXEL ART Hard Edge Outline with Solid Colors Only - v5.2
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
@@ -124,6 +124,25 @@ Shader "SlimeMec/SpriteOutline"
                 return color;
             }
 
+            fixed4 SampleSpriteTextureWithBorder(float2 uv)
+            {
+                // Verifica se UV está dentro dos limites da textura
+                if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0)
+                {
+                    // Fora dos limites = considera como transparente
+                    return fixed4(0,0,0,0);
+                }
+                
+                fixed4 color = tex2D(_MainTex, uv);
+
+                #if ETC1_EXTERNAL_ALPHA
+                fixed4 alpha = tex2D(_AlphaTex, uv);
+                color.a = lerp(color.a, alpha.r, _EnableExternalAlpha);
+                #endif
+
+                return color;
+            }
+
             fixed4 SpriteFragWithOutline(v2f IN) : SV_Target
             {
                 fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
@@ -136,18 +155,18 @@ Shader "SlimeMec/SpriteOutline"
                 
                 float currentAlpha = c.a;
                 
-                // Se o pixel atual já tem conteúdo, retorna ele normalmente
-                if (currentAlpha > 0.01)
+                // Se o pixel atual já tem conteúdo SÓLIDO (alpha = 1.0), retorna ele normalmente
+                if (currentAlpha >= 0.99)
                 {
                     c.rgb *= c.a;
                     return c;
                 }
                 
-                // PIXEL ART OUTLINE: Hard edges, sem suavização
+                // PIXEL ART OUTLINE com tratamento de bordas - APENAS para cores sólidas
                 float2 texelSize = _MainTex_TexelSize.xy;
                 int outlinePixels = max(1, (int)(_OutlineSize * 50.0));
                 
-                // Verifica se há conteúdo nas 4 direções cardinais
+                // Verifica se há conteúdo SÓLIDO nas 4 direções cardinais
                 bool hasOutline = false;
                 
                 // Para cada pixel de distância até o limite do outline
@@ -158,18 +177,40 @@ Shader "SlimeMec/SpriteOutline"
                     
                     float2 offset = texelSize * float(dist);
                     
-                    // Testa 4 direções cardinais (pixel art style)
-                    float rightAlpha = SampleSpriteTexture(IN.texcoord + float2(offset.x, 0)).a;
-                    float leftAlpha = SampleSpriteTexture(IN.texcoord + float2(-offset.x, 0)).a;
-                    float upAlpha = SampleSpriteTexture(IN.texcoord + float2(0, offset.y)).a;
-                    float downAlpha = SampleSpriteTexture(IN.texcoord + float2(0, -offset.y)).a;
+                    // Posições para testar
+                    float2 rightPos = IN.texcoord + float2(offset.x, 0);
+                    float2 leftPos = IN.texcoord + float2(-offset.x, 0);
+                    float2 upPos = IN.texcoord + float2(0, offset.y);
+                    float2 downPos = IN.texcoord + float2(0, -offset.y);
                     
-                    // Se encontrou qualquer conteúdo, marca para outline
-                    if (rightAlpha > 0.01 || leftAlpha > 0.01 || upAlpha > 0.01 || downAlpha > 0.01)
+                    // Testa 4 direções cardinais - APENAS cores sólidas (alpha >= 0.99)
+                    float rightAlpha = SampleSpriteTextureWithBorder(rightPos).a;
+                    float leftAlpha = SampleSpriteTextureWithBorder(leftPos).a;
+                    float upAlpha = SampleSpriteTextureWithBorder(upPos).a;
+                    float downAlpha = SampleSpriteTextureWithBorder(downPos).a;
+                    
+                    // TRATAMENTO ESPECIAL PARA BORDAS - apenas se há cores sólidas:
+                    float2 currentPos = IN.texcoord;
+                    
+                    // Verifica se estamos próximos das bordas da textura
+                    bool nearLeftBorder = currentPos.x < texelSize.x * float(outlinePixels);
+                    bool nearRightBorder = currentPos.x > (1.0 - texelSize.x * float(outlinePixels));
+                    bool nearTopBorder = currentPos.y > (1.0 - texelSize.y * float(outlinePixels));
+                    bool nearBottomBorder = currentPos.y < texelSize.y * float(outlinePixels);
+                    
+                    // Se está na borda E há conteúdo SÓLIDO do lado oposto, considera como outline
+                    if (nearLeftBorder && rightAlpha >= 0.99) hasOutline = true;
+                    if (nearRightBorder && leftAlpha >= 0.99) hasOutline = true;
+                    if (nearTopBorder && downAlpha >= 0.99) hasOutline = true;
+                    if (nearBottomBorder && upAlpha >= 0.99) hasOutline = true;
+                    
+                    // Testa normalmente também - APENAS cores sólidas
+                    if (rightAlpha >= 0.99 || leftAlpha >= 0.99 || upAlpha >= 0.99 || downAlpha >= 0.99)
                     {
                         hasOutline = true;
-                        break;
                     }
+                    
+                    if (hasOutline) break;
                 }
                 
                 // Outline binário: ou tem ou não tem (pixel art style)
@@ -180,7 +221,16 @@ Shader "SlimeMec/SpriteOutline"
                 }
                 else
                 {
-                    c = fixed4(0,0,0,0);
+                    // Mantém pixels semi-transparentes como estão (sem outline)
+                    // Se currentAlpha > 0 mas < 0.99, mantém o pixel original
+                    if (currentAlpha > 0.01)
+                    {
+                        c = SampleSpriteTexture(IN.texcoord) * IN.color;
+                    }
+                    else
+                    {
+                        c = fixed4(0,0,0,0);
+                    }
                 }
                 
                 c.rgb *= c.a;

@@ -12,6 +12,7 @@ namespace SlimeMec.Visual
     /// • Ativação/desativação em tempo real
     /// • Integração automática com SpriteRenderer
     /// • Material instance management
+    /// • Detecção automática por trigger
     /// 
     /// SISTEMA DE SHADER:
     /// • Usa shader "SlimeMec/SpriteOutline"
@@ -19,15 +20,23 @@ namespace SlimeMec.Visual
     /// • Preserva transparência original
     /// • Compatible com Sprite Atlas
     /// 
+    /// SISTEMA DE TRIGGER:
+    /// • OnTriggerEnter2D: Ativa outline automaticamente
+    /// • OnTriggerExit2D: Desativa outline automaticamente
+    /// • Validação por tipo de collider (CapsuleCollider2D)
+    /// • Validação por tag (configurável)
+    /// • Auto-setup de trigger collider se necessário
+    /// 
     /// EXEMPLO DE USO:
     /// • Adicionar como component ao objeto 2D
     /// • Configurar cor e tamanho no Inspector
-    /// • Chamar EnableOutline() para ativar
-    /// • Chamar DisableOutline() para desativar
+    /// • Ativar "Enable Trigger Detection" para modo automático
+    /// • Ou chamar EnableOutline()/DisableOutline() manualmente
     /// 
     /// DEPENDÊNCIAS:
     /// • Shader "SlimeMec/SpriteOutline" deve existir
     /// • Objeto deve ter SpriteRenderer
+    /// • Para trigger: Collider2D configurado como trigger
     /// • Material será criado automaticamente
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
@@ -48,6 +57,16 @@ namespace SlimeMec.Visual
         [Header("⚡ Performance")]
         [Tooltip("Criar instância do material (recomendado para múltiplos objetos)")]
         [SerializeField] private bool createMaterialInstance = true;
+
+        [Header("🎯 Trigger Detection")]
+        [Tooltip("Ativa detecção automática por trigger")]
+        [SerializeField] private bool enableTriggerDetection = true;
+
+        [Tooltip("Requere que seja CapsuleCollider2D para ativar")]
+        [SerializeField] private bool requireCapsuleCollider = true;
+
+        [Tooltip("Tag necessária no objeto que entra no trigger")]
+        [SerializeField] private string requiredTag = "Player";
 
         [Header("🔧 Debug")]
         [Tooltip("Mostra logs de debug no Console")]
@@ -82,11 +101,47 @@ namespace SlimeMec.Visual
             {
                 EnableOutline();
             }
+
+            // Configura trigger se necessário
+            EnsureTriggerSetup();
         }
 
         private void OnDestroy()
         {
             CleanupMaterials();
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!enableTriggerDetection) return;
+
+            if (ValidateTriggerCollider(other))
+            {
+                Debug.Log($"OutlineShaderController: Trigger Enter - {GetColliderInfo(other)} ativou outline em '{gameObject.name}'", this);
+                EnableOutline();
+
+                if (enableDebugLogs)
+                {
+                    string colliderInfo = GetColliderInfo(other);
+                    Debug.Log($"OutlineShaderController: Trigger Enter - {colliderInfo} ativou outline em '{gameObject.name}'", this);
+                }
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (!enableTriggerDetection) return;
+
+            if (ValidateTriggerCollider(other))
+            {
+                DisableOutline();
+
+                if (enableDebugLogs)
+                {
+                    string colliderInfo = GetColliderInfo(other);
+                    Debug.Log($"OutlineShaderController: Trigger Exit - {colliderInfo} desativou outline em '{gameObject.name}'", this);
+                }
+            }
         }
         #endregion
 
@@ -296,6 +351,80 @@ namespace SlimeMec.Visual
                 _spriteRenderer.material = _originalMaterial;
             }
         }
+
+        /// <summary>
+        /// Valida se o collider que entrou no trigger atende aos critérios.
+        /// </summary>
+        /// <param name="other">Collider2D que entrou no trigger</param>
+        /// <returns>True se atende aos critérios, false caso contrário</returns>
+        private bool ValidateTriggerCollider(Collider2D other)
+        {
+            // Verifica tag
+            if (!other.CompareTag(requiredTag))
+            {
+                if (enableDebugLogs)
+                    Debug.Log($"OutlineShaderController: Tag '{other.tag}' não corresponde à tag necessária '{requiredTag}'", this);
+                return false;
+            }
+
+            // Verifica tipo de collider se necessário
+            if (requireCapsuleCollider)
+            {
+                if (this.GetComponent<CapsuleCollider2D>() == null)
+                {
+                    if (enableDebugLogs)
+                        Debug.Log($"OutlineShaderController: Objeto '{this.name}' não possui CapsuleCollider2D", this);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Retorna informações detalhadas sobre o collider para debug.
+        /// </summary>
+        /// <param name="collider">Collider2D para analisar</param>
+        /// <returns>String com informações do collider</returns>
+        private string GetColliderInfo(Collider2D collider)
+        {
+            return collider switch
+            {
+                BoxCollider2D box => $"BoxCollider2D (size: {box.size}) em '{collider.name}'",
+                CircleCollider2D circle => $"CircleCollider2D (radius: {circle.radius}) em '{collider.name}'",
+                CapsuleCollider2D capsule => $"CapsuleCollider2D (size: {capsule.size}, direction: {capsule.direction}) em '{collider.name}'",
+                PolygonCollider2D polygon => $"PolygonCollider2D ({polygon.points.Length} pontos) em '{collider.name}'",
+                EdgeCollider2D edge => $"EdgeCollider2D ({edge.points.Length} pontos) em '{collider.name}'",
+                CompositeCollider2D composite => $"CompositeCollider2D ({composite.pathCount} paths) em '{collider.name}'",
+                _ => $"{collider.GetType().Name} em '{collider.name}'"
+            };
+        }
+
+        /// <summary>
+        /// Garante que o objeto tem um collider configurado como trigger.
+        /// </summary>
+        private void EnsureTriggerSetup()
+        {
+            if (!enableTriggerDetection) return;
+
+            Collider2D col = GetComponent<Collider2D>();
+            if (col == null)
+            {
+                // Adiciona BoxCollider2D como trigger automaticamente
+                BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
+                box.isTrigger = true;
+
+                if (enableDebugLogs)
+                    Debug.Log($"OutlineShaderController: BoxCollider2D adicionado automaticamente como trigger em '{gameObject.name}'", this);
+            }
+            else if (!col.isTrigger)
+            {
+                col.isTrigger = true;
+
+                if (enableDebugLogs)
+                    Debug.Log($"OutlineShaderController: Collider configurado como trigger em '{gameObject.name}'", this);
+            }
+        }
         #endregion
 
         #region Properties
@@ -369,6 +498,8 @@ namespace SlimeMec.Visual
         [ContextMenu("Debug Info")]
         private void DebugInfo()
         {
+            Collider2D thisCollider = GetComponent<Collider2D>();
+
             Debug.Log($"OutlineShaderController Debug Info:" +
                       $"\n• GameObject: {gameObject.name}" +
                       $"\n• Outline Active: {_outlineActive}" +
@@ -378,7 +509,41 @@ namespace SlimeMec.Visual
                       $"\n• SpriteRenderer: {(_spriteRenderer != null ? "OK" : "NULL")}" +
                       $"\n• Instance Material: {(_instanceMaterial != null ? _instanceMaterial.name : "NULL")}" +
                       $"\n• Shader: {(_instanceMaterial != null ? _instanceMaterial.shader.name : "NULL")}" +
-                      $"\n• Create Instance: {createMaterialInstance}");
+                      $"\n• Create Instance: {createMaterialInstance}" +
+                      $"\n--- TRIGGER DETECTION ---" +
+                      $"\n• Enable Trigger Detection: {enableTriggerDetection}" +
+                      $"\n• Require Capsule Collider: {requireCapsuleCollider}" +
+                      $"\n• Required Tag: '{requiredTag}'" +
+                      $"\n• This Collider: {(thisCollider != null ? thisCollider.GetType().Name : "NULL")}" +
+                      $"\n• Is Trigger: {(thisCollider != null ? thisCollider.isTrigger : false)}");
+        }
+
+        [ContextMenu("Test Trigger Enter")]
+        private void TestTriggerEnter()
+        {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
+                return;
+            }
+
+            // Simula trigger enter
+            EnableOutline();
+            Debug.Log("OutlineShaderController: Trigger Enter simulado");
+        }
+
+        [ContextMenu("Test Trigger Exit")]
+        private void TestTriggerExit()
+        {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
+                return;
+            }
+
+            // Simula trigger exit
+            DisableOutline();
+            Debug.Log("OutlineShaderController: Trigger Exit simulado");
         }
 
         [ContextMenu("Force Recreate Material")]

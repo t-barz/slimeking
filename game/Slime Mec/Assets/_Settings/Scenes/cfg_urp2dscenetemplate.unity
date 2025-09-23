@@ -311,11 +311,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9237932
+      value: 1.1015698
       objectReference: {fileID: 0}
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9237932
+      value: 1.1015698
       objectReference: {fileID: 0}
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -357,13 +357,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 564614146018037825, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 981683821645573240, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_Name
       value: bushB
       objectReference: {fileID: 0}
+    - target: {fileID: 3524885834085592127, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6877768845602483188, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_FlipX
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8865409972672192196, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -372,6 +384,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 981683821645573240, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 843391580}
+    - targetCorrespondingSourceObject: {fileID: 981683821645573240, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 843391590}
   m_SourcePrefab: {fileID: 100100000, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
 --- !u!1001 &426483419
 PrefabInstance:
@@ -592,6 +607,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 483616793}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &532454466 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
+  m_PrefabInstance: {fileID: 1864773025}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &532454474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532454466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineSize: 0.01
+  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
+  enableOnStart: 0
+  createMaterialInstance: 1
+  enableTriggerDetection: 1
+  requireCapsuleCollider: 1
+  requiredTag: Player
+  enableDebugLogs: 0
 --- !u!1001 &545650021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -751,10 +792,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.5
+  outlineSize: 0.01
   outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
   enableOnStart: 0
   createMaterialInstance: 1
+  enableTriggerDetection: 1
+  requireCapsuleCollider: 1
+  requiredTag: Player
   enableDebugLogs: 0
 --- !u!1 &843391569 stripped
 GameObject:
@@ -778,7 +822,47 @@ MonoBehaviour:
   outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
   enableOnStart: 1
   createMaterialInstance: 1
+  enableTriggerDetection: 1
+  requireCapsuleCollider: 1
+  requiredTag: Player
   enableDebugLogs: 0
+--- !u!70 &843391590
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843391569}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0.25}
+  m_Size: {x: 1.5, y: 0.5}
+  m_Direction: 0
 --- !u!1001 &951231624
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1130,6 +1214,32 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
+--- !u!1 &1457152652 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 275090942622643926, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
+  m_PrefabInstance: {fileID: 5636522687416261508}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1457152660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457152652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineSize: 0.02
+  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
+  enableOnStart: 0
+  createMaterialInstance: 1
+  enableTriggerDetection: 1
+  requireCapsuleCollider: 1
+  requiredTag: Player
+  enableDebugLogs: 0
 --- !u!1 &1533887555
 GameObject:
   m_ObjectHideFlags: 0
@@ -1360,7 +1470,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 532454474}
   m_SourcePrefab: {fileID: 100100000, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
 --- !u!1 &1974147917
 GameObject:
@@ -1714,6 +1827,14 @@ PrefabInstance:
       value: env_brown_rockA
       objectReference: {fileID: 0}
     - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7195359
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7443605
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.4296811
       objectReference: {fileID: 0}
@@ -1756,7 +1877,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 275090942622643926, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1457152660}
   m_SourcePrefab: {fileID: 100100000, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
 --- !u!1001 &6368664075821980783
 PrefabInstance:
