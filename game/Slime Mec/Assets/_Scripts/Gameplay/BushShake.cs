@@ -32,6 +32,7 @@ public class BushShake : MonoBehaviour
     #region Collision Detection
     /// <summary>
     /// Detecta quando o jogador entra na área de trigger e ativa o shake.
+    /// Verifica se o jogador tem CapsuleCollider2D e se este objeto tem CircleCollider2D.
     /// </summary>
     /// <param name="other">Collider que entrou no trigger</param>
     private void OnTriggerEnter2D(Collider2D other)
@@ -45,7 +46,7 @@ public class BushShake : MonoBehaviour
                 _animator.SetTrigger(ShakeTrigger);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"BushShake: Ativando shake em '{gameObject.name}' - jogador detectado!", this);
+                Debug.Log($"BushShake: Ativando shake em '{gameObject.name}' - jogador com CapsuleCollider2D detectado!", this);
 #endif
             }
         }

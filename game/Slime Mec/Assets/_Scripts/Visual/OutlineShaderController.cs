@@ -12,7 +12,7 @@ namespace SlimeMec.Visual
     /// • Ativação/desativação em tempo real
     /// • Integração automática com SpriteRenderer
     /// • Material instance management
-    /// • Detecção automática por trigger
+    /// • Detecção automática por circle overlap
     /// 
     /// SISTEMA DE SHADER:
     /// • Usa shader "SlimeMec/SpriteOutline"
@@ -20,23 +20,22 @@ namespace SlimeMec.Visual
     /// • Preserva transparência original
     /// • Compatible com Sprite Atlas
     /// 
-    /// SISTEMA DE TRIGGER:
-    /// • OnTriggerEnter2D: Ativa outline automaticamente
-    /// • OnTriggerExit2D: Desativa outline automaticamente
-    /// • Validação por tipo de collider (CapsuleCollider2D)
-    /// • Validação por tag (configurável)
-    /// • Auto-setup de trigger collider se necessário
+    /// SISTEMA DE CIRCLE OVERLAP:
+    /// • Physics2D.OverlapCircle para detecção contínua
+    /// • Controle preciso de distância de ativação
+    /// • Validação por LayerMask e Tag
+    /// • Update otimizado com intervalo configurável
+    /// • Hysteresis para evitar flickering
     /// 
     /// EXEMPLO DE USO:
     /// • Adicionar como component ao objeto 2D
-    /// • Configurar cor e tamanho no Inspector
-    /// • Ativar "Enable Trigger Detection" para modo automático
+    /// • Configurar cor, tamanho e raio de detecção
+    /// • Ativar "Enable Circle Detection" para modo automático
     /// • Ou chamar EnableOutline()/DisableOutline() manualmente
     /// 
     /// DEPENDÊNCIAS:
     /// • Shader "SlimeMec/SpriteOutline" deve existir
     /// • Objeto deve ter SpriteRenderer
-    /// • Para trigger: Collider2D configurado como trigger
     /// • Material será criado automaticamente
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
@@ -58,19 +57,40 @@ namespace SlimeMec.Visual
         [Tooltip("Criar instância do material (recomendado para múltiplos objetos)")]
         [SerializeField] private bool createMaterialInstance = true;
 
-        [Header("🎯 Trigger Detection")]
-        [Tooltip("Ativa detecção automática por trigger")]
-        [SerializeField] private bool enableTriggerDetection = true;
+        [Header("🎯 Circle Overlap Detection")]
+        [Tooltip("Ativa detecção automática por circle overlap")]
+        [SerializeField] private bool enableCircleDetection = true;
 
-        [Tooltip("Requere que seja CapsuleCollider2D para ativar")]
-        [SerializeField] private bool requireCapsuleCollider = true;
+        [Tooltip("Raio do círculo para detecção (em unidades)")]
+        [SerializeField, Range(0.1f, 10f)] private float detectionRadius = 1f;
 
-        [Tooltip("Tag necessária no objeto que entra no trigger")]
+        [Tooltip("Raio de desativação (deve ser maior que detectionRadius para hysteresis)")]
+        [SerializeField, Range(0.1f, 15f)] private float deactivationRadius = 1.5f;
+
+        [Tooltip("LayerMask dos objetos que podem ativar o outline")]
+        [SerializeField] private LayerMask detectionLayerMask = -1;
+
+        [Tooltip("Tag necessária no objeto detectado (deixar vazio para qualquer tag)")]
         [SerializeField] private string requiredTag = "Player";
+
+        [Tooltip("Intervalo entre verificações (em segundos - menor = mais responsivo)")]
+        [SerializeField, Range(0.01f, 1f)] private float checkInterval = 0.1f;
+
+        [Tooltip("Offset da posição para detecção (relativo ao transform)")]
+        [SerializeField] private Vector2 detectionOffset = Vector2.zero;
 
         [Header("🔧 Debug")]
         [Tooltip("Mostra logs de debug no Console")]
         [SerializeField] private bool enableDebugLogs = false;
+
+        [Tooltip("Desenha gizmos de debug na Scene")]
+        [SerializeField] private bool showDebugGizmos = true;
+
+        [Tooltip("Cor do gizmo de detecção")]
+        [SerializeField] private Color gizmoColor = Color.green;
+
+        [Tooltip("Cor do gizmo quando outline está ativo")]
+        [SerializeField] private Color gizmoActiveColor = Color.red;
         #endregion
 
         #region Private Fields
@@ -79,6 +99,11 @@ namespace SlimeMec.Visual
         private Material _instanceMaterial;
         private bool _outlineActive = false;
         private bool _isInitialized = false;
+
+        // Circle detection
+        private float _lastCheckTime = 0f;
+        private Collider2D _currentDetectedObject = null;
+        private Vector2 DetectionPosition => (Vector2)transform.position + detectionOffset;
 
         // Property IDs para performance
         private static readonly int OutlineColorProperty = Shader.PropertyToID("_OutlineColor");
@@ -102,8 +127,16 @@ namespace SlimeMec.Visual
                 EnableOutline();
             }
 
-            // Configura trigger se necessário
-            EnsureTriggerSetup();
+            // Validação de configuração
+            ValidateCircleDetectionSettings();
+        }
+
+        private void Update()
+        {
+            if (enableCircleDetection)
+            {
+                HandleCircleDetection();
+            }
         }
 
         private void OnDestroy()
@@ -111,36 +144,32 @@ namespace SlimeMec.Visual
             CleanupMaterials();
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnDrawGizmos()
         {
-            if (!enableTriggerDetection) return;
+            if (!showDebugGizmos || !enableCircleDetection) return;
 
-            if (ValidateTriggerCollider(other))
+            Vector2 detectionPos = DetectionPosition;
+
+            // Gizmo do círculo de detecção
+            Gizmos.color = _outlineActive ? gizmoActiveColor : gizmoColor;
+            Gizmos.DrawWireSphere(detectionPos, detectionRadius);
+
+            // Gizmo do círculo de desativação (se diferente)
+            if (deactivationRadius != detectionRadius)
             {
-                Debug.Log($"OutlineShaderController: Trigger Enter - {GetColliderInfo(other)} ativou outline em '{gameObject.name}'", this);
-                EnableOutline();
-
-                if (enableDebugLogs)
-                {
-                    string colliderInfo = GetColliderInfo(other);
-                    Debug.Log($"OutlineShaderController: Trigger Enter - {colliderInfo} ativou outline em '{gameObject.name}'", this);
-                }
+                Gizmos.color = Color.Lerp(gizmoColor, Color.white, 0.5f);
+                Gizmos.DrawWireSphere(detectionPos, deactivationRadius);
             }
-        }
 
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (!enableTriggerDetection) return;
+            // Ponto central
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(detectionPos, Vector3.one * 0.1f);
 
-            if (ValidateTriggerCollider(other))
+            // Linha do offset se houver
+            if (detectionOffset != Vector2.zero)
             {
-                DisableOutline();
-
-                if (enableDebugLogs)
-                {
-                    string colliderInfo = GetColliderInfo(other);
-                    Debug.Log($"OutlineShaderController: Trigger Exit - {colliderInfo} desativou outline em '{gameObject.name}'", this);
-                }
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(transform.position, detectionPos);
             }
         }
         #endregion
@@ -188,6 +217,7 @@ namespace SlimeMec.Visual
 
             SetOutlineProperties(false);
             _outlineActive = false;
+            _currentDetectedObject = null;
 
             if (enableDebugLogs)
                 Debug.Log($"OutlineShaderController: Outline desativado em '{gameObject.name}'", this);
@@ -236,6 +266,33 @@ namespace SlimeMec.Visual
 
             if (enableDebugLogs)
                 Debug.Log($"OutlineShaderController: Tamanho alterado para {outlineSize} em '{gameObject.name}'", this);
+        }
+
+        /// <summary>
+        /// Atualiza o raio de detecção em tempo real.
+        /// </summary>
+        /// <param name="newRadius">Novo raio de detecção</param>
+        public void SetDetectionRadius(float newRadius)
+        {
+            detectionRadius = Mathf.Max(0.1f, newRadius);
+
+            // Garante que deactivation radius seja sempre maior ou igual
+            if (deactivationRadius < detectionRadius)
+                deactivationRadius = detectionRadius + 0.5f;
+
+            if (enableDebugLogs)
+                Debug.Log($"OutlineShaderController: Raio de detecção alterado para {detectionRadius} em '{gameObject.name}'", this);
+        }
+
+        /// <summary>
+        /// Força uma verificação imediata de circle overlap.
+        /// </summary>
+        public void ForceCircleCheck()
+        {
+            if (enableCircleDetection)
+            {
+                CheckCircleOverlap();
+            }
         }
         #endregion
 
@@ -353,77 +410,299 @@ namespace SlimeMec.Visual
         }
 
         /// <summary>
-        /// Valida se o collider que entrou no trigger atende aos critérios.
+        /// Gerencia a detecção por circle overlap no Update.
         /// </summary>
-        /// <param name="other">Collider2D que entrou no trigger</param>
-        /// <returns>True se atende aos critérios, false caso contrário</returns>
-        private bool ValidateTriggerCollider(Collider2D other)
+        private void HandleCircleDetection()
         {
-            // Verifica tag
-            if (!other.CompareTag(requiredTag))
+            // Verifica intervalo de tempo
+            if (Time.time - _lastCheckTime < checkInterval)
+                return;
+
+            _lastCheckTime = Time.time;
+            CheckCircleOverlap();
+        }
+
+        /// <summary>
+        /// Executa a verificação de circle overlap.
+        /// </summary>
+        private void CheckCircleOverlap()
+        {
+            Vector2 detectionPos = DetectionPosition;
+
+            // Usa raio apropriado baseado no estado atual (hysteresis)
+            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
+
+            // Debug detalhado quando logs estão habilitados
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[DEBUG] CheckCircleOverlap - Pos: {detectionPos}, Raio: {radiusToUse}, LayerMask: {detectionLayerMask}, OutlineAtivo: {_outlineActive}", this);
+            }
+
+            // Usa OverlapCircleAll para verificar TODOS os objetos na área
+            Collider2D[] allDetected = Physics2D.OverlapCircleAll(detectionPos, radiusToUse, detectionLayerMask);
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[DEBUG] Total de objetos detectados na área: {allDetected.Length}", this);
+                for (int i = 0; i < allDetected.Length && i < 8; i++) // Mostra até 8 objetos
+                {
+                    var col = allDetected[i];
+                    Debug.Log($"[DEBUG] Objeto {i + 1}: {col.name} - Layer: {col.gameObject.layer} - Tag: '{col.tag}'", this);
+                }
+            }
+
+            // Procura especificamente por um objeto válido (prioritiza Player)
+            Collider2D validObject = null;
+            Collider2D playerObject = null;
+
+            foreach (var detected in allDetected)
+            {
+                if (ValidateDetectedObject(detected))
+                {
+                    validObject = detected;
+
+                    // Se encontrou um Player, usa prioritariamente
+                    if (!string.IsNullOrEmpty(requiredTag) && detected.CompareTag(requiredTag))
+                    {
+                        playerObject = detected;
+                        break; // Para a busca, Player tem prioridade
+                    }
+                }
+            }
+
+            // Usa Player se encontrado, senão usa qualquer objeto válido
+            Collider2D finalDetected = playerObject ?? validObject;
+
+            // Valida objeto detectado
+            if (finalDetected != null)
             {
                 if (enableDebugLogs)
-                    Debug.Log($"OutlineShaderController: Tag '{other.tag}' não corresponde à tag necessária '{requiredTag}'", this);
+                {
+                    Debug.Log($"[DEBUG] Objeto ESCOLHIDO: {GetObjectInfo(finalDetected)} {(playerObject != null ? "(PLAYER)" : "(OUTROS)")}", this);
+                }
+
+                // Objeto válido detectado
+                if (!_outlineActive)
+                {
+                    _currentDetectedObject = finalDetected;
+                    EnableOutline();
+
+                    if (enableDebugLogs)
+                    {
+                        string objectInfo = GetObjectInfo(finalDetected);
+                        Debug.Log($"OutlineShaderController: Circle overlap - {objectInfo} ativou outline em '{gameObject.name}' (distância: {Vector2.Distance(detectionPos, finalDetected.transform.position):F2})", this);
+                    }
+                }
+                else
+                {
+                    _currentDetectedObject = finalDetected;
+                }
+            }
+            else
+            {
+                // Nenhum objeto válido detectado
+                if (_outlineActive)
+                {
+                    DisableOutline();
+
+                    if (enableDebugLogs)
+                    {
+                        string objectInfo = _currentDetectedObject != null ? GetObjectInfo(_currentDetectedObject) : "objeto desconhecido";
+                        Debug.Log($"OutlineShaderController: Circle overlap - {objectInfo} saiu do raio, desativando outline em '{gameObject.name}'", this);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Valida se o objeto detectado atende aos critérios.
+        /// </summary>
+        /// <param name="detected">Collider2D detectado</param>
+        /// <returns>True se atende aos critérios, false caso contrário</returns>
+        private bool ValidateDetectedObject(Collider2D detected)
+        {
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[DEBUG] ValidateDetectedObject - Objeto: {detected.name}, Tag: '{detected.tag}', RequiredTag: '{requiredTag}', IsSelf: {detected.gameObject == gameObject}", this);
+            }
+
+            // Verifica se não é o próprio objeto
+            if (detected.gameObject == gameObject)
+            {
+                if (enableDebugLogs)
+                    Debug.Log($"[DEBUG] Objeto rejeitado: é o próprio objeto", this);
                 return false;
             }
 
-            // Verifica tipo de collider se necessário
-            if (requireCapsuleCollider)
+            // Verifica tag se especificada
+            if (!string.IsNullOrEmpty(requiredTag) && !detected.CompareTag(requiredTag))
             {
-                if (this.GetComponent<CapsuleCollider2D>() == null)
-                {
-                    if (enableDebugLogs)
-                        Debug.Log($"OutlineShaderController: Objeto '{this.name}' não possui CapsuleCollider2D", this);
-                    return false;
-                }
+                if (enableDebugLogs)
+                    Debug.Log($"[DEBUG] Objeto rejeitado: Tag '{detected.tag}' não corresponde à tag necessária '{requiredTag}'", this);
+                return false;
+            }
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[DEBUG] Objeto APROVADO na validação: {GetObjectInfo(detected)}", this);
             }
 
             return true;
         }
 
         /// <summary>
-        /// Retorna informações detalhadas sobre o collider para debug.
+        /// Retorna informações detalhadas sobre o objeto detectado para debug.
         /// </summary>
-        /// <param name="collider">Collider2D para analisar</param>
-        /// <returns>String com informações do collider</returns>
-        private string GetColliderInfo(Collider2D collider)
+        /// <param name="collider">Collider2D detectado</param>
+        /// <returns>String com informações do objeto</returns>
+        private string GetObjectInfo(Collider2D collider)
         {
+            if (collider == null) return "null";
+
             return collider switch
             {
-                BoxCollider2D box => $"BoxCollider2D (size: {box.size}) em '{collider.name}'",
-                CircleCollider2D circle => $"CircleCollider2D (radius: {circle.radius}) em '{collider.name}'",
-                CapsuleCollider2D capsule => $"CapsuleCollider2D (size: {capsule.size}, direction: {capsule.direction}) em '{collider.name}'",
-                PolygonCollider2D polygon => $"PolygonCollider2D ({polygon.points.Length} pontos) em '{collider.name}'",
-                EdgeCollider2D edge => $"EdgeCollider2D ({edge.points.Length} pontos) em '{collider.name}'",
-                CompositeCollider2D composite => $"CompositeCollider2D ({composite.pathCount} paths) em '{collider.name}'",
-                _ => $"{collider.GetType().Name} em '{collider.name}'"
+                BoxCollider2D box => $"BoxCollider2D (size: {box.size}) em '{collider.name}' [Tag: {collider.tag}]",
+                CircleCollider2D circle => $"CircleCollider2D (radius: {circle.radius}) em '{collider.name}' [Tag: {collider.tag}]",
+                CapsuleCollider2D capsule => $"CapsuleCollider2D (size: {capsule.size}) em '{collider.name}' [Tag: {collider.tag}]",
+                PolygonCollider2D polygon => $"PolygonCollider2D ({polygon.points.Length} pontos) em '{collider.name}' [Tag: {collider.tag}]",
+                _ => $"{collider.GetType().Name} em '{collider.name}' [Tag: {collider.tag}]"
             };
         }
 
         /// <summary>
-        /// Garante que o objeto tem um collider configurado como trigger.
+        /// Valida as configurações de circle detection.
         /// </summary>
-        private void EnsureTriggerSetup()
+        private void ValidateCircleDetectionSettings()
         {
-            if (!enableTriggerDetection) return;
-
-            Collider2D col = GetComponent<Collider2D>();
-            if (col == null)
+            if (!enableCircleDetection)
             {
-                // Adiciona BoxCollider2D como trigger automaticamente
-                BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
-                box.isTrigger = true;
-
-                if (enableDebugLogs)
-                    Debug.Log($"OutlineShaderController: BoxCollider2D adicionado automaticamente como trigger em '{gameObject.name}'", this);
+                Debug.LogWarning($"OutlineShaderController: Circle Detection está DESABILITADO em '{gameObject.name}'", this);
+                return;
             }
-            else if (!col.isTrigger)
+
+            // Garante que deactivation radius seja maior ou igual ao detection radius
+            if (deactivationRadius < detectionRadius)
             {
-                col.isTrigger = true;
-
-                if (enableDebugLogs)
-                    Debug.Log($"OutlineShaderController: Collider configurado como trigger em '{gameObject.name}'", this);
+                deactivationRadius = detectionRadius + 0.5f;
+                Debug.LogWarning($"OutlineShaderController: deactivationRadius ajustado para {deactivationRadius} " +
+                               $"(deve ser >= detectionRadius {detectionRadius}) em '{gameObject.name}'", this);
             }
+
+            // Valida LayerMask
+            if (detectionLayerMask == 0)
+            {
+                Debug.LogError($"OutlineShaderController: detectionLayerMask está vazio em '{gameObject.name}'. " +
+                               "NENHUM OBJETO SERÁ DETECTADO! Configure o LayerMask corretamente.", this);
+            }
+
+            // Valida raio mínimo
+            if (detectionRadius < 0.1f)
+            {
+                Debug.LogWarning($"OutlineShaderController: detectionRadius muito pequeno ({detectionRadius}) em '{gameObject.name}'. " +
+                               "Pode ser difícil detectar objetos.", this);
+            }
+
+            // Valida intervalo
+            if (checkInterval > 0.5f)
+            {
+                Debug.LogWarning($"OutlineShaderController: checkInterval muito alto ({checkInterval}s) em '{gameObject.name}'. " +
+                               "A detecção pode parecer lenta.", this);
+            }
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"OutlineShaderController: Circle detection configurado - " +
+                         $"Raio: {detectionRadius}, Desativação: {deactivationRadius}, " +
+                         $"LayerMask: {detectionLayerMask}, Tag: '{requiredTag}', " +
+                         $"Intervalo: {checkInterval}s em '{gameObject.name}'", this);
+            }
+        }
+
+        /// <summary>
+        /// Diagnóstico completo dos problemas mais comuns.
+        /// </summary>
+        private void DiagnoseCommonIssues()
+        {
+            Debug.Log("=== DIAGNÓSTICO DE PROBLEMAS COMUNS ===");
+
+            // 1. Circle Detection habilitado?
+            if (!enableCircleDetection)
+            {
+                Debug.LogError("❌ PROBLEMA: Circle Detection está DESABILITADO!");
+                return;
+            }
+            else
+            {
+                Debug.Log("✅ Circle Detection está habilitado");
+            }
+
+            // 2. LayerMask configurado?
+            if (detectionLayerMask == 0)
+            {
+                Debug.LogError("❌ PROBLEMA: LayerMask está vazio (0). Nenhum objeto será detectado!");
+                return;
+            }
+            else
+            {
+                Debug.Log($"✅ LayerMask configurado: {detectionLayerMask}");
+            }
+
+            // 3. Raio adequado?
+            if (detectionRadius < 0.5f)
+            {
+                Debug.LogWarning($"⚠️ AVISO: Raio de detecção muito pequeno ({detectionRadius}). Considere aumentar.");
+            }
+            else
+            {
+                Debug.Log($"✅ Raio de detecção adequado: {detectionRadius}");
+            }
+
+            // 4. Procura por players na cena
+            GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+            if (playerObjects.Length == 0)
+            {
+                Debug.LogError("❌ PROBLEMA: Nenhum objeto com tag 'Player' encontrado na cena!");
+                return;
+            }
+            else
+            {
+                Debug.Log($"✅ {playerObjects.Length} objeto(s) com tag 'Player' encontrado(s)");
+
+                // Verifica se algum player tem Collider2D
+                bool hasColliders = false;
+                foreach (var player in playerObjects)
+                {
+                    if (player.GetComponent<Collider2D>() != null)
+                    {
+                        hasColliders = true;
+                        break;
+                    }
+                }
+
+                if (!hasColliders)
+                {
+                    Debug.LogError("❌ PROBLEMA: Nenhum Player tem Collider2D!");
+                    return;
+                }
+                else
+                {
+                    Debug.Log("✅ Player(s) têm Collider2D");
+                }
+            }
+
+            // 5. Verifica se o próprio objeto tem o componente inicializado
+            if (!_isInitialized)
+            {
+                Debug.LogError("❌ PROBLEMA: Componente não foi inicializado corretamente!");
+                return;
+            }
+            else
+            {
+                Debug.Log("✅ Componente inicializado");
+            }
+
+            Debug.Log("=== DIAGNÓSTICO CONCLUÍDO ===");
+            Debug.Log("Se ainda não está funcionando, ative os Debug Logs e use 'Debug Detection Area' para mais detalhes.");
         }
         #endregion
 
@@ -452,6 +731,21 @@ namespace SlimeMec.Visual
         /// Material instance sendo usado.
         /// </summary>
         public Material InstanceMaterial => _instanceMaterial;
+
+        /// <summary>
+        /// Raio atual de detecção.
+        /// </summary>
+        public float DetectionRadius => detectionRadius;
+
+        /// <summary>
+        /// Objeto atualmente detectado (pode ser null).
+        /// </summary>
+        public Collider2D CurrentDetectedObject => _currentDetectedObject;
+
+        /// <summary>
+        /// Posição mundial do centro de detecção.
+        /// </summary>
+        public Vector2 WorldDetectionPosition => DetectionPosition;
         #endregion
 
         #region Context Menu (Editor Only)
@@ -498,8 +792,6 @@ namespace SlimeMec.Visual
         [ContextMenu("Debug Info")]
         private void DebugInfo()
         {
-            Collider2D thisCollider = GetComponent<Collider2D>();
-
             Debug.Log($"OutlineShaderController Debug Info:" +
                       $"\n• GameObject: {gameObject.name}" +
                       $"\n• Outline Active: {_outlineActive}" +
@@ -510,40 +802,167 @@ namespace SlimeMec.Visual
                       $"\n• Instance Material: {(_instanceMaterial != null ? _instanceMaterial.name : "NULL")}" +
                       $"\n• Shader: {(_instanceMaterial != null ? _instanceMaterial.shader.name : "NULL")}" +
                       $"\n• Create Instance: {createMaterialInstance}" +
-                      $"\n--- TRIGGER DETECTION ---" +
-                      $"\n• Enable Trigger Detection: {enableTriggerDetection}" +
-                      $"\n• Require Capsule Collider: {requireCapsuleCollider}" +
+                      $"\n--- CIRCLE DETECTION ---" +
+                      $"\n• Enable Circle Detection: {enableCircleDetection}" +
+                      $"\n• Detection Radius: {detectionRadius}" +
+                      $"\n• Deactivation Radius: {deactivationRadius}" +
+                      $"\n• Detection LayerMask: {detectionLayerMask}" +
                       $"\n• Required Tag: '{requiredTag}'" +
-                      $"\n• This Collider: {(thisCollider != null ? thisCollider.GetType().Name : "NULL")}" +
-                      $"\n• Is Trigger: {(thisCollider != null ? thisCollider.isTrigger : false)}");
+                      $"\n• Check Interval: {checkInterval}s" +
+                      $"\n• Detection Offset: {detectionOffset}" +
+                      $"\n• Detection Position: {DetectionPosition}" +
+                      $"\n• Current Detected Object: {(CurrentDetectedObject != null ? CurrentDetectedObject.name : "None")}" +
+                      $"\n• Last Check Time: {_lastCheckTime}");
         }
 
-        [ContextMenu("Test Trigger Enter")]
-        private void TestTriggerEnter()
+        [ContextMenu("Test Force Circle Check")]
+        private void TestForceCircleCheck()
+        {
+            if (Application.isPlaying)
+            {
+                ForceCircleCheck();
+                Debug.Log("Circle check forçado!");
+            }
+            else
+            {
+                Debug.LogWarning("Só funciona no Play Mode");
+            }
+        }
+
+        [ContextMenu("Debug Detection Area")]
+        private void DebugDetectionArea()
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
+                Debug.LogWarning("Só funciona no Play Mode");
                 return;
             }
 
-            // Simula trigger enter
-            EnableOutline();
-            Debug.Log("OutlineShaderController: Trigger Enter simulado");
+            Vector2 detectionPos = DetectionPosition;
+            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
+
+            Debug.Log($"=== DEBUG DETECTION AREA ===");
+            Debug.Log($"Detection Position: {detectionPos}");
+            Debug.Log($"Detection Radius: {radiusToUse}");
+            Debug.Log($"LayerMask: {detectionLayerMask}");
+            Debug.Log($"Required Tag: '{requiredTag}'");
+
+            // Verifica todos os colliders na área
+            Collider2D[] allColliders = Physics2D.OverlapCircleAll(detectionPos, radiusToUse);
+            Debug.Log($"Total colliders na área (todos layers): {allColliders.Length}");
+
+            for (int i = 0; i < allColliders.Length; i++)
+            {
+                var col = allColliders[i];
+                bool matchesLayer = ((1 << col.gameObject.layer) & detectionLayerMask) != 0;
+                bool matchesTag = string.IsNullOrEmpty(requiredTag) || col.CompareTag(requiredTag);
+                bool isSelf = col.gameObject == gameObject;
+
+                Debug.Log($"Collider {i + 1}: {col.name}" +
+                         $"\n  Layer: {col.gameObject.layer} (matches: {matchesLayer})" +
+                         $"\n  Tag: '{col.tag}' (matches: {matchesTag})" +
+                         $"\n  Is Self: {isSelf}" +
+                         $"\n  Valid: {matchesLayer && matchesTag && !isSelf}");
+            }
+
+            // Testa especificamente com o LayerMask
+            Collider2D detected = Physics2D.OverlapCircle(detectionPos, radiusToUse, detectionLayerMask);
+            Debug.Log($"Physics2D.OverlapCircle result: {(detected != null ? detected.name : "NULL")}");
         }
 
-        [ContextMenu("Test Trigger Exit")]
-        private void TestTriggerExit()
+        [ContextMenu("Find Player Objects")]
+        private void FindPlayerObjects()
+        {
+            GameObject[] allObjects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+            Debug.Log("=== PROCURANDO OBJETOS COM TAG 'Player' ===");
+
+            int playerCount = 0;
+            foreach (GameObject obj in allObjects)
+            {
+                if (obj.CompareTag("Player"))
+                {
+                    playerCount++;
+                    Collider2D col = obj.GetComponent<Collider2D>();
+                    Debug.Log($"Player encontrado: {obj.name}" +
+                             $"\n  Layer: {obj.layer}" +
+                             $"\n  Position: {obj.transform.position}" +
+                             $"\n  Has Collider2D: {col != null}" +
+                             $"\n  Distance to this: {Vector2.Distance(transform.position, obj.transform.position):F2}");
+                }
+            }
+
+            if (playerCount == 0)
+            {
+                Debug.LogWarning("Nenhum objeto com tag 'Player' encontrado!");
+            }
+            else
+            {
+                Debug.Log($"Total de objetos Player encontrados: {playerCount}");
+            }
+        }
+
+        [ContextMenu("🔍 Diagnose Problems")]
+        private void DiagnoseProblems()
+        {
+            DiagnoseCommonIssues();
+        }
+
+        [ContextMenu("🎯 Search Players in Area")]
+        private void SearchPlayersInArea()
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
+                Debug.LogWarning("Só funciona no Play Mode");
                 return;
             }
 
-            // Simula trigger exit
-            DisableOutline();
-            Debug.Log("OutlineShaderController: Trigger Exit simulado");
+            Vector2 detectionPos = DetectionPosition;
+            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
+
+            Debug.Log("=== BUSCA POR PLAYERS NA ÁREA ===");
+            Debug.Log($"Posição: {detectionPos}, Raio: {radiusToUse}");
+
+            // Busca TODOS os objetos (sem LayerMask)
+            Collider2D[] allObjects = Physics2D.OverlapCircleAll(detectionPos, radiusToUse);
+            Debug.Log($"Total de objetos na área (todos layers): {allObjects.Length}");
+
+            int playerCount = 0;
+            int objectsInLayerCount = 0;
+
+            foreach (var obj in allObjects)
+            {
+                bool isInLayer = ((1 << obj.gameObject.layer) & detectionLayerMask) != 0;
+                if (isInLayer) objectsInLayerCount++;
+
+                bool isPlayer = obj.CompareTag("Player");
+                if (isPlayer) playerCount++;
+
+                Debug.Log($"• {obj.name}: Layer {obj.gameObject.layer} {(isInLayer ? "✅" : "❌")} | Tag '{obj.tag}' {(isPlayer ? "🎯" : "")} | Distância: {Vector2.Distance(detectionPos, obj.transform.position):F2}");
+            }
+
+            Debug.Log($"Resumo:");
+            Debug.Log($"• Players encontrados: {playerCount}");
+            Debug.Log($"• Objetos no LayerMask correto: {objectsInLayerCount}");
+
+            if (playerCount == 0)
+            {
+                Debug.LogError("❌ NENHUM PLAYER na área de detecção!");
+            }
+            else if (objectsInLayerCount == 0)
+            {
+                Debug.LogError("❌ Players estão na área mas no LAYER ERRADO!");
+            }
+            else
+            {
+                Debug.Log("✅ Players encontrados e no layer correto!");
+            }
+        }
+
+        [ContextMenu("Toggle Debug Logs")]
+        private void ToggleDebugLogs()
+        {
+            enableDebugLogs = !enableDebugLogs;
+            Debug.Log($"Debug logs {(enableDebugLogs ? "ATIVADOS" : "DESATIVADOS")}");
         }
 
         [ContextMenu("Force Recreate Material")]
