@@ -79,18 +79,23 @@ namespace SlimeMec.Visual
         [Tooltip("Offset da posição para detecção (relativo ao transform)")]
         [SerializeField] private Vector2 detectionOffset = Vector2.zero;
 
-        [Header("🔧 Debug")]
-        [Tooltip("Mostra logs de debug no Console")]
-        [SerializeField] private bool enableDebugLogs = false;
+        [Header("🎬 Fade Animation")]
+        [Tooltip("Ativa animação de fade in/out")]
+        [SerializeField] private bool enableFadeAnimation = true;
 
-        [Tooltip("Desenha gizmos de debug na Scene")]
-        [SerializeField] private bool showDebugGizmos = true;
+        [Tooltip("Duração do fade in (segundos)")]
+        [SerializeField, Range(0.05f, 3f)] private float fadeInDuration = 0.3f;
 
-        [Tooltip("Cor do gizmo de detecção")]
-        [SerializeField] private Color gizmoColor = Color.green;
+        [Tooltip("Duração do fade out (segundos)")]
+        [SerializeField, Range(0.05f, 3f)] private float fadeOutDuration = 0.2f;
 
-        [Tooltip("Cor do gizmo quando outline está ativo")]
-        [SerializeField] private Color gizmoActiveColor = Color.red;
+        [Tooltip("Curva de animação para fade in")]
+        [SerializeField] private AnimationCurve fadeInCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+        [Tooltip("Curva de animação para fade out")]
+        [SerializeField] private AnimationCurve fadeOutCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
+
+
         #endregion
 
         #region Private Fields
@@ -104,6 +109,18 @@ namespace SlimeMec.Visual
         private float _lastCheckTime = 0f;
         private Collider2D _currentDetectedObject = null;
         private Vector2 DetectionPosition => (Vector2)transform.position + detectionOffset;
+
+        // Fade animation
+        private bool _isFading = false;
+        private bool _targetOutlineState = false;
+        private float _fadeStartTime = 0f;
+        private float _fadeDuration = 0f;
+        private AnimationCurve _currentFadeCurve;
+        private float _fadeStartAlpha = 0f;
+        private float _fadeTargetAlpha = 0f;
+        private float _currentOutlineAlpha = 0f;
+        private float _fadeProgress = 0f;
+        private Coroutine _fadeCoroutine = null;
 
         // Property IDs para performance
         private static readonly int OutlineColorProperty = Shader.PropertyToID("_OutlineColor");
@@ -122,13 +139,14 @@ namespace SlimeMec.Visual
 
         private void Start()
         {
+            // Validação de configuração
+            ValidateCircleDetectionSettings();
+            ValidateFadeSettings();
+
             if (enableOnStart)
             {
                 EnableOutline();
             }
-
-            // Validação de configuração
-            ValidateCircleDetectionSettings();
         }
 
         private void Update()
@@ -137,6 +155,12 @@ namespace SlimeMec.Visual
             {
                 HandleCircleDetection();
             }
+
+            // Atualiza fade animation se não estiver usando Coroutine
+            if (enableFadeAnimation && _isFading && _fadeCoroutine == null)
+            {
+                UpdateFadeAnimation();
+            }
         }
 
         private void OnDestroy()
@@ -144,39 +168,12 @@ namespace SlimeMec.Visual
             CleanupMaterials();
         }
 
-        private void OnDrawGizmos()
-        {
-            if (!showDebugGizmos || !enableCircleDetection) return;
 
-            Vector2 detectionPos = DetectionPosition;
-
-            // Gizmo do círculo de detecção
-            Gizmos.color = _outlineActive ? gizmoActiveColor : gizmoColor;
-            Gizmos.DrawWireSphere(detectionPos, detectionRadius);
-
-            // Gizmo do círculo de desativação (se diferente)
-            if (deactivationRadius != detectionRadius)
-            {
-                Gizmos.color = Color.Lerp(gizmoColor, Color.white, 0.5f);
-                Gizmos.DrawWireSphere(detectionPos, deactivationRadius);
-            }
-
-            // Ponto central
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(detectionPos, Vector3.one * 0.1f);
-
-            // Linha do offset se houver
-            if (detectionOffset != Vector2.zero)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(transform.position, detectionPos);
-            }
-        }
         #endregion
 
         #region Public Methods
         /// <summary>
-        /// Ativa o efeito de outline via shader.
+        /// Ativa o efeito de outline com fade in opcional.
         /// </summary>
         public void EnableOutline()
         {
@@ -186,49 +183,63 @@ namespace SlimeMec.Visual
                 return;
             }
 
-            if (_outlineActive)
+            if (_outlineActive && !_isFading)
             {
-                if (enableDebugLogs)
-                    Debug.LogWarning($"OutlineShaderController: Outline já está ativo em '{gameObject.name}'", this);
                 return;
             }
+            _targetOutlineState = true;
 
-            SetOutlineProperties(true);
-            _outlineActive = true;
+            if (enableFadeAnimation)
+            {
+                StartFadeAnimation(true);
+            }
+            else
+            {
+                // Ativação instantânea
+                SetOutlineProperties(true, 1f);
+                _outlineActive = true;
+                _currentOutlineAlpha = 1f;
+            }
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Outline ativado em '{gameObject.name}' - Cor: {outlineColor}, Tamanho: {outlineSize}", this);
+
         }
 
         /// <summary>
-        /// Desativa o efeito de outline via shader.
+        /// Desativa o efeito de outline com fade out opcional.
         /// </summary>
         public void DisableOutline()
         {
             if (!_isInitialized)
                 return;
 
-            if (!_outlineActive)
+            if (!_outlineActive && !_isFading)
             {
-                if (enableDebugLogs)
-                    Debug.LogWarning($"OutlineShaderController: Outline já está inativo em '{gameObject.name}'", this);
                 return;
             }
+            _targetOutlineState = false;
 
-            SetOutlineProperties(false);
-            _outlineActive = false;
-            _currentDetectedObject = null;
+            if (enableFadeAnimation && _currentOutlineAlpha > 0f)
+            {
+                StartFadeAnimation(false);
+            }
+            else
+            {
+                // Desativação instantânea
+                SetOutlineProperties(false, 0f);
+                _outlineActive = false;
+                _currentDetectedObject = null;
+                _currentOutlineAlpha = 0f;
+            }
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Outline desativado em '{gameObject.name}'", this);
+
         }
 
         /// <summary>
-        /// Alterna entre ativo/inativo.
+        /// Alterna entre ativo/inativo com fade.
         /// </summary>
         public void ToggleOutline()
         {
-            if (_outlineActive)
+            if (_targetOutlineState || (_outlineActive && !_isFading))
                 DisableOutline();
             else
                 EnableOutline();
@@ -247,8 +258,75 @@ namespace SlimeMec.Visual
                 _instanceMaterial.SetColor(OutlineColorProperty, outlineColor);
             }
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Cor alterada para {newColor} em '{gameObject.name}'", this);
+
+        }
+
+        /// <summary>
+        /// Define o alpha do outline diretamente (usado para animações).
+        /// </summary>
+        /// <param name="alpha">Valor alpha (0-1)</param>
+        public void SetOutlineAlpha(float alpha)
+        {
+            _currentOutlineAlpha = Mathf.Clamp01(alpha);
+
+            if (_isInitialized && _instanceMaterial != null)
+            {
+                Color colorWithAlpha = new Color(outlineColor.r, outlineColor.g, outlineColor.b, _currentOutlineAlpha);
+                _instanceMaterial.SetColor(OutlineColorProperty, colorWithAlpha);
+            }
+        }
+
+        /// <summary>
+        /// Inicia fade animation com duração customizada.
+        /// </summary>
+        /// <param name="fadeIn">True para fade in, false para fade out</param>
+        /// <param name="customDuration">Duração customizada (opcional)</param>
+        public void StartCustomFade(bool fadeIn, float customDuration = -1f)
+        {
+            if (!_isInitialized) return;
+
+            _targetOutlineState = fadeIn;
+
+            // Usa o método interno que aceita duração personalizada
+            StartFadeAnimation(fadeIn, customDuration);
+        }
+
+        /// <summary>
+        /// Para imediatamente qualquer animação em curso.
+        /// </summary>
+        public void StopFadeAnimation()
+        {
+            if (_fadeCoroutine != null)
+            {
+                StopCoroutine(_fadeCoroutine);
+                _fadeCoroutine = null;
+            }
+
+            _isFading = false;
+
+
+        }
+
+        /// <summary>
+        /// Força o outline para um estado específico sem animação.
+        /// </summary>
+        /// <param name="active">Estado desejado</param>
+        /// <param name="alpha">Alpha desejado</param>
+        public void ForceOutlineState(bool active, float alpha = -1f)
+        {
+            StopFadeAnimation();
+
+            _outlineActive = active;
+            _targetOutlineState = active;
+
+            if (alpha < 0f)
+                alpha = active ? 1f : 0f;
+
+            _currentOutlineAlpha = alpha;
+
+            SetOutlineProperties(active, alpha);
+
+
         }
 
         /// <summary>
@@ -264,8 +342,7 @@ namespace SlimeMec.Visual
                 _instanceMaterial.SetFloat(OutlineSizeProperty, outlineSize);
             }
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Tamanho alterado para {outlineSize} em '{gameObject.name}'", this);
+
         }
 
         /// <summary>
@@ -280,8 +357,7 @@ namespace SlimeMec.Visual
             if (deactivationRadius < detectionRadius)
                 deactivationRadius = detectionRadius + 0.5f;
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Raio de detecção alterado para {detectionRadius} em '{gameObject.name}'", this);
+
         }
 
         /// <summary>
@@ -322,8 +398,7 @@ namespace SlimeMec.Visual
 
             _isInitialized = true;
 
-            if (enableDebugLogs)
-                Debug.Log($"OutlineShaderController: Inicializado em '{gameObject.name}'", this);
+
         }
 
         /// <summary>
@@ -352,8 +427,7 @@ namespace SlimeMec.Visual
                 // Cria material com o shader
                 materialToUse = new Material(outlineShader);
 
-                if (enableDebugLogs)
-                    Debug.Log($"OutlineShaderController: Material criado automaticamente com shader '{ShaderName}'", this);
+
             }
 
             // Cria instância se necessário
@@ -375,16 +449,23 @@ namespace SlimeMec.Visual
         }
 
         /// <summary>
-        /// Define as propriedades do shader.
+        /// Define as propriedades do shader com controle de alpha.
         /// </summary>
         /// <param name="enable">Se deve ativar o outline</param>
-        private void SetOutlineProperties(bool enable)
+        /// <param name="alpha">Valor alpha (0-1)</param>
+        private void SetOutlineProperties(bool enable, float alpha = 1f)
         {
             if (_instanceMaterial == null) return;
 
             _instanceMaterial.SetFloat(EnableOutlineProperty, enable ? 1f : 0f);
-            _instanceMaterial.SetColor(OutlineColorProperty, outlineColor);
+
+            // Aplica cor com alpha específico
+            Color colorWithAlpha = new Color(outlineColor.r, outlineColor.g, outlineColor.b, alpha);
+            _instanceMaterial.SetColor(OutlineColorProperty, colorWithAlpha);
+
             _instanceMaterial.SetFloat(OutlineSizeProperty, outlineSize);
+
+            _currentOutlineAlpha = alpha;
         }
 
         /// <summary>
@@ -410,6 +491,139 @@ namespace SlimeMec.Visual
         }
 
         /// <summary>
+        /// Inicia a animação de fade.
+        /// </summary>
+        /// <param name="fadeIn">True para fade in, false para fade out</param>
+        private void StartFadeAnimation(bool fadeIn)
+        {
+            StartFadeAnimation(fadeIn, -1f);
+        }
+
+        /// <summary>
+        /// Inicia a animação de fade com duração personalizada.
+        /// </summary>
+        /// <param name="fadeIn">True para fade in, false para fade out</param>
+        /// <param name="customDuration">Duração personalizada (usar -1 para usar a duração padrão)</param>
+        private void StartFadeAnimation(bool fadeIn, float customDuration)
+        {
+            // Para animação anterior se existir
+            if (_fadeCoroutine != null)
+            {
+                StopCoroutine(_fadeCoroutine);
+            }
+
+            _isFading = true;
+            _fadeStartTime = Time.time;
+
+            // Usa duração personalizada se fornecida, senão usa a configuração padrão
+            if (customDuration > 0f)
+            {
+                _fadeDuration = customDuration;
+            }
+            else
+            {
+                _fadeDuration = fadeIn ? fadeInDuration : fadeOutDuration;
+            }
+
+            _currentFadeCurve = fadeIn ? fadeInCurve : fadeOutCurve;
+
+            _fadeStartAlpha = _currentOutlineAlpha;
+            _fadeTargetAlpha = fadeIn ? 1f : 0f;
+
+            // Se está fazendo fade in, ativa o outline imediatamente (mas com alpha atual)
+            if (fadeIn && !_outlineActive)
+            {
+                _outlineActive = true;
+                SetOutlineProperties(true, _fadeStartAlpha);
+            }
+
+            // Usa Coroutine para animação mais suave
+            _fadeCoroutine = StartCoroutine(FadeCoroutine());
+
+
+        }
+
+        /// <summary>
+        /// Coroutine para animação de fade suave.
+        /// </summary>
+        private System.Collections.IEnumerator FadeCoroutine()
+        {
+            while (_isFading)
+            {
+                float elapsed = Time.time - _fadeStartTime;
+                float progress = Mathf.Clamp01(elapsed / _fadeDuration);
+
+                // Avalia a curva de animação
+                float curveValue = _currentFadeCurve.Evaluate(progress);
+
+                // Interpola o alpha
+                float currentAlpha = Mathf.Lerp(_fadeStartAlpha, _fadeTargetAlpha, curveValue);
+
+                // Aplica o alpha atual
+                SetOutlineAlpha(currentAlpha);
+
+                // Verifica se a animação terminou
+                if (progress >= 1f)
+                {
+                    _isFading = false;
+                    _fadeCoroutine = null;
+
+                    // Se foi fade out completo, desativa o outline
+                    if (_fadeTargetAlpha == 0f)
+                    {
+                        _outlineActive = false;
+                        _currentDetectedObject = null;
+                        SetOutlineProperties(false, 0f);
+                    }
+
+
+
+                    yield break;
+                }
+
+                yield return null; // Espera próximo frame
+            }
+        }
+
+        /// <summary>
+        /// Atualiza animação de fade no Update (fallback se não usar Coroutine).
+        /// </summary>
+        private void UpdateFadeAnimation()
+        {
+            if (!_isFading) return;
+
+            float elapsed = Time.time - _fadeStartTime;
+            float progress = Mathf.Clamp01(elapsed / _fadeDuration);
+            _fadeProgress = progress;
+
+            // Avalia a curva de animação
+            float curveValue = _currentFadeCurve.Evaluate(progress);
+
+            // Interpola o alpha
+            float currentAlpha = Mathf.Lerp(_fadeStartAlpha, _fadeTargetAlpha, curveValue);
+            _currentOutlineAlpha = currentAlpha;
+
+            // Aplica o alpha atual
+            SetOutlineAlpha(currentAlpha);
+
+            // Verifica se a animação terminou
+            if (progress >= 1f)
+            {
+                _isFading = false;
+
+                // Se foi fade out completo, desativa o outline
+                if (_fadeTargetAlpha == 0f)
+                {
+                    _outlineActive = false;
+                    _currentDetectedObject = null;
+                    SetOutlineProperties(false, 0f);
+                }
+
+
+            }
+        }
+
+        /// <summary>
         /// Gerencia a detecção por circle overlap no Update.
         /// </summary>
         private void HandleCircleDetection()
@@ -430,26 +644,10 @@ namespace SlimeMec.Visual
             Vector2 detectionPos = DetectionPosition;
 
             // Usa raio apropriado baseado no estado atual (hysteresis)
-            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
-
-            // Debug detalhado quando logs estão habilitados
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[DEBUG] CheckCircleOverlap - Pos: {detectionPos}, Raio: {radiusToUse}, LayerMask: {detectionLayerMask}, OutlineAtivo: {_outlineActive}", this);
-            }
+            float radiusToUse = (_outlineActive || _targetOutlineState) ? deactivationRadius : detectionRadius;
 
             // Usa OverlapCircleAll para verificar TODOS os objetos na área
             Collider2D[] allDetected = Physics2D.OverlapCircleAll(detectionPos, radiusToUse, detectionLayerMask);
-
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[DEBUG] Total de objetos detectados na área: {allDetected.Length}", this);
-                for (int i = 0; i < allDetected.Length && i < 8; i++) // Mostra até 8 objetos
-                {
-                    var col = allDetected[i];
-                    Debug.Log($"[DEBUG] Objeto {i + 1}: {col.name} - Layer: {col.gameObject.layer} - Tag: '{col.tag}'", this);
-                }
-            }
 
             // Procura especificamente por um objeto válido (prioritiza Player)
             Collider2D validObject = null;
@@ -476,22 +674,11 @@ namespace SlimeMec.Visual
             // Valida objeto detectado
             if (finalDetected != null)
             {
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"[DEBUG] Objeto ESCOLHIDO: {GetObjectInfo(finalDetected)} {(playerObject != null ? "(PLAYER)" : "(OUTROS)")}", this);
-                }
-
                 // Objeto válido detectado
-                if (!_outlineActive)
+                if (!_targetOutlineState)
                 {
                     _currentDetectedObject = finalDetected;
                     EnableOutline();
-
-                    if (enableDebugLogs)
-                    {
-                        string objectInfo = GetObjectInfo(finalDetected);
-                        Debug.Log($"OutlineShaderController: Circle overlap - {objectInfo} ativou outline em '{gameObject.name}' (distância: {Vector2.Distance(detectionPos, finalDetected.transform.position):F2})", this);
-                    }
                 }
                 else
                 {
@@ -501,15 +688,9 @@ namespace SlimeMec.Visual
             else
             {
                 // Nenhum objeto válido detectado
-                if (_outlineActive)
+                if (_targetOutlineState)
                 {
                     DisableOutline();
-
-                    if (enableDebugLogs)
-                    {
-                        string objectInfo = _currentDetectedObject != null ? GetObjectInfo(_currentDetectedObject) : "objeto desconhecido";
-                        Debug.Log($"OutlineShaderController: Circle overlap - {objectInfo} saiu do raio, desativando outline em '{gameObject.name}'", this);
-                    }
                 }
             }
         }
@@ -521,53 +702,22 @@ namespace SlimeMec.Visual
         /// <returns>True se atende aos critérios, false caso contrário</returns>
         private bool ValidateDetectedObject(Collider2D detected)
         {
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[DEBUG] ValidateDetectedObject - Objeto: {detected.name}, Tag: '{detected.tag}', RequiredTag: '{requiredTag}', IsSelf: {detected.gameObject == gameObject}", this);
-            }
-
             // Verifica se não é o próprio objeto
             if (detected.gameObject == gameObject)
             {
-                if (enableDebugLogs)
-                    Debug.Log($"[DEBUG] Objeto rejeitado: é o próprio objeto", this);
                 return false;
             }
 
             // Verifica tag se especificada
             if (!string.IsNullOrEmpty(requiredTag) && !detected.CompareTag(requiredTag))
             {
-                if (enableDebugLogs)
-                    Debug.Log($"[DEBUG] Objeto rejeitado: Tag '{detected.tag}' não corresponde à tag necessária '{requiredTag}'", this);
                 return false;
-            }
-
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[DEBUG] Objeto APROVADO na validação: {GetObjectInfo(detected)}", this);
             }
 
             return true;
         }
 
-        /// <summary>
-        /// Retorna informações detalhadas sobre o objeto detectado para debug.
-        /// </summary>
-        /// <param name="collider">Collider2D detectado</param>
-        /// <returns>String com informações do objeto</returns>
-        private string GetObjectInfo(Collider2D collider)
-        {
-            if (collider == null) return "null";
 
-            return collider switch
-            {
-                BoxCollider2D box => $"BoxCollider2D (size: {box.size}) em '{collider.name}' [Tag: {collider.tag}]",
-                CircleCollider2D circle => $"CircleCollider2D (radius: {circle.radius}) em '{collider.name}' [Tag: {collider.tag}]",
-                CapsuleCollider2D capsule => $"CapsuleCollider2D (size: {capsule.size}) em '{collider.name}' [Tag: {collider.tag}]",
-                PolygonCollider2D polygon => $"PolygonCollider2D ({polygon.points.Length} pontos) em '{collider.name}' [Tag: {collider.tag}]",
-                _ => $"{collider.GetType().Name} em '{collider.name}' [Tag: {collider.tag}]"
-            };
-        }
 
         /// <summary>
         /// Valida as configurações de circle detection.
@@ -576,7 +726,6 @@ namespace SlimeMec.Visual
         {
             if (!enableCircleDetection)
             {
-                Debug.LogWarning($"OutlineShaderController: Circle Detection está DESABILITADO em '{gameObject.name}'", this);
                 return;
             }
 
@@ -584,126 +733,43 @@ namespace SlimeMec.Visual
             if (deactivationRadius < detectionRadius)
             {
                 deactivationRadius = detectionRadius + 0.5f;
-                Debug.LogWarning($"OutlineShaderController: deactivationRadius ajustado para {deactivationRadius} " +
-                               $"(deve ser >= detectionRadius {detectionRadius}) em '{gameObject.name}'", this);
-            }
-
-            // Valida LayerMask
-            if (detectionLayerMask == 0)
-            {
-                Debug.LogError($"OutlineShaderController: detectionLayerMask está vazio em '{gameObject.name}'. " +
-                               "NENHUM OBJETO SERÁ DETECTADO! Configure o LayerMask corretamente.", this);
-            }
-
-            // Valida raio mínimo
-            if (detectionRadius < 0.1f)
-            {
-                Debug.LogWarning($"OutlineShaderController: detectionRadius muito pequeno ({detectionRadius}) em '{gameObject.name}'. " +
-                               "Pode ser difícil detectar objetos.", this);
-            }
-
-            // Valida intervalo
-            if (checkInterval > 0.5f)
-            {
-                Debug.LogWarning($"OutlineShaderController: checkInterval muito alto ({checkInterval}s) em '{gameObject.name}'. " +
-                               "A detecção pode parecer lenta.", this);
-            }
-
-            if (enableDebugLogs)
-            {
-                Debug.Log($"OutlineShaderController: Circle detection configurado - " +
-                         $"Raio: {detectionRadius}, Desativação: {deactivationRadius}, " +
-                         $"LayerMask: {detectionLayerMask}, Tag: '{requiredTag}', " +
-                         $"Intervalo: {checkInterval}s em '{gameObject.name}'", this);
             }
         }
 
         /// <summary>
-        /// Diagnóstico completo dos problemas mais comuns.
+        /// Valida configurações de fade animation.
         /// </summary>
-        private void DiagnoseCommonIssues()
+        private void ValidateFadeSettings()
         {
-            Debug.Log("=== DIAGNÓSTICO DE PROBLEMAS COMUNS ===");
-
-            // 1. Circle Detection habilitado?
-            if (!enableCircleDetection)
+            if (!enableFadeAnimation)
             {
-                Debug.LogError("❌ PROBLEMA: Circle Detection está DESABILITADO!");
                 return;
             }
-            else
+
+            // Valida durações mínimas
+            if (fadeInDuration < 0.05f)
             {
-                Debug.Log("✅ Circle Detection está habilitado");
+                fadeInDuration = 0.05f;
             }
 
-            // 2. LayerMask configurado?
-            if (detectionLayerMask == 0)
+            if (fadeOutDuration < 0.05f)
             {
-                Debug.LogError("❌ PROBLEMA: LayerMask está vazio (0). Nenhum objeto será detectado!");
-                return;
-            }
-            else
-            {
-                Debug.Log($"✅ LayerMask configurado: {detectionLayerMask}");
+                fadeOutDuration = 0.05f;
             }
 
-            // 3. Raio adequado?
-            if (detectionRadius < 0.5f)
+            // Valida curvas de animação
+            if (fadeInCurve == null || fadeInCurve.keys.Length == 0)
             {
-                Debug.LogWarning($"⚠️ AVISO: Raio de detecção muito pequeno ({detectionRadius}). Considere aumentar.");
-            }
-            else
-            {
-                Debug.Log($"✅ Raio de detecção adequado: {detectionRadius}");
+                fadeInCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
             }
 
-            // 4. Procura por players na cena
-            GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
-            if (playerObjects.Length == 0)
+            if (fadeOutCurve == null || fadeOutCurve.keys.Length == 0)
             {
-                Debug.LogError("❌ PROBLEMA: Nenhum objeto com tag 'Player' encontrado na cena!");
-                return;
+                fadeOutCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
             }
-            else
-            {
-                Debug.Log($"✅ {playerObjects.Length} objeto(s) com tag 'Player' encontrado(s)");
-
-                // Verifica se algum player tem Collider2D
-                bool hasColliders = false;
-                foreach (var player in playerObjects)
-                {
-                    if (player.GetComponent<Collider2D>() != null)
-                    {
-                        hasColliders = true;
-                        break;
-                    }
-                }
-
-                if (!hasColliders)
-                {
-                    Debug.LogError("❌ PROBLEMA: Nenhum Player tem Collider2D!");
-                    return;
-                }
-                else
-                {
-                    Debug.Log("✅ Player(s) têm Collider2D");
-                }
-            }
-
-            // 5. Verifica se o próprio objeto tem o componente inicializado
-            if (!_isInitialized)
-            {
-                Debug.LogError("❌ PROBLEMA: Componente não foi inicializado corretamente!");
-                return;
-            }
-            else
-            {
-                Debug.Log("✅ Componente inicializado");
-            }
-
-            Debug.Log("=== DIAGNÓSTICO CONCLUÍDO ===");
-            Debug.Log("Se ainda não está funcionando, ative os Debug Logs e use 'Debug Detection Area' para mais detalhes.");
         }
+
+
         #endregion
 
         #region Properties
@@ -746,240 +812,28 @@ namespace SlimeMec.Visual
         /// Posição mundial do centro de detecção.
         /// </summary>
         public Vector2 WorldDetectionPosition => DetectionPosition;
+
+        /// <summary>
+        /// Verifica se está fazendo fade no momento.
+        /// </summary>
+        public bool IsFading => _isFading;
+
+        /// <summary>
+        /// Estado-alvo do outline (true = fade in, false = fade out).
+        /// </summary>
+        public bool TargetOutlineState => _targetOutlineState;
+
+        /// <summary>
+        /// Alpha atual do outline (0.0 = invisível, 1.0 = totalmente visível).
+        /// </summary>
+        public float CurrentOutlineAlpha => _currentOutlineAlpha;
+
+        /// <summary>
+        /// Progresso atual do fade (0.0 a 1.0).
+        /// </summary>
+        public float FadeProgress => _fadeProgress;
         #endregion
 
-        #region Context Menu (Editor Only)
-#if UNITY_EDITOR
-        [ContextMenu("Test Enable Outline")]
-        private void TestEnableOutline()
-        {
-            if (Application.isPlaying)
-            {
-                EnableOutline();
-            }
-            else
-            {
-                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
-            }
-        }
 
-        [ContextMenu("Test Disable Outline")]
-        private void TestDisableOutline()
-        {
-            if (Application.isPlaying)
-            {
-                DisableOutline();
-            }
-            else
-            {
-                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
-            }
-        }
-
-        [ContextMenu("Test Toggle Outline")]
-        private void TestToggleOutline()
-        {
-            if (Application.isPlaying)
-            {
-                ToggleOutline();
-            }
-            else
-            {
-                Debug.LogWarning("OutlineShaderController: Teste só funciona no Play Mode");
-            }
-        }
-
-        [ContextMenu("Debug Info")]
-        private void DebugInfo()
-        {
-            Debug.Log($"OutlineShaderController Debug Info:" +
-                      $"\n• GameObject: {gameObject.name}" +
-                      $"\n• Outline Active: {_outlineActive}" +
-                      $"\n• Initialized: {_isInitialized}" +
-                      $"\n• Outline Color: {outlineColor}" +
-                      $"\n• Outline Size: {outlineSize}" +
-                      $"\n• SpriteRenderer: {(_spriteRenderer != null ? "OK" : "NULL")}" +
-                      $"\n• Instance Material: {(_instanceMaterial != null ? _instanceMaterial.name : "NULL")}" +
-                      $"\n• Shader: {(_instanceMaterial != null ? _instanceMaterial.shader.name : "NULL")}" +
-                      $"\n• Create Instance: {createMaterialInstance}" +
-                      $"\n--- CIRCLE DETECTION ---" +
-                      $"\n• Enable Circle Detection: {enableCircleDetection}" +
-                      $"\n• Detection Radius: {detectionRadius}" +
-                      $"\n• Deactivation Radius: {deactivationRadius}" +
-                      $"\n• Detection LayerMask: {detectionLayerMask}" +
-                      $"\n• Required Tag: '{requiredTag}'" +
-                      $"\n• Check Interval: {checkInterval}s" +
-                      $"\n• Detection Offset: {detectionOffset}" +
-                      $"\n• Detection Position: {DetectionPosition}" +
-                      $"\n• Current Detected Object: {(CurrentDetectedObject != null ? CurrentDetectedObject.name : "None")}" +
-                      $"\n• Last Check Time: {_lastCheckTime}");
-        }
-
-        [ContextMenu("Test Force Circle Check")]
-        private void TestForceCircleCheck()
-        {
-            if (Application.isPlaying)
-            {
-                ForceCircleCheck();
-                Debug.Log("Circle check forçado!");
-            }
-            else
-            {
-                Debug.LogWarning("Só funciona no Play Mode");
-            }
-        }
-
-        [ContextMenu("Debug Detection Area")]
-        private void DebugDetectionArea()
-        {
-            if (!Application.isPlaying)
-            {
-                Debug.LogWarning("Só funciona no Play Mode");
-                return;
-            }
-
-            Vector2 detectionPos = DetectionPosition;
-            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
-
-            Debug.Log($"=== DEBUG DETECTION AREA ===");
-            Debug.Log($"Detection Position: {detectionPos}");
-            Debug.Log($"Detection Radius: {radiusToUse}");
-            Debug.Log($"LayerMask: {detectionLayerMask}");
-            Debug.Log($"Required Tag: '{requiredTag}'");
-
-            // Verifica todos os colliders na área
-            Collider2D[] allColliders = Physics2D.OverlapCircleAll(detectionPos, radiusToUse);
-            Debug.Log($"Total colliders na área (todos layers): {allColliders.Length}");
-
-            for (int i = 0; i < allColliders.Length; i++)
-            {
-                var col = allColliders[i];
-                bool matchesLayer = ((1 << col.gameObject.layer) & detectionLayerMask) != 0;
-                bool matchesTag = string.IsNullOrEmpty(requiredTag) || col.CompareTag(requiredTag);
-                bool isSelf = col.gameObject == gameObject;
-
-                Debug.Log($"Collider {i + 1}: {col.name}" +
-                         $"\n  Layer: {col.gameObject.layer} (matches: {matchesLayer})" +
-                         $"\n  Tag: '{col.tag}' (matches: {matchesTag})" +
-                         $"\n  Is Self: {isSelf}" +
-                         $"\n  Valid: {matchesLayer && matchesTag && !isSelf}");
-            }
-
-            // Testa especificamente com o LayerMask
-            Collider2D detected = Physics2D.OverlapCircle(detectionPos, radiusToUse, detectionLayerMask);
-            Debug.Log($"Physics2D.OverlapCircle result: {(detected != null ? detected.name : "NULL")}");
-        }
-
-        [ContextMenu("Find Player Objects")]
-        private void FindPlayerObjects()
-        {
-            GameObject[] allObjects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-            Debug.Log("=== PROCURANDO OBJETOS COM TAG 'Player' ===");
-
-            int playerCount = 0;
-            foreach (GameObject obj in allObjects)
-            {
-                if (obj.CompareTag("Player"))
-                {
-                    playerCount++;
-                    Collider2D col = obj.GetComponent<Collider2D>();
-                    Debug.Log($"Player encontrado: {obj.name}" +
-                             $"\n  Layer: {obj.layer}" +
-                             $"\n  Position: {obj.transform.position}" +
-                             $"\n  Has Collider2D: {col != null}" +
-                             $"\n  Distance to this: {Vector2.Distance(transform.position, obj.transform.position):F2}");
-                }
-            }
-
-            if (playerCount == 0)
-            {
-                Debug.LogWarning("Nenhum objeto com tag 'Player' encontrado!");
-            }
-            else
-            {
-                Debug.Log($"Total de objetos Player encontrados: {playerCount}");
-            }
-        }
-
-        [ContextMenu("🔍 Diagnose Problems")]
-        private void DiagnoseProblems()
-        {
-            DiagnoseCommonIssues();
-        }
-
-        [ContextMenu("🎯 Search Players in Area")]
-        private void SearchPlayersInArea()
-        {
-            if (!Application.isPlaying)
-            {
-                Debug.LogWarning("Só funciona no Play Mode");
-                return;
-            }
-
-            Vector2 detectionPos = DetectionPosition;
-            float radiusToUse = _outlineActive ? deactivationRadius : detectionRadius;
-
-            Debug.Log("=== BUSCA POR PLAYERS NA ÁREA ===");
-            Debug.Log($"Posição: {detectionPos}, Raio: {radiusToUse}");
-
-            // Busca TODOS os objetos (sem LayerMask)
-            Collider2D[] allObjects = Physics2D.OverlapCircleAll(detectionPos, radiusToUse);
-            Debug.Log($"Total de objetos na área (todos layers): {allObjects.Length}");
-
-            int playerCount = 0;
-            int objectsInLayerCount = 0;
-
-            foreach (var obj in allObjects)
-            {
-                bool isInLayer = ((1 << obj.gameObject.layer) & detectionLayerMask) != 0;
-                if (isInLayer) objectsInLayerCount++;
-
-                bool isPlayer = obj.CompareTag("Player");
-                if (isPlayer) playerCount++;
-
-                Debug.Log($"• {obj.name}: Layer {obj.gameObject.layer} {(isInLayer ? "✅" : "❌")} | Tag '{obj.tag}' {(isPlayer ? "🎯" : "")} | Distância: {Vector2.Distance(detectionPos, obj.transform.position):F2}");
-            }
-
-            Debug.Log($"Resumo:");
-            Debug.Log($"• Players encontrados: {playerCount}");
-            Debug.Log($"• Objetos no LayerMask correto: {objectsInLayerCount}");
-
-            if (playerCount == 0)
-            {
-                Debug.LogError("❌ NENHUM PLAYER na área de detecção!");
-            }
-            else if (objectsInLayerCount == 0)
-            {
-                Debug.LogError("❌ Players estão na área mas no LAYER ERRADO!");
-            }
-            else
-            {
-                Debug.Log("✅ Players encontrados e no layer correto!");
-            }
-        }
-
-        [ContextMenu("Toggle Debug Logs")]
-        private void ToggleDebugLogs()
-        {
-            enableDebugLogs = !enableDebugLogs;
-            Debug.Log($"Debug logs {(enableDebugLogs ? "ATIVADOS" : "DESATIVADOS")}");
-        }
-
-        [ContextMenu("Force Recreate Material")]
-        private void ForceRecreateMaterial()
-        {
-            if (Application.isPlaying)
-            {
-                CleanupMaterials();
-                SetupOutlineMaterial();
-                Debug.Log("Material recriado!");
-            }
-            else
-            {
-                Debug.LogWarning("Só funciona no Play Mode");
-            }
-        }
-#endif
-        #endregion
     }
 }

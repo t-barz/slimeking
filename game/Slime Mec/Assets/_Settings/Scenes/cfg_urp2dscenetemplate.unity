@@ -311,11 +311,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.202903
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.202903
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 32192272798385181, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -604,41 +604,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 483616793}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &532454466 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
-  m_PrefabInstance: {fileID: 1864773025}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &532454474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 532454466}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.01
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
-  enableOnStart: 0
-  createMaterialInstance: 1
-  enableCircleDetection: 1
-  detectionRadius: 1
-  deactivationRadius: 1.5
-  detectionLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  requiredTag: Player
-  checkInterval: 0.1
-  detectionOffset: {x: 0, y: 0}
-  enableDebugLogs: 0
-  showDebugGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
-  gizmoActiveColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1001 &545650021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -780,41 +745,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &653264415 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
-  m_PrefabInstance: {fileID: 7276404156438362683}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &653264425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 653264415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.01
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
-  enableOnStart: 0
-  createMaterialInstance: 1
-  enableCircleDetection: 1
-  detectionRadius: 1
-  deactivationRadius: 1.5
-  detectionLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  requiredTag: Player
-  checkInterval: 0.1
-  detectionOffset: {x: 0, y: 0}
-  enableDebugLogs: 0
-  showDebugGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
-  gizmoActiveColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &843391569 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 981683821645573240, guid: 32d38aff782331f48b5a35198d3392dc, type: 3}
@@ -839,17 +769,146 @@ MonoBehaviour:
   createMaterialInstance: 1
   enableCircleDetection: 1
   detectionRadius: 1
-  deactivationRadius: 1.5
+  deactivationRadius: 1
+  detectionLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  requiredTag: Player
+  checkInterval: 0.1
+  detectionOffset: {x: 0, y: 0}
+  enableFadeAnimation: 1
+  fadeInDuration: 0.05
+  fadeOutDuration: 0.05
+  fadeInCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 4
+      outSlope: 4
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.25
+      value: 1
+      inSlope: 4
+      outSlope: 4
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fadeOutCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -2.2518077
+      outSlope: -2.2518077
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.4916687
+      value: -0.1071434
+      inSlope: -2.2518077
+      outSlope: -2.2518077
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!1 &909158201 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
+  m_PrefabInstance: {fileID: 951231624}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &909158211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909158201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineSize: 0.01
+  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
+  enableOnStart: 0
+  createMaterialInstance: 1
+  enableCircleDetection: 1
+  detectionRadius: 1
+  deactivationRadius: 1
   detectionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   requiredTag: Player
   checkInterval: 0.1
   detectionOffset: {x: 0, y: 0}
-  enableDebugLogs: 0
-  showDebugGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
-  gizmoActiveColor: {r: 1, g: 0, b: 0, a: 1}
+  enableFadeAnimation: 1
+  fadeInDuration: 0.3
+  fadeOutDuration: 0.2
+  fadeInCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fadeOutCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &951231624
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -860,11 +919,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9585728
+      value: 0.94476503
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9585728
+      value: 0.94476503
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalPosition.x
@@ -913,7 +972,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 909158211}
   m_SourcePrefab: {fileID: 100100000, guid: c87d440d8091ba14692b494f10114952, type: 3}
 --- !u!1001 &1118622178
 PrefabInstance:
@@ -1201,41 +1263,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
---- !u!1 &1457152652 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 275090942622643926, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
-  m_PrefabInstance: {fileID: 5636522687416261508}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1457152660
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1457152652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineSize: 0.02
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
-  enableOnStart: 0
-  createMaterialInstance: 1
-  enableCircleDetection: 1
-  detectionRadius: 1
-  deactivationRadius: 1.5
-  detectionLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  requiredTag: Player
-  checkInterval: 0.1
-  detectionOffset: {x: 0, y: 0}
-  enableDebugLogs: 0
-  showDebugGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
-  gizmoActiveColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &1533887555
 GameObject:
   m_ObjectHideFlags: 0
@@ -1466,10 +1493,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 532454474}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
 --- !u!1 &1974147917
 GameObject:
@@ -1560,11 +1584,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4419167951618456855, guid: c611be997137e6641b1d39a6d4e6074a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.053
       objectReference: {fileID: 0}
     - target: {fileID: 4419167951618456855, guid: c611be997137e6641b1d39a6d4e6074a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.066
       objectReference: {fileID: 0}
     - target: {fileID: 4419167951618456855, guid: c611be997137e6641b1d39a6d4e6074a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1824,11 +1848,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7195359
+      value: 0.6564789
       objectReference: {fileID: 0}
     - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7443605
+      value: 0.679128
       objectReference: {fileID: 0}
     - target: {fileID: 1025883169543724723, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1873,10 +1897,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 275090942622643926, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1457152660}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c66405825aa47a141b54d194d9616ac6, type: 3}
 --- !u!1001 &6368664075821980783
 PrefabInstance:
@@ -1961,11 +1982,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.77389956
+      value: 0.70961595
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.8005997
+      value: 0.73409826
       objectReference: {fileID: 0}
     - target: {fileID: 8181343261730292364, guid: c87d440d8091ba14692b494f10114952, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2014,10 +2035,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 653264425}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c87d440d8091ba14692b494f10114952, type: 3}
 --- !u!1001 &8018322588699472185
 PrefabInstance:
@@ -2033,11 +2051,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1.413
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.585
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.z
