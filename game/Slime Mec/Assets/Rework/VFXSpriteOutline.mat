@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: VFXSpriteOutline
-  m_Shader: {fileID: 4800000, guid: 6c51c9f44b018044eb54083505fe2f2f, type: 3}
+  m_Shader: {fileID: 4800000, guid: 8b315928c79ea044d9a10ae5036cd66a, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -41,11 +41,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlphaThreshold: 0.5
     - _EnableExternalAlpha: 0
+    - _EnableOutline: 0
+    - _ForceUpdate: 1
+    - _OutlineSize: 0.01
     - _OutlineWidth: 1
+    - _ShowOutline: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

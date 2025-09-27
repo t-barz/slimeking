@@ -50,7 +50,7 @@ namespace SlimeMec.Gameplay
         [SerializeField] private Transform switchButtons;       // Botões de Nintendo Switch
 
         [Header("Outline Effect")]
-        [SerializeField] private OutlineShaderController outlineController; // Controlador de outline via shader
+        [SerializeField] private OutlineController outlineController; // Controlador de outline otimizado
         [SerializeField] private bool enableOutlineOnInteraction = true;    // Ativar outline quando player se aproxima
         [SerializeField] private Color interactionOutlineColor = Color.cyan; // Cor do outline de interação
 
@@ -100,10 +100,10 @@ namespace SlimeMec.Gameplay
             if (xboxButtons == null) xboxButtons = transform.Find("xbox");
             if (switchButtons == null) switchButtons = transform.Find("switch");
 
-            // Auto-encontra o OutlineShaderController se não foi configurado
+            // Auto-encontra o OutlineController se não foi configurado
             if (outlineController == null)
             {
-                outlineController = GetComponent<OutlineShaderController>();
+                outlineController = GetComponent<OutlineController>();
             }
 
             // Valida que pelo menos keyboard existe (fallback obrigatório)
@@ -133,8 +133,8 @@ namespace SlimeMec.Gameplay
             // Configura o outline controller se disponível
             if (outlineController != null && enableOutlineOnInteraction)
             {
-                outlineController.SetOutlineColor(interactionOutlineColor);
-                outlineController.DisableOutline(); // Inicia desativado
+                outlineController.UpdateOutlineColor(interactionOutlineColor);
+                outlineController.ShowOutline(false); // Inicia desativado
             }
 
             // Desativa todos os renderers inicialmente
@@ -243,7 +243,7 @@ namespace SlimeMec.Gameplay
             // Ativa o outline de interação
             if (outlineController != null && enableOutlineOnInteraction)
             {
-                outlineController.EnableOutline();
+                outlineController.ShowOutline(true);
 
                 if (enableDebugLogs)
                     Debug.Log($"InteractivePointHandler: Outline ativado para '{gameObject.name}'", this);
@@ -261,7 +261,7 @@ namespace SlimeMec.Gameplay
             // Desativa o outline de interação
             if (outlineController != null && enableOutlineOnInteraction)
             {
-                outlineController.DisableOutline();
+                outlineController.ShowOutline(false);
 
                 if (enableDebugLogs)
                     Debug.Log($"InteractivePointHandler: Outline desativado para '{gameObject.name}'", this);
@@ -362,7 +362,7 @@ namespace SlimeMec.Gameplay
         {
             if (Application.isPlaying && outlineController != null)
             {
-                outlineController.EnableOutline();
+                outlineController.ShowOutline(true);
                 Debug.Log("Outline forçado ON");
             }
         }
@@ -372,7 +372,7 @@ namespace SlimeMec.Gameplay
         {
             if (Application.isPlaying && outlineController != null)
             {
-                outlineController.DisableOutline();
+                outlineController.ShowOutline(false);
                 Debug.Log("Outline forçado OFF");
             }
         }

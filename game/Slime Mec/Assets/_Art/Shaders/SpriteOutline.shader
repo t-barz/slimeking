@@ -1,12 +1,14 @@
 Shader "SlimeMec/SpriteOutline"
 {
-    // PIXEL ART Hard Edge Outline with Solid Colors Only - v5.2
+    // Optimized Sprite Outline - Based on Efficient 8-Direction Algorithm - v6.0
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         _OutlineColor ("Outline Color", Color) = (1,1,1,1)
-        _OutlineSize ("Outline Size", Range(0, 0.5)) = 0.01
+        _OutlineSize ("Outline Size", Range(0, 1.0)) = 0.03
+        _AlphaThreshold ("Alpha Threshold", Range(0, 1)) = 0.5
+        [MaterialToggle] _ShowOutline ("Show Outline", Float) = 0
         [MaterialToggle] _EnableOutline ("Enable Outline", Float) = 0
         [HideInInspector] _RendererColor ("RendererColor", Color) = (1,1,1,1)
         [HideInInspector] _Flip ("Flip", Vector) = (1,1,1,1)
@@ -69,6 +71,8 @@ Shader "SlimeMec/SpriteOutline"
             fixed4 _Color;
             fixed4 _OutlineColor;
             float _OutlineSize;
+            float _AlphaThreshold;
+            float _ShowOutline;
             float _EnableOutline;
             float4 _MainTex_TexelSize;
 
@@ -147,90 +151,58 @@ Shader "SlimeMec/SpriteOutline"
             {
                 fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
                 
-                if (_EnableOutline < 0.5)
+                // Check both _ShowOutline and _EnableOutline for compatibility
+                if (_ShowOutline < 0.5 && _EnableOutline < 0.5)
                 {
                     c.rgb *= c.a;
                     return c;
                 }
                 
-                float currentAlpha = c.a;
+                float centerAlpha = c.a;
                 
-                // Se o pixel atual já tem conteúdo SÓLIDO (alpha = 1.0), retorna ele normalmente
-                if (currentAlpha >= 0.99)
+                // If current pixel is already solid, return it normally
+                if (centerAlpha >= _AlphaThreshold)
                 {
                     c.rgb *= c.a;
                     return c;
                 }
                 
-                // PIXEL ART OUTLINE com tratamento de bordas - APENAS para cores sólidas
+                // Efficient 8-direction outline algorithm
                 float2 texelSize = _MainTex_TexelSize.xy;
-                int outlinePixels = max(1, (int)(_OutlineSize * 50.0));
+                float2 pixelSize = texelSize * _OutlineSize;
                 
-                // Verifica se há conteúdo SÓLIDO nas 4 direções cardinais
-                bool hasOutline = false;
+                // 8-direction offsets for smooth outline
+                float2 offsets[8] = {
+                    float2(-1, 0),  // Left
+                    float2(1, 0),   // Right
+                    float2(0, 1),   // Up
+                    float2(0, -1),  // Down
+                    float2(-1, 1),  // Top-left
+                    float2(1, 1),   // Top-right
+                    float2(-1, -1), // Bottom-left
+                    float2(1, -1)   // Bottom-right
+                };
                 
-                // Para cada pixel de distância até o limite do outline
-                [unroll]
-                for (int dist = 1; dist <= 25; dist++)
+                float outline = 0;
+                
+                // Check all 8 directions
+                for (int j = 0; j < 8; j++)
                 {
-                    if (dist > outlinePixels) break;
-                    
-                    float2 offset = texelSize * float(dist);
-                    
-                    // Posições para testar
-                    float2 rightPos = IN.texcoord + float2(offset.x, 0);
-                    float2 leftPos = IN.texcoord + float2(-offset.x, 0);
-                    float2 upPos = IN.texcoord + float2(0, offset.y);
-                    float2 downPos = IN.texcoord + float2(0, -offset.y);
-                    
-                    // Testa 4 direções cardinais - APENAS cores sólidas (alpha >= 0.99)
-                    float rightAlpha = SampleSpriteTextureWithBorder(rightPos).a;
-                    float leftAlpha = SampleSpriteTextureWithBorder(leftPos).a;
-                    float upAlpha = SampleSpriteTextureWithBorder(upPos).a;
-                    float downAlpha = SampleSpriteTextureWithBorder(downPos).a;
-                    
-                    // TRATAMENTO ESPECIAL PARA BORDAS - apenas se há cores sólidas:
-                    float2 currentPos = IN.texcoord;
-                    
-                    // Verifica se estamos próximos das bordas da textura
-                    bool nearLeftBorder = currentPos.x < texelSize.x * float(outlinePixels);
-                    bool nearRightBorder = currentPos.x > (1.0 - texelSize.x * float(outlinePixels));
-                    bool nearTopBorder = currentPos.y > (1.0 - texelSize.y * float(outlinePixels));
-                    bool nearBottomBorder = currentPos.y < texelSize.y * float(outlinePixels);
-                    
-                    // Se está na borda E há conteúdo SÓLIDO do lado oposto, considera como outline
-                    if (nearLeftBorder && rightAlpha >= 0.99) hasOutline = true;
-                    if (nearRightBorder && leftAlpha >= 0.99) hasOutline = true;
-                    if (nearTopBorder && downAlpha >= 0.99) hasOutline = true;
-                    if (nearBottomBorder && upAlpha >= 0.99) hasOutline = true;
-                    
-                    // Testa normalmente também - APENAS cores sólidas
-                    if (rightAlpha >= 0.99 || leftAlpha >= 0.99 || upAlpha >= 0.99 || downAlpha >= 0.99)
-                    {
-                        hasOutline = true;
-                    }
-                    
-                    if (hasOutline) break;
+                    float2 sampleUV = IN.texcoord + offsets[j] * pixelSize;
+                    float sampleAlpha = SampleSpriteTextureWithBorder(sampleUV).a;
+                    outline += step(_AlphaThreshold, sampleAlpha);
                 }
                 
-                // Outline binário: ou tem ou não tem (pixel art style)
-                if (hasOutline)
+                // If outline detected, apply outline color
+                if (outline > 0)
                 {
                     c = _OutlineColor;
-                    c.a = 1.0; // Alpha fixo para bordas nítidas
+                    c.a = _OutlineColor.a;
                 }
                 else
                 {
-                    // Mantém pixels semi-transparentes como estão (sem outline)
-                    // Se currentAlpha > 0 mas < 0.99, mantém o pixel original
-                    if (currentAlpha > 0.01)
-                    {
-                        c = SampleSpriteTexture(IN.texcoord) * IN.color;
-                    }
-                    else
-                    {
-                        c = fixed4(0,0,0,0);
-                    }
+                    // No outline, return transparent
+                    c = fixed4(0,0,0,0);
                 }
                 
                 c.rgb *= c.a;
