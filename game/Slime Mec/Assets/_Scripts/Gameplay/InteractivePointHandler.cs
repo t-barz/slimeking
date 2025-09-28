@@ -69,7 +69,7 @@ namespace SlimeMec.Gameplay
 
         // Estado atual da interação
         private bool _isPlayerInRange = false;
-        private InputType _currentInputType = InputType.Keyboard;
+        protected InputType _currentInputType = InputType.Keyboard;
         private InputType _lastInputType = InputType.Keyboard;
 
         // Timer para verificação de input
@@ -77,6 +77,13 @@ namespace SlimeMec.Gameplay
 
         // Hash da tag para performance
         private static readonly int PlayerTagHash = "Player".GetHashCode();
+        #endregion
+
+        #region Protected Properties
+        /// <summary>
+        /// Propriedade protegida para acesso ao estado de proximidade do Player por classes filhas.
+        /// </summary>
+        protected bool IsPlayerInRange => _isPlayerInRange;
         #endregion
 
         #region Unity Lifecycle
@@ -91,7 +98,7 @@ namespace SlimeMec.Gameplay
         /// <summary>
         /// Inicializa os componentes necessários e validações.
         /// </summary>
-        private void InitializeComponents()
+        protected void InitializeComponents()
         {
             // Auto-encontra os subobjetos se não foram configurados
             if (keyboardButtons == null) keyboardButtons = transform.Find("keyboard");
@@ -143,13 +150,12 @@ namespace SlimeMec.Gameplay
 
             // Detecta o tipo de input inicial
             _currentInputType = DetectCurrentInputType();
-            _lastInputType = _currentInputType;
         }
 
         /// <summary>
         /// Detecta o tipo de input atualmente sendo usado pelo jogador.
         /// </summary>
-        private InputType DetectCurrentInputType()
+        protected InputType DetectCurrentInputType()
         {
             // Verifica se há controles conectados
             if (Gamepad.current != null)
@@ -185,27 +191,9 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
-        /// Verifica se houve mudança no tipo de input e atualiza a exibição.
-        /// </summary>
-        private void CheckInputTypeChange()
-        {
-            _currentInputType = DetectCurrentInputType();
-
-            if (_currentInputType != _lastInputType)
-            {
-                _lastInputType = _currentInputType;
-
-                if (_isPlayerInRange)
-                {
-                    ShowInteractionButtons();
-                }
-            }
-        }
-
-        /// <summary>
         /// Desativa todos os renderers de botões.
         /// </summary>
-        private void HideAllButtons()
+        protected void HideAllButtons()
         {
             if (_keyboardRenderer != null) _keyboardRenderer.enabled = false;
             if (_gamepadRenderer != null) _gamepadRenderer.enabled = false;
@@ -217,7 +205,7 @@ namespace SlimeMec.Gameplay
         /// <summary>
         /// Ativa a exibição dos botões de interação baseado no input atual.
         /// </summary>
-        private void ShowInteractionButtons()
+        protected void ShowInteractionButtons()
         {
             // Desativa todos primeiro
             HideAllButtons();
@@ -293,7 +281,7 @@ namespace SlimeMec.Gameplay
         /// <param name="other">Collider que entrou no trigger</param>
         private void OnTriggerEnter2D(Collider2D other)
         {
-            DetectCurrentInputType();
+            _currentInputType = DetectCurrentInputType();
             ShowInteractionButtons();
             // Verifica se é o Player usando CompareTag para performance
             if (other.CompareTag("Player"))

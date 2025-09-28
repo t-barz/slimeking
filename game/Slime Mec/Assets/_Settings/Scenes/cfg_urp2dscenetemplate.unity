@@ -486,11 +486,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.96
+      value: -3.169
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -531,7 +531,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 505242242391058894, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 485453499}
+      addedObject: {fileID: 485453502}
   m_SourcePrefab: {fileID: 100100000, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
 --- !u!4 &485453492 stripped
 Transform:
@@ -568,7 +568,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 505242242391058894, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
   m_PrefabInstance: {fileID: 485453491}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &485453499
+--- !u!114 &485453502
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -577,9 +577,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 485453498}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a890660b8399ca54cb3eb3e621431c0b, type: 3}
+  m_Script: {fileID: 11500000, guid: f141845830a51254f95ae77d98aa46cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.SlimeSpecialMovement
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.SpecialMovementPoint
   keyboardButtons: {fileID: 485453493}
   gamepadButtons: {fileID: 485453497}
   playstationButtons: {fileID: 485453496}
@@ -587,12 +587,15 @@ MonoBehaviour:
   switchButtons: {fileID: 485453495}
   outlineController: {fileID: 0}
   enableOutlineOnInteraction: 0
-  interactionOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  interactionOutlineColor: {r: 0, g: 1, b: 1, a: 1}
   enableDebugLogs: 0
   inputCheckInterval: 0.1
+  movementType: 1
   destinationPoint: {fileID: 687967766}
-  movementDuration: 2
-  animationTrigger: SpecialMove
+  movementDuration: 0.75
+  playerLayers:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,11 +888,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.16
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.96
+      value: 0.672
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -976,9 +979,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 687967760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a890660b8399ca54cb3eb3e621431c0b, type: 3}
+  m_Script: {fileID: 11500000, guid: f141845830a51254f95ae77d98aa46cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.SlimeSpecialMovement
+  m_EditorClassIdentifier: '::'
   keyboardButtons: {fileID: 687967765}
   gamepadButtons: {fileID: 687967764}
   playstationButtons: {fileID: 687967763}
@@ -986,12 +989,15 @@ MonoBehaviour:
   switchButtons: {fileID: 687967761}
   outlineController: {fileID: 0}
   enableOutlineOnInteraction: 0
-  interactionOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  interactionOutlineColor: {r: 0, g: 1, b: 1, a: 1}
   enableDebugLogs: 0
   inputCheckInterval: 0.1
+  movementType: 1
   destinationPoint: {fileID: 485453492}
-  movementDuration: 2
-  animationTrigger: SpecialMove
+  movementDuration: 0.75
+  playerLayers:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &909158201 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8963292276566518505, guid: c87d440d8091ba14692b494f10114952, type: 3}
@@ -1009,88 +1015,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a49076080cd4a15459630daf918b3756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Visual.OutlineShaderController
-  outlineColor:
-    r: 1
-    g: 1
-    b: 1
-    a: 1
-  outlineSize: 0.01
-  outlineMaterial: {fileID: 2100000, guid: 43f08db6dcf51084f8e3bd8173878730, type: 2}
-  enableOnStart: 0
-  createMaterialInstance: 1
-  enableCircleDetection: 1
-  detectionRadius: 1
-  deactivationRadius: 1
-  detectionLayerMask:
-    m_Bits: 4294967295
-  requiredTag: Player
-  checkInterval: 0.1
-  detectionOffset: {x: 0, y: 0}
-  enableFadeAnimation: 1
-  fadeInDuration: 0.3
-  fadeOutDuration: 0.2
-  fadeInCurve:
-    m_Curve:
-    - time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  fadeOutCurve:
-    m_Curve:
-    - time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _spriteRenderer: {fileID: 0}
-  _originalMaterial: {fileID: 0}
-  _instanceMaterial: {fileID: 0}
-  _outlineActive: 0
-  _isInitialized: 0
-  _lastCheckTime: 0
-  _currentDetectedObject: {fileID: 0}
-  _isFading: 0
-  _targetOutlineState: 0
-  _fadeStartTime: 0
-  _fadeDuration: 0
-  _currentFadeCurve:
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _fadeStartAlpha: 0
-  _fadeTargetAlpha: 0
-  _currentOutlineAlpha: 0
-  _fadeProgress: 0
 --- !u!1001 &951231624
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2233,11 +2157,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.413
+      value: 0.725
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.585
+      value: -1.089
       objectReference: {fileID: 0}
     - target: {fileID: 787850297681248683, guid: 320586a63fb0b1b48a78ce368613c9c7, type: 3}
       propertyPath: m_LocalPosition.z

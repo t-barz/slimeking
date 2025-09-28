@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
+using SlimeMec.Gameplay;
 
 /// <summary>
 /// Controlador principal do personagem jogador para o jogo SlimeKing.
@@ -104,6 +106,13 @@ public class PlayerController : MonoBehaviour
     private bool _isAttacking = false;           // Se o jogador está executando um ataque
     private bool _isHiding = false;              // Se o jogador está escondido (Crouch pressionado)
 
+    // === SISTEMA DE MOVIMENTO ESPECIAL ===
+    // Controle de movimentos especiais (Jump/Shrink)
+    private bool _isPerformingSpecialMovement = false;  // Flag que indica se está executando movimento especial
+    private Coroutine _specialMovementCoroutine = null; // Referência à corrotina ativa de movimento especial
+    private List<Collider2D> _playerColliders = new List<Collider2D>(); // Cache de todos os colliders do player
+    private SpecialMovementPoint _currentSpecialMovementPoint = null; // SpecialMovementPoint em contato atual (otimização)
+
     // === OTIMIZAÇÃO DE PERFORMANCE ===
     // Usando StringToHash para evitar overhead de strings nas chamadas do Animator
     // Estas constantes são calculadas uma vez no carregamento da classe
@@ -111,6 +120,8 @@ public class PlayerController : MonoBehaviour
     private static readonly int IsHiding = Animator.StringToHash("isHiding");
     private static readonly int Attack01 = Animator.StringToHash("Attack01");
     private static readonly int FacingRight = Animator.StringToHash("FacingRight");
+    private static readonly int JumpTrigger = Animator.StringToHash("Jump");     // Trigger para animação de Jump
+    private static readonly int ShrinkTrigger = Animator.StringToHash("Shrink"); // Trigger para animação de Shrink
 
     // === CONSTANTES DE CONFIGURAÇÃO ===
     // Valores mágicos extraídos para facilitar manutenção
@@ -197,6 +208,9 @@ public class PlayerController : MonoBehaviour
         // Inicializa sistema visual direcional
         InitializeVisualObjects();
 
+        // Cache todos os colliders do player para uso no movimento especial
+        CachePlayerColliders();
+
         // Valida parâmetros do Animator
         ValidateAnimatorParameters();
 
@@ -221,6 +235,30 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         HandleMovement();
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Verifica se é um SpecialMovementPoint
+        SpecialMovementPoint specialMovementPoint = other.GetComponent<SpecialMovementPoint>();
+
+        if (specialMovementPoint != null && specialMovementPoint.IsValidMovementPoint())
+        {
+            _currentSpecialMovementPoint = specialMovementPoint;
+            Debug.Log($"PlayerController: Entrou em contato com {specialMovementPoint.GetMovementName()} - {other.gameObject.name}");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        // Verifica se é o SpecialMovementPoint atual saindo de contato
+        SpecialMovementPoint specialMovementPoint = other.GetComponent<SpecialMovementPoint>();
+
+        if (specialMovementPoint != null && specialMovementPoint == _currentSpecialMovementPoint)
+        {
+            Debug.Log($"PlayerController: Saiu de contato com {specialMovementPoint.GetMovementName()} - {other.gameObject.name}");
+            _currentSpecialMovementPoint = null;
+        }
     }
 
     #endregion
@@ -342,6 +380,30 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
+    /// Faz cache de todos os Collider2D do player para controle durante movimento especial.
+    /// </summary>
+    private void CachePlayerColliders()
+    {
+        _playerColliders.Clear();
+
+        // Busca colliders no próprio objeto
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        _playerColliders.AddRange(colliders);
+
+        // Busca colliders nos objetos filhos
+        Collider2D[] childColliders = GetComponentsInChildren<Collider2D>();
+        foreach (var collider in childColliders)
+        {
+            if (!_playerColliders.Contains(collider))
+            {
+                _playerColliders.Add(collider);
+            }
+        }
+
+        Debug.Log($"PlayerController: {_playerColliders.Count} colliders encontrados e armazenados em cache.");
+    }
+
+    /// <summary>
     /// Valida se os parâmetros do Animator Controller estão configurados corretamente.
     /// Ajuda a identificar problemas de configuração que podem afetar as animações.
     /// </summary>
@@ -351,7 +413,7 @@ public class PlayerController : MonoBehaviour
 
         // Lista de parâmetros que devem existir no Animator Controller
         string[] requiredBoolParams = { "isWalking", "isHiding", "FacingRight" };
-        string[] requiredTriggerParams = { "Attack01" };
+        string[] requiredTriggerParams = { "Attack01", "Jump", "Shrink" };
 
         // Verifica parâmetros bool
         foreach (string paramName in requiredBoolParams)
@@ -562,16 +624,36 @@ public class PlayerController : MonoBehaviour
     /// Processa input de interação contextual via tecla E.
     /// Usado para coletar itens próximos e interagir com elementos do cenário.
     /// 
+    /// FUNCIONALIDADES IMPLEMENTADAS:
+    /// • Detecção e ativação de SpecialMovementPoints (Jump/Shrink) - OTIMIZADO
+    /// 
     /// FUTURAS IMPLEMENTAÇÕES:
     /// • Detecção de CollectibleItems próximos
     /// • Interação com NPCs (diálogo)
     /// • Ativação de switches/alavancas
-    /// • Entrada em passagens especiais (Shrink/Jump)
     /// </summary>
     /// <param name="context">Contexto de input da tecla de interação</param>
     private void OnInteractInput(InputAction.CallbackContext context)
     {
+        // Verifica se já está executando um movimento especial
+        if (_isPerformingSpecialMovement)
+        {
+            Debug.Log("PlayerController: Já executando movimento especial. Ignorando input de interação.");
+            return;
+        }
 
+        // Verifica se há um SpecialMovementPoint em contato (otimizado)
+        if (_currentSpecialMovementPoint != null)
+        {
+            Debug.Log($"PlayerController: Ativando movimento especial - {_currentSpecialMovementPoint.GetMovementName()}");
+            StartSpecialMovement(_currentSpecialMovementPoint);
+            return;
+        }        // TODO: Implementar outras interações
+        // - Coleta de itens
+        // - Diálogo com NPCs
+        // - Ativação de switches
+
+        Debug.Log("PlayerController: Nenhuma interação disponível no momento.");
     }
 
     /// <summary>
@@ -672,6 +754,174 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Special Movement System
+
+    /// <summary>
+    /// MÉTODO REMOVIDO - Otimização implementada
+    /// Substituído por sistema de trigger direto usando _currentSpecialMovementPoint
+    /// que é setado automaticamente nos métodos OnTriggerEnter2D/OnTriggerExit2D
+    /// </summary>
+    // private SpecialMovementPoint FindNearbySpecialMovementPoint() - REMOVIDO    /// <summary>
+    /// Inicia o movimento especial baseado no SpecialMovementPoint.
+    /// </summary>
+    /// <param name="movementPoint">Ponto de movimento especial ativado</param>
+    private void StartSpecialMovement(SpecialMovementPoint movementPoint)
+    {
+        // Verifica se já há um movimento especial em execução
+        if (_isPerformingSpecialMovement)
+        {
+            Debug.LogWarning("PlayerController: Tentativa de iniciar movimento especial enquanto outro está em execução.");
+            return;
+        }
+
+        // Inicia a corrotina de movimento especial
+        _specialMovementCoroutine = StartCoroutine(PerformSpecialMovement(movementPoint));
+    }
+
+    /// <summary>
+    /// Executa o movimento especial completo.
+    /// IMPORTANTE: Não pode ser cancelado durante a execução para garantir integridade do gameplay.
+    /// </summary>
+    /// <param name="movementPoint">Configurações do movimento especial</param>
+    private IEnumerator PerformSpecialMovement(SpecialMovementPoint movementPoint)
+    {
+        _isPerformingSpecialMovement = true;
+
+        try
+        {
+            // FASE 1: PREPARAÇÃO
+            Debug.Log($"PlayerController: Iniciando {movementPoint.GetMovementName()}...");
+
+            // Desabilita movimento normal
+            _canMove = false;
+            _canAttack = false;
+
+            // Para o movimento atual
+            _rigidbody.linearVelocity = Vector2.zero;
+
+            // Desativa todos os colliders do player
+            DisablePlayerColliders();
+
+            // FASE 2: ANIMAÇÃO
+            // Ativa o trigger de animação apropriado
+            TriggerSpecialMovementAnimation(movementPoint.GetMovementType());
+
+            // Pequeno delay para a animação começar
+            yield return new WaitForSeconds(0.1f);
+
+            // FASE 3: MOVIMENTO
+            // Calcula parâmetros do movimento
+            Vector3 startPosition = transform.position;
+            Vector3 endPosition = movementPoint.GetDestinationPosition();
+            float duration = movementPoint.GetMovementDuration();
+            float elapsedTime = 0f;
+
+            Debug.Log($"PlayerController: Movendo de {startPosition} para {endPosition} em {duration}s");
+
+            // Loop de movimento - executa até completar (não pode ser cancelado)
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float progress = elapsedTime / duration;
+
+                // Aplica curva de movimento suave (ease-in-out)
+                float smoothProgress = Mathf.SmoothStep(0f, 1f, progress);
+
+                // Interpola posição
+                Vector3 currentPosition = Vector3.Lerp(startPosition, endPosition, smoothProgress);
+                transform.position = currentPosition;
+
+                yield return null;
+            }
+
+            // Garante posição final exata
+            transform.position = endPosition;
+
+            // FASE 4: FINALIZAÇÃO
+            Debug.Log($"PlayerController: {movementPoint.GetMovementName()} completado!");
+
+            // Pequeno delay antes de reativar colliders
+            yield return new WaitForSeconds(0.2f);
+
+            // Reativa todos os colliders do player
+            EnablePlayerColliders();
+
+            // Reabilita controles normais
+            _canMove = true;
+            _canAttack = true;
+
+            // IMPORTANTE: Limpa a referência atual para evitar uso indevido
+            // O trigger ainda pode estar ativo, mas o movimento foi concluído
+            _currentSpecialMovementPoint = null;
+        }
+        finally
+        {
+            // Garante que o estado seja resetado mesmo se houver erro
+            _isPerformingSpecialMovement = false;
+            _specialMovementCoroutine = null;
+        }
+    }
+
+    /// <summary>
+    /// Ativa o trigger de animação apropriado para o tipo de movimento especial.
+    /// </summary>
+    /// <param name="movementType">Tipo de movimento especial</param>
+    private void TriggerSpecialMovementAnimation(SpecialMovementPoint.MovementType movementType)
+    {
+        if (_animator == null) return;
+
+        switch (movementType)
+        {
+            case SpecialMovementPoint.MovementType.Jump:
+                _animator.SetTrigger(JumpTrigger);
+                Debug.Log("PlayerController: Trigger 'Jump' ativado no Animator");
+                break;
+
+            case SpecialMovementPoint.MovementType.Shrink:
+                _animator.SetTrigger(ShrinkTrigger);
+                Debug.Log("PlayerController: Trigger 'Shrink' ativado no Animator");
+                break;
+
+            default:
+                Debug.LogWarning($"PlayerController: Tipo de movimento '{movementType}' não reconhecido");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Desativa todos os colliders do player.
+    /// </summary>
+    private void DisablePlayerColliders()
+    {
+        foreach (Collider2D collider in _playerColliders)
+        {
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+        }
+
+        Debug.Log($"PlayerController: {_playerColliders.Count} colliders desativados");
+    }
+
+    /// <summary>
+    /// Reativa todos os colliders do player.
+    /// </summary>
+    private void EnablePlayerColliders()
+    {
+        foreach (Collider2D collider in _playerColliders)
+        {
+            if (collider != null)
+            {
+                collider.enabled = true;
+            }
+        }
+
+        Debug.Log($"PlayerController: {_playerColliders.Count} colliders reativados");
+    }
+
+    #endregion
+
     #region Movement System
 
     /// <summary>
@@ -691,8 +941,11 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
-        // Early exit se movimento estiver desabilitado (ex: cutscenes, morte, etc.)
+        // Early exit se movimento estiver desabilitado (ex: cutscenes, morte, movimento especial, etc.)
         if (!_canMove) return;
+
+        // Early exit se estiver executando movimento especial
+        if (_isPerformingSpecialMovement) return;
 
         // Se o jogador estiver atacando e movimento estiver bloqueado
         if (_isAttacking && lockMovementDuringAttack)
