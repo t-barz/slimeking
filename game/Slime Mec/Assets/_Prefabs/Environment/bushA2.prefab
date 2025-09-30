@@ -34,13 +34,14 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.95039415, y: 0.9831835, z: 1}
+  m_LocalScale: {x: 0.9109736, y: 0.94240296, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3626916397498700004
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -86,6 +87,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: -8500396549278966867, guid: e7d4901c0eda545458c5a8e646a851fe, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
@@ -95,7 +97,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 1
 --- !u!95 &1160356261127867848
 Animator:
@@ -231,7 +232,7 @@ MonoBehaviour:
   enableFlipY: 0
   applyScaleVariations: 1
   enableScaleVariation: 1
-  scaleRange: {x: 0.9, y: 1.1}
+  scaleRange: {x: 0.95, y: 1.05}
   uniformScale: 1
   applyColorVariations: 0
   enableColorVariation: 0

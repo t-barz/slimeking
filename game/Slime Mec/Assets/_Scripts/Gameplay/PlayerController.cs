@@ -33,6 +33,9 @@ using SlimeMec.Gameplay;
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance { get; private set; }
+
+    // ...existing code...
     #region Inspector Configuration
 
     [Header("⚙️ Configurações de Movimento")]
@@ -152,6 +155,15 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        // Faz o Player persistir entre cenas
+        DontDestroyOnLoad(gameObject);
+
         // Obtém componentes obrigatórios
         _rigidbody = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();

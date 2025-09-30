@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XInput;
 using UnityEngine.InputSystem.DualShock;
+#if UNITY_SWITCH
 using UnityEngine.InputSystem.Switch;
+#endif
 
 namespace SlimeKing.UI
 {
@@ -100,6 +102,7 @@ namespace SlimeKing.UI
         {
             if (Gamepad.current == null) return PLATFORM_KEYBOARD;
 
+#if UNITY_SWITCH
             return Gamepad.current switch
             {
                 XInputController => PLATFORM_XBOX,
@@ -107,6 +110,14 @@ namespace SlimeKing.UI
                 SwitchProControllerHID => PLATFORM_SWITCH,
                 _ => PLATFORM_OTHER
             };
+#else
+            return Gamepad.current switch
+            {
+                XInputController => PLATFORM_XBOX,
+                DualShockGamepad => PLATFORM_PLAYSTATION,
+                _ => PLATFORM_OTHER
+            };
+#endif
         }
 
         /// <summary>
