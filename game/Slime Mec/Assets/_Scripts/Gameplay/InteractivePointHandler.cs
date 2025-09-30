@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using SlimeMec.Visual;
 
 namespace SlimeMec.Gameplay
 {
@@ -48,6 +49,11 @@ namespace SlimeMec.Gameplay
         [SerializeField] private Transform xboxButtons;         // Botões de Xbox
         [SerializeField] private Transform switchButtons;       // Botões de Nintendo Switch
 
+        [Header("Outline Effect")]
+        [SerializeField] private OutlineController outlineController; // Controlador de outline otimizado
+        [SerializeField] private bool enableOutlineOnInteraction = true;    // Ativar outline quando player se aproxima
+        [SerializeField] private Color interactionOutlineColor = Color.cyan; // Cor do outline de interação
+
         [Header("Settings")]
         [SerializeField] private bool enableDebugLogs = false; // Para debug opcional
         [SerializeField] private float inputCheckInterval = 0.1f; // Intervalo para verificar mudanças de input
@@ -63,7 +69,7 @@ namespace SlimeMec.Gameplay
 
         // Estado atual da interação
         private bool _isPlayerInRange = false;
-        private InputType _currentInputType = InputType.Keyboard;
+        protected InputType _currentInputType = InputType.Keyboard;
         private InputType _lastInputType = InputType.Keyboard;
 
         // Timer para verificação de input
@@ -71,6 +77,13 @@ namespace SlimeMec.Gameplay
 
         // Hash da tag para performance
         private static readonly int PlayerTagHash = "Player".GetHashCode();
+        #endregion
+
+        #region Protected Properties
+        /// <summary>
+        /// Propriedade protegida para acesso ao estado de proximidade do Player por classes filhas.
+        /// </summary>
+        protected bool IsPlayerInRange => _isPlayerInRange;
         #endregion
 
         #region Unity Lifecycle
@@ -85,7 +98,7 @@ namespace SlimeMec.Gameplay
         /// <summary>
         /// Inicializa os componentes necessários e validações.
         /// </summary>
-        private void InitializeComponents()
+        protected void InitializeComponents()
         {
             // Auto-encontra os subobjetos se não foram configurados
             if (keyboardButtons == null) keyboardButtons = transform.Find("keyboard");
@@ -93,6 +106,12 @@ namespace SlimeMec.Gameplay
             if (playstationButtons == null) playstationButtons = transform.Find("playstation");
             if (xboxButtons == null) xboxButtons = transform.Find("xbox");
             if (switchButtons == null) switchButtons = transform.Find("switch");
+
+            // Auto-encontra o OutlineController se não foi configurado
+            if (outlineController == null)
+            {
+                outlineController = GetComponent<OutlineController>();
+            }
 
             // Valida que pelo menos keyboard existe (fallback obrigatório)
             if (keyboardButtons == null)
@@ -118,19 +137,25 @@ namespace SlimeMec.Gameplay
                 return;
             }
 
+            // Configura o outline controller se disponível
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.UpdateOutlineColor(interactionOutlineColor);
+                outlineController.ShowOutline(false); // Inicia desativado
+            }
+
             // Desativa todos os renderers inicialmente
             HideAllButtons();
             _isPlayerInRange = false;
 
             // Detecta o tipo de input inicial
             _currentInputType = DetectCurrentInputType();
-            _lastInputType = _currentInputType;
         }
 
         /// <summary>
         /// Detecta o tipo de input atualmente sendo usado pelo jogador.
         /// </summary>
-        private InputType DetectCurrentInputType()
+        protected InputType DetectCurrentInputType()
         {
             // Verifica se há controles conectados
             if (Gamepad.current != null)
@@ -166,27 +191,9 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
-        /// Verifica se houve mudança no tipo de input e atualiza a exibição.
-        /// </summary>
-        private void CheckInputTypeChange()
-        {
-            _currentInputType = DetectCurrentInputType();
-
-            if (_currentInputType != _lastInputType)
-            {
-                _lastInputType = _currentInputType;
-
-                if (_isPlayerInRange)
-                {
-                    ShowInteractionButtons();
-                }
-            }
-        }
-
-        /// <summary>
         /// Desativa todos os renderers de botões.
         /// </summary>
-        private void HideAllButtons()
+        protected void HideAllButtons()
         {
             if (_keyboardRenderer != null) _keyboardRenderer.enabled = false;
             if (_gamepadRenderer != null) _gamepadRenderer.enabled = false;
@@ -198,7 +205,7 @@ namespace SlimeMec.Gameplay
         /// <summary>
         /// Ativa a exibição dos botões de interação baseado no input atual.
         /// </summary>
-        private void ShowInteractionButtons()
+        protected void ShowInteractionButtons()
         {
             // Desativa todos primeiro
             HideAllButtons();
@@ -220,6 +227,15 @@ namespace SlimeMec.Gameplay
                     _isPlayerInRange = true;
                 }
             }
+
+            // Ativa o outline de interação
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.ShowOutline(true);
+
+                if (enableDebugLogs)
+                    Debug.Log($"InteractivePointHandler: Outline ativado para '{gameObject.name}'", this);
+            }
         }
 
         /// <summary>
@@ -229,6 +245,15 @@ namespace SlimeMec.Gameplay
         {
             HideAllButtons();
             _isPlayerInRange = false;
+
+            // Desativa o outline de interação
+            if (outlineController != null && enableOutlineOnInteraction)
+            {
+                outlineController.ShowOutline(false);
+
+                if (enableDebugLogs)
+                    Debug.Log($"InteractivePointHandler: Outline desativado para '{gameObject.name}'", this);
+            }
         }
 
         /// <summary>
@@ -256,7 +281,7 @@ namespace SlimeMec.Gameplay
         /// <param name="other">Collider que entrou no trigger</param>
         private void OnTriggerEnter2D(Collider2D other)
         {
-            DetectCurrentInputType();
+            _currentInputType = DetectCurrentInputType();
             ShowInteractionButtons();
             // Verifica se é o Player usando CompareTag para performance
             if (other.CompareTag("Player"))
@@ -315,7 +340,29 @@ namespace SlimeMec.Gameplay
                       $"\n• Keyboard: {(_keyboardRenderer != null ? (_keyboardRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
                       $"\n• PlayStation: {(_playstationRenderer != null ? (_playstationRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
                       $"\n• Xbox: {(_xboxRenderer != null ? (_xboxRenderer.enabled ? "ON" : "OFF") : "NULL")}" +
+                      $"\n• Outline Controller: {(outlineController != null ? "FOUND" : "NULL")}" +
+                      $"\n• Outline Active: {(outlineController != null ? outlineController.IsOutlineActive : false)}" +
                       $"\n• Trigger: {(GetComponent<Collider2D>()?.isTrigger ?? false)}");
+        }
+
+        [ContextMenu("Test Enable Outline")]
+        private void TestEnableOutline()
+        {
+            if (Application.isPlaying && outlineController != null)
+            {
+                outlineController.ShowOutline(true);
+                Debug.Log("Outline forçado ON");
+            }
+        }
+
+        [ContextMenu("Test Disable Outline")]
+        private void TestDisableOutline()
+        {
+            if (Application.isPlaying && outlineController != null)
+            {
+                outlineController.ShowOutline(false);
+                Debug.Log("Outline forçado OFF");
+            }
         }
 #endif
         #endregion
