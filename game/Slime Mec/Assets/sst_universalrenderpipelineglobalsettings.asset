@@ -64,6 +64,7 @@ MonoBehaviour:
       - rid: 8925792804530552836
       - rid: 8357722666378461184
       - rid: 8357722666378461185
+      - rid: 655404612242636800
     m_RuntimeSettings:
       m_List: []
   m_AssetVersion: 9
@@ -89,6 +90,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 655404612242636800
+      type: {class: OnTilePostProcessResource, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
+      data:
+        m_Version: 0
+        m_UberPostShader: {fileID: 4800000, guid: fe4f13c1004a07d4ea1e30bfd0326d9e, type: 3}
     - rid: 3114554777721110528
       type: {class: UniversalRenderPipelineEditorAssets, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
