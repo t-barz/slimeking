@@ -6,6 +6,7 @@ namespace ExtraTools
     /// <summary>
     /// AudioManager - Gerenciador de áudio persistente para The Slime King
     /// Responsável por música contínua entre cenas e efeitos sonoros
+    /// Gerencia transições entre música de menu e gameplay
     /// </summary>
     public class AudioManager : MonoBehaviour
     {
@@ -35,7 +36,6 @@ namespace ExtraTools
 
         #region Music Clips
         [Header("Music Library")]
-        [SerializeField] private AudioClip splashMusic;
         [SerializeField] private AudioClip menuMusic;
         [SerializeField] private AudioClip gameplayMusic;
         #endregion
@@ -50,10 +50,6 @@ namespace ExtraTools
         private AudioClip currentMusicClip;
         private bool isCrossfading = false;
 
-        /// <summary>
-        /// Indica se a música atual é a música de splash.
-        /// </summary>
-        public bool IsPlayingSplashMusic => currentMusicClip == splashMusic;
         /// <summary>
         /// Indica se a música atual é a música de menu.
         /// </summary>
@@ -93,15 +89,6 @@ namespace ExtraTools
         }
 
         #region Music Control
-        /// <summary>
-        /// Inicia música de splash (continua entre cenas)
-        /// </summary>
-        public void PlaySplashMusic()
-        {
-            PlayMusic(splashMusic);
-            Debug.Log("[AudioManager] Música de splash iniciada");
-        }
-
         /// <summary>
         /// Troca para música do menu principal
         /// </summary>

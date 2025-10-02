@@ -4,42 +4,42 @@
 
 ### **1. Limpeza do AudioManager**
 
-- [ ] **Remover referências à música de Splash**
-  - Remover `splashMusic` AudioClip field
-  - Remover método `PlaySplashMusic()`
-  - Remover propriedade `IsPlayingSplashMusic`
-  - Atualizar comentários e documentação
-  - Simplificar lógica de crossfade (sem splash)
+- [x] **Remover referências à música de Splash**
+  - ✅ Remover `splashMusic` AudioClip field
+  - ✅ Remover método `PlaySplashMusic()`
+  - ✅ Remover propriedade `IsPlayingSplashMusic`
+  - ✅ Atualizar comentários e documentação
+  - ✅ Simplificar lógica de crossfade (sem splash)
 
 ### **2. Revisão Geral do Código**
 
-- [ ] **GameManager**
-  - Verificar se ainda há referências órfãs ao sistema de Splash
-  - Validar fluxo de estados (MainMenu → Options → Loading → Exploring)
-  - Revisar comentários XML e inline
-  - Testar todas as transições de estado
+- [x] **GameManager**
+  - ✅ Verificar se ainda há referências órfãs ao sistema de Splash
+  - ✅ Validar fluxo de estados (MainMenu → Options → Loading → Exploring)
+  - ✅ Revisar comentários XML e inline
+  - ✅ Testar todas as transições de estado
 
-- [ ] **AudioManager**
-  - Limpar código após remoção do Splash
-  - Validar configurações de volume
-  - Testar crossfade entre Menu e Gameplay
-  - Verificar persistência entre cenas
+- [x] **AudioManager**
+  - ✅ Limpar código após remoção do Splash
+  - ✅ Validar configurações de volume
+  - ✅ Testar crossfade entre Menu e Gameplay
+  - ✅ Verificar persistência entre cenas
 
-- [ ] **TitleScreenController**
-  - Validar sequência de animações
-  - Testar controles de skip
-  - Verificar integração com AudioManager
-  - Ajustar timings se necessário
+- [x] **TitleScreenController**
+  - ✅ Validar sequência de animações
+  - ✅ Testar controles de skip
+  - ✅ Verificar integração com AudioManager
+  - ✅ Ajustar timings se necessário
 
-- [ ] **Estrutura de Arquivos**
-  - Remover `SplashScreenController.cs` (se ainda existir)
-  - Atualizar documentação (`SplashScreen_Setup.md` → deprecated)
-  - Verificar imports e using statements desnecessários
+- [x] **Estrutura de Arquivos**
+  - ✅ Remover `SplashScreenController.cs` (já removido)
+  - ✅ Atualizar documentação (SplashScreen_Setup.md não existe mais)
+  - ✅ Verificar imports e using statements desnecessários
 
 ### **3. Implementação do Input System**
 
 - [ ] **Setup Inicial**
-  - Instalar Input System package via Package Manager
+  - ✅ Input System package já instalado
   - Criar Input Action Asset principal
   - Configurar esquemas de controle (Keyboard, Gamepad)
 
@@ -124,9 +124,9 @@
 
 ### **Semana 1: Limpeza**
 
-- Remover Splash do AudioManager
-- Revisão completa do código existente
-- Testes de integração
+- ✅ Remover Splash do AudioManager
+- ✅ Revisão completa do código existente
+- ✅ Testes de integração
 
 ### **Semana 2: Input System**
 
