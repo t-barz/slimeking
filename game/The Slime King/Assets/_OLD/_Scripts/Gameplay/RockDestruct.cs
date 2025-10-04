@@ -14,7 +14,10 @@ namespace SlimeMec.Gameplay
     /// - Sistema de múltiplos ataques com estados (normal → rachado → destruído)
     /// - VFX contextuais baseados no sucesso/falha do ataque
     /// - Integration com DropController para loot
-    /// - Cache estático do PlayerAttributesHandler para performance
+    /// REQUISITOS EXTERNOS:
+    /// • PlayerController com sistema de combate (tags e layers configurados)
+    /// - Cache estático do PlayerAttributesSystem para performance
+    /// • SFX configurados no AudioManager
     /// - Debug tools completos via Context Menu
     /// </summary>
     public class RockDestruct : MonoBehaviour
@@ -49,7 +52,7 @@ namespace SlimeMec.Gameplay
         private static readonly int DestroyTriggerHash = Animator.StringToHash("Destroy");
 
         // Cache do player para obter atributos de ataque
-        private static PlayerAttributesHandler s_cachedPlayerAttributes;
+        private static PlayerAttributesSystem s_cachedPlayerAttributes;
         private static bool s_playerCacheInitialized = false;
         #endregion
 
@@ -98,10 +101,10 @@ namespace SlimeMec.Gameplay
                 GameObject player = GameObject.FindWithTag("Player");
                 if (player != null)
                 {
-                    s_cachedPlayerAttributes = player.GetComponent<PlayerAttributesHandler>();
+                    s_cachedPlayerAttributes = player.GetComponent<PlayerAttributesSystem>();
                     if (s_cachedPlayerAttributes == null)
                     {
-                        Debug.LogWarning("RockDestruct: PlayerAttributesHandler não encontrado no Player. Sistema de resistência pode não funcionar corretamente.");
+                        Debug.LogWarning("RockDestruct: PlayerAttributesSystem não encontrado no Player. Sistema de resistência pode não funcionar corretamente.");
                     }
                 }
                 else
@@ -242,7 +245,7 @@ namespace SlimeMec.Gameplay
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableDebugLogs)
-                Debug.LogWarning("RockDestruct: PlayerAttributesHandler não encontrado. Usando ataque padrão (1).");
+                Debug.LogWarning("RockDestruct: PlayerAttributesSystem não encontrado. Usando ataque padrão (1).");
 #endif
             return 1; // Fallback: ataque mínimo
         }
@@ -370,7 +373,7 @@ namespace SlimeMec.Gameplay
 
             // Cria player temporário com ataque fraco
             GameObject tempPlayer = new GameObject("TempPlayer");
-            PlayerAttributesHandler tempAttributes = tempPlayer.AddComponent<PlayerAttributesHandler>();
+            PlayerAttributesSystem tempAttributes = tempPlayer.AddComponent<PlayerAttributesSystem>();
             s_cachedPlayerAttributes = tempAttributes;
 
             // Simula ataque fraco
@@ -391,7 +394,7 @@ namespace SlimeMec.Gameplay
             // Backup do player cache
             var originalPlayer = s_cachedPlayerAttributes;
 
-            // TODO: Quando PlayerAttributesHandler permitir setar ataque, usar valor forte
+            // TODO: Quando PlayerAttributesSystem permitir setar ataque, usar valor forte
             Debug.Log($"Nota: Usando ataque atual do player ({GetPlayerAttack()}) - implementar setter se necessário");
 
             TakeDamage(transform.position + Vector3.up);

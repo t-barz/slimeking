@@ -40,7 +40,7 @@ namespace SlimeMec.Gameplay
         [SerializeField] private List<BuffData> activeBuffs = new List<BuffData>();
 
         // Cache de performance
-        private PlayerAttributesHandler _playerAttributes;
+        private PlayerAttributesSystem _playerAttributes;
         private float _lastUpdateTime;
         private const float UPDATE_INTERVAL = 0.1f; // Update buffs a cada 100ms
 
@@ -53,10 +53,10 @@ namespace SlimeMec.Gameplay
 
         private void Awake()
         {
-            _playerAttributes = GetComponent<PlayerAttributesHandler>();
+            _playerAttributes = GetComponent<PlayerAttributesSystem>();
 
             if (_playerAttributes == null)
-                Debug.LogError("[ItemBuffHandler] PlayerAttributesHandler não encontrado!");
+                Debug.LogError("[ItemBuffHandler] PlayerAttributesSystem não encontrado!");
         }
 
         private void Update()
@@ -209,7 +209,7 @@ namespace SlimeMec.Gameplay
                 _totalSpeedBuff += buff.speedBonus;
             }
 
-            // TODO: Aplicar totais no PlayerAttributesHandler quando métodos estiverem disponíveis
+            // TODO: Aplicar totais no PlayerAttributesSystem quando métodos estiverem disponíveis
             // _playerAttributes.SetAttackBuff(_totalAttackBuff);
             // _playerAttributes.SetDefenseBuff(_totalDefenseBuff);
             // _playerAttributes.SetSpeedBuff(_totalSpeedBuff);

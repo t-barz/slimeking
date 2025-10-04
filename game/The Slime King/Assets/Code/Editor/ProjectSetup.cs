@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
@@ -89,6 +92,97 @@ namespace ExtraTools
             enableDebug = !enableDebug;
             DebugLog($"Debug {(enableDebug ? "habilitado" : "desabilitado")}");
         }
+
+        #region Post Processing Tools
+        /// <summary>
+        /// Configura Post Processing na cena ativa com Volume global
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Volume in Scene")]
+        public static void SetupVolumeInScene()
+        {
+            Log("Configurando Post Processing na cena ativa...");
+            SetupGlobalVolumeInScene();
+        }
+
+        /// <summary>
+        /// Configura Volume específico para bioma Floresta
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Forest Biome")]
+        public static void SetupForestBiome()
+        {
+            Log("Configurando Volume para Floresta...");
+            SetupBiomeVolume("ForestBiome_Volume");
+        }
+
+        /// <summary>
+        /// Configura Volume específico para bioma Caverna
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Cave Biome")]
+        public static void SetupCaveBiome()
+        {
+            Log("Configurando Volume para Caverna...");
+            SetupBiomeVolume("CaveBiome_Volume");
+        }
+
+        /// <summary>
+        /// Configura Volume específico para bioma Cristal
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Crystal Biome")]
+        public static void SetupCrystalBiome()
+        {
+            Log("Configurando Volume para Cristal...");
+            SetupBiomeVolume("CrystalBiome_Volume");
+        }
+
+        /// <summary>
+        /// Configura efeitos de gameplay (Hit Effect e Evolution Effect)
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Gameplay Effects")]
+        public static void SetupGameplayEffects()
+        {
+            Log("Configurando efeitos de gameplay...");
+            SetupGameplayVolumeEffects();
+        }
+
+        /// <summary>
+        /// Configura câmera principal otimizada para pixel art com Post Processing
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Pixel Perfect Camera")]
+        public static void SetupPixelPerfectCamera()
+        {
+            Log("Configurando câmera para pixel art...");
+            SetupOptimalPixelArtCamera();
+        }
+
+        /// <summary>
+        /// Configura Global Light 2D otimizada para pixel art
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Setup Global Light 2D")]
+        public static void SetupGlobalLight2D()
+        {
+            Log("Configurando Global Light 2D...");
+            SetupOptimalGlobalLight();
+        }
+
+        /// <summary>
+        /// Configuração completa: Câmera + Luz + Post Processing
+        /// </summary>
+        [MenuItem("Extra Tools/Post Processing/Complete Camera Setup")]
+        public static void CompleteCameraSetup()
+        {
+            Log("Executando configuração completa de câmera...");
+            SetupOptimalPixelArtCamera();
+            SetupOptimalGlobalLight();
+            SetupGlobalVolumeInScene();
+            Log("Configuração completa de câmera finalizada!");
+            EditorUtility.DisplayDialog("Camera Setup Completo",
+                "Configuração completa finalizada:\n\n" +
+                "✅ Pixel Perfect Camera configurada\n" +
+                "✅ Global Light 2D otimizada\n" +
+                "✅ Post Processing Volume aplicado\n" +
+                "✅ Cinemachine Brain configurado", "OK");
+        }
+        #endregion
         #endregion
 
         #region Folder Structure Creation
@@ -444,6 +538,393 @@ namespace ExtraTools
             {
                 LogWarning($"Erro ao configurar URP: {e.Message}");
             }
+        }
+        #endregion
+
+        #region Post Processing Implementation
+        /// <summary>
+        /// Configura Volume global na cena ativa
+        /// </summary>
+        private static void SetupGlobalVolumeInScene()
+        {
+            if (!ValidateURPSetup())
+                return;
+
+            // Verifica se já existe um Volume global na cena
+            Volume existingVolume = Object.FindFirstObjectByType<Volume>();
+            if (existingVolume != null && existingVolume.isGlobal)
+            {
+                Log("Volume global já existe na cena");
+                return;
+            }
+
+            // Carrega o Global Volume Profile
+            VolumeProfile globalProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(
+                "Assets/Settings/PostProcessing/GlobalVolumeProfile.asset");
+
+            if (globalProfile == null)
+            {
+                LogError("GlobalVolumeProfile.asset não encontrado! Execute 'Extra Tools/Project Setup/Complete Setup' primeiro.");
+                return;
+            }
+
+            // Cria GameObject para o Volume
+            GameObject volumeGO = new GameObject("Global Volume");
+            Volume volume = volumeGO.AddComponent<Volume>();
+
+            // Configura o Volume
+            volume.isGlobal = true;
+            volume.priority = 0;
+            volume.profile = globalProfile;
+
+            // Posiciona na origem
+            volumeGO.transform.position = Vector3.zero;
+
+            // Registra para Undo
+            Undo.RegisterCreatedObjectUndo(volumeGO, "Create Global Volume");
+
+            // Seleciona o objeto criado
+            Selection.activeGameObject = volumeGO;
+
+            Log("Volume global configurado com sucesso na cena!");
+            EditorUtility.DisplayDialog("Post Processing Setup",
+                "Volume global configurado com sucesso!\nO GameObject foi criado e selecionado na cena.", "OK");
+        }
+
+        /// <summary>
+        /// Configura Volume específico para bioma
+        /// </summary>
+        private static void SetupBiomeVolume(string profileName)
+        {
+            if (!ValidateURPSetup())
+                return;
+
+            // Carrega o Volume Profile do bioma
+            string profilePath = $"Assets/Settings/PostProcessing/Biomes/{profileName}.asset";
+            VolumeProfile biomeProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
+
+            if (biomeProfile == null)
+            {
+                LogError($"Volume Profile '{profileName}' não encontrado em {profilePath}!");
+                return;
+            }
+
+            // Cria GameObject para o Volume
+            string biomeName = profileName.Replace("Biome_Volume", "").Replace("_", " ");
+            GameObject volumeGO = new GameObject($"{biomeName} Volume");
+            Volume volume = volumeGO.AddComponent<Volume>();
+
+            // Configura o Volume
+            volume.isGlobal = false;
+            volume.priority = 1; // Maior que global
+            volume.profile = biomeProfile;
+
+            // Adiciona Box Collider como trigger para delimitar área
+            BoxCollider boxCollider = volumeGO.AddComponent<BoxCollider>();
+            boxCollider.isTrigger = true;
+            boxCollider.size = new Vector3(20, 20, 20); // Tamanho padrão
+
+            // Posiciona na origem
+            volumeGO.transform.position = Vector3.zero;
+
+            // Registra para Undo
+            Undo.RegisterCreatedObjectUndo(volumeGO, $"Create {biomeName} Volume");
+
+            // Seleciona o objeto criado
+            Selection.activeGameObject = volumeGO;
+
+            Log($"Volume '{biomeName}' configurado com sucesso!");
+            EditorUtility.DisplayDialog("Biome Volume Setup",
+                $"Volume '{biomeName}' configurado com sucesso!\n\nAjuste o Box Collider para delimitar a área do bioma.\nO Volume tem prioridade 1 (maior que global).", "OK");
+        }
+
+        /// <summary>
+        /// Configura efeitos de gameplay (Hit e Evolution)
+        /// </summary>
+        private static void SetupGameplayVolumeEffects()
+        {
+            if (!ValidateURPSetup())
+                return;
+
+            bool hitCreated = CreateGameplayEffectVolume("HitEffect_Volume", "Hit Effect", 10);
+            bool evolutionCreated = CreateGameplayEffectVolume("EvolutionEffect_Volume", "Evolution Effect", 15);
+
+            if (hitCreated || evolutionCreated)
+            {
+                string message = "Efeitos de gameplay configurados:\n";
+                if (hitCreated) message += "- Hit Effect Volume (prioridade 10)\n";
+                if (evolutionCreated) message += "- Evolution Effect Volume (prioridade 15)\n";
+                message += "\nOs volumes estão desabilitados por padrão.\nAtive via script quando necessário.";
+
+                EditorUtility.DisplayDialog("Gameplay Effects Setup", message, "OK");
+            }
+        }
+
+        /// <summary>
+        /// Cria um Volume para efeito de gameplay específico
+        /// </summary>
+        private static bool CreateGameplayEffectVolume(string profileName, string effectName, int priority)
+        {
+            // Verifica se já existe
+            GameObject existing = GameObject.Find($"{effectName} Volume");
+            if (existing != null)
+            {
+                Log($"Volume '{effectName}' já existe na cena");
+                return false;
+            }
+
+            // Carrega o Volume Profile
+            string profilePath = $"Assets/Settings/PostProcessing/Gameplay/{profileName}.asset";
+            VolumeProfile effectProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
+
+            if (effectProfile == null)
+            {
+                LogError($"Volume Profile '{profileName}' não encontrado em {profilePath}!");
+                return false;
+            }
+
+            // Cria GameObject para o Volume
+            GameObject volumeGO = new GameObject($"{effectName} Volume");
+            Volume volume = volumeGO.AddComponent<Volume>();
+
+            // Configura o Volume
+            volume.isGlobal = true;
+            volume.priority = priority;
+            volume.profile = effectProfile;
+            volume.weight = 0f; // Inicia desabilitado
+
+            // Desabilita o GameObject por padrão
+            volumeGO.SetActive(false);
+
+            // Adiciona tag para fácil identificação
+            volumeGO.tag = "EditorOnly"; // Se existir, senão será "Untagged"
+
+            // Registra para Undo
+            Undo.RegisterCreatedObjectUndo(volumeGO, $"Create {effectName} Volume");
+
+            Log($"Volume '{effectName}' criado com prioridade {priority}");
+            return true;
+        }
+
+        /// <summary>
+        /// Valida se o URP está configurado corretamente
+        /// </summary>
+        private static bool ValidateURPSetup()
+        {
+            // Verifica se o URP está ativo
+            if (GraphicsSettings.defaultRenderPipeline == null)
+            {
+                LogError("Universal Render Pipeline não está configurado!\nVá em Project Settings > Graphics > Scriptable Render Pipeline Settings");
+                EditorUtility.DisplayDialog("URP não configurado",
+                    "Universal Render Pipeline não está ativo!\n\nPara usar Post Processing:\n1. Vá em Project Settings > Graphics\n2. Configure o Scriptable Render Pipeline Settings", "OK");
+                return false;
+            }
+
+            // Verifica se é URP
+            if (!(GraphicsSettings.defaultRenderPipeline is UniversalRenderPipelineAsset))
+            {
+                LogError("Render Pipeline ativo não é URP!");
+                EditorUtility.DisplayDialog("Render Pipeline Incorreto",
+                    "O Render Pipeline ativo não é Universal Render Pipeline!\n\nEste sistema de Post Processing requer URP.", "OK");
+                return false;
+            }
+
+            // Verifica se a pasta de Volume Profiles existe
+            if (!AssetDatabase.IsValidFolder("Assets/Settings/PostProcessing"))
+            {
+                LogError("Pasta de Post Processing não encontrada! Execute 'Extra Tools/Project Setup/Complete Setup' primeiro.");
+                EditorUtility.DisplayDialog("Setup Incompleto",
+                    "Pasta Assets/Settings/PostProcessing não encontrada!\n\nExecute 'Extra Tools/Project Setup/Complete Setup' primeiro.", "OK");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Configura a câmera principal com componentes otimizados para pixel art
+        /// </summary>
+        private static void SetupOptimalPixelArtCamera()
+        {
+            if (!ValidateURPSetup())
+                return;
+
+            // Encontra ou cria Main Camera
+            Camera mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                GameObject cameraGO = new GameObject("Main Camera");
+                cameraGO.tag = "MainCamera";
+                mainCamera = cameraGO.AddComponent<Camera>();
+                cameraGO.transform.position = new Vector3(0, 0, -10);
+
+                Undo.RegisterCreatedObjectUndo(cameraGO, "Create Main Camera");
+            }
+
+            // Configurações básicas da câmera
+            mainCamera.orthographic = true;
+            mainCamera.orthographicSize = 5f; // Valor padrão, será sobrescrito pelo Pixel Perfect
+            mainCamera.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1f); // Cinza escuro
+            mainCamera.cullingMask = -1; // Renderiza todas as layers
+
+            // Adiciona Pixel Perfect Camera (via reflection para evitar dependency issues)
+            if (!mainCamera.TryGetComponent(out PixelPerfectCamera pixelPerfect))
+            {
+                try
+                {
+                    var pixelPerfectType = System.Type.GetType("UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect");
+                    if (pixelPerfectType != null)
+                    {
+                        pixelPerfect = mainCamera.gameObject.AddComponent(pixelPerfectType) as PixelPerfectCamera;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    LogWarning($"Não foi possível adicionar PixelPerfectCamera: {e.Message}");
+                }
+            }
+
+            // Configura Pixel Perfect Camera
+            if (pixelPerfect != null)
+            {
+                var so = new SerializedObject(pixelPerfect);
+
+                var assetsPPU = so.FindProperty("m_AssetsPPU");
+                if (assetsPPU != null) assetsPPU.intValue = 16; // 16 pixels per unit (padrão pixel art)
+
+                var refResX = so.FindProperty("m_RefResolutionX");
+                if (refResX != null) refResX.intValue = 320; // Resolução referência 320x240 (estilo retro)
+
+                var refResY = so.FindProperty("m_RefResolutionY");
+                if (refResY != null) refResY.intValue = 240;
+
+                var upscaleRT = so.FindProperty("m_UpscaleRT");
+                if (upscaleRT != null) upscaleRT.boolValue = false; // Melhor performance
+
+                var pixelSnapping = so.FindProperty("m_PixelSnapping");
+                if (pixelSnapping != null) pixelSnapping.boolValue = true; // Evita pixels "borrados"
+
+                var cropFrameX = so.FindProperty("m_CropFrameX");
+                if (cropFrameX != null) cropFrameX.boolValue = false; // Permite letterboxing
+
+                var cropFrameY = so.FindProperty("m_CropFrameY");
+                if (cropFrameY != null) cropFrameY.boolValue = false;
+
+                var stretchFill = so.FindProperty("m_StretchFill");
+                if (stretchFill != null) stretchFill.boolValue = false; // Mantém aspect ratio
+
+                so.ApplyModifiedProperties();
+                Log("Pixel Perfect Camera configurado: 16 PPU, 320x240 referência");
+            }
+
+            // Adiciona Cinemachine Brain (via reflection)
+            Component brain = mainCamera.GetComponent("CinemachineBrain");
+            if (brain == null)
+            {
+                try
+                {
+                    var brainType = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine");
+                    if (brainType != null)
+                    {
+                        brain = mainCamera.gameObject.AddComponent(brainType);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    LogWarning($"Não foi possível adicionar CinemachineBrain: {e.Message}");
+                }
+            }
+
+            // Configura Cinemachine Brain
+            if (brain != null)
+            {
+                var so = new SerializedObject(brain);
+
+                // Blend settings otimizados para pixel art
+                var blendTime = so.FindProperty("m_DefaultBlend.m_Time");
+                if (blendTime != null) blendTime.floatValue = 1.0f; // Transições suaves
+
+                var blendStyle = so.FindProperty("m_DefaultBlend.m_Style");
+                if (blendStyle != null) blendStyle.intValue = 1; // EaseInOut
+
+                var updateMethod = so.FindProperty("m_UpdateMethod");
+                if (updateMethod != null) updateMethod.intValue = 1; // LateUpdate para sincronização
+
+                var blendUpdateMethod = so.FindProperty("m_BlendUpdateMethod");
+                if (blendUpdateMethod != null) blendUpdateMethod.intValue = 1; // LateUpdate
+
+                so.ApplyModifiedProperties();
+                Log("Cinemachine Brain configurado com blends suaves");
+            }
+
+            // Configura render pipeline específico para a câmera
+            if (mainCamera.TryGetComponent(out UniversalAdditionalCameraData urpCameraData))
+            {
+                urpCameraData.renderType = CameraRenderType.Base;
+                urpCameraData.cameraStack.Clear(); // Remove overlay cameras
+                urpCameraData.renderPostProcessing = true; // Habilita Post Processing
+                urpCameraData.antialiasing = AntialiasingMode.None; // Sem anti-aliasing para pixel art
+                urpCameraData.antialiasingQuality = AntialiasingQuality.Low;
+
+                Log("URP Camera Data configurado: Post Processing ON, Anti-aliasing OFF");
+            }
+
+            // Marca como modificado para salvar
+            EditorUtility.SetDirty(mainCamera.gameObject);
+
+            // Seleciona a câmera
+            Selection.activeGameObject = mainCamera.gameObject;
+
+            Log("Câmera pixel art configurada com sucesso!");
+        }
+
+        /// <summary>
+        /// Configura Global Light 2D otimizada para pixel art
+        /// </summary>
+        private static void SetupOptimalGlobalLight()
+        {
+            // Procura por Global Light 2D existente
+            Light2D globalLight = Object.FindFirstObjectByType<Light2D>();
+
+            if (globalLight == null)
+            {
+                // Cria novo GameObject para Global Light 2D
+                GameObject lightGO = new GameObject("Global Light 2D");
+                globalLight = lightGO.AddComponent<Light2D>();
+
+                Undo.RegisterCreatedObjectUndo(lightGO, "Create Global Light 2D");
+                Log("Global Light 2D criado");
+            }
+
+            // Configura as propriedades da luz (via reflection para evitar dependency issues)
+            var so = new SerializedObject(globalLight);
+
+            // Configura como Global Light
+            var lightTypeProperty = so.FindProperty("m_LightType");
+            if (lightTypeProperty != null)
+                lightTypeProperty.intValue = 3; // Global = 3
+
+            // Intensidade otimizada para pixel art
+            var intensityProperty = so.FindProperty("m_Intensity");
+            if (intensityProperty != null)
+                intensityProperty.floatValue = 1.0f; // Intensidade padrão
+
+            // Cor ligeiramente quente para pixel art
+            var colorProperty = so.FindProperty("m_Color");
+            if (colorProperty != null)
+                colorProperty.colorValue = new Color(1.0f, 0.95f, 0.9f, 1.0f); // Branco ligeiramente quente
+
+            // Volume light settings para performance
+            var volumeOpacityProperty = so.FindProperty("m_VolumeOpacity");
+            if (volumeOpacityProperty != null)
+                volumeOpacityProperty.floatValue = 0.0f; // Sem volume light para performance
+
+            so.ApplyModifiedProperties();
+
+            // Marca como modificado
+            EditorUtility.SetDirty(globalLight.gameObject);
+
+            Log("Global Light 2D configurado: Intensidade 1.0, cor quente, sem volume light");
         }
         #endregion
     }

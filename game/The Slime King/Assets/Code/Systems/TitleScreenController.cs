@@ -33,15 +33,33 @@ namespace ExtraTools
         [SerializeField] private AnimationCurve fadeOutCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
         #endregion
 
+        #region Ping Pong Effect
+        [Header("Ping Pong Effect")]
+        [SerializeField] private float effectRange = 10f;
+        [Tooltip("Velocidade do movimento (pixels por segundo)")]
+        [SerializeField] private float effectSpeed = 20f;
+        [Tooltip("Intervalo de pausa ao trocar de direção (segundos)")]
+        [SerializeField] private float directionChangeDelay = 0.5f;
+        [Tooltip("Ativa o efeito ping pong no gameTitle")]
+        [SerializeField] private bool enablePingPongEffect = true;
+        #endregion
+
         #region Control
         [Header("Control")]
         [SerializeField] private bool autoStart = true;
         [SerializeField] private bool skipOnInput = true;
-        [SerializeField] private KeyCode skipKey = KeyCode.Space;
         #endregion
 
         private bool sequenceRunning = false;
         private bool sequenceCompleted = false;
+
+        // Variáveis para o efeito ping pong
+        private Vector2 gameTitleInitialPosition;
+        private bool pingPongEffectActive = false;
+        private float pingPongDirection = 1f; // 1 para cima, -1 para baixo
+        private float currentYOffset = 0f;
+        private bool isWaitingDirectionChange = false; // Flag para controlar a pausa
+        private float directionChangeTimer = 0f; // Timer para a pausa
 
         /// <summary>
         /// Evento disparado quando toda a sequência termina
@@ -52,20 +70,57 @@ namespace ExtraTools
         {
             InitializeElements();
 
+            // Captura posição inicial do gameTitle para o efeito ping pong
+            if (gameTitle != null)
+            {
+                RectTransform rt = gameTitle.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    gameTitleInitialPosition = rt.anchoredPosition;
+                }
+            }
+
+            // Configura InputManager para contexto de TitleScreen
+            if (InputManager.Instance != null)
+            {
+                InputManager.Instance.SetTitleScreenContext();
+                InputManager.Instance.OnSkip += HandleSkipInput;
+            }
+
             if (autoStart)
             {
                 StartTitleSequence();
             }
         }
 
+        private void OnDestroy()
+        {
+            // Remove callback para evitar vazamentos
+            if (InputManager.Instance != null)
+            {
+                InputManager.Instance.OnSkip -= HandleSkipInput;
+            }
+        }
+
         private void Update()
+        {
+            // Input handling agora é feito via InputManager.OnSkip
+            // Mantido Update vazio para compatibilidade
+
+            if (pingPongEffectActive && enablePingPongEffect)
+            {
+                UpdatePingPongEffect();
+            }
+        }
+
+        /// <summary>
+        /// Handler para input de skip via InputManager
+        /// </summary>
+        private void HandleSkipInput()
         {
             if (skipOnInput && sequenceRunning && !sequenceCompleted)
             {
-                if (Input.GetKeyDown(skipKey) || Input.anyKeyDown)
-                {
-                    SkipToEnd();
-                }
+                SkipToEnd();
             }
         }
 
@@ -109,6 +164,9 @@ namespace ExtraTools
             sequenceRunning = false;
             sequenceCompleted = true;
 
+            // Inicia efeito ping pong também no skip
+            StartPingPongEffect();
+
             Debug.Log("[TitleScreen] Sequência pulada - todos elementos finais visíveis");
             OnSequenceCompleted?.Invoke();
         }
@@ -144,6 +202,9 @@ namespace ExtraTools
 
             // Fase 5: Game Title fade in (quando background estiver totalmente visível)
             yield return StartCoroutine(FadeImageIn(gameTitle, gameTitleFadeInDuration));
+
+            // Inicia efeito ping pong após gameTitle estar totalmente visível
+            StartPingPongEffect();
 
             // Fase 6: WS Logo fade in (quando gameTitle estiver totalmente visível)
             yield return StartCoroutine(FadeImageIn(wsLogo, wsLogoFadeInDuration));
@@ -211,6 +272,71 @@ namespace ExtraTools
             color.a = alpha;
             image.color = color;
         }
+
+        /// <summary>
+        /// Atualiza o efeito ping pong do gameTitle com intervalo na troca de direção
+        /// Move de inicial para +range, pausa, depois para -range, pausa, e repete
+        /// </summary>
+        private void UpdatePingPongEffect()
+        {
+            if (gameTitle == null) return;
+
+            RectTransform rt = gameTitle.GetComponent<RectTransform>();
+            if (rt == null) return;
+
+            // Se está esperando troca de direção, conta o timer
+            if (isWaitingDirectionChange)
+            {
+                directionChangeTimer += Time.unscaledDeltaTime;
+                if (directionChangeTimer >= directionChangeDelay)
+                {
+                    // Fim da pausa, inverte direção
+                    pingPongDirection *= -1f;
+                    isWaitingDirectionChange = false;
+                    directionChangeTimer = 0f;
+                }
+                return; // Não move durante a pausa
+            }
+
+            // Calcula movimento baseado na velocidade
+            float deltaY = effectSpeed * Time.unscaledDeltaTime * pingPongDirection;
+            currentYOffset += deltaY;
+
+            // Verifica limites e inicia pausa para trocar direção
+            if (pingPongDirection > 0 && currentYOffset >= effectRange)
+            {
+                currentYOffset = effectRange;
+                isWaitingDirectionChange = true;
+                directionChangeTimer = 0f;
+            }
+            else if (pingPongDirection < 0 && currentYOffset <= -effectRange)
+            {
+                currentYOffset = -effectRange;
+                isWaitingDirectionChange = true;
+                directionChangeTimer = 0f;
+            }
+
+            // Aplica nova posição
+            Vector2 newPosition = gameTitleInitialPosition + new Vector2(0f, currentYOffset);
+            rt.anchoredPosition = newPosition;
+        }
+
+        /// <summary>
+        /// Inicia o efeito ping pong do gameTitle
+        /// </summary>
+        private void StartPingPongEffect()
+        {
+            if (enablePingPongEffect && gameTitle != null)
+            {
+                pingPongEffectActive = true;
+                currentYOffset = 0f;
+                pingPongDirection = 1f; // Começa subindo
+                isWaitingDirectionChange = false;
+                directionChangeTimer = 0f;
+                Debug.Log("[TitleScreen] Efeito ping pong iniciado");
+            }
+        }
+
 
         #region Debug Helpers
 #if UNITY_EDITOR

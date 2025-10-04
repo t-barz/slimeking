@@ -2,6 +2,9 @@
 
 ## 🎯 Diretrizes Gerais
 
+- Lembre-se que estamos utilizando Unity 6.3+.
+- Sempre busque a simplicidade e clareza no código.
+- Sempre verifique se existe alguma documentação relacionada na pasta Assets/Docs antes de implementar algo novo.
 - Utilize o idioma inglês para nomes de arquivos, pastas, classes e variáveis.
 - Use camelCase para nomes de variáveis e métodos, e PascalCase para nomes de classes.
 - Utilize o idioma português para comentários e documentação, mantendo a clareza e a compreensão do código.

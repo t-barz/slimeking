@@ -10,7 +10,7 @@ using SlimeMec.Gameplay;
 /// RESPONSABILIDADES:
 /// • Gerencia movimento suave com aceleração/desaceleração
 /// • Controla sistema de combate com detecção de inimigos
-/// • Integra com PlayerAttributesHandler para atributos dinâmicos
+/// • Integra com PlayerAttributesSystem para atributos dinâmicos
 /// • Processa input através do novo Input System do Unity
 /// • Controla animações e flip de sprite baseado na direção
 /// • Gerencia sistema de direção visual com rotação de objetos de ataque
@@ -24,7 +24,7 @@ using SlimeMec.Gameplay;
 /// • Rigidbody2D: Para física de movimento
 /// • Animator: Para controle de animações
 /// • SpriteRenderer: Para flip de direção
-/// • PlayerAttributesHandler: Para sistema de atributos (opcional)
+/// • PlayerAttributesSystem: Para sistema de atributos (opcional)
 /// • InputSystem_Actions: Para processamento de input
 /// 
 /// NOTA: Esta classe segue o padrão de não usar Singleton para classes Player*
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     #region Inspector Configuration
 
     [Header("⚙️ Configurações de Movimento")]
-    [Tooltip("Velocidade máxima de movimento do jogador (será sobrescrita pelos atributos se PlayerAttributesHandler estiver presente)")]
+    [Tooltip("Velocidade máxima de movimento do jogador (será sobrescrita pelos atributos se PlayerAttributesSystem estiver presente)")]
     [SerializeField] private float moveSpeed = 5f;
 
     [Tooltip("Velocidade de aceleração ao iniciar movimento (unidades por segundo)")]
@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D _rigidbody;              // Física de movimento
     private Animator _animator;                   // Controle de animações
     private SpriteRenderer _spriteRenderer;      // Flip de sprite
-    private PlayerAttributesHandler _attributesHandler; // Sistema de atributos (opcional)
+    private PlayerAttributesSystem _attributesHandler; // Sistema de atributos (opcional)
 
     // === SISTEMA DE INPUT ===
     // Gerenciamento de entrada do usuário via novo Input System
@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
         // Obtém componente opcional de atributos
-        _attributesHandler = GetComponent<PlayerAttributesHandler>();
+        _attributesHandler = GetComponent<PlayerAttributesSystem>();
 
         // Validações críticas - sem estes componentes o jogador não funciona
         ValidateRequiredComponents();
@@ -1724,7 +1724,7 @@ public class PlayerController : MonoBehaviour
        - UI do inventário (mostrar itens nos slots 1-4)
        - Sistema de uso de itens do inventário (UseItem1-4)
        - Efeitos dos itens (cura, buff de ataque, etc.)
-       - Integração com PlayerAttributesHandler
+       - Integração com PlayerAttributesSystem
     
     4. SISTEMA DE INIMIGOS:
        - EnemyHealth class (sistema de vida para inimigos)
@@ -1740,7 +1740,7 @@ public class PlayerController : MonoBehaviour
     ✅ Movimento básico com WASD/Arrow Keys
     ✅ Sistema de animação (isWalking, FacingRight)
     ✅ Combate básico (Attack01 trigger)
-    ✅ Integração com PlayerAttributesHandler
+    ✅ Integração com PlayerAttributesSystem
     ✅ Sistema de flip de sprite
     ✅ Controles de movimento (enable/disable)
     ✅ Input System (totalmente implementado e funcional)

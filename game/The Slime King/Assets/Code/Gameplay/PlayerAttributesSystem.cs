@@ -2,11 +2,12 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// Gerencia todos os atributos do personagem jogador.
+/// Sistema de atributos do personagem jogador.
 /// Responsável por controlar pontos de vida, ataque, defesa, velocidade e sistema de habilidades.
 /// Esta classe deve ser anexada ao GameObject do jogador para funcionamento correto.
+/// Segue o padrão System das Boas Práticas para funcionalidades complexas e modulares.
 /// </summary>
-public class PlayerAttributesHandler : MonoBehaviour
+public class PlayerAttributesSystem : MonoBehaviour
 {
     #region Inspector Configuration
 
