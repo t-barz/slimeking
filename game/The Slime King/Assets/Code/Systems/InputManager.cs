@@ -72,16 +72,16 @@ namespace ExtraTools
         #region UI Events
         /// <summary>Evento disparado quando o jogador navega nos menus (Vector2: direção)</summary>
         public event Action<Vector2> OnNavigate;
-        
+
         /// <summary>Evento disparado quando o jogador confirma uma seleção</summary>
         public event Action OnSubmit;
-        
+
         /// <summary>Evento disparado quando o jogador cancela/volta</summary>
         public event Action OnCancel;
-        
+
         /// <summary>Evento disparado quando o mouse se move (Vector2: posição)</summary>
         public event Action<Vector2> OnPoint;
-        
+
         /// <summary>Evento disparado quando o jogador clica</summary>
         public event Action OnClick;
         #endregion
@@ -89,19 +89,19 @@ namespace ExtraTools
         #region Gameplay Events
         /// <summary>Evento disparado quando o jogador se move (Vector2: direção normalizada)</summary>
         public event Action<Vector2> OnMove;
-        
+
         /// <summary>Evento disparado quando o jogador ataca (started, performed, canceled)</summary>
         public event Action<InputAction.CallbackContext> OnAttack;
-        
+
         /// <summary>Evento disparado quando o jogador interage (started, performed, canceled)</summary>
         public event Action<InputAction.CallbackContext> OnInteract;
-        
+
         /// <summary>Evento disparado quando o jogador usa ataque especial</summary>
         public event Action<InputAction.CallbackContext> OnSpecialAttack;
-        
+
         /// <summary>Evento disparado quando o jogador agacha</summary>
         public event Action<InputAction.CallbackContext> OnCrouch;
-        
+
         /// <summary>Eventos para uso de itens (1-4)</summary>
         public event Action OnUseItem1;
         public event Action OnUseItem2;
@@ -112,12 +112,21 @@ namespace ExtraTools
         #region System Events
         /// <summary>Evento disparado quando o jogador abre o menu (pausa implícita)</summary>
         public event Action OnMenu;
-        
+
         /// <summary>Evento disparado quando o jogador abre o inventário</summary>
         public event Action OnInventory;
-        
+
         /// <summary>Evento disparado quando o jogador pula/avança telas (TitleScreen, cutscenes)</summary>
         public event Action OnSkip;
+
+        /// <summary>Evento disparado quando o dispositivo de entrada ativo muda (InputDevice: novo dispositivo)</summary>
+        public event Action<InputDevice> OnDeviceChanged;
+        #endregion
+
+        #region Device Detection
+        private InputDevice lastActiveDevice;
+        private float deviceCheckInterval = 0.1f;
+        private float lastDeviceCheckTime;
         #endregion
 
         #region Initialization
@@ -128,15 +137,15 @@ namespace ExtraTools
         {
             // Cria a instância do Input Actions
             inputActions = new InputSystem_Actions();
-            
+
             // Configura callbacks para todos os eventos
             SetupUICallbacks();
             SetupGameplayCallbacks();
             SetupSystemCallbacks();
-            
+
             // Configura estado inicial dos mapas
             SetInitialMapStates();
-            
+
             Debug.Log("[InputManager] Inicializado com sucesso");
         }
 
@@ -157,23 +166,23 @@ namespace ExtraTools
 
             inputActions.Gameplay.Move.performed += ctx => OnMove?.Invoke(ctx.ReadValue<Vector2>());
             inputActions.Gameplay.Move.canceled += ctx => OnMove?.Invoke(Vector2.zero);
-            
+
             inputActions.Gameplay.Attack.started += ctx => OnAttack?.Invoke(ctx);
             inputActions.Gameplay.Attack.performed += ctx => OnAttack?.Invoke(ctx);
             inputActions.Gameplay.Attack.canceled += ctx => OnAttack?.Invoke(ctx);
-            
+
             inputActions.Gameplay.Interact.started += ctx => OnInteract?.Invoke(ctx);
             inputActions.Gameplay.Interact.performed += ctx => OnInteract?.Invoke(ctx);
             inputActions.Gameplay.Interact.canceled += ctx => OnInteract?.Invoke(ctx);
-            
+
             inputActions.Gameplay.SpecialAttack.started += ctx => OnSpecialAttack?.Invoke(ctx);
             inputActions.Gameplay.SpecialAttack.performed += ctx => OnSpecialAttack?.Invoke(ctx);
             inputActions.Gameplay.SpecialAttack.canceled += ctx => OnSpecialAttack?.Invoke(ctx);
-            
+
             inputActions.Gameplay.Crouch.started += ctx => OnCrouch?.Invoke(ctx);
             inputActions.Gameplay.Crouch.performed += ctx => OnCrouch?.Invoke(ctx);
             inputActions.Gameplay.Crouch.canceled += ctx => OnCrouch?.Invoke(ctx);
-            
+
             inputActions.Gameplay.UseItem1.performed += ctx => OnUseItem1?.Invoke();
             inputActions.Gameplay.UseItem2.performed += ctx => OnUseItem2?.Invoke();
             inputActions.Gameplay.UseItem3.performed += ctx => OnUseItem3?.Invoke();
@@ -335,6 +344,13 @@ namespace ExtraTools
 
         private void Update()
         {
+            // Verifica mudanças de dispositivo periodicamente para performance
+            if (Time.time - lastDeviceCheckTime >= deviceCheckInterval)
+            {
+                CheckForDeviceChange();
+                lastDeviceCheckTime = Time.time;
+            }
+
             if (debugMode)
             {
                 // Log estado dos mapas quando mudam
@@ -366,6 +382,66 @@ namespace ExtraTools
                 SetTitleScreenContext();
         }
 #endif
+        #endregion
+
+        #region Device Detection
+        /// <summary>
+        /// Verifica se houve mudança no dispositivo ativo e notifica ouvintes
+        /// </summary>
+        private void CheckForDeviceChange()
+        {
+            InputDevice currentActiveDevice = GetCurrentActiveDevice();
+
+            if (currentActiveDevice != lastActiveDevice)
+            {
+                lastActiveDevice = currentActiveDevice;
+                OnDeviceChanged?.Invoke(currentActiveDevice);
+
+                Debug.Log($"[InputManager] Dispositivo alterado para: {currentActiveDevice?.displayName ?? "None"}");
+            }
+        }
+
+        /// <summary>
+        /// Determina qual é o dispositivo atualmente ativo baseado em uso recente
+        /// </summary>
+        private InputDevice GetCurrentActiveDevice()
+        {
+            // Prioridade 1: Teclado se alguma tecla foi pressionada
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.anyKey.isPressed)
+            {
+                return keyboard;
+            }
+
+            // Prioridade 2: Gamepad ativo
+            if (Gamepad.current != null && IsGamepadActive(Gamepad.current))
+            {
+                return Gamepad.current;
+            }
+
+            // Fallback: mantém último dispositivo conhecido ou teclado
+            return lastActiveDevice ?? keyboard;
+        }
+
+        /// <summary>
+        /// Verifica se um gamepad está sendo usado ativamente
+        /// </summary>
+        private bool IsGamepadActive(Gamepad gamepad)
+        {
+            const float deadzone = 0.1f;
+
+            return gamepad.leftStick.ReadValue().magnitude > deadzone ||
+                   gamepad.rightStick.ReadValue().magnitude > deadzone ||
+                   gamepad.buttonSouth.isPressed ||
+                   gamepad.buttonEast.isPressed ||
+                   gamepad.buttonWest.isPressed ||
+                   gamepad.buttonNorth.isPressed ||
+                   gamepad.leftShoulder.isPressed ||
+                   gamepad.rightShoulder.isPressed ||
+                   gamepad.leftTrigger.isPressed ||
+                   gamepad.rightTrigger.isPressed ||
+                   gamepad.dpad.ReadValue().magnitude > deadzone;
+        }
         #endregion
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 namespace ExtraTools
 {
@@ -8,6 +9,8 @@ namespace ExtraTools
     /// TitleScreenController - Controla a sequência de animações da tela inicial.
     /// Sequência: música (1s delay) → centerLogo fade in/out + background fade in → gameTitle fade in → 
     /// ping pong effect starts + pressStart text + inputButton icons fade in simultâneo → wsLogo fade in
+    /// 
+    /// Skip: Após a música iniciar, qualquer botão pula toda a animação diretamente para o estado final.
     /// </summary>
     public class TitleScreenController : MonoBehaviour
     {
@@ -19,6 +22,13 @@ namespace ExtraTools
         [SerializeField] private Image gameTitle;
         [SerializeField] private TMPro.TextMeshProUGUI pressStart;
         [SerializeField] private GameObject inputButton;
+
+        [Header("Input Icons")]
+        [SerializeField] private GameObject gamepadIcon;
+        [SerializeField] private GameObject playstationIcon;
+        [SerializeField] private GameObject switchIcon;
+        [SerializeField] private GameObject xboxIcon;
+        [SerializeField] private GameObject keyboardIcon;
         #endregion
 
         #region Animation Settings
@@ -56,6 +66,7 @@ namespace ExtraTools
 
         private bool sequenceRunning = false;
         private bool sequenceCompleted = false;
+        private bool skipAvailable = false; // Controla quando o skip está disponível (após música iniciar)
 
         // Variáveis para o efeito ping pong
         private Vector2 gameTitleInitialPosition;
@@ -87,13 +98,88 @@ namespace ExtraTools
             // Configura InputManager para contexto de TitleScreen
             if (InputManager.Instance != null)
             {
+                Debug.Log("[TitleScreen] InputManager encontrado - configurando eventos");
                 InputManager.Instance.SetTitleScreenContext();
                 InputManager.Instance.OnSkip += HandleSkipInput;
+                InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
+                Debug.Log("[TitleScreen] Eventos OnSkip e OnDeviceChanged conectados com sucesso");
+
+                // Força verificação inicial do dispositivo
+                StartCoroutine(CheckInitialDevice());
+            }
+            else
+            {
+                Debug.LogWarning("[TitleScreen] InputManager.Instance é null - criando InputManager");
+                CreateInputManager();
             }
 
             if (autoStart)
             {
                 StartTitleSequence();
+            }
+        }
+
+        /// <summary>
+        /// Cria o InputManager se ele não existir
+        /// </summary>
+        private void CreateInputManager()
+        {
+            GameObject inputManagerGO = new GameObject("InputManager");
+            InputManager inputManager = inputManagerGO.AddComponent<InputManager>();
+            Debug.Log("[TitleScreen] InputManager criado dinamicamente");
+
+            // Aguarda um frame para o Awake ser chamado, então configura
+            StartCoroutine(SetupInputManagerDelayed());
+        }
+
+        /// <summary>
+        /// Configura o InputManager após criação com delay
+        /// </summary>
+        private System.Collections.IEnumerator SetupInputManagerDelayed()
+        {
+            yield return null; // Espera um frame
+
+            if (InputManager.Instance != null)
+            {
+                Debug.Log("[TitleScreen] Configurando InputManager após criação");
+                InputManager.Instance.SetTitleScreenContext();
+                InputManager.Instance.OnSkip += HandleSkipInput;
+                InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
+                Debug.Log("[TitleScreen] Eventos OnSkip e OnDeviceChanged conectados com sucesso (delayed)");
+
+                // Força verificação inicial do dispositivo
+                yield return CheckInitialDevice();
+            }
+        }
+
+        /// <summary>
+        /// Verifica o dispositivo inicial após um pequeno delay para garantir que o InputManager está totalmente inicializado
+        /// </summary>
+        private System.Collections.IEnumerator CheckInitialDevice()
+        {
+            yield return new WaitForSecondsRealtime(0.1f); // Pequeno delay para garantir inicialização
+
+            if (InputManager.Instance != null)
+            {
+                // Força uma verificação manual do dispositivo atual
+                InputDevice currentDevice = null;
+
+                // Verifica teclado
+                var keyboard = Keyboard.current;
+                if (keyboard != null)
+                {
+                    currentDevice = keyboard;
+                }
+
+                // Verifica gamepad se existe e está ativo
+                var gamepad = Gamepad.current;
+                if (gamepad != null)
+                {
+                    currentDevice = gamepad;
+                }
+
+                Debug.Log($"[TitleScreen] Dispositivo inicial detectado: {currentDevice?.displayName ?? "None"}");
+                UpdateInputIcon(currentDevice);
             }
         }
 
@@ -103,14 +189,12 @@ namespace ExtraTools
             if (InputManager.Instance != null)
             {
                 InputManager.Instance.OnSkip -= HandleSkipInput;
+                InputManager.Instance.OnDeviceChanged -= HandleDeviceChanged;
             }
         }
 
         private void Update()
         {
-            // Input handling agora é feito via InputManager.OnSkip
-            // Mantido Update vazio para compatibilidade
-
             if (pingPongEffectActive && enablePingPongEffect)
             {
                 UpdatePingPongEffect();
@@ -122,15 +206,81 @@ namespace ExtraTools
         /// </summary>
         private void HandleSkipInput()
         {
-            if (skipOnInput && sequenceRunning && !sequenceCompleted)
+            Debug.Log($"[TitleScreen] HandleSkipInput chamado - skipOnInput:{skipOnInput} skipAvailable:{skipAvailable} sequenceRunning:{sequenceRunning} sequenceCompleted:{sequenceCompleted}");
+
+            if (skipOnInput && skipAvailable && sequenceRunning && !sequenceCompleted)
             {
+                Debug.Log("[TitleScreen] Skip via InputManager - executando skip");
                 SkipToEnd();
+            }
+            else
+            {
+                Debug.Log("[TitleScreen] Skip bloqueado - condições não atendidas");
             }
         }
 
         /// <summary>
-        /// Inicializa todos os elementos como invisíveis
+        /// Handler para mudança de dispositivo via InputManager
         /// </summary>
+        private void HandleDeviceChanged(InputDevice device)
+        {
+            UpdateInputIcon(device);
+        }
+
+        /// <summary>
+        /// Atualiza o ícone de input baseado no dispositivo detectado
+        /// </summary>
+        private void UpdateInputIcon(InputDevice device)
+        {
+            // Esconde todos os ícones primeiro
+            SetGameObjectVisibility(gamepadIcon, false);
+            SetGameObjectVisibility(playstationIcon, false);
+            SetGameObjectVisibility(switchIcon, false);
+            SetGameObjectVisibility(xboxIcon, false);
+            SetGameObjectVisibility(keyboardIcon, false);
+
+            // Determina qual ícone mostrar baseado no dispositivo
+            if (device == null || device is Keyboard)
+            {
+                SetGameObjectVisibility(keyboardIcon, true);
+                Debug.Log("[TitleScreen] Ícone alterado para: Teclado");
+            }
+            else if (device is Gamepad gamepad)
+            {
+                string deviceName = gamepad.displayName.ToLowerInvariant();
+
+                if (deviceName.Contains("xbox") || deviceName.Contains("xinput"))
+                {
+                    SetGameObjectVisibility(xboxIcon, true);
+                    Debug.Log("[TitleScreen] Ícone alterado para: Xbox");
+                }
+                else if (deviceName.Contains("dualshock") || deviceName.Contains("dualsense") ||
+                         deviceName.Contains("playstation") || deviceName.Contains("ps4") || deviceName.Contains("ps5"))
+                {
+                    SetGameObjectVisibility(playstationIcon, true);
+                    Debug.Log("[TitleScreen] Ícone alterado para: PlayStation");
+                }
+                else if (deviceName.Contains("pro controller") || deviceName.Contains("nintendo") ||
+                         deviceName.Contains("switch"))
+                {
+                    SetGameObjectVisibility(switchIcon, true);
+                    Debug.Log("[TitleScreen] Ícone alterado para: Switch");
+                }
+                else
+                {
+                    SetGameObjectVisibility(gamepadIcon, true);
+                    Debug.Log("[TitleScreen] Ícone alterado para: Gamepad Genérico");
+                }
+            }
+            else
+            {
+                // Fallback para teclado
+                SetGameObjectVisibility(keyboardIcon, true);
+                Debug.Log("[TitleScreen] Ícone alterado para: Teclado (fallback)");
+            }
+        }        /// <summary>
+                 /// Inicializa todos os elementos como invisíveis
+                 /// </summary>
         private void InitializeElements()
         {
             SetImageAlpha(centerLogo, 0f);
@@ -139,9 +289,45 @@ namespace ExtraTools
             SetImageAlpha(gameTitle, 0f);
             SetTextAlpha(pressStart, 0f);
             SetGameObjectVisibility(inputButton, true); // Mantém ativo para permitir fade
+
+            // Inicializa ícones de input - mostra apenas teclado por padrão
+            InitializeInputIcons();
             SetInputButtonAlpha(0f); // Mas invisível
 
+            // Reset estados de controle
+            sequenceRunning = false;
+            sequenceCompleted = false;
+            skipAvailable = false;
+
             Debug.Log("[TitleScreen] Elementos inicializados como invisíveis");
+        }
+
+        /// <summary>
+        /// Inicializa os ícones de input - mostra apenas o teclado por padrão
+        /// </summary>
+        private void InitializeInputIcons()
+        {
+            // Busca os ícones automaticamente se não foram atribuídos no inspector
+            if (inputButton != null)
+            {
+                if (gamepadIcon == null) gamepadIcon = inputButton.transform.Find("gamepad")?.gameObject;
+                if (playstationIcon == null) playstationIcon = inputButton.transform.Find("playstation")?.gameObject;
+                if (switchIcon == null) switchIcon = inputButton.transform.Find("switch")?.gameObject;
+                if (xboxIcon == null) xboxIcon = inputButton.transform.Find("xbox")?.gameObject;
+                if (keyboardIcon == null) keyboardIcon = inputButton.transform.Find("keyboard")?.gameObject;
+            }
+
+            // Esconde todos os ícones
+            SetGameObjectVisibility(gamepadIcon, false);
+            SetGameObjectVisibility(playstationIcon, false);
+            SetGameObjectVisibility(switchIcon, false);
+            SetGameObjectVisibility(xboxIcon, false);
+            SetGameObjectVisibility(keyboardIcon, false);
+
+            // Mostra apenas o teclado por padrão
+            SetGameObjectVisibility(keyboardIcon, true);
+
+            Debug.Log("[TitleScreen] Ícones de input inicializados - mostrando teclado por padrão");
         }
 
         /// <summary>
@@ -163,6 +349,13 @@ namespace ExtraTools
 
             StopAllCoroutines();
 
+            // Garante que a música toque mesmo no skip
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayMenuMusic(crossfade: true);
+                Debug.Log("[TitleScreen] Música iniciada (via skip)");
+            }
+
             SetImageAlpha(centerLogo, 0f);    // Logo central some
             SetImageAlpha(background, 1f);     // Background visível
             SetImageAlpha(gameTitle, 1f);      // Título visível
@@ -172,6 +365,7 @@ namespace ExtraTools
 
             sequenceRunning = false;
             sequenceCompleted = true;
+            skipAvailable = false; // Desabilita skip após pular
 
             // Inicia efeito ping pong também no skip
             StartPingPongEffect();
@@ -187,6 +381,7 @@ namespace ExtraTools
         {
             sequenceRunning = true;
             sequenceCompleted = false;
+            skipAvailable = false; // Skip não disponível no início
 
             Debug.Log("[TitleScreen] Iniciando sequência da tela de título");
 
@@ -198,6 +393,10 @@ namespace ExtraTools
                 AudioManager.Instance.PlayMenuMusic(crossfade: true);
                 Debug.Log("[TitleScreen] Música iniciada");
             }
+
+            // Habilita skip logo após a música começar
+            skipAvailable = true;
+            Debug.Log("[TitleScreen] Skip disponível - pressione qualquer botão para pular animação");
 
             // Fase 2: Center Logo fade in
             yield return StartCoroutine(FadeImageIn(centerLogo, centerLogoFadeInDuration));
@@ -224,6 +423,7 @@ namespace ExtraTools
             // Sequência concluída
             sequenceRunning = false;
             sequenceCompleted = true;
+            skipAvailable = false; // Desabilita skip após conclusão natural
 
             Debug.Log("[TitleScreen] Sequência de animação concluída");
             OnSequenceCompleted?.Invoke();
@@ -340,7 +540,7 @@ namespace ExtraTools
         {
             if (inputButton == null) return;
 
-            // Encontra todos os componentes Image filhos do inputButton
+            // Aplica alpha a todas as imagens filhas do inputButton
             Image[] childImages = inputButton.GetComponentsInChildren<Image>();
 
             foreach (Image img in childImages)
@@ -352,11 +552,9 @@ namespace ExtraTools
                     img.color = color;
                 }
             }
-        }
-
-        /// <summary>
-        /// Define alpha de um texto TextMeshPro
-        /// </summary>
+        }        /// <summary>
+                 /// Define alpha de um texto TextMeshPro
+                 /// </summary>
         private void SetTextAlpha(TMPro.TextMeshProUGUI text, float alpha)
         {
             if (text == null) return;
