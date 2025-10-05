@@ -93,6 +93,16 @@ namespace ExtraTools
             DebugLog($"Debug {(enableDebug ? "habilitado" : "desabilitado")}");
         }
 
+        /// <summary>
+        /// Exporta a estrutura completa da cena ativa para análise
+        /// </summary>
+        [MenuItem("Extra Tools/Debug/Export Scene Structure")]
+        public static void ExportSceneStructure()
+        {
+            Log("Exportando estrutura da cena ativa...");
+            ExportCurrentSceneStructure();
+        }
+
         #region Post Processing Tools
         /// <summary>
         /// Configura Post Processing na cena ativa com Volume global
@@ -926,6 +936,256 @@ namespace ExtraTools
 
             Log("Global Light 2D configurado: Intensidade 1.0, cor quente, sem volume light");
         }
+
+        #endregion
+
+        #region Scene Structure Export
+        /// <summary>
+        /// Exporta a estrutura completa da cena ativa para um arquivo de texto
+        /// </summary>
+        private static void ExportCurrentSceneStructure()
+        {
+            var scene = SceneManager.GetActiveScene();
+            if (!scene.IsValid())
+            {
+                LogError("Nenhuma cena ativa encontrada!");
+                return;
+            }
+
+            var fileName = $"SceneStructure_{scene.name}_{System.DateTime.Now:yyyyMMdd_HHmmss}.txt";
+            var filePath = Path.Combine(Application.dataPath, "..", "Logs", fileName);
+
+            // Cria diretório Logs se não existir
+            var logsDir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(logsDir))
+                Directory.CreateDirectory(logsDir);
+
+            using (var writer = new StreamWriter(filePath))
+            {
+                writer.WriteLine($"======================================");
+                writer.WriteLine($"ESTRUTURA DA CENA: {scene.name}");
+                writer.WriteLine($"Exportado em: {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                writer.WriteLine($"Caminho da cena: {scene.path}");
+                writer.WriteLine($"Total de GameObjects: {scene.rootCount}");
+                writer.WriteLine($"======================================");
+                writer.WriteLine();
+
+                // Analisa cada GameObject raiz
+                var rootObjects = scene.GetRootGameObjects();
+                for (int i = 0; i < rootObjects.Length; i++)
+                {
+                    writer.WriteLine($"[{i + 1}/{rootObjects.Length}] ROOT OBJECT:");
+                    AnalyzeGameObject(rootObjects[i], writer, 0);
+                    writer.WriteLine();
+                }
+
+                writer.WriteLine($"======================================");
+                writer.WriteLine($"RESUMO DA EXPORTAÇÃO");
+                writer.WriteLine($"Total de objetos raiz: {rootObjects.Length}");
+                writer.WriteLine($"Arquivo gerado: {fileName}");
+                writer.WriteLine($"======================================");
+            }
+
+            Log($"Estrutura da cena exportada para: {filePath}");
+            EditorUtility.DisplayDialog("Exportação Concluída",
+                $"Estrutura da cena '{scene.name}' exportada com sucesso!\n\nArquivo: {fileName}\nLocalização: {logsDir}", "OK");
+
+            // Abre a pasta dos logs
+            EditorUtility.RevealInFinder(filePath);
+        }
+
+        /// <summary>
+        /// Analisa recursivamente um GameObject e seus filhos
+        /// </summary>
+        private static void AnalyzeGameObject(GameObject go, StreamWriter writer, int depth)
+        {
+            string indent = new string(' ', depth * 2);
+            string prefix = depth == 0 ? "├── " : "│   ├── ";
+
+            writer.WriteLine($"{indent}{prefix}{go.name}");
+            writer.WriteLine($"{indent}│   │   Active: {go.activeInHierarchy}");
+            writer.WriteLine($"{indent}│   │   Tag: {go.tag}");
+            writer.WriteLine($"{indent}│   │   Layer: {LayerMask.LayerToName(go.layer)} ({go.layer})");
+
+            // Analisa Transform
+            var transform = go.transform;
+            if (transform is RectTransform rectTransform)
+            {
+                writer.WriteLine($"{indent}│   │   Transform: RectTransform");
+                writer.WriteLine($"{indent}│   │   │   Position: {rectTransform.anchoredPosition}");
+                writer.WriteLine($"{indent}│   │   │   Size: {rectTransform.sizeDelta}");
+                writer.WriteLine($"{indent}│   │   │   Anchors: {rectTransform.anchorMin} - {rectTransform.anchorMax}");
+                writer.WriteLine($"{indent}│   │   │   Pivot: {rectTransform.pivot}");
+                writer.WriteLine($"{indent}│   │   │   Rotation: {rectTransform.localEulerAngles}");
+                writer.WriteLine($"{indent}│   │   │   Scale: {rectTransform.localScale}");
+            }
+            else
+            {
+                writer.WriteLine($"{indent}│   │   Transform: Transform");
+                writer.WriteLine($"{indent}│   │   │   Position: {transform.localPosition}");
+                writer.WriteLine($"{indent}│   │   │   Rotation: {transform.localEulerAngles}");
+                writer.WriteLine($"{indent}│   │   │   Scale: {transform.localScale}");
+            }
+
+            // Analisa componentes
+            var components = go.GetComponents<Component>();
+            writer.WriteLine($"{indent}│   │   Components: ({components.Length})");
+
+            foreach (var component in components)
+            {
+                if (component == null) continue;
+
+                var componentType = component.GetType();
+                writer.WriteLine($"{indent}│   │   │   ├── {componentType.Name}");
+
+                // Informações específicas para componentes comuns
+                AnalyzeSpecificComponent(component, writer, indent + "│   │   │   │   ");
+            }
+
+            // Analisa filhos recursivamente
+            if (transform.childCount > 0)
+            {
+                writer.WriteLine($"{indent}│   │   Children: ({transform.childCount})");
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    AnalyzeGameObject(transform.GetChild(i).gameObject, writer, depth + 2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Analisa componentes específicos com informações detalhadas
+        /// </summary>
+        private static void AnalyzeSpecificComponent(Component component, StreamWriter writer, string indent)
+        {
+            // Canvas
+            if (component is Canvas canvas)
+            {
+                writer.WriteLine($"{indent}Render Mode: {canvas.renderMode}");
+                writer.WriteLine($"{indent}Sort Order: {canvas.sortingOrder}");
+                writer.WriteLine($"{indent}Pixel Perfect: {canvas.pixelPerfect}");
+            }
+            // Image
+            else if (component is UnityEngine.UI.Image image)
+            {
+                writer.WriteLine($"{indent}Sprite: {(image.sprite ? image.sprite.name : "None")}");
+                writer.WriteLine($"{indent}Color: {image.color}");
+                writer.WriteLine($"{indent}Material: {(image.material ? image.material.name : "None")}");
+                writer.WriteLine($"{indent}Raycast Target: {image.raycastTarget}");
+            }
+            // Camera
+            else if (component is Camera cam)
+            {
+                writer.WriteLine($"{indent}Clear Flags: {cam.clearFlags}");
+                writer.WriteLine($"{indent}Projection: {cam.orthographic}");
+                writer.WriteLine($"{indent}Size/FOV: {(cam.orthographic ? cam.orthographicSize.ToString() : cam.fieldOfView.ToString())}");
+                writer.WriteLine($"{indent}Near/Far: {cam.nearClipPlane}/{cam.farClipPlane}");
+                writer.WriteLine($"{indent}Depth: {cam.depth}");
+            }
+            // Light
+            else if (component is Light light)
+            {
+                writer.WriteLine($"{indent}Type: {light.type}");
+                writer.WriteLine($"{indent}Color: {light.color}");
+                writer.WriteLine($"{indent}Intensity: {light.intensity}");
+                writer.WriteLine($"{indent}Range: {light.range}");
+            }
+            // AudioSource
+            else if (component is AudioSource audioSource)
+            {
+                writer.WriteLine($"{indent}Clip: {(audioSource.clip ? audioSource.clip.name : "None")}");
+                writer.WriteLine($"{indent}Volume: {audioSource.volume}");
+                writer.WriteLine($"{indent}Loop: {audioSource.loop}");
+                writer.WriteLine($"{indent}Play On Awake: {audioSource.playOnAwake}");
+            }
+            // Scripts customizados
+            else if (component.GetType().Namespace == "ExtraTools" ||
+                     !component.GetType().Namespace?.StartsWith("UnityEngine") == true)
+            {
+                writer.WriteLine($"{indent}Custom Script: {component.GetType().FullName}");
+
+                // Usa SerializedObject para ler propriedades serializadas
+                var so = new SerializedObject(component);
+                var prop = so.GetIterator();
+
+                if (prop.NextVisible(true))
+                {
+                    do
+                    {
+                        if (prop.propertyPath == "m_Script") continue;
+
+                        string value = GetSerializedPropertyValue(prop);
+                        writer.WriteLine($"{indent}│   {prop.displayName}: {value}");
+                    }
+                    while (prop.NextVisible(false));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Obtém o valor de uma SerializedProperty como string
+        /// </summary>
+        private static string GetSerializedPropertyValue(SerializedProperty prop)
+        {
+            switch (prop.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return prop.intValue.ToString();
+                case SerializedPropertyType.Boolean:
+                    return prop.boolValue.ToString();
+                case SerializedPropertyType.Float:
+                    return prop.floatValue.ToString("F2");
+                case SerializedPropertyType.String:
+                    return $"\"{prop.stringValue}\"";
+                case SerializedPropertyType.Color:
+                    return prop.colorValue.ToString();
+                case SerializedPropertyType.ObjectReference:
+                    return prop.objectReferenceValue ? prop.objectReferenceValue.name : "None";
+                case SerializedPropertyType.LayerMask:
+                    return prop.intValue.ToString();
+                case SerializedPropertyType.Enum:
+                    // Proteção contra enumValueIndex inválido (pode ocorrer quando enum mudou)
+                    if (prop.enumNames != null && prop.enumNames.Length > 0)
+                    {
+                        int idx = prop.enumValueIndex;
+                        if (idx >= 0 && idx < prop.enumNames.Length)
+                        {
+                            // enumDisplayNames pode ser null em versões antigas
+                            if (prop.enumDisplayNames != null && prop.enumDisplayNames.Length == prop.enumNames.Length)
+                                return prop.enumDisplayNames[idx];
+                            return prop.enumNames[idx];
+                        }
+                        return $"(Enum inválido: {idx} / max {prop.enumNames.Length - 1})";
+                    }
+                    return "(Enum vazio)";
+                case SerializedPropertyType.Vector2:
+                    return prop.vector2Value.ToString();
+                case SerializedPropertyType.Vector3:
+                    return prop.vector3Value.ToString();
+                case SerializedPropertyType.Vector4:
+                    return prop.vector4Value.ToString();
+                case SerializedPropertyType.Rect:
+                    return prop.rectValue.ToString();
+                case SerializedPropertyType.AnimationCurve:
+                    return prop.animationCurveValue != null ? $"Curve ({prop.animationCurveValue.keys.Length} keys)" : "None";
+                case SerializedPropertyType.Bounds:
+                    return prop.boundsValue.ToString();
+                case SerializedPropertyType.Quaternion:
+                    return prop.quaternionValue.ToString();
+                case SerializedPropertyType.Generic:
+                    // Se for array/lista
+                    if (prop.isArray)
+                    {
+                        return $"Array(Size={prop.arraySize})";
+                    }
+                    return "(Generic)";
+                case SerializedPropertyType.ManagedReference:
+                    return string.IsNullOrEmpty(prop.managedReferenceFullTypename) ? "(ManagedRef null)" : prop.managedReferenceFullTypename;
+                default:
+                    return $"({prop.propertyType})";
+            }
+        }
+
         #endregion
     }
 }

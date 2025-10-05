@@ -6,7 +6,8 @@ namespace ExtraTools
 {
     /// <summary>
     /// TitleScreenController - Controla a sequência de animações da tela inicial.
-    /// Sequência: música (1s delay) → centerLogo fade in/out + background fade in → gameTitle fade in → wsLogo fade in
+    /// Sequência: música (1s delay) → centerLogo fade in/out + background fade in → gameTitle fade in → 
+    /// ping pong effect starts + pressStart text + inputButton icons fade in simultâneo → wsLogo fade in
     /// </summary>
     public class TitleScreenController : MonoBehaviour
     {
@@ -16,6 +17,8 @@ namespace ExtraTools
         [SerializeField] private Image wsLogo;
         [SerializeField] private Image background;
         [SerializeField] private Image gameTitle;
+        [SerializeField] private TMPro.TextMeshProUGUI pressStart;
+        [SerializeField] private GameObject inputButton;
         #endregion
 
         #region Animation Settings
@@ -27,6 +30,7 @@ namespace ExtraTools
         [SerializeField] private float backgroundFadeInDuration = 2f;
         [SerializeField] private float gameTitleFadeInDuration = 1.5f;
         [SerializeField] private float wsLogoFadeInDuration = 1f;
+        [SerializeField] private float pressStartFadeInDuration = 1f;
 
         [Header("Animation Curves")]
         [SerializeField] private AnimationCurve fadeInCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -133,6 +137,9 @@ namespace ExtraTools
             SetImageAlpha(wsLogo, 0f);
             SetImageAlpha(background, 0f);
             SetImageAlpha(gameTitle, 0f);
+            SetTextAlpha(pressStart, 0f);
+            SetGameObjectVisibility(inputButton, true); // Mantém ativo para permitir fade
+            SetInputButtonAlpha(0f); // Mas invisível
 
             Debug.Log("[TitleScreen] Elementos inicializados como invisíveis");
         }
@@ -160,6 +167,8 @@ namespace ExtraTools
             SetImageAlpha(background, 1f);     // Background visível
             SetImageAlpha(gameTitle, 1f);      // Título visível
             SetImageAlpha(wsLogo, 1f);         // WS Logo visível
+            SetTextAlpha(pressStart, 1f);      // Press Start visível
+            SetInputButtonAlpha(1f);           // Input Button visível
 
             sequenceRunning = false;
             sequenceCompleted = true;
@@ -206,6 +215,9 @@ namespace ExtraTools
             // Inicia efeito ping pong após gameTitle estar totalmente visível
             StartPingPongEffect();
 
+            // Fase 5.5: Press Start e inputButton fade in (simultaneamente com o início do ping pong)
+            StartCoroutine(FadePressStartIn(pressStartFadeInDuration));
+
             // Fase 6: WS Logo fade in (quando gameTitle estiver totalmente visível)
             yield return StartCoroutine(FadeImageIn(wsLogo, wsLogoFadeInDuration));
 
@@ -240,6 +252,54 @@ namespace ExtraTools
         }
 
         /// <summary>
+        /// Fade in de um texto TextMeshPro
+        /// </summary>
+        private IEnumerator FadeTextIn(TMPro.TextMeshProUGUI text, float duration)
+        {
+            if (text == null) yield break;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / duration;
+                float alpha = fadeInCurve.Evaluate(progress);
+
+                SetTextAlpha(text, alpha);
+                yield return null;
+            }
+
+            SetTextAlpha(text, 1f);
+            Debug.Log($"[TitleScreen] {text.name} fade in concluído");
+        }
+
+        /// <summary>
+        /// Fade in do pressStart com seu inputButton
+        /// </summary>
+        private IEnumerator FadePressStartIn(float duration)
+        {
+            if (pressStart == null) yield break;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / duration;
+                float alpha = fadeInCurve.Evaluate(progress);
+
+                // Aplica fade tanto no texto quanto no inputButton
+                SetTextAlpha(pressStart, alpha);
+                SetInputButtonAlpha(alpha);
+                yield return null;
+            }
+
+            // Finaliza com alpha total
+            SetTextAlpha(pressStart, 1f);
+            SetInputButtonAlpha(1f);
+            Debug.Log("[TitleScreen] pressStart e inputButton fade in concluído");
+        }
+
+        /// <summary>
         /// Fade out de uma imagem
         /// </summary>
         private IEnumerator FadeImageOut(Image image, float duration)
@@ -271,6 +331,50 @@ namespace ExtraTools
             Color color = image.color;
             color.a = alpha;
             image.color = color;
+        }
+
+        /// <summary>
+        /// Define alpha de todos os ícones dentro do inputButton
+        /// </summary>
+        private void SetInputButtonAlpha(float alpha)
+        {
+            if (inputButton == null) return;
+
+            // Encontra todos os componentes Image filhos do inputButton
+            Image[] childImages = inputButton.GetComponentsInChildren<Image>();
+
+            foreach (Image img in childImages)
+            {
+                if (img != null)
+                {
+                    Color color = img.color;
+                    color.a = alpha;
+                    img.color = color;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Define alpha de um texto TextMeshPro
+        /// </summary>
+        private void SetTextAlpha(TMPro.TextMeshProUGUI text, float alpha)
+        {
+            if (text == null) return;
+
+            Color color = text.color;
+            color.a = alpha;
+            text.color = color;
+        }
+
+        /// <summary>
+        /// Define visibilidade de um GameObject
+        /// </summary>
+        private void SetGameObjectVisibility(GameObject obj, bool visible)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(visible);
+            }
         }
 
         /// <summary>
