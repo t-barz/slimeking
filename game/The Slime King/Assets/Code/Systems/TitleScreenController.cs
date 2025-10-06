@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace ExtraTools
 {
@@ -15,6 +17,26 @@ namespace ExtraTools
     /// </summary>
     public class TitleScreenController : MonoBehaviour
     {
+        [Header("Debug / Logging")]
+        [SerializeField] private bool verboseLogging = false; // Controla logs verbosos em runtime
+
+        // Wrappers de logging para evitar custo quando desativado
+        [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+        private void Log(string message)
+        {
+            if (verboseLogging) Debug.Log(message);
+        }
+        [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+        private void LogWarning(string message)
+        {
+            if (verboseLogging) Debug.LogWarning(message);
+        }
+        [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+        private void LogError(string message)
+        {
+            // Erros normalmente devem aparecer mesmo fora de verbose, mas mantemos controle aqui
+            Debug.LogError(message);
+        }
         #region UI References
         [Header("UI Elements")]
         [SerializeField] private Image centerLogo;
@@ -30,6 +52,8 @@ namespace ExtraTools
         [SerializeField] private GameObject switchIcon;
         [SerializeField] private GameObject xboxIcon;
         [SerializeField] private GameObject keyboardIcon;
+        // Cache de imagens filhas do inputButton para reduzir alocações em fades
+        private Image[] _cachedInputButtonImages;
         #endregion
 
         #region Animation Settings
@@ -42,6 +66,27 @@ namespace ExtraTools
         [SerializeField] private float gameTitleFadeInDuration = 1.5f;
         [SerializeField] private float wsLogoFadeInDuration = 1f;
         [SerializeField] private float pressStartFadeInDuration = 1f;
+
+        // Cache de esperas para reduzir alocações GC em corrotinas
+        private WaitForSecondsRealtime waitMusicDelay;
+        private WaitForSecondsRealtime waitCenterLogoVisible;
+
+        private void Awake()
+        {
+            // Inicializa caches de WaitForSecondsRealtime
+            waitMusicDelay = new WaitForSecondsRealtime(musicDelay);
+            waitCenterLogoVisible = new WaitForSecondsRealtime(centerLogoVisibleDuration);
+        }
+
+        private void OnValidate()
+        {
+            // Atualiza caches quando valores mudam no inspector (modo editor)
+            if (musicDelay < 0f) musicDelay = 0f;
+            if (centerLogoVisibleDuration < 0f) centerLogoVisibleDuration = 0f;
+
+            waitMusicDelay = new WaitForSecondsRealtime(musicDelay);
+            waitCenterLogoVisible = new WaitForSecondsRealtime(centerLogoVisibleDuration);
+        }
 
         [Header("Animation Curves")]
         [SerializeField] private AnimationCurve fadeInCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -63,6 +108,19 @@ namespace ExtraTools
         [Header("Control")]
         [SerializeField] private bool autoStart = true;
         [SerializeField] private bool skipOnInput = true;
+        #endregion
+
+        #region Post Processing
+        [Header("Post Processing")]
+        [Tooltip("Volume global usado para animar vinheta no fade de saída. Se vazio, será detectado automaticamente.")]
+        [SerializeField] private Volume globalVolume;
+        [Tooltip("Intensidade inicial (aberta) da vinheta antes do fade.")]
+        [SerializeField] private float vignetteStartIntensity = 0.0f;
+        [Tooltip("Intensidade final (fechada) da vinheta no término do fade.")]
+        [SerializeField] private float vignetteEndIntensity = 0.55f;
+        [Tooltip("Suavização (smoothness) final da vinheta para fechar mais suave.")]
+        [SerializeField] private float vignetteEndSmoothness = 0.9f;
+        private Vignette _vignette;
         #endregion
 
         #region Scene Preload
@@ -96,6 +154,30 @@ namespace ExtraTools
         private void Start()
         {
             InitializeElements();
+            // Tenta auto detectar volume se não atribuído
+            if (globalVolume == null)
+            {
+#if UNITY_2023_1_OR_NEWER
+                globalVolume = FindFirstObjectByType<Volume>();
+                if (globalVolume == null)
+                    globalVolume = FindAnyObjectByType<Volume>();
+#else
+                globalVolume = FindObjectOfType<Volume>(); // Versões antigas
+#endif
+                if (globalVolume != null)
+                    Log("[TitleScreen] Volume global detectado automaticamente");
+            }
+
+            if (globalVolume != null)
+            {
+                if (globalVolume.profile != null && globalVolume.profile.TryGet(out _vignette))
+                {
+                    // Força valores iniciais
+                    if (_vignette.intensity.overrideState == false) _vignette.intensity.overrideState = true;
+                    if (_vignette.smoothness.overrideState == false) _vignette.smoothness.overrideState = true;
+                    _vignette.intensity.value = vignetteStartIntensity;
+                }
+            }
 
             // Captura posição inicial do gameTitle para o efeito ping pong
             if (gameTitle != null)
@@ -110,19 +192,19 @@ namespace ExtraTools
             // Configura InputManager para contexto de TitleScreen
             if (InputManager.Instance != null)
             {
-                Debug.Log("[TitleScreen] InputManager encontrado - configurando eventos");
+                Log("[TitleScreen] InputManager encontrado - configurando eventos");
                 InputManager.Instance.SetTitleScreenContext();
                 InputManager.Instance.OnSkip += HandleSkipInput;
                 InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
                 InputManager.Instance.OnAttack += HandleAttackInput;
-                Debug.Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso");
+                Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso");
 
                 // Força verificação inicial do dispositivo
                 StartCoroutine(CheckInitialDevice());
             }
             else
             {
-                Debug.LogWarning("[TitleScreen] InputManager.Instance é null - criando InputManager");
+                LogWarning("[TitleScreen] InputManager.Instance é null - criando InputManager");
                 CreateInputManager();
             }
 
@@ -142,7 +224,7 @@ namespace ExtraTools
         {
             GameObject inputManagerGO = new GameObject("InputManager");
             InputManager inputManager = inputManagerGO.AddComponent<InputManager>();
-            Debug.Log("[TitleScreen] InputManager criado dinamicamente");
+            Log("[TitleScreen] InputManager criado dinamicamente");
 
             // Aguarda um frame para o Awake ser chamado, então configura
             StartCoroutine(SetupInputManagerDelayed());
@@ -156,7 +238,7 @@ namespace ExtraTools
 
             if (string.IsNullOrEmpty(nextSceneName))
             {
-                Debug.LogWarning("[TitleScreen] nextSceneName vazio - preload não iniciado");
+                LogWarning("[TitleScreen] nextSceneName vazio - preload não iniciado");
                 return;
             }
 
@@ -166,11 +248,11 @@ namespace ExtraTools
 
         private IEnumerator PreloadNextScene()
         {
-            Debug.Log($"[TitleScreen] Iniciando pré-carregamento da cena '{nextSceneName}'");
+            Log($"[TitleScreen] Iniciando pré-carregamento da cena '{nextSceneName}'");
             preloadOperation = SceneManager.LoadSceneAsync(nextSceneName);
             if (preloadOperation == null)
             {
-                Debug.LogError($"[TitleScreen] Falha ao iniciar LoadSceneAsync para '{nextSceneName}'");
+                LogError($"[TitleScreen] Falha ao iniciar LoadSceneAsync para '{nextSceneName}'");
                 yield break;
             }
             preloadOperation.allowSceneActivation = false;
@@ -178,7 +260,7 @@ namespace ExtraTools
             {
                 yield return null;
             }
-            Debug.Log($"[TitleScreen] Cena '{nextSceneName}' pré-carregada (ready=0.9)");
+            Log($"[TitleScreen] Cena '{nextSceneName}' pré-carregada (ready=0.9)");
         }
 
         /// <summary>
@@ -189,7 +271,7 @@ namespace ExtraTools
             if (isTransitioning) return; // Previne múltiplas ativações
 
             isTransitioning = true;
-            Debug.Log("[TitleScreen] Iniciando transição com fade out");
+            Log("[TitleScreen] Iniciando transição com fade out");
             StartCoroutine(FadeOutAndActivateScene());
         }
 
@@ -198,7 +280,7 @@ namespace ExtraTools
         /// </summary>
         private IEnumerator FadeOutAndActivateScene()
         {
-            Debug.Log($"[TitleScreen] Fade out iniciado - duração: {fadeOutDuration}s");
+            Log($"[TitleScreen] Fade out iniciado - duração: {fadeOutDuration}s");
 
             // Inicia fade out de todos os elementos simultaneamente
             StartCoroutine(FadeImageOut(background, fadeOutDuration));
@@ -210,25 +292,49 @@ namespace ExtraTools
             // Para o efeito ping pong durante o fade
             pingPongEffectActive = false;
 
-            // Aguarda o fade out completar
-            yield return new WaitForSecondsRealtime(fadeOutDuration);
+            float elapsed = 0f;
+            bool canAnimateVignette = _vignette != null;
+            float initialIntensity = vignetteStartIntensity;
+            float targetIntensity = vignetteEndIntensity;
+            float initialSmooth = canAnimateVignette ? _vignette.smoothness.value : 0f;
+            float targetSmooth = vignetteEndSmoothness;
 
-            Debug.Log("[TitleScreen] Fade out concluído - ativando próxima cena");
+            // Loop manual para permitir animar vinheta junto ao fade de UI
+            while (elapsed < fadeOutDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / fadeOutDuration);
+                if (canAnimateVignette)
+                {
+                    _vignette.intensity.value = Mathf.Lerp(initialIntensity, targetIntensity, t);
+                    _vignette.smoothness.value = Mathf.Lerp(initialSmooth, targetSmooth, t);
+                }
+                yield return null;
+            }
+
+            // Garante valores finais
+            if (canAnimateVignette)
+            {
+                _vignette.intensity.value = targetIntensity;
+                _vignette.smoothness.value = targetSmooth;
+            }
+
+            Log("[TitleScreen] Fade out concluído - ativando próxima cena");
 
             // Ativa a cena
             if (preloadOperation != null && preloadOperation.progress >= 0.9f)
             {
-                Debug.Log($"[TitleScreen] Ativando cena pré-carregada '{nextSceneName}'");
+                Log($"[TitleScreen] Ativando cena pré-carregada '{nextSceneName}'");
                 preloadOperation.allowSceneActivation = true;
             }
             else if (!string.IsNullOrEmpty(nextSceneName))
             {
-                Debug.Log($"[TitleScreen] Preload não pronto, carregando '{nextSceneName}' diretamente");
+                Log($"[TitleScreen] Preload não pronto, carregando '{nextSceneName}' diretamente");
                 SceneManager.LoadScene(nextSceneName);
             }
             else
             {
-                Debug.LogError("[TitleScreen] Não foi possível navegar - nextSceneName vazio e preload indisponível");
+                LogError("[TitleScreen] Não foi possível navegar - nextSceneName vazio e preload indisponível");
                 isTransitioning = false; // Reset em caso de erro
             }
         }
@@ -243,12 +349,12 @@ namespace ExtraTools
 
             if (InputManager.Instance != null)
             {
-                Debug.Log("[TitleScreen] Configurando InputManager após criação");
+                Log("[TitleScreen] Configurando InputManager após criação");
                 InputManager.Instance.SetTitleScreenContext();
                 InputManager.Instance.OnSkip += HandleSkipInput;
                 InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
                 InputManager.Instance.OnAttack += HandleAttackInput;
-                Debug.Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso (delayed)");
+                Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso (delayed)");
 
                 // Força verificação inicial do dispositivo
                 yield return CheckInitialDevice();
@@ -281,7 +387,7 @@ namespace ExtraTools
                     currentDevice = gamepad;
                 }
 
-                Debug.Log($"[TitleScreen] Dispositivo inicial detectado: {currentDevice?.displayName ?? "None"}");
+                Log($"[TitleScreen] Dispositivo inicial detectado: {currentDevice?.displayName ?? "None"}");
                 UpdateInputIcon(currentDevice);
             }
         }
@@ -310,16 +416,16 @@ namespace ExtraTools
         /// </summary>
         private void HandleSkipInput()
         {
-            Debug.Log($"[TitleScreen] HandleSkipInput chamado - skipOnInput:{skipOnInput} skipAvailable:{skipAvailable} sequenceRunning:{sequenceRunning} sequenceCompleted:{sequenceCompleted}");
+            Log($"[TitleScreen] HandleSkipInput chamado - skipOnInput:{skipOnInput} skipAvailable:{skipAvailable} sequenceRunning:{sequenceRunning} sequenceCompleted:{sequenceCompleted}");
 
             if (skipOnInput && skipAvailable && sequenceRunning && !sequenceCompleted)
             {
-                Debug.Log("[TitleScreen] Skip via InputManager - executando skip");
+                Log("[TitleScreen] Skip via InputManager - executando skip");
                 SkipToEnd();
             }
             else
             {
-                Debug.Log("[TitleScreen] Skip bloqueado - condições não atendidas");
+                Log("[TitleScreen] Skip bloqueado - condições não atendidas");
             }
         }
 
@@ -339,16 +445,16 @@ namespace ExtraTools
             // Aceita tanto started quanto performed para responsividade imediata
             if (!(context.started || context.performed)) return;
 
-            Debug.Log($"[TitleScreen] HandleAttackInput chamado - sequenceCompleted:{sequenceCompleted} preloadOperation:{(preloadOperation != null ? "ready" : "null")}");
+            Log($"[TitleScreen] HandleAttackInput chamado - sequenceCompleted:{sequenceCompleted} preloadOperation:{(preloadOperation != null ? "ready" : "null")}");
 
             if (sequenceCompleted)
             {
-                Debug.Log("[TitleScreen] Ataque detectado - navegando para próxima cena");
+                Log("[TitleScreen] Ataque detectado - navegando para próxima cena");
                 ActivatePreloadedScene();
             }
             else
             {
-                Debug.Log("[TitleScreen] Ataque ignorado - sequência ainda não completada");
+                Log("[TitleScreen] Ataque ignorado - sequência ainda não completada");
             }
         }
 
@@ -368,7 +474,7 @@ namespace ExtraTools
             if (device == null || device is Keyboard)
             {
                 SetGameObjectVisibility(keyboardIcon, true);
-                Debug.Log("[TitleScreen] Ícone alterado para: Teclado");
+                Log("[TitleScreen] Ícone alterado para: Teclado");
             }
             else if (device is Gamepad gamepad)
             {
@@ -377,31 +483,31 @@ namespace ExtraTools
                 if (deviceName.Contains("xbox") || deviceName.Contains("xinput"))
                 {
                     SetGameObjectVisibility(xboxIcon, true);
-                    Debug.Log("[TitleScreen] Ícone alterado para: Xbox");
+                    Log("[TitleScreen] Ícone alterado para: Xbox");
                 }
                 else if (deviceName.Contains("dualshock") || deviceName.Contains("dualsense") ||
                          deviceName.Contains("playstation") || deviceName.Contains("ps4") || deviceName.Contains("ps5"))
                 {
                     SetGameObjectVisibility(playstationIcon, true);
-                    Debug.Log("[TitleScreen] Ícone alterado para: PlayStation");
+                    Log("[TitleScreen] Ícone alterado para: PlayStation");
                 }
                 else if (deviceName.Contains("pro controller") || deviceName.Contains("nintendo") ||
                          deviceName.Contains("switch"))
                 {
                     SetGameObjectVisibility(switchIcon, true);
-                    Debug.Log("[TitleScreen] Ícone alterado para: Switch");
+                    Log("[TitleScreen] Ícone alterado para: Switch");
                 }
                 else
                 {
                     SetGameObjectVisibility(gamepadIcon, true);
-                    Debug.Log("[TitleScreen] Ícone alterado para: Gamepad Genérico");
+                    Log("[TitleScreen] Ícone alterado para: Gamepad Genérico");
                 }
             }
             else
             {
                 // Fallback para teclado
                 SetGameObjectVisibility(keyboardIcon, true);
-                Debug.Log("[TitleScreen] Ícone alterado para: Teclado (fallback)");
+                Log("[TitleScreen] Ícone alterado para: Teclado (fallback)");
             }
         }        /// <summary>
                  /// Inicializa todos os elementos como invisíveis
@@ -424,7 +530,7 @@ namespace ExtraTools
             sequenceCompleted = false;
             skipAvailable = false;
 
-            Debug.Log("[TitleScreen] Elementos inicializados como invisíveis");
+            Log("[TitleScreen] Elementos inicializados como invisíveis");
         }
 
         /// <summary>
@@ -440,6 +546,8 @@ namespace ExtraTools
                 if (switchIcon == null) switchIcon = inputButton.transform.Find("switch")?.gameObject;
                 if (xboxIcon == null) xboxIcon = inputButton.transform.Find("xbox")?.gameObject;
                 if (keyboardIcon == null) keyboardIcon = inputButton.transform.Find("keyboard")?.gameObject;
+                // Cache inicial (inclui inativos)
+                _cachedInputButtonImages = inputButton.GetComponentsInChildren<Image>(includeInactive: true);
             }
 
             // Esconde todos os ícones
@@ -452,7 +560,7 @@ namespace ExtraTools
             // Mostra apenas o teclado por padrão
             SetGameObjectVisibility(keyboardIcon, true);
 
-            Debug.Log("[TitleScreen] Ícones de input inicializados - mostrando teclado por padrão");
+            Log("[TitleScreen] Ícones de input inicializados - mostrando teclado por padrão");
         }
 
         /// <summary>
@@ -478,7 +586,7 @@ namespace ExtraTools
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayMenuMusic(crossfade: true);
-                Debug.Log("[TitleScreen] Música iniciada (via skip)");
+                Log("[TitleScreen] Música iniciada (via skip)");
             }
 
             SetImageAlpha(centerLogo, 0f);    // Logo central some
@@ -495,14 +603,10 @@ namespace ExtraTools
             // Inicia efeito ping pong também no skip
             StartPingPongEffect();
 
-            Debug.Log("[TitleScreen] Sequência pulada - todos elementos finais visíveis");
+            Log("[TitleScreen] Sequência pulada - todos elementos finais visíveis");
 
             // Habilita input de ataque após o skip
-            if (InputManager.Instance != null)
-            {
-                InputManager.Instance.EnableGameplay();
-                Debug.Log("[TitleScreen] Input de ataque habilitado após skip");
-            }
+            EnableAttackInput("após skip");
 
             OnSequenceCompleted?.Invoke();
         }
@@ -516,26 +620,26 @@ namespace ExtraTools
             sequenceCompleted = false;
             skipAvailable = false; // Skip não disponível no início
 
-            Debug.Log("[TitleScreen] Iniciando sequência da tela de título");
+            Log("[TitleScreen] Iniciando sequência da tela de título");
 
             // Fase 1: Aguarda delay e inicia música
-            yield return new WaitForSecondsRealtime(musicDelay);
+            yield return waitMusicDelay;
 
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayMenuMusic(crossfade: true);
-                Debug.Log("[TitleScreen] Música iniciada");
+                Log("[TitleScreen] Música iniciada");
             }
 
             // Habilita skip logo após a música começar
             skipAvailable = true;
-            Debug.Log("[TitleScreen] Skip disponível - pressione qualquer botão para pular animação");
+            Log("[TitleScreen] Skip disponível - pressione qualquer botão para pular animação");
 
             // Fase 2: Center Logo fade in
             yield return StartCoroutine(FadeImageIn(centerLogo, centerLogoFadeInDuration));
 
             // Fase 3: Center Logo fica visível
-            yield return new WaitForSecondsRealtime(centerLogoVisibleDuration);
+            yield return waitCenterLogoVisible;
 
             // Fase 4: Background fade in + Center Logo fade out (simultâneo)
             StartCoroutine(FadeImageOut(centerLogo, centerLogoFadeOutDuration));
@@ -558,16 +662,22 @@ namespace ExtraTools
             sequenceCompleted = true;
             skipAvailable = false; // Desabilita skip após conclusão natural
 
-            Debug.Log("[TitleScreen] Sequência de animação concluída");
+            Log("[TitleScreen] Sequência de animação concluída");
 
             // Habilita input de ataque após sequência natural
-            if (InputManager.Instance != null)
-            {
-                InputManager.Instance.EnableGameplay();
-                Debug.Log("[TitleScreen] Input de ataque habilitado - pressione Z para continuar");
-            }
+            EnableAttackInput("após sequência - pressione Z para continuar");
 
             OnSequenceCompleted?.Invoke();
+        }
+
+        /// <summary>
+        /// Centraliza habilitação do gameplay input (ataque) com logging
+        /// </summary>
+        private void EnableAttackInput(string contexto)
+        {
+            if (InputManager.Instance == null) return;
+            InputManager.Instance.EnableGameplay();
+            Log($"[TitleScreen] Input de ataque habilitado {contexto}");
         }
 
         /// <summary>
@@ -589,7 +699,7 @@ namespace ExtraTools
             }
 
             SetImageAlpha(image, 1f);
-            Debug.Log($"[TitleScreen] {image.name} fade in concluído");
+            Log($"[TitleScreen] {image.name} fade in concluído");
         }
 
         /// <summary>
@@ -611,7 +721,7 @@ namespace ExtraTools
             }
 
             SetTextAlpha(text, 1f);
-            Debug.Log($"[TitleScreen] {text.name} fade in concluído");
+            Log($"[TitleScreen] {text.name} fade in concluído");
         }
 
         /// <summary>
@@ -637,7 +747,7 @@ namespace ExtraTools
             // Finaliza com alpha total
             SetTextAlpha(pressStart, 1f);
             SetInputButtonAlpha(1f);
-            Debug.Log("[TitleScreen] pressStart e inputButton fade in concluído");
+            Log("[TitleScreen] pressStart e inputButton fade in concluído");
         }
 
         /// <summary>
@@ -659,7 +769,7 @@ namespace ExtraTools
             }
 
             SetImageAlpha(image, 0f);
-            Debug.Log($"[TitleScreen] {image.name} fade out concluído");
+            Log($"[TitleScreen] {image.name} fade out concluído");
         }
 
         /// <summary>
@@ -681,7 +791,7 @@ namespace ExtraTools
             }
 
             SetTextAlpha(text, 0f);
-            Debug.Log($"[TitleScreen] {text.name} fade out concluído");
+            Log($"[TitleScreen] {text.name} fade out concluído");
         }
 
         /// <summary>
@@ -703,7 +813,7 @@ namespace ExtraTools
             }
 
             SetInputButtonAlpha(0f);
-            Debug.Log("[TitleScreen] inputButton fade out concluído");
+            Log("[TitleScreen] inputButton fade out concluído");
         }
 
         /// <summary>
@@ -724,18 +834,14 @@ namespace ExtraTools
         private void SetInputButtonAlpha(float alpha)
         {
             if (inputButton == null) return;
-
-            // Aplica alpha a todas as imagens filhas do inputButton
-            Image[] childImages = inputButton.GetComponentsInChildren<Image>();
-
-            foreach (Image img in childImages)
+            if (_cachedInputButtonImages == null || _cachedInputButtonImages.Length == 0)
             {
-                if (img != null)
-                {
-                    Color color = img.color;
-                    color.a = alpha;
-                    img.color = color;
-                }
+                _cachedInputButtonImages = inputButton.GetComponentsInChildren<Image>(includeInactive: true);
+            }
+            foreach (var img in _cachedInputButtonImages)
+            {
+                if (img == null) continue;
+                var c = img.color; c.a = alpha; img.color = c;
             }
         }        /// <summary>
                  /// Define alpha de um texto TextMeshPro
@@ -754,10 +860,9 @@ namespace ExtraTools
         /// </summary>
         private void SetGameObjectVisibility(GameObject obj, bool visible)
         {
-            if (obj != null)
-            {
-                obj.SetActive(visible);
-            }
+            if (obj == null) return;
+            if (obj.activeSelf == visible) return; // Evita chamada redundante
+            obj.SetActive(visible);
         }
 
         /// <summary>
@@ -820,7 +925,7 @@ namespace ExtraTools
                 pingPongDirection = 1f; // Começa subindo
                 isWaitingDirectionChange = false;
                 directionChangeTimer = 0f;
-                Debug.Log("[TitleScreen] Efeito ping pong iniciado");
+                Log("[TitleScreen] Efeito ping pong iniciado");
             }
         }
 
