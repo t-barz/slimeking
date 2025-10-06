@@ -69,8 +69,11 @@ namespace ExtraTools
         [Header("Scene Preload")]
         [Tooltip("Nome da próxima cena a ser pré-carregada")]
         [SerializeField] private string nextSceneName = "MainMenu";
+        [Tooltip("Duração do fade out antes de ativar a próxima cena")]
+        [SerializeField] private float fadeOutDuration = 1f;
         private AsyncOperation preloadOperation;
         private bool preloadStarted = false;
+        private bool isTransitioning = false; // Previne múltiplas transições
         #endregion
 
         private bool sequenceRunning = false;
@@ -183,6 +186,36 @@ namespace ExtraTools
         /// </summary>
         private void ActivatePreloadedScene()
         {
+            if (isTransitioning) return; // Previne múltiplas ativações
+
+            isTransitioning = true;
+            Debug.Log("[TitleScreen] Iniciando transição com fade out");
+            StartCoroutine(FadeOutAndActivateScene());
+        }
+
+        /// <summary>
+        /// Fade out de todos os elementos e ativa a próxima cena
+        /// </summary>
+        private IEnumerator FadeOutAndActivateScene()
+        {
+            Debug.Log($"[TitleScreen] Fade out iniciado - duração: {fadeOutDuration}s");
+
+            // Inicia fade out de todos os elementos simultaneamente
+            StartCoroutine(FadeImageOut(background, fadeOutDuration));
+            StartCoroutine(FadeImageOut(gameTitle, fadeOutDuration));
+            StartCoroutine(FadeImageOut(wsLogo, fadeOutDuration));
+            StartCoroutine(FadeTextOut(pressStart, fadeOutDuration));
+            StartCoroutine(FadeInputButtonOut(fadeOutDuration));
+
+            // Para o efeito ping pong durante o fade
+            pingPongEffectActive = false;
+
+            // Aguarda o fade out completar
+            yield return new WaitForSecondsRealtime(fadeOutDuration);
+
+            Debug.Log("[TitleScreen] Fade out concluído - ativando próxima cena");
+
+            // Ativa a cena
             if (preloadOperation != null && preloadOperation.progress >= 0.9f)
             {
                 Debug.Log($"[TitleScreen] Ativando cena pré-carregada '{nextSceneName}'");
@@ -196,6 +229,7 @@ namespace ExtraTools
             else
             {
                 Debug.LogError("[TitleScreen] Não foi possível navegar - nextSceneName vazio e preload indisponível");
+                isTransitioning = false; // Reset em caso de erro
             }
         }
         #endregion
@@ -626,6 +660,50 @@ namespace ExtraTools
 
             SetImageAlpha(image, 0f);
             Debug.Log($"[TitleScreen] {image.name} fade out concluído");
+        }
+
+        /// <summary>
+        /// Fade out de um texto TextMeshPro
+        /// </summary>
+        private IEnumerator FadeTextOut(TMPro.TextMeshProUGUI text, float duration)
+        {
+            if (text == null) yield break;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / duration;
+                float alpha = fadeOutCurve.Evaluate(progress);
+
+                SetTextAlpha(text, alpha);
+                yield return null;
+            }
+
+            SetTextAlpha(text, 0f);
+            Debug.Log($"[TitleScreen] {text.name} fade out concluído");
+        }
+
+        /// <summary>
+        /// Fade out do inputButton
+        /// </summary>
+        private IEnumerator FadeInputButtonOut(float duration)
+        {
+            if (inputButton == null) yield break;
+
+            float elapsedTime = 0f;
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.unscaledDeltaTime;
+                float progress = elapsedTime / duration;
+                float alpha = fadeOutCurve.Evaluate(progress);
+
+                SetInputButtonAlpha(alpha);
+                yield return null;
+            }
+
+            SetInputButtonAlpha(0f);
+            Debug.Log("[TitleScreen] inputButton fade out concluído");
         }
 
         /// <summary>
