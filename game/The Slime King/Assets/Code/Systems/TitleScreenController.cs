@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace ExtraTools
 {
@@ -64,6 +65,14 @@ namespace ExtraTools
         [SerializeField] private bool skipOnInput = true;
         #endregion
 
+        #region Scene Preload
+        [Header("Scene Preload")]
+        [Tooltip("Nome da próxima cena a ser pré-carregada")]
+        [SerializeField] private string nextSceneName = "MainMenu";
+        private AsyncOperation preloadOperation;
+        private bool preloadStarted = false;
+        #endregion
+
         private bool sequenceRunning = false;
         private bool sequenceCompleted = false;
         private bool skipAvailable = false; // Controla quando o skip está disponível (após música iniciar)
@@ -102,7 +111,8 @@ namespace ExtraTools
                 InputManager.Instance.SetTitleScreenContext();
                 InputManager.Instance.OnSkip += HandleSkipInput;
                 InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
-                Debug.Log("[TitleScreen] Eventos OnSkip e OnDeviceChanged conectados com sucesso");
+                InputManager.Instance.OnAttack += HandleAttackInput;
+                Debug.Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso");
 
                 // Força verificação inicial do dispositivo
                 StartCoroutine(CheckInitialDevice());
@@ -117,6 +127,9 @@ namespace ExtraTools
             {
                 StartTitleSequence();
             }
+
+            // Pré-carrega a próxima cena ao final do Start
+            BeginPreload();
         }
 
         /// <summary>
@@ -132,6 +145,61 @@ namespace ExtraTools
             StartCoroutine(SetupInputManagerDelayed());
         }
 
+        #region Preload Logic
+        private void BeginPreload()
+        {
+            if (preloadStarted)
+                return;
+
+            if (string.IsNullOrEmpty(nextSceneName))
+            {
+                Debug.LogWarning("[TitleScreen] nextSceneName vazio - preload não iniciado");
+                return;
+            }
+
+            preloadStarted = true;
+            StartCoroutine(PreloadNextScene());
+        }
+
+        private IEnumerator PreloadNextScene()
+        {
+            Debug.Log($"[TitleScreen] Iniciando pré-carregamento da cena '{nextSceneName}'");
+            preloadOperation = SceneManager.LoadSceneAsync(nextSceneName);
+            if (preloadOperation == null)
+            {
+                Debug.LogError($"[TitleScreen] Falha ao iniciar LoadSceneAsync para '{nextSceneName}'");
+                yield break;
+            }
+            preloadOperation.allowSceneActivation = false;
+            while (preloadOperation.progress < 0.9f)
+            {
+                yield return null;
+            }
+            Debug.Log($"[TitleScreen] Cena '{nextSceneName}' pré-carregada (ready=0.9)");
+        }
+
+        /// <summary>
+        /// Ativa a cena que foi pré-carregada ou carrega diretamente se não estiver pronta
+        /// </summary>
+        private void ActivatePreloadedScene()
+        {
+            if (preloadOperation != null && preloadOperation.progress >= 0.9f)
+            {
+                Debug.Log($"[TitleScreen] Ativando cena pré-carregada '{nextSceneName}'");
+                preloadOperation.allowSceneActivation = true;
+            }
+            else if (!string.IsNullOrEmpty(nextSceneName))
+            {
+                Debug.Log($"[TitleScreen] Preload não pronto, carregando '{nextSceneName}' diretamente");
+                SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                Debug.LogError("[TitleScreen] Não foi possível navegar - nextSceneName vazio e preload indisponível");
+            }
+        }
+        #endregion
+
         /// <summary>
         /// Configura o InputManager após criação com delay
         /// </summary>
@@ -145,7 +213,8 @@ namespace ExtraTools
                 InputManager.Instance.SetTitleScreenContext();
                 InputManager.Instance.OnSkip += HandleSkipInput;
                 InputManager.Instance.OnDeviceChanged += HandleDeviceChanged;
-                Debug.Log("[TitleScreen] Eventos OnSkip e OnDeviceChanged conectados com sucesso (delayed)");
+                InputManager.Instance.OnAttack += HandleAttackInput;
+                Debug.Log("[TitleScreen] Eventos OnSkip, OnDeviceChanged e OnAttack conectados com sucesso (delayed)");
 
                 // Força verificação inicial do dispositivo
                 yield return CheckInitialDevice();
@@ -190,6 +259,7 @@ namespace ExtraTools
             {
                 InputManager.Instance.OnSkip -= HandleSkipInput;
                 InputManager.Instance.OnDeviceChanged -= HandleDeviceChanged;
+                InputManager.Instance.OnAttack -= HandleAttackInput;
             }
         }
 
@@ -225,6 +295,27 @@ namespace ExtraTools
         private void HandleDeviceChanged(InputDevice device)
         {
             UpdateInputIcon(device);
+        }
+
+        /// <summary>
+        /// Handler para input de ataque via InputManager - ativa próxima cena quando sequência completa
+        /// </summary>
+        private void HandleAttackInput(InputAction.CallbackContext context)
+        {
+            // Aceita tanto started quanto performed para responsividade imediata
+            if (!(context.started || context.performed)) return;
+
+            Debug.Log($"[TitleScreen] HandleAttackInput chamado - sequenceCompleted:{sequenceCompleted} preloadOperation:{(preloadOperation != null ? "ready" : "null")}");
+
+            if (sequenceCompleted)
+            {
+                Debug.Log("[TitleScreen] Ataque detectado - navegando para próxima cena");
+                ActivatePreloadedScene();
+            }
+            else
+            {
+                Debug.Log("[TitleScreen] Ataque ignorado - sequência ainda não completada");
+            }
         }
 
         /// <summary>
@@ -371,6 +462,14 @@ namespace ExtraTools
             StartPingPongEffect();
 
             Debug.Log("[TitleScreen] Sequência pulada - todos elementos finais visíveis");
+
+            // Habilita input de ataque após o skip
+            if (InputManager.Instance != null)
+            {
+                InputManager.Instance.EnableGameplay();
+                Debug.Log("[TitleScreen] Input de ataque habilitado após skip");
+            }
+
             OnSequenceCompleted?.Invoke();
         }
 
@@ -426,6 +525,14 @@ namespace ExtraTools
             skipAvailable = false; // Desabilita skip após conclusão natural
 
             Debug.Log("[TitleScreen] Sequência de animação concluída");
+
+            // Habilita input de ataque após sequência natural
+            if (InputManager.Instance != null)
+            {
+                InputManager.Instance.EnableGameplay();
+                Debug.Log("[TitleScreen] Input de ataque habilitado - pressione Z para continuar");
+            }
+
             OnSequenceCompleted?.Invoke();
         }
 

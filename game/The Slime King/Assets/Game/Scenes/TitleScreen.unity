@@ -1217,6 +1217,7 @@ MonoBehaviour:
   enablePingPongEffect: 1
   autoStart: 1
   skipOnInput: 1
+  nextSceneName: InitialCave
   debugMode: 0
 --- !u!4 &1110224181
 Transform:
@@ -1703,8 +1704,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start Game
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ebe2bf662551d874d9c30e2d28acb240, type: 2}
+  m_sharedMaterial: {fileID: 5885666390624264225, guid: ebe2bf662551d874d9c30e2d28acb240, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1728,7 +1729,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 112
+  m_fontSize: 106.1
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
