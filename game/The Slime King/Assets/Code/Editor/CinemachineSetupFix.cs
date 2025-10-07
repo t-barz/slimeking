@@ -466,5 +466,167 @@ namespace ExtraTools
         }
 
         #endregion
+
+        #region Normalization
+        [MenuItem("Extra Tools/Camera Setup/Normalize Cinemachine Structure", false, 120)]
+        public static void NormalizeCinemachineStructure()
+        {
+            if (Application.isPlaying)
+            {
+                Debug.LogWarning("⚠️ Pare o Play Mode antes de normalizar.");
+                return;
+            }
+
+            Debug.Log("=== NORMALIZANDO ESTRUTURA CINEMACHINE ===");
+
+            // 1. Localizar ou criar Camera principal
+            Camera cam = Camera.main ?? Object.FindFirstObjectByType<Camera>();
+            if (cam == null)
+            {
+                var camGO = new GameObject("Main Camera");
+                cam = camGO.AddComponent<Camera>();
+                camGO.tag = "MainCamera";
+                cam.orthographic = true;
+                cam.orthographicSize = 5;
+                Debug.Log("➕ Camera criada (Main Camera).");
+            }
+            else if (!cam.orthographic)
+            {
+                cam.orthographic = true;
+                if (cam.orthographicSize <= 0) cam.orthographicSize = 5f;
+                Debug.Log("⚙️ Camera ajustada para Orthographic.");
+            }
+
+            // 2. Garantir CinemachineBrain no mesmo GameObject da Camera
+            var brainType = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine");
+            Component brainComponent = null;
+            if (brainType != null)
+            {
+                brainComponent = cam.GetComponent(brainType);
+                if (brainComponent == null)
+                {
+                    // Procura brains órfãos para reaproveitar
+                    var allBrains = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine") != null
+                        ? Object.FindObjectsByType(brainType, FindObjectsSortMode.None)
+                        : null;
+                    if (allBrains != null && allBrains.Length > 0)
+                    {
+                        var orphan = allBrains[0] as Component;
+                        if (orphan.gameObject != cam.gameObject)
+                        {
+                            brainComponent = cam.gameObject.AddComponent(brainType);
+                            Debug.Log("➕ CinemachineBrain movido/criado na Main Camera.");
+                            // Apaga GameObject órfão se estiver vazio (Transform + Brain)
+                            if (orphan.gameObject.GetComponents<Component>().Length == 2)
+                                Object.DestroyImmediate(orphan.gameObject);
+                            else
+                                Object.DestroyImmediate(orphan);
+                        }
+                        else
+                        {
+                            brainComponent = orphan;
+                        }
+                    }
+                }
+                if (brainComponent == null)
+                {
+                    brainComponent = cam.gameObject.AddComponent(brainType);
+                    Debug.Log("➕ CinemachineBrain criado na Main Camera.");
+                }
+            }
+            else
+            {
+                Debug.LogError("❌ CinemachineBrain type não encontrado. Verifique se o pacote Cinemachine está instalado.");
+            }
+
+            // 3. Ajustar CinemachineCamera virtual
+            var vcamType = System.Type.GetType("Unity.Cinemachine.CinemachineCamera, Unity.Cinemachine");
+            Component virtualCam = vcamType != null ? Object.FindFirstObjectByType(vcamType) as Component : null;
+            if (virtualCam == null)
+            {
+                Debug.LogWarning("⚠️ Nenhuma CinemachineCamera encontrada. Crie uma pelo menu Cinemachine.");
+            }
+            else
+            {
+                var vcamGO = virtualCam.gameObject;
+                var strayCam = vcamGO.GetComponent<Camera>();
+                if (strayCam != null)
+                {
+                    // Verifica se há UniversalAdditionalCameraData que depende da Camera
+                    var urpExtra = vcamGO.GetComponent("UnityEngine.Rendering.Universal.UniversalAdditionalCameraData");
+                    if (urpExtra != null)
+                    {
+                        // Em vez de remover, vamos transformar este GO na MainCamera e criar uma nova virtual limpa
+                        Debug.Log("ℹ️ CinemachineCamera possui Camera + URP. Convertendo para Main Camera e criando Virtual dedicada.");
+
+                        // Se ainda não for a Camera principal adotamos como tal
+                        if (Camera.main != strayCam)
+                        {
+                            vcamGO.tag = "MainCamera";
+                            if (!strayCam.orthographic)
+                            {
+                                strayCam.orthographic = true;
+                                if (strayCam.orthographicSize <= 0) strayCam.orthographicSize = 5f;
+                            }
+                        }
+
+                        // Garantir brain neste GO se não estiver (já pode ter sido criado antes)
+                        if (brainType != null && vcamGO.GetComponent(brainType) == null)
+                        {
+                            vcamGO.AddComponent(brainType);
+                            Debug.Log("➕ CinemachineBrain adicionado na Camera convertida.");
+                        }
+
+                        // Criar nova virtual camera container
+                        var newVcamGO = new GameObject("CinemachineCamera_Virtual");
+                        var newVcam = newVcamGO.AddComponent(vcamType) as Component;
+                        Debug.Log("➕ Nova CinemachineCamera virtual criada.");
+
+                        // Migrar possíveis componentes body/composer relevantes
+                        var composerType = System.Type.GetType("Unity.Cinemachine.CinemachinePositionComposer, Unity.Cinemachine");
+                        if (composerType != null && newVcamGO.GetComponent(composerType) == null)
+                        {
+                            newVcamGO.AddComponent(composerType);
+                        }
+
+                        // Ajustar prioridade
+                        var pProp = vcamType.GetProperty("Priority");
+                        if (pProp != null) pProp.SetValue(newVcam, 10);
+
+                        // Desanexar scripts Cinemachine do objeto que agora é somente Camera principal (remover componente antigo virtual)
+                        Object.DestroyImmediate(virtualCam); // remove script CinemachineCamera do GO que virou MainCamera
+                        virtualCam = newVcam; // atualizar referência
+                    }
+                    else
+                    {
+                        // Seguro remover Camera porque não há dependência URP
+                        Object.DestroyImmediate(strayCam);
+                        Debug.Log("🗑️ Camera removida do GameObject da CinemachineCamera.");
+                    }
+                }
+
+                // Ajusta prioridade mínima
+                var priorityProp = vcamType.GetProperty("Priority");
+                if (priorityProp != null)
+                {
+                    int p = (int)priorityProp.GetValue(virtualCam);
+                    if (p < 10)
+                    {
+                        priorityProp.SetValue(virtualCam, 10);
+                        Debug.Log("⚙️ Priority ajustada para 10.");
+                    }
+                }
+                // Garante PositionComposer
+                var composerTypeFinal = System.Type.GetType("Unity.Cinemachine.CinemachinePositionComposer, Unity.Cinemachine");
+                if (composerTypeFinal != null && ((Component)virtualCam).gameObject.GetComponent(composerTypeFinal) == null)
+                {
+                    ((Component)virtualCam).gameObject.AddComponent(composerTypeFinal);
+                    Debug.Log("➕ PositionComposer adicionado.");
+                }
+            }
+
+            Debug.Log("✅ Estrutura normalizada. Revise Depth Of Field / TAA se ainda houver blur.");
+        }
+        #endregion
     }
 }
