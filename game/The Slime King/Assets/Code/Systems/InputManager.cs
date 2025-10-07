@@ -58,15 +58,14 @@ namespace ExtraTools
         #region Context Management
         [Header("Context Settings")]
         [SerializeField] private bool enableUIOnStart = false;
-        [SerializeField] private bool enableGameplayOnStart = false;
-        [SerializeField] private bool enableSystemOnStart = true;
+        [SerializeField] private bool enableGameplayOnStart = false; // Se ambos false, nada habilita até contexto definido
 
         /// <summary>
         /// Estado atual dos mapas de input
         /// </summary>
         public bool IsUIEnabled => inputActions?.UI.enabled ?? false;
         public bool IsGameplayEnabled => inputActions?.Gameplay.enabled ?? false;
-        public bool IsSystemEnabled => inputActions?.System.enabled ?? false;
+        // Mapa System removido: usamos UI para navegação e eventos globais, e Gameplay para ações in-game
         #endregion
 
         #region UI Events
@@ -81,9 +80,6 @@ namespace ExtraTools
 
         /// <summary>Evento disparado quando o mouse se move (Vector2: posição)</summary>
         public event Action<Vector2> OnPoint;
-
-        /// <summary>Evento disparado quando o jogador clica</summary>
-        public event Action OnClick;
         #endregion
 
         #region Gameplay Events
@@ -96,8 +92,6 @@ namespace ExtraTools
         /// <summary>Evento disparado quando o jogador interage (started, performed, canceled)</summary>
         public event Action<InputAction.CallbackContext> OnInteract;
 
-        /// <summary>Evento disparado quando o jogador usa ataque especial</summary>
-        public event Action<InputAction.CallbackContext> OnSpecialAttack;
 
         /// <summary>Evento disparado quando o jogador agacha</summary>
         public event Action<InputAction.CallbackContext> OnCrouch;
@@ -157,7 +151,6 @@ namespace ExtraTools
             inputActions.UI.Submit.performed += ctx => OnSubmit?.Invoke();
             inputActions.UI.Cancel.performed += ctx => OnCancel?.Invoke();
             inputActions.UI.Point.performed += ctx => OnPoint?.Invoke(ctx.ReadValue<Vector2>());
-            inputActions.UI.Click.performed += ctx => OnClick?.Invoke();
         }
 
         private void SetupGameplayCallbacks()
@@ -175,9 +168,6 @@ namespace ExtraTools
             inputActions.Gameplay.Interact.performed += ctx => OnInteract?.Invoke(ctx);
             inputActions.Gameplay.Interact.canceled += ctx => OnInteract?.Invoke(ctx);
 
-            inputActions.Gameplay.SpecialAttack.started += ctx => OnSpecialAttack?.Invoke(ctx);
-            inputActions.Gameplay.SpecialAttack.performed += ctx => OnSpecialAttack?.Invoke(ctx);
-            inputActions.Gameplay.SpecialAttack.canceled += ctx => OnSpecialAttack?.Invoke(ctx);
 
             inputActions.Gameplay.Crouch.started += ctx => OnCrouch?.Invoke(ctx);
             inputActions.Gameplay.Crouch.performed += ctx => OnCrouch?.Invoke(ctx);
@@ -191,11 +181,21 @@ namespace ExtraTools
 
         private void SetupSystemCallbacks()
         {
-            if (inputActions?.System == null) return;
+            // Não existe mais action map System. Reaproveitamos:
+            // Menu  -> Gameplay.Menu ou UI.Cancel como fallback
+            // Inventory -> Gameplay.Inventory
+            // Skip -> UI.Submit / UI.Cancel / Gameplay.Attack (primeiro evento que ocorrer)
 
-            inputActions.System.Menu.performed += ctx => OnMenu?.Invoke();
-            inputActions.System.Inventory.performed += ctx => OnInventory?.Invoke();
-            inputActions.System.Skip.performed += ctx => OnSkip?.Invoke();
+            if (inputActions == null) return;
+
+            // Gameplay bindings (sempre disponíveis se inputActions instanciado)
+            inputActions.Gameplay.Menu.performed += ctx => OnMenu?.Invoke();
+            inputActions.Gameplay.Inventory.performed += ctx => OnInventory?.Invoke();
+            inputActions.Gameplay.Attack.performed += ctx => OnSkip?.Invoke(); // fallback
+
+            // UI bindings para Skip
+            inputActions.UI.Submit.performed += ctx => OnSkip?.Invoke();
+            inputActions.UI.Cancel.performed += ctx => OnSkip?.Invoke();
         }
 
         private void SetInitialMapStates()
@@ -203,12 +203,10 @@ namespace ExtraTools
             // Desabilita todos os mapas inicialmente
             inputActions?.UI.Disable();
             inputActions?.Gameplay.Disable();
-            inputActions?.System.Disable();
 
             // Habilita conforme configuração inicial
             if (enableUIOnStart) EnableUI();
             if (enableGameplayOnStart) EnableGameplay();
-            if (enableSystemOnStart) EnableSystem();
         }
         #endregion
 
@@ -249,23 +247,7 @@ namespace ExtraTools
             Debug.Log("[InputManager] Mapa Gameplay desabilitado");
         }
 
-        /// <summary>
-        /// Habilita o mapa System (ações globais como Menu, Skip)
-        /// </summary>
-        public void EnableSystem()
-        {
-            inputActions?.System.Enable();
-            Debug.Log("[InputManager] Mapa System habilitado");
-        }
-
-        /// <summary>
-        /// Desabilita o mapa System
-        /// </summary>
-        public void DisableSystem()
-        {
-            inputActions?.System.Disable();
-            Debug.Log("[InputManager] Mapa System desabilitado");
-        }
+        // Mapa System removido: funções de Enable/Disable System não são mais necessárias
 
         /// <summary>
         /// Configura mapas para contexto de menu/UI (UI + System ativos)
@@ -274,7 +256,6 @@ namespace ExtraTools
         {
             DisableGameplay();
             EnableUI();
-            EnableSystem();
             Debug.Log("[InputManager] Contexto alterado para Menu");
         }
 
@@ -285,7 +266,6 @@ namespace ExtraTools
         {
             DisableUI();
             EnableGameplay();
-            EnableSystem();
             Debug.Log("[InputManager] Contexto alterado para Gameplay");
         }
 
@@ -294,9 +274,9 @@ namespace ExtraTools
         /// </summary>
         public void SetTitleScreenContext()
         {
-            DisableUI();
+            // Para TitleScreen: habilita apenas UI para permitir Submit/Cancel como Skip
             DisableGameplay();
-            EnableSystem();
+            EnableUI();
             Debug.Log("[InputManager] Contexto alterado para TitleScreen");
         }
 
@@ -307,7 +287,6 @@ namespace ExtraTools
         {
             DisableUI();
             DisableGameplay();
-            DisableSystem();
             Debug.Log("[InputManager] Todos os mapas desabilitados");
         }
         #endregion
@@ -356,7 +335,7 @@ namespace ExtraTools
                 // Log estado dos mapas quando mudam
                 if (Input.GetKeyDown(KeyCode.F1))
                 {
-                    Debug.Log($"[InputManager] Estado dos mapas - UI: {IsUIEnabled}, Gameplay: {IsGameplayEnabled}, System: {IsSystemEnabled}");
+                    Debug.Log($"[InputManager] Estado dos mapas - UI: {IsUIEnabled}, Gameplay: {IsGameplayEnabled}");
                 }
             }
         }

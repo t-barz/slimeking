@@ -120,7 +120,7 @@ namespace ExtraTools
         {
             if (InputManager.Instance == null)
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Prefabs/System/InputManager.prefab");
                 if (prefab != null)
                 {
@@ -136,10 +136,10 @@ namespace ExtraTools
                     GameObject inputManagerGO = new GameObject("InputManager");
                     var inputManager = inputManagerGO.AddComponent<InputManager>();
                 }
-                #else
+#else
                 GameObject inputManagerGO = new GameObject("InputManager");
                 var inputManager = inputManagerGO.AddComponent<InputManager>();
-                #endif
+#endif
 
                 // Configurações básicas para diferentes tipos de cena
                 ConfigureInputManagerForSceneType(InputManager.Instance, setupManager.SceneType);

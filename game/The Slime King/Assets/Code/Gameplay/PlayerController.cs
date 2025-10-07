@@ -295,7 +295,6 @@ public class PlayerController : MonoBehaviour
         // Eventos de ação - apenas performed pois são actions pontuais
         _inputActions.Gameplay.Attack.performed += OnAttackInput;
         _inputActions.Gameplay.Interact.performed += OnInteractInput;
-        _inputActions.Gameplay.SpecialAttack.performed += OnSpecialAttackInput;
 
         // Eventos de esconderijo - tanto performed quanto canceled para controle contínuo
         _inputActions.Gameplay.Crouch.performed += OnCrouchInput;
@@ -321,7 +320,6 @@ public class PlayerController : MonoBehaviour
         // Remove eventos de ação
         _inputActions.Gameplay.Attack.performed -= OnAttackInput;
         _inputActions.Gameplay.Interact.performed -= OnInteractInput;
-        _inputActions.Gameplay.SpecialAttack.performed -= OnSpecialAttackInput;
 
         // Remove eventos de esconderijo
         _inputActions.Gameplay.Crouch.performed -= OnCrouchInput;
@@ -664,10 +662,7 @@ public class PlayerController : MonoBehaviour
     /// • Pode ter animações mais elaboradas
     /// </summary>
     /// <param name="context">Contexto de input do ataque especial</param>
-    private void OnSpecialAttackInput(InputAction.CallbackContext context)
-    {
-
-    }
+    // SpecialAttack removido do asset de input (método excluído)
 
     /// <summary>
     /// Processa input de esconderijo via tecla de Crouch.
