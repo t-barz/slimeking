@@ -11,6 +11,7 @@
 - Sempre utilize as funcionalidades mais recentes do C# e do Unity, evitando práticas obsoletas.
 - Não faça over engineering; implemente apenas o necessário para a funcionalidade atual.
 - Priorize a performance seguida da legibilidade do código, evitando complexidade desnecessária e mantendo uma estrutura clara.
+- O Sorting dos objetos deve ser feito via eixo Y por se tratar de um jogo 2D Top Down.
 - Nunca utilize detecção direta de input, sempre utilize o Input System.
 - Sempre utilize as soluções com melhor performance, evitando soluções que possam impactar negativamente o desempenho do jogo.
 - Utilize o recurso de regiões para organizar o código em seções lógicas, facilitando a navegação e compreensão.
