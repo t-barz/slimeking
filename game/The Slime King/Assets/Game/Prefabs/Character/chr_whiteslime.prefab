@@ -82,7 +82,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       insertIndex: -1
       addedObject: {fileID: -881936651771174391}
+    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3590092579095929788}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+--- !u!1 &1443290089864978481 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3930086621309378627, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2559418920463816962 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 74592756940380528, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
@@ -93,9 +101,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 911473755738892535, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
   m_PrefabInstance: {fileID: 2489892756996440178}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3731915640331621322 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7978252334861413448, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4535151144451779547 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7170302673964078167, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4593836510105678198 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7111898828100931324, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
   m_PrefabInstance: {fileID: 2489892756996440178}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &4770894293968131866 stripped
@@ -364,23 +382,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1cf4dc3ef59f00448b097f18552f8f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
-  acceleration: 10
-  deceleration: 10
-  attackRange: 1
   enemyLayers:
     serializedVersion: 2
     m_Bits: 1
   attackPrefab: {fileID: 764701950184065400, guid: 3854ef1d53461aa4a8bb7b66e70024b8, type: 3}
-  attackDuration: 0.5
   lockMovementDuringAttack: 1
   attackInstantiationOffset: {x: 0, y: -0.15}
-  frontObject: {fileID: 0}
-  backObject: {fileID: 0}
-  sideObject: {fileID: 0}
+  frontObject: {fileID: 4593836510105678198}
+  backObject: {fileID: 1443290089864978481}
+  sideObject: {fileID: 3731915640331621322}
   vfxFrontObject: {fileID: 2559418920463816962}
   vfxBackObject: {fileID: 3326986705294010501}
   vfxSideObject: {fileID: 4535151144451779547}
-  shadowObject: {fileID: 0}
+  shadowObject: {fileID: 8893181554572654189}
   enableLogs: 1
   enableDebugGizmos: 1
+--- !u!114 &3590092579095929788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4770894293968131866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ad3d83eb793d634eb69c1df4e19d642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttributesSystem
+  baseHealthPoints: 10
+  baseAttack: 1
+  baseDefense: 0
+  baseMoveSpeed: 5
+  baseAttackRange: 1
+  baseAttackDuration: 0.5
+  baseAcceleration: 10
+  baseDeceleration: 10
+  enableLogs: 0
+  enableDebugGizmos: 1
+--- !u!1 &8893181554572654189 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -2745210311206455777, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}

@@ -34,32 +34,14 @@ using SlimeMec.Gameplay;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance { get; private set; }
-
-    // ...existing code...
     #region Inspector Configuration
 
-    [Header("⚙️ Configurações de Movimento")]
-    [Tooltip("Velocidade máxima de movimento do jogador (será sobrescrita pelos atributos se PlayerAttributesSystem estiver presente)")]
-    [SerializeField] private float moveSpeed = 5f;
-
-    [Tooltip("Velocidade de aceleração ao iniciar movimento (unidades por segundo)")]
-    [SerializeField] private float acceleration = 10f;
-
-    [Tooltip("Velocidade de desaceleração ao parar movimento (unidades por segundo)")]
-    [SerializeField] private float deceleration = 10f;
-
     [Header("⚔️ Configurações de Combate")]
-    [Tooltip("Raio de detecção de inimigos para o ataque (em unidades do mundo)")]
-    [SerializeField] private float attackRange = 1f;
-
     [Tooltip("Layers que contêm inimigos que podem ser atacados")]
     [SerializeField] private LayerMask enemyLayers;
 
     [Tooltip("Prefab do GameObject que representa o ataque visual")]
     [SerializeField] private GameObject attackPrefab;
-
-    [Tooltip("Duração do ataque em segundos")]
-    [SerializeField] private float attackDuration = 0.5f;
 
     [Tooltip("Se verdadeiro, impede movimento durante ataques")]
     [SerializeField] private bool lockMovementDuringAttack = true;
@@ -374,12 +356,16 @@ public class PlayerController : MonoBehaviour
     {
         if (_attributesHandler != null)
         {
-            float attributeSpeed = _attributesHandler.CurrentSpeed;
-            if (attributeSpeed != moveSpeed)
+            // Todos os atributos de movimento agora vêm do PlayerAttributesSystem
+            if (enableLogs)
             {
-                moveSpeed = attributeSpeed;
-
+                Debug.Log($"[PlayerController] Sincronizando com sistema de atributos. " +
+                         $"Speed: {_attributesHandler.CurrentMoveSpeed:F1}");
             }
+        }
+        else if (enableLogs)
+        {
+            Debug.LogWarning("[PlayerController] PlayerAttributesSystem não encontrado. Usando valores padrão.");
         }
     }
 
@@ -531,7 +517,7 @@ public class PlayerController : MonoBehaviour
         if (_attributesHandler != null)
         {
             Vector3 labelPosition = transform.position + Vector3.up * DEBUG_LABEL_HEIGHT;
-            string debugInfo = $"Speed: {moveSpeed:F1}\n" +
+            string debugInfo = $"Speed: {_attributesHandler.CurrentMoveSpeed:F1}\n" +
                              $"Can Move: {_canMove}\n" +
                              $"Can Attack: {_canAttack}\n" +
                              $"Is Moving: {_isMoving}\n" +
@@ -1004,14 +990,9 @@ public class PlayerController : MonoBehaviour
     {
         if (_attributesHandler != null)
         {
-            float attributeSpeed = _attributesHandler.CurrentSpeed;
-
-            // Só atualiza se houve mudança para evitar processamento desnecessário
-            if (attributeSpeed != moveSpeed)
-            {
-                moveSpeed = attributeSpeed;
-
-            }
+            // O PlayerAttributesSystem já gerencia a velocidade de movimento
+            // Este método agora é principalmente para compatibilidade e debug
+            Debug.Log($"PlayerController sincronizado com PlayerAttributesSystem - MoveSpeed: {_attributesHandler.CurrentMoveSpeed}");
         }
     }
 
@@ -1021,7 +1002,8 @@ public class PlayerController : MonoBehaviour
     /// <returns>Velocidade alvo como Vector2</returns>
     private Vector2 CalculateTargetVelocity()
     {
-        return _moveInput * moveSpeed;
+        float currentMoveSpeed = _attributesHandler != null ? _attributesHandler.CurrentMoveSpeed : 5f;
+        return _moveInput * currentMoveSpeed;
     }
 
     /// <summary>
@@ -1038,7 +1020,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // Escolhe taxa de interpolação baseada se está acelerando ou desacelerando
-        float currentRate = _isMoving ? acceleration : deceleration;
+        float currentAcceleration = _attributesHandler != null ? _attributesHandler.CurrentAcceleration : 10f;
+        float currentDeceleration = _attributesHandler != null ? _attributesHandler.CurrentDeceleration : 10f;
+        float currentRate = _isMoving ? currentAcceleration : currentDeceleration;
 
         // Aplica movimento suave usando MoveTowards para controle preciso
         _rigidbody.linearVelocity = Vector2.MoveTowards(
@@ -1292,7 +1276,8 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Fallback: sistema antigo de detecção (manter compatibilidade)
-            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
+            float currentAttackRange = _attributesHandler != null ? _attributesHandler.CurrentAttackRange : 1f;
+            Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, currentAttackRange, enemyLayers);
 
             // Aplica dano nos inimigos
             foreach (Collider2D enemy in hitEnemies)
@@ -1307,7 +1292,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Aguarda a duração do ataque
-        yield return new WaitForSeconds(attackDuration);
+        yield return new WaitForSeconds(_attributesHandler != null ? _attributesHandler.CurrentAttackDuration : 1f);
 
         // Destrói o GameObject de ataque após a duração
         if (attackInstance != null)

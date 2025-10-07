@@ -15,7 +15,15 @@ public class PlayerAttributesSystem : MonoBehaviour
     [SerializeField] private int baseHealthPoints = 10;
     [SerializeField] private int baseAttack = 1;
     [SerializeField] private int baseDefense = 0;
-    [SerializeField] private int baseSpeed = 2;
+    [SerializeField] private float baseMoveSpeed = 5f;
+
+    [Header("Configurações de Combate")]
+    [SerializeField] private float baseAttackRange = 1f;
+    [SerializeField] private float baseAttackDuration = 0.5f;
+
+    [Header("Configurações de Movimento")]
+    [SerializeField] private float baseAcceleration = 10f;
+    [SerializeField] private float baseDeceleration = 10f;
 
     [Header("Configurações de Debug")]
     [SerializeField] private bool enableLogs = false;
@@ -28,7 +36,11 @@ public class PlayerAttributesSystem : MonoBehaviour
     private int _currentHealthPoints;
     private int _currentAttack;
     private int _currentDefense;
-    private int _currentSpeed;
+    private float _currentMoveSpeed;
+    private float _currentAttackRange;
+    private float _currentAttackDuration;
+    private float _currentAcceleration;
+    private float _currentDeceleration;
     private int _totalSkillPoints;
     private int _currentSkillPoints;
 
@@ -106,19 +118,91 @@ public class PlayerAttributesSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Velocidade atual do jogador.
+    /// Velocidade de movimento atual do jogador.
     /// </summary>
-    public int CurrentSpeed
+    public float CurrentMoveSpeed
     {
-        get => baseSpeed;
+        get => _currentMoveSpeed;
         set
         {
-            int oldValue = _currentSpeed;
-            _currentSpeed = Mathf.Max(0, value);
+            float oldValue = _currentMoveSpeed;
+            _currentMoveSpeed = Mathf.Max(0, value);
 
-            if (enableLogs && oldValue != _currentSpeed)
+            if (enableLogs && !Mathf.Approximately(oldValue, _currentMoveSpeed))
             {
-                Debug.Log($"[PlayerAttributes] Speed alterado: {oldValue} → {_currentSpeed}");
+                Debug.Log($"[PlayerAttributes] Move Speed alterado: {oldValue:F2} → {_currentMoveSpeed:F2}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Alcance de ataque atual do jogador.
+    /// </summary>
+    public float CurrentAttackRange
+    {
+        get => _currentAttackRange;
+        set
+        {
+            float oldValue = _currentAttackRange;
+            _currentAttackRange = Mathf.Max(0, value);
+
+            if (enableLogs && !Mathf.Approximately(oldValue, _currentAttackRange))
+            {
+                Debug.Log($"[PlayerAttributes] Attack Range alterado: {oldValue:F2} → {_currentAttackRange:F2}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Duração do ataque atual do jogador.
+    /// </summary>
+    public float CurrentAttackDuration
+    {
+        get => _currentAttackDuration;
+        set
+        {
+            float oldValue = _currentAttackDuration;
+            _currentAttackDuration = Mathf.Max(0.1f, value);
+
+            if (enableLogs && !Mathf.Approximately(oldValue, _currentAttackDuration))
+            {
+                Debug.Log($"[PlayerAttributes] Attack Duration alterado: {oldValue:F2} → {_currentAttackDuration:F2}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Aceleração atual do jogador.
+    /// </summary>
+    public float CurrentAcceleration
+    {
+        get => _currentAcceleration;
+        set
+        {
+            float oldValue = _currentAcceleration;
+            _currentAcceleration = Mathf.Max(0, value);
+
+            if (enableLogs && !Mathf.Approximately(oldValue, _currentAcceleration))
+            {
+                Debug.Log($"[PlayerAttributes] Acceleration alterado: {oldValue:F2} → {_currentAcceleration:F2}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Desaceleração atual do jogador.
+    /// </summary>
+    public float CurrentDeceleration
+    {
+        get => _currentDeceleration;
+        set
+        {
+            float oldValue = _currentDeceleration;
+            _currentDeceleration = Mathf.Max(0, value);
+
+            if (enableLogs && !Mathf.Approximately(oldValue, _currentDeceleration))
+            {
+                Debug.Log($"[PlayerAttributes] Deceleration alterado: {oldValue:F2} → {_currentDeceleration:F2}");
             }
         }
     }
@@ -214,7 +298,7 @@ public class PlayerAttributesSystem : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.Handles.Label(position, $"HP: {CurrentHealthPoints}/{MaxHealthPoints}\n" +
                                            $"ATK: {CurrentAttack} | DEF: {CurrentDefense}\n" +
-                                           $"SPD: {CurrentSpeed} | SP: {CurrentSkillPoints}/{TotalSkillPoints}");
+                                           $"SPD: {CurrentMoveSpeed:F1} | SP: {CurrentSkillPoints}/{TotalSkillPoints}");
 #endif
     }
 
@@ -336,7 +420,7 @@ public class PlayerAttributesSystem : MonoBehaviour
     {
         return $"HP: {CurrentHealthPoints}/{MaxHealthPoints} | " +
                $"ATK: {CurrentAttack} | DEF: {CurrentDefense} | " +
-               $"SPD: {CurrentSpeed} | SP: {CurrentSkillPoints}/{TotalSkillPoints}";
+               $"SPD: {CurrentMoveSpeed:F1} | SP: {CurrentSkillPoints}/{TotalSkillPoints}";
     }
 
     #endregion
@@ -351,7 +435,11 @@ public class PlayerAttributesSystem : MonoBehaviour
         _currentHealthPoints = baseHealthPoints;
         _currentAttack = baseAttack;
         _currentDefense = baseDefense;
-        _currentSpeed = baseSpeed;
+        _currentMoveSpeed = baseMoveSpeed;
+        _currentAttackRange = baseAttackRange;
+        _currentAttackDuration = baseAttackDuration;
+        _currentAcceleration = baseAcceleration;
+        _currentDeceleration = baseDeceleration;
         _totalSkillPoints = 0;
         _currentSkillPoints = 0;
 
