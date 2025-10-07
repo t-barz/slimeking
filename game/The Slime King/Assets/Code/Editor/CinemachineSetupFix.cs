@@ -53,58 +53,65 @@ namespace ExtraTools
         #region Main Camera Setup
 
         /// <summary>
-        /// Garante que existe uma Main Camera com o componente Camera necessário.
+        /// Garante que existe uma câmera ativa utilizável. Não exige mais a tag MainCamera, pois a cena atual
+        /// usa um GameObject dedicado "CinemachineCamera" contendo tanto a Camera quanto a CinemachineCamera.
+        /// Mantemos comportamento não destrutivo: apenas adicionamos Camera se faltar.
         /// </summary>
         private static bool EnsureMainCameraWithCameraComponent()
         {
-            Debug.Log("🔍 Verificando Main Camera...");
+            Debug.Log("🔍 Verificando câmera principal utilizável...");
 
-            // Busca por câmera com tag MainCamera
-            Camera mainCamera = Camera.main;
-            GameObject mainCameraGO = null;
+            // Primeiro tenta a Camera.main (respeita se existir tag MainCamera configurada).
+            Camera mainCam = Camera.main;
 
-            if (mainCamera != null)
+            // Se não houver Camera.main, tentamos localizar uma Camera que coexist a com CinemachineCamera.
+            if (mainCam == null)
             {
-                mainCameraGO = mainCamera.gameObject;
-                Debug.Log($"✅ Main Camera encontrada: {mainCameraGO.name}");
-            }
-            else
-            {
-                // Busca por GameObject com tag MainCamera
-                GameObject taggedCamera = GameObject.FindWithTag("MainCamera");
-                if (taggedCamera != null)
+                var unityCinemachineCamType = System.Type.GetType("Unity.Cinemachine.CinemachineCamera, Unity.Cinemachine");
+                if (unityCinemachineCamType != null)
                 {
-                    mainCameraGO = taggedCamera;
-                    Debug.Log($"📍 GameObject com tag MainCamera encontrado: {mainCameraGO.name}");
-
-                    // Adiciona componente Camera se não existir
-                    Camera cameraComponent = mainCameraGO.GetComponent<Camera>();
-                    if (cameraComponent == null)
+                    // Procura qualquer CinemachineCamera e verifica se o mesmo GO tem Camera.
+                    Object anyCine = Object.FindFirstObjectByType(unityCinemachineCamType);
+                    if (anyCine != null)
                     {
-                        cameraComponent = mainCameraGO.AddComponent<Camera>();
-                        Debug.Log("➕ Componente Camera adicionado à Main Camera");
+                        var go = ((Component)anyCine).gameObject;
+                        mainCam = go.GetComponent<Camera>();
+                        if (mainCam != null)
+                        {
+                            Debug.Log($"✅ Usando câmera encontrada junto à CinemachineCamera: {go.name}");
+                        }
                     }
                 }
-                else
+            }
+
+            // Se ainda não encontramos, escolhemos a primeira Camera da cena.
+            if (mainCam == null)
+            {
+                mainCam = Object.FindFirstObjectByType<Camera>();
+                if (mainCam != null)
                 {
-                    Debug.LogError("❌ Nenhuma Main Camera encontrada na cena. Crie um GameObject com tag 'MainCamera' primeiro.");
-                    return false;
+                    Debug.Log($"✅ Usando primeira Camera encontrada na cena: {mainCam.gameObject.name}");
                 }
             }
 
-            // Configura propriedades básicas da câmera para 2D
-            Camera cam = mainCameraGO.GetComponent<Camera>();
-            if (cam != null)
+            // Se continuamos sem camera, criamos uma mínima.
+            if (mainCam == null)
             {
-                cam.orthographic = true;
-                cam.orthographicSize = 5f;
-                cam.backgroundColor = Color.black;
-                cam.clearFlags = CameraClearFlags.SolidColor;
-
-                Debug.Log("⚙️ Camera configurada para modo ortográfico 2D");
+                GameObject go = new GameObject("MainCamera_Auto");
+                mainCam = go.AddComponent<Camera>();
+                go.tag = "MainCamera"; // Fornece tag para futuras detecções
+                Debug.Log("➕ Camera criada automaticamente (MainCamera_Auto)");
             }
 
-            return true;
+            // Ajuste leve sem forçar estilo (evita sobrescrever intencional): só garantimos ortographic se ainda estiver perspective em projeto 2D.
+            if (!mainCam.orthographic)
+            {
+                mainCam.orthographic = true;
+                mainCam.orthographicSize = Mathf.Clamp(mainCam.orthographicSize <= 0 ? 5f : mainCam.orthographicSize, 1f, 50f);
+                Debug.Log("⚙️ Camera ajustada para modo ortográfico (2D)");
+            }
+
+            return mainCam != null;
         }
 
         #endregion
@@ -112,63 +119,50 @@ namespace ExtraTools
         #region CinemachineBrain Fix
 
         /// <summary>
-        /// Corrige o posicionamento do CinemachineBrain e suas configurações.
-        /// O CinemachineBrain deve estar no mesmo GameObject da Main Camera, não como filho.
+        /// Garante que existe um CinemachineBrain ativo. Aceita tanto:
+        /// 1) Brain no mesmo GameObject da Camera (padrão clássico)
+        /// 2) Brain isolado em GameObject dedicado (estado atual da cena)
+        /// Não destrói a estrutura existente; apenas configura se necessário.
         /// </summary>
         private static bool FixCinemachineBrainPosition()
         {
-            Debug.Log("🔍 Verificando posicionamento do CinemachineBrain...");
+            Debug.Log("🔍 Verificando CinemachineBrain...");
 
-            GameObject mainCameraGO = Camera.main?.gameObject ?? GameObject.FindWithTag("MainCamera");
-            if (mainCameraGO == null)
-            {
-                Debug.LogError("❌ Main Camera não encontrada para configurar CinemachineBrain");
-                return false;
-            }
-
-            // Busca por CinemachineBrain existente
             var cinemachineBrainType = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine");
             if (cinemachineBrainType == null)
             {
-                Debug.LogError("❌ Cinemachine não está instalado ou não foi encontrado");
+                Debug.LogError("❌ Pacote Cinemachine não encontrado.");
                 return false;
             }
 
-            Component brainComponent = mainCameraGO.GetComponent(cinemachineBrainType);
+            Component brainComponent = Object.FindFirstObjectByType(cinemachineBrainType) as Component;
 
-            // Busca por CinemachineBrain em objetos filhos (configuração incorreta)
-            Component childBrain = mainCameraGO.GetComponentInChildren(cinemachineBrainType);
-
-            if (childBrain != null && childBrain.gameObject != mainCameraGO)
-            {
-                Debug.Log("🔄 CinemachineBrain encontrado como filho - movendo para Main Camera...");
-
-                // Remove o GameObject filho com CinemachineBrain
-                Object.DestroyImmediate(childBrain.gameObject);
-                Debug.Log("🗑️ GameObject filho com CinemachineBrain removido");
-
-                // Força brainComponent a ser null para recriar no local correto
-                brainComponent = null;
-            }
-
-            // Adiciona CinemachineBrain à Main Camera se não existir
+            // Se não existir, tentamos adicionar na Camera principal detectada.
             if (brainComponent == null)
             {
+                Camera cam = Camera.main ?? Object.FindFirstObjectByType<Camera>();
+                if (cam == null)
+                {
+                    Debug.LogError("❌ Nenhuma Camera disponível para adicionar CinemachineBrain.");
+                    return false;
+                }
                 try
                 {
-                    brainComponent = mainCameraGO.AddComponent(cinemachineBrainType);
-                    Debug.Log("➕ CinemachineBrain adicionado à Main Camera");
+                    brainComponent = cam.gameObject.AddComponent(cinemachineBrainType);
+                    Debug.Log("➕ CinemachineBrain criado na câmera ativa.");
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"❌ Erro ao adicionar CinemachineBrain: {e.Message}");
+                    Debug.LogError($"❌ Falha ao adicionar CinemachineBrain: {e.Message}");
                     return false;
                 }
             }
+            else
+            {
+                Debug.Log($"✅ CinemachineBrain existente preservado em: {brainComponent.gameObject.name}");
+            }
 
-            // Configura propriedades do CinemachineBrain usando reflection
             ConfigureCinemachineBrain(brainComponent);
-
             return true;
         }
 
@@ -223,48 +217,74 @@ namespace ExtraTools
         /// </summary>
         private static bool ConfigureCinemachineCamera()
         {
-            Debug.Log("🔍 Configurando CinemachineCamera...");
+            Debug.Log("🔍 Verificando CinemachineCamera existente...");
 
             var cinemachineCameraType = System.Type.GetType("Unity.Cinemachine.CinemachineCamera, Unity.Cinemachine");
             if (cinemachineCameraType == null)
             {
-                Debug.LogError("❌ CinemachineCamera não encontrada");
+                Debug.LogWarning("⚠️ Pacote Cinemachine ausente ou tipo não resolvido. Pulando configuração de virtual camera.");
                 return false;
             }
 
-            // Busca por CinemachineCamera na cena
-            Component cinemachineCamera = Object.FindFirstObjectByType(cinemachineCameraType) as Component;
-
-            if (cinemachineCamera == null)
+            Component cineCam = Object.FindFirstObjectByType(cinemachineCameraType) as Component;
+            if (cineCam == null)
             {
-                Debug.LogError("❌ Nenhuma CinemachineCamera encontrada na cena. Adicione uma CinemachineCamera primeiro.");
+                Debug.LogWarning("⚠️ Nenhuma CinemachineCamera encontrada. Nada a configurar.");
                 return false;
             }
 
             try
             {
-                var cameraType = cinemachineCamera.GetType();
+                var camType = cineCam.GetType();
 
-                // Configura Priority
-                var priorityProperty = cameraType.GetProperty("Priority");
-                if (priorityProperty != null)
+                // PRIORITY: só define se estiver em zero (valor padrão) para não sobrescrever ajustes do designer
+                var priorityProp = camType.GetProperty("Priority");
+                if (priorityProp != null)
                 {
-                    priorityProperty.SetValue(cinemachineCamera, 10);
+                    int currentPriority = (int)priorityProp.GetValue(cineCam);
+                    if (currentPriority <= 0)
+                    {
+                        priorityProp.SetValue(cineCam, 10);
+                        Debug.Log("⚙️ Priority ajustada para 10");
+                    }
                 }
 
-                // Configura Output Channel
-                var outputChannelField = cameraType.GetField("OutputChannel");
-                if (outputChannelField != null)
+                // OUTPUT CHANNEL: define 0 apenas se for inválido (<0)
+                var outputField = camType.GetField("OutputChannel");
+                if (outputField != null)
                 {
-                    outputChannelField.SetValue(cinemachineCamera, 0); // Channel 0
+                    int currentChannel = (int)outputField.GetValue(cineCam);
+                    if (currentChannel < 0)
+                    {
+                        outputField.SetValue(cineCam, 0);
+                        Debug.Log("⚙️ OutputChannel definido para 0 (Default)");
+                    }
                 }
 
-                Debug.Log($"⚙️ CinemachineCamera configurada: {cinemachineCamera.gameObject.name}");
+                // POSITION COMPOSER: se existir, podemos ajustar dead zones mínimas apenas se estiverem negativas (estado inválido).
+                var positionComposerType = System.Type.GetType("Unity.Cinemachine.CinemachinePositionComposer, Unity.Cinemachine");
+                if (positionComposerType != null)
+                {
+                    var composer = ((Component)cineCam).GetComponent(positionComposerType);
+                    if (composer != null)
+                    {
+                        SerializedObject so = new SerializedObject(composer);
+                        var deadZoneDepth = so.FindProperty("DeadZoneDepth");
+                        if (deadZoneDepth != null && deadZoneDepth.floatValue < 0f)
+                        {
+                            deadZoneDepth.floatValue = 0f;
+                            so.ApplyModifiedProperties();
+                            Debug.Log("⚙️ DeadZoneDepth corrigido para 0");
+                        }
+                    }
+                }
+
+                Debug.Log($"✅ CinemachineCamera validada: {cineCam.gameObject.name}");
                 return true;
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Erro ao configurar CinemachineCamera: {e.Message}");
+                Debug.LogWarning($"⚠️ Ajustes parciais na CinemachineCamera: {e.Message}");
                 return false;
             }
         }
@@ -344,31 +364,30 @@ namespace ExtraTools
 
             bool isValid = true;
 
-            // Verifica Main Camera
-            Camera mainCamera = Camera.main;
-            if (mainCamera == null)
+            // Detecta câmera principal de forma flexível
+            Camera mainCamera = Camera.main ?? Object.FindFirstObjectByType<Camera>();
+            if (mainCamera != null)
             {
-                Debug.LogError("❌ Main Camera não encontrada");
-                isValid = false;
+                Debug.Log($"✅ Camera ativa detectada: {mainCamera.gameObject.name}");
             }
             else
             {
-                Debug.Log($"✅ Main Camera: {mainCamera.gameObject.name}");
+                Debug.LogError("❌ Nenhuma Camera ativa encontrada.");
+                isValid = false;
+            }
 
-                // Verifica CinemachineBrain
-                var brainType = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine");
-                if (brainType != null)
+            // Verifica CinemachineBrain em qualquer lugar da cena
+            var brainType = System.Type.GetType("Unity.Cinemachine.CinemachineBrain, Unity.Cinemachine");
+            if (brainType != null)
+            {
+                Component brain = Object.FindFirstObjectByType(brainType) as Component;
+                if (brain != null)
                 {
-                    Component brain = mainCamera.GetComponent(brainType);
-                    if (brain != null)
-                    {
-                        Debug.Log("✅ CinemachineBrain presente na Main Camera");
-                    }
-                    else
-                    {
-                        Debug.LogError("❌ CinemachineBrain não encontrado na Main Camera");
-                        isValid = false;
-                    }
+                    Debug.Log($"✅ CinemachineBrain presente em: {brain.gameObject.name}");
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ Nenhum CinemachineBrain encontrado. A Cinemachine não controlará a câmera.");
                 }
             }
 
@@ -379,12 +398,11 @@ namespace ExtraTools
                 Component cinemachineCamera = Object.FindFirstObjectByType(cameraType) as Component;
                 if (cinemachineCamera != null)
                 {
-                    Debug.Log($"✅ CinemachineCamera: {cinemachineCamera.gameObject.name}");
+                    Debug.Log($"✅ CinemachineCamera detectada: {cinemachineCamera.gameObject.name}");
                 }
                 else
                 {
-                    Debug.LogError("❌ CinemachineCamera não encontrada na cena");
-                    isValid = false;
+                    Debug.LogWarning("⚠️ Nenhuma CinemachineCamera encontrada. A câmera ficará estática.");
                 }
             }
 
