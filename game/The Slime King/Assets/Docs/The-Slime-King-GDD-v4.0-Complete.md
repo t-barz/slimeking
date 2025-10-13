@@ -4,7 +4,7 @@
 
 ### 1.1 Conceito Central
 
-**The Slime King** é um RPG de aventura 2D top-down em pixel art, com exploração, quebra-cabeças e personalização. O jogador controla um slime branco recém-nascido, que evolui até se tornar o lendário Rei Slime em um mundo de fantasia habitado por criaturas únicas das Montanhas Cristalinas.
+**The Slime King** é um RPG de aventura 2D top-down em pixel art de mundo aberto, com exploração, quebra-cabeças e personalização. O jogador controla um slime branco recém-nascido, que evolui até se tornar o lendário Rei Slime em um mundo de fantasia habitado por criaturas únicas das Montanhas Cristalinas.
 
 ### 1.2 Premissa Narrativa
 
