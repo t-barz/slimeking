@@ -19,21 +19,21 @@ Este roadmap centraliza **TODAS** as tarefas de desenvolvimento do projeto, orga
 
 **1.1 GameManager Implementation**
 
-- [ ] **Criar classe base ManagerSingleton<T>**
-  - Padrão singleton com DontDestroyOnLoad
-  - Sistema de logs opcional por manager
-  - Template base para outros managers
+- [x] **Criar classe base ManagerSingleton<T>**
+  - ✅ Padrão singleton com DontDestroyOnLoad
+  - ✅ Sistema de logs opcional por manager
+  - ✅ Template base para outros managers
   
-- [ ] **Implementar GameManager completo**
-  - Sistema de estados (Playing, Paused, MainMenu, Loading, Settings)
-  - Sistema temporal (dia/noite, estações, clima)
-  - Coordenação de evolução do slime
-  - Eventos globais de comunicação
+- [x] **Implementar GameManager completo**
+  - ✅ Sistema de estados (Playing, Paused, MainMenu, Loading, Settings)
+  - ✅ Sistema temporal (dia/noite, estações, clima)
+  - ✅ Coordenação de evolução do slime
+  - ✅ Eventos globais de comunicação
   
-- [ ] **Criar enums e estruturas de dados**
-  - GameState, SlimeStage, Season, WeatherType
-  - ElementType, BiomeType
-  - Estruturas de dados para progressão
+- [x] **Criar enums e estruturas de dados**
+  - ✅ GameState, SlimeStage, Season, WeatherType
+  - ✅ ElementType, BiomeType, TimeOfDay
+  - ✅ Sistema de eventos GameEvents
 
 **1.2 AudioManager Implementation**
 
@@ -69,6 +69,20 @@ Este roadmap centraliza **TODAS** as tarefas de desenvolvimento do projeto, orga
   - Salvamento automático configurável
   - Pontos de checkpoint importantes
   - Indicador visual de salvamento
+
+**1.4 SceneTransitionManager Implementation** ✅ **CONCLUÍDO**
+
+- [x] **Sistema de Transições de Cena**
+  - ✅ SceneTransitionManager como Singleton
+  - ✅ Efeito CellularEffect para transições
+  - ✅ Carregamento assíncrono de cenas
+  - ✅ Sistema de fallback para segurança
+  
+- [x] **Integração com TitleScreen**
+  - ✅ TitleScreenController atualizado
+  - ✅ Transição TitleScreen → InitialCave
+  - ✅ Configuração via Inspector
+  - ✅ Logs de debug implementados
 
 ---
 
@@ -177,7 +191,8 @@ Este roadmap centraliza **TODAS** as tarefas de desenvolvimento do projeto, orga
 | **Componente** | **Status** | **Prioridade** | **Estimativa** |
 |----------------|------------|----------------|----------------|
 | **Arquitetura Core** | ✅ Planejado | 🔴 Crítica | 1 semana |
-| **GameManager** | 🔨 Próximo | 🔴 Crítica | 2 dias |
+| **GameManager** | ✅ Concluído | 🔴 Crítica | 2 dias |
+| **SceneTransitionManager** | ✅ Concluído | 🟡 Alta | 1 dia |
 | **AudioManager** | ⏳ Pendente | 🟡 Alta | 1 dia |
 | **SaveManager** | ⏳ Pendente | 🟡 Alta | 1 dia |
 | **NestController** | ⏳ Pendente | 🟡 Alta | 2 dias |
@@ -189,10 +204,11 @@ Este roadmap centraliza **TODAS** as tarefas de desenvolvimento do projeto, orga
 
 ## 🎯 **PRÓXIMOS PASSOS IMEDIATOS**
 
-1. **[AGORA]** Implementar classe base `ManagerSingleton<T>`
-2. **[HOJE]** Criar e testar `GameManager` completo
-3. **[AMANHÃ]** Implementar `AudioManager` e `SaveManager`
-4. **[ESTA SEMANA]** Criar `NestController` para tutorial
-5. **[PRÓXIMA SEMANA]** Implementar `ForestController` e sistema de criaturas
+1. **[CONCLUÍDO]** ✅ Implementar classe base `ManagerSingleton<T>`
+2. **[CONCLUÍDO]** ✅ Criar e testar `GameManager` completo
+3. **[CONCLUÍDO]** ✅ Implementar `SceneTransitionManager` com efeito cellular
+4. **[PRÓXIMO]** Implementar `AudioManager` e `SaveManager`
+5. **[ESTA SEMANA]** Criar `NestController` para tutorial
+6. **[PRÓXIMA SEMANA]** Implementar `ForestController` e sistema de criaturas
 
 ---

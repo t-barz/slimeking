@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using PixeLadder.EasyTransition;
 
 /// <summary>
 /// Controller específico para a tela inicial, gerencia a sequência de apresentação
@@ -53,7 +55,6 @@ public class TitleScreenController : MonoBehaviour
     [SerializeField] private float logoMoveUpDistance = 10f;
     [SerializeField] private float logoMoveDownDistance = 15f;
     [SerializeField] private float logoMoveDuration = 1.5f;
-    [SerializeField] private float logoPauseTime = 0.5f;
     #endregion
 
     #region Audio
@@ -63,7 +64,8 @@ public class TitleScreenController : MonoBehaviour
 
     #region Scene Transition
     [Header("Scene Transition")]
-    [SerializeField] private string gameSceneName = "GameScene";
+    [SerializeField] private string gameSceneName = "InitialCave";
+    [SerializeField] private TransitionEffect cellularTransitionEffect;
     #endregion
 
     #region Debug
@@ -405,57 +407,29 @@ public class TitleScreenController : MonoBehaviour
     }
 
     /// <summary>
-    /// Loop contínuo da animação ping pong do logo
+    /// Loop contínuo da animação ping pong do logo usando movimento senoidal suave
     /// </summary>
     private IEnumerator GameLogoAnimationLoop()
     {
         if (gameLogo == null) yield break;
 
+        float time = 0f;
+        float frequency = 1f / logoMoveDuration; // Frequência baseada na duração configurada
+        float amplitude = (logoMoveUpDistance + logoMoveDownDistance) * 0.5f; // Amplitude média
+
         while (true)
         {
-            // Move para cima
-            yield return StartCoroutine(MoveGameLogoTo(gameLogoOriginalPosition + Vector3.up * logoMoveUpDistance, logoMoveDuration * 0.5f));
+            time += Time.deltaTime;
 
-            // Pausa no topo
-            yield return new WaitForSeconds(logoPauseTime);
+            // Usa função senoidal para movimento suave e contínuo
+            float yOffset = Mathf.Sin(time * frequency * 2f * Mathf.PI) * amplitude;
 
-            // Move para baixo (abaixo da posição original)
-            yield return StartCoroutine(MoveGameLogoTo(gameLogoOriginalPosition - Vector3.up * logoMoveDownDistance, logoMoveDuration));
+            // Aplica o offset à posição original
+            Vector3 newPosition = gameLogoOriginalPosition + Vector3.up * yOffset;
+            gameLogo.transform.localPosition = newPosition;
 
-            // Pausa em baixo
-            yield return new WaitForSeconds(logoPauseTime);
-
-            // Retorna para a posição original
-            yield return StartCoroutine(MoveGameLogoTo(gameLogoOriginalPosition, logoMoveDuration * 0.5f));
-
-            // Pausa antes de repetir
-            yield return new WaitForSeconds(logoPauseTime);
-        }
-    }
-
-    /// <summary>
-    /// Move o logo do jogo suavemente para uma posição específica
-    /// </summary>
-    private IEnumerator MoveGameLogoTo(Vector3 targetPosition, float duration)
-    {
-        if (gameLogo == null) yield break;
-
-        Vector3 startPosition = gameLogo.transform.localPosition;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / duration;
-
-            // Usa ease in-out para movimento mais suave
-            float smoothProgress = Mathf.SmoothStep(0f, 1f, progress);
-
-            gameLogo.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, smoothProgress);
             yield return null;
         }
-
-        gameLogo.transform.localPosition = targetPosition;
     }
 
     #endregion
@@ -524,14 +498,22 @@ public class TitleScreenController : MonoBehaviour
     }
 
     /// <summary>
-    /// Inicia o jogo principal
+    /// Inicia o jogo principal usando Easy Transition com efeito cellular
     /// </summary>
     private void StartGame()
     {
-        Log("Starting game - Loading next scene");
+        Log("Starting game with Easy Transition cellular effect");
 
-        // Carrega a próxima cena
-        UnityEngine.SceneManagement.SceneManager.LoadScene(gameSceneName);
+        // Usa o Easy Transition para fazer a transição com efeito cellular
+        if (SceneTransitioner.Instance != null)
+        {
+            SceneTransitioner.Instance.LoadScene(gameSceneName, cellularTransitionEffect);
+        }
+        else
+        {
+            Log("SceneTransitioner instance not found, loading scene directly");
+            SceneManager.LoadScene(gameSceneName);
+        }
     }
 
     #endregion
