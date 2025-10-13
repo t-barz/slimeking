@@ -19,6 +19,13 @@ namespace SlimeKing.Gameplay.UI
         [SerializeField] private GameObject companySmallLogo;  // ui_wssmalllogo
         [SerializeField] private GameObject pressStart;        // ui_pressstart
 
+        [Header("Input UI Elements")]
+        [SerializeField] private GameObject inputKeyboard;     // ui_keyboard
+        [SerializeField] private GameObject inputGamepad;      // ui_gamepad
+        [SerializeField] private GameObject inputXbox;         // ui_xbox
+        [SerializeField] private GameObject inputPlaystation;  // ui_playstation
+        [SerializeField] private GameObject inputSwitch;       // ui_switch
+
         [Header("Sequence Settings")]
         [SerializeField] private float musicStartDelay = 1f;
         [SerializeField] private float companyLogoVisibleTime = 4f;
@@ -44,6 +51,8 @@ namespace SlimeKing.Gameplay.UI
         private bool canSkip = false;
         private bool hasSkipped = false;
         private bool inputReceived = false;
+        private GameObject currentInputUI = null;
+        private SlimeKing.Systems.InputType lastKnownInputType;
 
         #region Unity Lifecycle
 
@@ -53,10 +62,49 @@ namespace SlimeKing.Gameplay.UI
             StartSequence();
         }
 
+        private void InitializeInputUI()
+        {
+            // Desativa todos os input UIs inicialmente (SetActive evita interferência com fade)
+            if (inputKeyboard != null) inputKeyboard.SetActive(false);
+            if (inputXbox != null) inputXbox.SetActive(false);
+            if (inputPlaystation != null) inputPlaystation.SetActive(false);
+            if (inputSwitch != null) inputSwitch.SetActive(false);
+            if (inputGamepad != null) inputGamepad.SetActive(false);
+
+            // Reseta o currentInputUI para forçar atualização
+            currentInputUI = null;
+
+            // Inicializa o tipo de input atual
+            if (SlimeKing.Systems.InputManager.Instance != null)
+            {
+                lastKnownInputType = SlimeKing.Systems.InputManager.Instance.CurrentInputType;
+            }
+            else
+            {
+                lastKnownInputType = SlimeKing.Systems.InputType.Keyboard; // Fallback
+            }
+
+            // Mostra o input UI correto
+            UpdateInputUI();
+
+            Log($"Input UI initialized with type: {lastKnownInputType}");
+        }
+
         private void Update()
         {
             // Checa input usando Input System
             CheckForAnyInput();
+
+            // Atualiza UI do input atual apenas se o tipo mudou
+            if (SlimeKing.Systems.InputManager.Instance != null)
+            {
+                var currentInputType = SlimeKing.Systems.InputManager.Instance.CurrentInputType;
+                if (currentInputType != lastKnownInputType)
+                {
+                    lastKnownInputType = currentInputType;
+                    UpdateInputUI();
+                }
+            }
 
             if (inputReceived)
             {
@@ -77,15 +125,6 @@ namespace SlimeKing.Gameplay.UI
                 return;
             }
 
-            if (Mouse.current != null &&
-                (Mouse.current.leftButton.wasPressedThisFrame ||
-                 Mouse.current.rightButton.wasPressedThisFrame ||
-                 Mouse.current.middleButton.wasPressedThisFrame))
-            {
-                inputReceived = true;
-                return;
-            }
-
             // Verifica gamepads conectados
             if (Gamepad.current != null)
             {
@@ -98,6 +137,64 @@ namespace SlimeKing.Gameplay.UI
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Atualiza a UI do input baseado no dispositivo atual
+        /// Usa SetActive() para evitar interferência com sistema de fade
+        /// </summary>
+        private void UpdateInputUI()
+        {
+            // Permite inicialização mesmo antes do menu estar pronto
+            if (currentState != TitleScreenState.MenuReady && currentInputUI != null)
+                return;
+
+            GameObject targetInputUI = GetCurrentInputUI();
+
+            if (currentInputUI != targetInputUI)
+            {
+                // Desativa o UI anterior
+                if (currentInputUI != null)
+                {
+                    currentInputUI.SetActive(false);
+                }
+
+                // Ativa o novo UI
+                currentInputUI = targetInputUI;
+                if (currentInputUI != null)
+                {
+                    currentInputUI.SetActive(true);
+                }
+
+                Log($"Switched input UI to: {currentInputUI?.name ?? "none"}");
+            }
+        }
+
+        /// <summary>
+        /// Detecta o tipo de input atual e retorna o GameObject correspondente
+        /// </summary>
+        private GameObject GetCurrentInputUI()
+        {
+            // Verifica se há InputManager disponível
+            if (SlimeKing.Systems.InputManager.Instance == null)
+            {
+                Log("InputManager not available, using keyboard fallback");
+                return inputKeyboard; // Fallback para keyboard
+            }
+
+            // Pega o tipo de input atual do InputManager
+            var inputType = SlimeKing.Systems.InputManager.Instance.CurrentInputType;
+            Log($"Current input type from InputManager: {inputType}");
+
+            return inputType switch
+            {
+                SlimeKing.Systems.InputType.Keyboard => inputKeyboard,
+                SlimeKing.Systems.InputType.Xbox => inputXbox,
+                SlimeKing.Systems.InputType.PlayStation => inputPlaystation,
+                SlimeKing.Systems.InputType.Switch => inputSwitch,
+                SlimeKing.Systems.InputType.Gamepad => inputGamepad,
+                _ => inputKeyboard // Fallback
+            };
         }
 
         #endregion
@@ -117,6 +214,13 @@ namespace SlimeKing.Gameplay.UI
             SetGameObjectVisibility(gameLogo, false);
             SetGameObjectVisibility(companySmallLogo, false);
             SetGameObjectVisibility(pressStart, false);
+
+            // Esconde todos os elementos de input inicialmente usando SetActive
+            if (inputKeyboard != null) inputKeyboard.SetActive(false);
+            if (inputGamepad != null) inputGamepad.SetActive(false);
+            if (inputXbox != null) inputXbox.SetActive(false);
+            if (inputPlaystation != null) inputPlaystation.SetActive(false);
+            if (inputSwitch != null) inputSwitch.SetActive(false);
 
             currentState = TitleScreenState.Initial;
 
@@ -207,6 +311,9 @@ namespace SlimeKing.Gameplay.UI
 
             currentState = TitleScreenState.MenuReady;
             canSkip = false;
+
+            // Inicializa o input UI correto após o menu estar pronto
+            InitializeInputUI();
 
             Log("Title sequence completed");
         }
@@ -377,6 +484,9 @@ namespace SlimeKing.Gameplay.UI
             SetGameObjectVisibility(pressStart, true);
 
             currentState = TitleScreenState.MenuReady;
+
+            // Inicializa o input UI correto após o skip
+            InitializeInputUI();
 
             Log("Skip sequence completed");
         }
