@@ -18,10 +18,20 @@ namespace PixeLadder.EasyTransition
         [Tooltip("The default transition effect to use if none is provided in the LoadScene call.")]
         [SerializeField] private TransitionEffect defaultTransition;
 
-        // --- Private State ---
-        private Image transitionImageInstance;
-        public static event System.Action OnSceneLoaded;
+        [Header("Debug")]
+        [Tooltip("Enable debug logs for troubleshooting.")]
+        [SerializeField] private bool enableDebugLogs = false;
 
+        #region Private State
+        private Image transitionImageInstance;
+        private Material currentMaterialInstance;
+        #endregion
+
+        #region Events
+        public static event System.Action OnSceneLoaded;
+        #endregion
+
+        #region Singleton
         private void Awake()
         {
             if (Instance == null)
@@ -35,7 +45,9 @@ namespace PixeLadder.EasyTransition
                 Destroy(gameObject);
             }
         }
+        #endregion
 
+        #region Initialization
         private void Initialize()
         {
             // Create a dedicated, persistent canvas for the transition UI.
@@ -49,8 +61,13 @@ namespace PixeLadder.EasyTransition
 
             transitionImageInstance = Instantiate(transitionImagePrefab, canvasGO.transform);
             transitionImageInstance.gameObject.SetActive(false);
-        }
 
+            if (enableDebugLogs)
+                Debug.Log("SceneTransitioner initialized successfully.");
+        }
+        #endregion
+
+        #region Public Methods
         /// <summary>
         /// The main public method to start a scene transition.
         /// </summary>
@@ -65,17 +82,28 @@ namespace PixeLadder.EasyTransition
                 return;
             }
 
+            if (enableDebugLogs)
+                Debug.Log($"Starting scene transition to '{sceneName}' using effect: {effectToUse.name}");
+
             StopAllCoroutines();
             StartCoroutine(TransitionRoutine(sceneName, effectToUse));
         }
+        #endregion
 
+        #region Private Methods
         private IEnumerator TransitionRoutine(string sceneName, TransitionEffect effect)
         {
+            // Clean up any previous material instance to prevent caching issues
+            CleanupMaterial();
+
             // Prepare the material and activate the image.
             transitionImageInstance.gameObject.SetActive(true);
-            Material materialInstance = new Material(effect.transitionMaterial);
-            transitionImageInstance.material = materialInstance;
-            effect.SetEffectProperties(materialInstance);
+            currentMaterialInstance = new Material(effect.transitionMaterial);
+            transitionImageInstance.material = currentMaterialInstance;
+            effect.SetEffectProperties(currentMaterialInstance);
+
+            if (enableDebugLogs)
+                Debug.Log($"Material applied: {currentMaterialInstance.name}, Shader: {currentMaterialInstance.shader.name}");
 
             // Run the fade-out animation.
             yield return effect.AnimateOut(transitionImageInstance);
@@ -89,8 +117,32 @@ namespace PixeLadder.EasyTransition
             // Run the fade-in animation.
             yield return effect.AnimateIn(transitionImageInstance);
 
-            // Deactivate the image.
+            // Deactivate the image and clean up material.
             transitionImageInstance.gameObject.SetActive(false);
+            CleanupMaterial();
         }
+
+        private void CleanupMaterial()
+        {
+            if (currentMaterialInstance != null)
+            {
+                if (enableDebugLogs)
+                    Debug.Log("Cleaning up previous material instance.");
+
+                // Reset the image material to null first
+                if (transitionImageInstance != null)
+                    transitionImageInstance.material = null;
+
+                // Destroy the material instance to free memory
+                DestroyImmediate(currentMaterialInstance);
+                currentMaterialInstance = null;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            CleanupMaterial();
+        }
+        #endregion
     }
 }

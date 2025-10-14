@@ -65,7 +65,8 @@ public class TitleScreenController : MonoBehaviour
     #region Scene Transition
     [Header("Scene Transition")]
     [SerializeField] private string gameSceneName = "InitialCave";
-    [SerializeField] private TransitionEffect cellularTransitionEffect;
+    [SerializeField] private bool useCustomTransitionEffect = false;
+    [SerializeField] private TransitionEffect customTransitionEffect;
     #endregion
 
     #region Debug
@@ -96,6 +97,12 @@ public class TitleScreenController : MonoBehaviour
 
     private void Update()
     {
+        // Bloqueia completamente a detecção de input durante a transição
+        if (currentState == TitleScreenState.TransitionStarted)
+        {
+            return;
+        }
+
         CheckForAnyInput();
         UpdateInputUIIfChanged();
 
@@ -441,6 +448,13 @@ public class TitleScreenController : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
+        // Bloqueia inputs durante a transição
+        if (currentState == TitleScreenState.TransitionStarted)
+        {
+            Log("Input blocked - transition in progress");
+            return;
+        }
+
         if (canSkip && !hasSkipped && currentState != TitleScreenState.MenuReady)
         {
             SkipToMenu();
@@ -498,16 +512,20 @@ public class TitleScreenController : MonoBehaviour
     }
 
     /// <summary>
-    /// Inicia o jogo principal usando Easy Transition com efeito cellular
+    /// Inicia o jogo principal usando Easy Transition
     /// </summary>
     private void StartGame()
     {
-        Log("Starting game with Easy Transition cellular effect");
+        // Bloqueia novos inputs durante a transição
+        currentState = TitleScreenState.TransitionStarted;
+        Log("Starting game with Easy Transition - inputs blocked");
 
-        // Usa o Easy Transition para fazer a transição com efeito cellular
+        // Usa o Easy Transition para fazer a transição
         if (SceneTransitioner.Instance != null)
         {
-            SceneTransitioner.Instance.LoadScene(gameSceneName, cellularTransitionEffect);
+            // Se o usuário configurou um efeito customizado, usa ele, senão usa o padrão do SceneTransitioner
+            TransitionEffect effectToUse = useCustomTransitionEffect ? customTransitionEffect : null;
+            SceneTransitioner.Instance.LoadScene(gameSceneName, effectToUse);
         }
         else
         {
@@ -711,7 +729,8 @@ public enum TitleScreenState
     CompanyLogo,
     Transition,
     GameTitle,
-    MenuReady
+    MenuReady,
+    TransitionStarted
 }
 
 /// <summary>
