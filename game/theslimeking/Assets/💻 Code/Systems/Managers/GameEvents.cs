@@ -73,11 +73,6 @@ namespace SlimeKing.Events
         /// </summary>
         public static event Action<ElementType, int> OnElementalXPGained;
 
-        /// <summary>
-        /// Disparado quando uma nova habilidade é desbloqueada
-        /// Parâmetro: nome da habilidade
-        /// </summary>
-        public static event Action<string> OnAbilityUnlocked;
 
         #endregion
 
@@ -197,6 +192,14 @@ namespace SlimeKing.Events
         public static void TriggerElementalXPGained(ElementType element, int xp)
         {
             OnElementalXPGained?.Invoke(element, xp);
+        }
+
+        /// <summary>
+        /// Invoca o evento de cena carregada
+        /// </summary>
+        public static void TriggerSceneLoaded(string sceneName)
+        {
+            OnSceneLoaded?.Invoke(sceneName);
         }
 
         #endregion

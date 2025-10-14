@@ -7,54 +7,29 @@ using SlimeKing.Events;
 namespace SlimeKing.Core
 {
     /// <summary>
-    /// Manager principal responsável pelo estado global do jogo e coordenação entre sistemas.
-    /// Gerencia ciclo temporal, evolução do slime, estados do jogo e transições entre cenas.
+    /// Manager central responsável pelo estado global do jogo, tempo e evolução do slime.
+    /// Implementação simplificada seguindo princípios KISS.
     /// </summary>
     public class GameManager : ManagerSingleton<GameManager>
     {
         #region Game State
 
         [Header("Game State")]
-        [SerializeField] private GameState currentState = GameState.Playing;
+        [SerializeField] private GameState currentGameState = GameState.MainMenu;
         [SerializeField] private bool isPaused = false;
-
-        /// <summary>
-        /// Estado atual do jogo
-        /// </summary>
-        public GameState CurrentState => currentState;
-
-        /// <summary>
-        /// Verifica se o jogo está pausado
-        /// </summary>
-        public bool IsPaused => isPaused;
+        [SerializeField] private int currentLives = 3;
+        [SerializeField] private int maxLives = 3;
 
         #endregion
 
         #region Time System
 
         [Header("Time System")]
-        [SerializeField] private float gameTimeSpeed = 1f; // Multiplicador de velocidade do tempo
-        [SerializeField] private bool autoAdvanceTime = true;
-
-        [Header("Time Values")]
-        [SerializeField] private float gameTime = 7f; // Começa às 7:00 da manhã
+        [SerializeField] private float gameTime = 7f; // Em horas de jogo (0-24), começar de manhã
         [SerializeField] private int currentDay = 1;
         [SerializeField] private Season currentSeason = Season.Spring;
-        [SerializeField] private TimeOfDay currentTimeOfDay = TimeOfDay.Morning;
-
-        [Header("Weather System")]
         [SerializeField] private WeatherType currentWeather = WeatherType.Clear;
-        [SerializeField] private float weatherChangeChance = 0.1f; // Chance por hora de mudar clima
-
-        // Constantes de tempo
-        private const float HOURS_PER_DAY = 24f;
-        private const float REAL_SECONDS_PER_GAME_HOUR = 60f; // 1 hora do jogo = 1 minuto real
-        private const int DAYS_PER_SEASON = 7; // 7 dias reais = 1 estação
-
-        // Cache para otimização
-        private TimeOfDay lastTimeOfDay;
-        private Season lastSeason;
-        private int lastDay;
+        [SerializeField] private float timeMultiplier = 1f; // 1 min real = 1 hora jogo
 
         #endregion
 
@@ -62,161 +37,139 @@ namespace SlimeKing.Core
 
         [Header("Slime Evolution")]
         [SerializeField] private SlimeStage currentSlimeStage = SlimeStage.Baby;
-        [SerializeField] private Dictionary<ElementType, int> elementalXP = new Dictionary<ElementType, int>();
-
-        [Header("Evolution Thresholds")]
-        [SerializeField] private int xpToAdult = 100;
-        [SerializeField] private int xpToLarge = 300;
-        [SerializeField] private int xpToKing = 500;
-
-        /// <summary>
-        /// Estágio atual de evolução do slime
-        /// </summary>
-        public SlimeStage CurrentSlimeStage => currentSlimeStage;
-
-        /// <summary>
-        /// XP elemental atual do slime
-        /// </summary>
-        public Dictionary<ElementType, int> ElementalXP => new Dictionary<ElementType, int>(elementalXP);
+        [SerializeField] private int totalCrystalFragments = 0;
+        [SerializeField] private Dictionary<ElementType, int> crystalFragments = new();
+        [SerializeField] private int allyCount = 0;
 
         #endregion
 
         #region Scene Management
 
         [Header("Scene Management")]
-        [SerializeField] private BiomeType currentBiome = BiomeType.Nest;
-        [SerializeField] private string currentSceneName = "NestScene";
-
-        /// <summary>
-        /// Bioma atual do jogador
-        /// </summary>
-        public BiomeType CurrentBiome => currentBiome;
+        [SerializeField] private string currentBiome = "Ninho";
+        [SerializeField] private BiomeType currentBiomeType = BiomeType.Nest;
 
         #endregion
 
-        #region Unity Lifecycle
+        #region Settings
+
+        [Header("Settings")]
+        [SerializeField] private GameSettings gameSettings = new GameSettings();
+
+        #endregion
+
+        #region Private Variables
+
+        private bool isTimeRunning = true;
+        private Coroutine timeCoroutine;
+        private WaitForSecondsRealtime timeWait;
+
+        #endregion
+
+        #region Properties
+
+        public GameState CurrentGameState => currentGameState;
+        public bool IsPaused => isPaused;
+        public int CurrentLives => currentLives;
+        public float GameTime => gameTime;
+        public int CurrentDay => currentDay;
+        public Season CurrentSeason => currentSeason;
+        public WeatherType CurrentWeather => currentWeather;
+        public SlimeStage CurrentSlimeStage => currentSlimeStage;
+        public int TotalCrystalFragments => totalCrystalFragments;
+        public int AllyCount => allyCount;
+        public string CurrentBiome => currentBiome;
+        public BiomeType CurrentBiomeType => currentBiomeType;
+        public GameSettings Settings => gameSettings;
+
+        #endregion
+
+        #region Singleton Implementation
 
         protected override void Initialize()
         {
-            Log("GameManager initialization started");
-
-            // Inicializar dicionário de XP elemental
-            InitializeElementalXP();
-
-            // Cache dos valores iniciais
-            lastTimeOfDay = currentTimeOfDay;
-            lastSeason = currentSeason;
-            lastDay = currentDay;
-
-            // Disparar evento inicial de estado
-            GameEvents.TriggerGameStateChanged(currentState);
-
-            Log("GameManager initialization completed");
+            Log("GameManager initialized successfully");
+            InitializeCrystalFragments();
+            InitializeTimeSystem();
         }
 
-        private void Start()
+        protected override void OnDestroy()
         {
-            // Iniciar sistema de tempo se estiver em jogo
-            if (currentState == GameState.Playing && autoAdvanceTime)
-            {
-                StartCoroutine(TimeAdvancementCoroutine());
-            }
+            base.OnDestroy(); // garante execução de OnManagerDestroy da base
+            StopTimeSystem();
         }
 
-        private void Update()
+        #endregion
+
+        #region Initialization
+
+        private void InitializeCrystalFragments()
         {
-            // Input de pause (pode ser configurado via Input System depois)
-            if (Input.GetKeyDown(KeyCode.Escape))
+            crystalFragments.Clear();
+            foreach (ElementType element in Enum.GetValues(typeof(ElementType)))
             {
-                TogglePause();
+                crystalFragments[element] = 0;
             }
+            Log("Crystal fragments dictionary initialized");
+        }
+
+        private void InitializeTimeSystem()
+        {
+            timeWait = new WaitForSecondsRealtime(60f); // 1 minuto real = 1 hora de jogo
+            StartTimeSystem();
         }
 
         #endregion
 
         #region Game State Management
 
-        /// <summary>
-        /// Muda o estado do jogo
-        /// </summary>
         public void ChangeGameState(GameState newState)
         {
-            if (currentState == newState) return;
+            if (currentGameState == newState) return;
 
-            Log($"Game state changing from {currentState} to {newState}");
+            GameState previousState = currentGameState;
+            currentGameState = newState;
 
-            var previousState = currentState;
-            currentState = newState;
+            Log($"Game state changed from {previousState} to {newState}");
 
-            // Lógica específica por estado
-            HandleStateTransition(previousState, newState);
+            // Handle state-specific logic
+            switch (newState)
+            {
+                case GameState.Playing:
+                    ResumeTime();
+                    break;
+                case GameState.Paused:
+                    PauseTime();
+                    break;
+                case GameState.MainMenu:
+                case GameState.Loading:
+                case GameState.Settings:
+                    PauseTime();
+                    break;
+            }
 
-            // Disparar evento
             GameEvents.TriggerGameStateChanged(newState);
         }
 
-        /// <summary>
-        /// Pausa ou despausa o jogo
-        /// </summary>
-        public void TogglePause()
-        {
-            if (currentState == GameState.Playing)
-            {
-                PauseGame();
-            }
-            else if (currentState == GameState.Paused)
-            {
-                ResumeGame();
-            }
-        }
-
-        /// <summary>
-        /// Pausa o jogo
-        /// </summary>
         public void PauseGame()
         {
-            if (currentState != GameState.Playing) return;
-
-            isPaused = true;
-            Time.timeScale = 0f;
-            ChangeGameState(GameState.Paused);
-            GameEvents.TriggerGamePaused();
-
-            Log("Game paused");
+            if (!isPaused)
+            {
+                isPaused = true;
+                PauseTime();
+                GameEvents.TriggerGamePaused();
+                Log("Game paused");
+            }
         }
 
-        /// <summary>
-        /// Despausa o jogo
-        /// </summary>
         public void ResumeGame()
         {
-            if (currentState != GameState.Paused) return;
-
-            isPaused = false;
-            Time.timeScale = 1f;
-            ChangeGameState(GameState.Playing);
-            GameEvents.TriggerGameResumed();
-
-            Log("Game resumed");
-        }
-
-        private void HandleStateTransition(GameState fromState, GameState toState)
-        {
-            // Lógica específica de transição de estados
-            switch (toState)
+            if (isPaused)
             {
-                case GameState.Playing:
-                    if (autoAdvanceTime)
-                        StartCoroutine(TimeAdvancementCoroutine());
-                    break;
-
-                case GameState.Paused:
-                    StopAllCoroutines();
-                    break;
-
-                case GameState.Loading:
-                    StopAllCoroutines();
-                    break;
+                isPaused = false;
+                ResumeTime();
+                GameEvents.TriggerGameResumed();
+                Log("Game resumed");
             }
         }
 
@@ -224,246 +177,253 @@ namespace SlimeKing.Core
 
         #region Time System
 
-        /// <summary>
-        /// Corrotina principal do sistema de tempo
-        /// </summary>
-        private IEnumerator TimeAdvancementCoroutine()
+        private void StartTimeSystem()
         {
-            while (currentState == GameState.Playing && autoAdvanceTime)
+            if (timeCoroutine == null)
             {
-                yield return new WaitForSeconds(REAL_SECONDS_PER_GAME_HOUR / gameTimeSpeed);
+                timeCoroutine = StartCoroutine(TimeLoop());
+                isTimeRunning = true;
+                Log("Time system started");
+            }
+        }
 
-                if (!isPaused)
+        private void StopTimeSystem()
+        {
+            if (timeCoroutine != null)
+            {
+                StopCoroutine(timeCoroutine);
+                timeCoroutine = null;
+                isTimeRunning = false;
+                Log("Time system stopped");
+            }
+        }
+
+        private void PauseTime()
+        {
+            isTimeRunning = false;
+        }
+
+        private void ResumeTime()
+        {
+            isTimeRunning = true;
+        }
+
+        private IEnumerator TimeLoop()
+        {
+            while (true)
+            {
+                yield return timeWait;
+
+                if (isTimeRunning && currentGameState == GameState.Playing)
                 {
-                    AdvanceTime(1f); // Avançar 1 hora
+                    AdvanceTime();
                 }
             }
         }
 
-        /// <summary>
-        /// Avança o tempo do jogo
-        /// </summary>
-        /// <param name="hours">Número de horas para avançar</param>
-        public void AdvanceTime(float hours)
+        private void AdvanceTime()
         {
-            gameTime += hours;
+            gameTime += timeMultiplier;
 
-            // Controle de dias
-            if (gameTime >= HOURS_PER_DAY)
+            // Check for day change
+            if (gameTime >= 24f)
             {
-                gameTime -= HOURS_PER_DAY;
+                gameTime = 0f;
                 currentDay++;
+                CheckSeasonChange();
+                ChangeWeather();
+
                 GameEvents.TriggerNewDay(currentDay);
-                Log($"New day started: Day {currentDay}");
+                Log($"New day: {currentDay}");
             }
 
-            // Atualizar período do dia
-            UpdateTimeOfDay();
-
-            // Atualizar estação (baseado no dia)
-            UpdateSeason();
-
-            // Sistema de clima dinâmico
-            UpdateWeather();
-
-            // Disparar evento de avanço de tempo
             GameEvents.TriggerTimeAdvanced(gameTime);
         }
 
-        private void UpdateTimeOfDay()
+        private void CheckSeasonChange()
         {
-            TimeOfDay newTimeOfDay = GetTimeOfDayFromHour(gameTime);
+            // Cada estação dura 7 dias
+            int seasonDay = (currentDay - 1) % 28;
+            Season newSeason = (Season)(seasonDay / 7);
 
-            if (newTimeOfDay != lastTimeOfDay)
-            {
-                currentTimeOfDay = newTimeOfDay;
-                lastTimeOfDay = newTimeOfDay;
-                GameEvents.TriggerTimeOfDayChanged(currentTimeOfDay);
-                Log($"Time of day changed to: {currentTimeOfDay}");
-            }
-        }
-
-        private TimeOfDay GetTimeOfDayFromHour(float hour)
-        {
-            if (hour >= 5f && hour < 7f) return TimeOfDay.Dawn;
-            if (hour >= 7f && hour < 12f) return TimeOfDay.Morning;
-            if (hour >= 12f && hour < 18f) return TimeOfDay.Afternoon;
-            if (hour >= 18f && hour < 21f) return TimeOfDay.Evening;
-            return TimeOfDay.Night;
-        }
-
-        private void UpdateSeason()
-        {
-            Season newSeason = GetSeasonFromDay(currentDay);
-
-            if (newSeason != lastSeason)
+            if (newSeason != currentSeason)
             {
                 currentSeason = newSeason;
-                lastSeason = newSeason;
                 GameEvents.TriggerSeasonChanged(currentSeason);
-                Log($"Season changed to: {currentSeason}");
-            }
-        }
-
-        private Season GetSeasonFromDay(int day)
-        {
-            int seasonCycle = (day - 1) / DAYS_PER_SEASON;
-            return (Season)(seasonCycle % 4);
-        }
-
-        private void UpdateWeather()
-        {
-            // Sistema simples de mudança climática baseado em chance
-            if (UnityEngine.Random.value < weatherChangeChance)
-            {
-                ChangeWeather();
+                Log($"Season changed to {currentSeason}");
             }
         }
 
         private void ChangeWeather()
         {
-            var weatherValues = Enum.GetValues(typeof(WeatherType));
-            WeatherType newWeather;
-
-            do
+            // Chance simples de mudança de clima
+            if (UnityEngine.Random.Range(0f, 1f) < 0.3f) // 30% chance
             {
-                newWeather = (WeatherType)weatherValues.GetValue(UnityEngine.Random.Range(0, weatherValues.Length));
+                Array weatherTypes = Enum.GetValues(typeof(WeatherType));
+                WeatherType newWeather = (WeatherType)weatherTypes.GetValue(UnityEngine.Random.Range(0, weatherTypes.Length));
+
+                if (newWeather != currentWeather)
+                {
+                    currentWeather = newWeather;
+                    GameEvents.TriggerWeatherChanged(currentWeather);
+                    Log($"Weather changed to {currentWeather}");
+                }
             }
-            while (newWeather == currentWeather);
-
-            SetWeather(newWeather);
-        }
-
-        /// <summary>
-        /// Define o clima atual
-        /// </summary>
-        public void SetWeather(WeatherType weather)
-        {
-            if (currentWeather == weather) return;
-
-            currentWeather = weather;
-            GameEvents.TriggerWeatherChanged(weather);
-            Log($"Weather changed to: {weather}");
         }
 
         #endregion
 
         #region Slime Evolution
 
-        private void InitializeElementalXP()
+        public void AddCrystalFragment(ElementType elementType, int amount = 1)
         {
-            elementalXP.Clear();
-            foreach (ElementType element in Enum.GetValues(typeof(ElementType)))
-            {
-                elementalXP[element] = 0;
-            }
+            crystalFragments[elementType] += amount;
+            totalCrystalFragments += amount;
+
+            Log($"Added {amount} {elementType} crystal fragment(s). Total: {crystalFragments[elementType]}");
+
+            CheckEvolution();
+            GameEvents.TriggerElementalXPGained(elementType, amount);
         }
 
-        /// <summary>
-        /// Adiciona XP elemental ao slime
-        /// </summary>
-        public void AddElementalXP(ElementType element, int amount)
+        public int GetCrystalFragments(ElementType elementType)
         {
-            if (amount <= 0) return;
-
-            elementalXP[element] += amount;
-            GameEvents.TriggerElementalXPGained(element, amount);
-
-            Log($"Added {amount} XP to {element} element. Total: {elementalXP[element]}");
-
-            // Verificar se pode evoluir
-            CheckEvolution();
+            return crystalFragments.ContainsKey(elementType) ? crystalFragments[elementType] : 0;
         }
 
         private void CheckEvolution()
         {
-            int totalXP = GetTotalElementalXP();
-            SlimeStage newStage = currentSlimeStage;
-
-            if (totalXP >= xpToKing && currentSlimeStage != SlimeStage.King)
-            {
-                newStage = SlimeStage.King;
-            }
-            else if (totalXP >= xpToLarge && currentSlimeStage == SlimeStage.Adult)
-            {
-                newStage = SlimeStage.Large;
-            }
-            else if (totalXP >= xpToAdult && currentSlimeStage == SlimeStage.Baby)
-            {
-                newStage = SlimeStage.Adult;
-            }
+            SlimeStage newStage = CalculateEvolutionStage();
 
             if (newStage != currentSlimeStage)
             {
-                EvolveSlime(newStage);
+                currentSlimeStage = newStage;
+                GameEvents.TriggerSlimeEvolved(currentSlimeStage);
+                Log($"Slime evolved to {currentSlimeStage}!");
             }
         }
 
-        /// <summary>
-        /// Força a evolução do slime para um estágio específico
-        /// </summary>
-        public void EvolveSlime(SlimeStage newStage)
+        private SlimeStage CalculateEvolutionStage()
         {
-            if (newStage == currentSlimeStage) return;
-
-            Log($"Slime evolved from {currentSlimeStage} to {newStage}!");
-
-            currentSlimeStage = newStage;
-            GameEvents.TriggerSlimeEvolved(newStage);
-        }
-
-        /// <summary>
-        /// Retorna o XP total de todos os elementos
-        /// </summary>
-        public int GetTotalElementalXP()
-        {
-            int total = 0;
-            foreach (var xp in elementalXP.Values)
+            // Requisitos baseados no Game Design Document
+            if (totalCrystalFragments >= 50 && allyCount >= 10 && currentSlimeStage >= SlimeStage.Large)
             {
-                total += xp;
+                return SlimeStage.King;
             }
-            return total;
+            else if (totalCrystalFragments >= 25)
+            {
+                return SlimeStage.Large;
+            }
+            else if (totalCrystalFragments >= 10)
+            {
+                return SlimeStage.Adult;
+            }
+
+            return SlimeStage.Baby;
         }
 
-        /// <summary>
-        /// Retorna o XP de um elemento específico
-        /// </summary>
-        public int GetElementalXP(ElementType element)
+        #endregion
+
+        #region Player Management
+
+        public void PlayerDied()
         {
-            return elementalXP.ContainsKey(element) ? elementalXP[element] : 0;
+            currentLives--;
+            Log($"Player died. Lives remaining: {currentLives}");
+
+            if (currentLives <= 0)
+            {
+                GameOver();
+            }
+        }
+
+        public void AddLife()
+        {
+            if (currentLives < maxLives)
+            {
+                currentLives++;
+                Log($"Life added. Current lives: {currentLives}");
+            }
+        }
+
+        private void GameOver()
+        {
+            ChangeGameState(GameState.MainMenu);
+            Log("Game Over");
         }
 
         #endregion
 
         #region Scene Management
 
-        /// <summary>
-        /// Notifica mudança de bioma
-        /// </summary>
-        public void ChangeBiome(BiomeType newBiome, string sceneName = "")
+        public void SetCurrentBiome(string biomeName, BiomeType biomeType)
         {
-            if (newBiome == currentBiome) return;
+            currentBiome = biomeName;
+            currentBiomeType = biomeType;
 
-            var previousBiome = currentBiome;
-            currentBiome = newBiome;
-
-            if (!string.IsNullOrEmpty(sceneName))
-            {
-                currentSceneName = sceneName;
-            }
-
-            GameEvents.TriggerBiomeExited(previousBiome);
-            GameEvents.TriggerBiomeEntered(newBiome);
-
-            Log($"Biome changed from {previousBiome} to {newBiome}");
+            Log($"Current biome set to: {biomeName} ({biomeType})");
+            GameEvents.TriggerBiomeEntered(biomeType);
         }
 
         #endregion
 
-        #region Public Getters
+        #region Friendship System
+
+        public void AddAlly()
+        {
+            allyCount++;
+            CheckEvolution(); // Pode desbloquear Rei Slime
+            Log($"New ally added. Total allies: {allyCount}");
+        }
+
+        #endregion
+
+        #region Settings Management
+
+        public void UpdateSettings(GameSettings newSettings)
+        {
+            gameSettings = newSettings;
+            Log("Game settings updated");
+        }
+
+        #endregion
+
+        #region Public Utilities
+
+        public TimeOfDay GetCurrentTimeOfDay()
+        {
+            if (gameTime >= 5f && gameTime < 7f) return TimeOfDay.Dawn;
+            if (gameTime >= 7f && gameTime < 12f) return TimeOfDay.Morning;
+            if (gameTime >= 12f && gameTime < 18f) return TimeOfDay.Afternoon;
+            if (gameTime >= 18f && gameTime < 21f) return TimeOfDay.Evening;
+            return TimeOfDay.Night;
+        }
+
+        public bool CanEvolve()
+        {
+            return CalculateEvolutionStage() > currentSlimeStage;
+        }
+
+        public void StartNewGame()
+        {
+            // Reset para estado inicial
+            currentLives = maxLives;
+            gameTime = 7f; // Começar de manhã
+            currentDay = 1;
+            currentSeason = Season.Spring;
+            currentWeather = WeatherType.Clear;
+            currentSlimeStage = SlimeStage.Baby;
+            totalCrystalFragments = 0;
+            allyCount = 0;
+
+            InitializeCrystalFragments();
+            ChangeGameState(GameState.Playing);
+
+            Log("New game started");
+        }
 
         /// <summary>
-        /// Retorna informações de tempo formatadas
+        /// Retorna o tempo formatado (HH:MM)
         /// </summary>
         public string GetFormattedTime()
         {
@@ -472,72 +432,69 @@ namespace SlimeKing.Core
             return $"{hours:00}:{minutes:00}";
         }
 
-        /// <summary>
-        /// Retorna o progresso do dia (0-1)
-        /// </summary>
-        public float GetDayProgress()
-        {
-            return gameTime / HOURS_PER_DAY;
-        }
-
-        /// <summary>
-        /// Retorna informações completas do estado atual
-        /// </summary>
-        public string GetGameStateInfo()
-        {
-            return $"Day {currentDay}, {GetFormattedTime()}, {currentSeason}, {currentWeather}, {currentTimeOfDay}";
-        }
-
         #endregion
 
-        #region Debug & Editor
-
-        [Header("Debug Tools")]
-        [SerializeField] private bool showDebugInfo = false;
+        #region Debug Methods
 
 #if UNITY_EDITOR
-        private void OnGUI()
+        [ContextMenu("Add Test Crystal")]
+        private void AddTestCrystal()
         {
-            if (!showDebugInfo) return;
-
-            GUILayout.BeginArea(new Rect(10, 10, 300, 200));
-            GUILayout.Box("GameManager Debug Info");
-
-            GUILayout.Label($"State: {currentState}");
-            GUILayout.Label($"Time: {GetFormattedTime()}");
-            GUILayout.Label($"Day: {currentDay}");
-            GUILayout.Label($"Season: {currentSeason}");
-            GUILayout.Label($"Weather: {currentWeather}");
-            GUILayout.Label($"Time of Day: {currentTimeOfDay}");
-            GUILayout.Label($"Slime Stage: {currentSlimeStage}");
-            GUILayout.Label($"Total XP: {GetTotalElementalXP()}");
-            GUILayout.Label($"Biome: {currentBiome}");
-
-            GUILayout.EndArea();
+            AddCrystalFragment(ElementType.Fire, 5);
         }
 
-        [UnityEngine.ContextMenu("Add Test XP")]
-        private void AddTestXP()
-        {
-            AddElementalXP(ElementType.Fire, 25);
-        }
-
-        [UnityEngine.ContextMenu("Force Evolution")]
+        [ContextMenu("Force Evolution")]
         private void ForceEvolution()
         {
             if (currentSlimeStage != SlimeStage.King)
             {
-                EvolveSlime((SlimeStage)((int)currentSlimeStage + 1));
+                totalCrystalFragments += 15;
+                CheckEvolution();
             }
         }
 
-        [UnityEngine.ContextMenu("Change Weather")]
-        private void DebugChangeWeather()
+        [ContextMenu("Add Ally")]
+        private void AddTestAlly()
         {
-            ChangeWeather();
+            AddAlly();
+        }
+
+        [ContextMenu("Skip Day")]
+        private void SkipDay()
+        {
+            gameTime = 0f;
+            AdvanceTime();
         }
 #endif
 
         #endregion
     }
+
+    #region GameSettings Serializable Class
+
+    [System.Serializable]
+    public class GameSettings
+    {
+        [Header("Audio")]
+        [Range(0f, 1f)] public float masterVolume = 1f;
+        [Range(0f, 1f)] public float musicVolume = 0.8f;
+        [Range(0f, 1f)] public float sfxVolume = 1f;
+
+        [Header("Graphics")]
+        public bool fullscreen = true;
+        public int resolutionIndex = 0;
+        public bool vSync = true;
+
+        [Header("Gameplay")]
+        public bool showTutorials = true;
+        public bool showDamageNumbers = true;
+        [Range(0.5f, 2f)] public float uiScale = 1f;
+
+        [Header("Accessibility")]
+        public bool subtitles = false;
+        public bool colorBlindMode = false;
+        [Range(0.8f, 1.5f)] public float textSize = 1f;
+    }
+
+    #endregion
 }
