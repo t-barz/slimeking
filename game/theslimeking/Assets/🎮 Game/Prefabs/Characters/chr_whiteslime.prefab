@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8429382318122910891}
   - component: {fileID: 7772663488307712309}
   - component: {fileID: 5627279081541992566}
+  - component: {fileID: 9078144548483558230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 8254251433927265478}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.19357, y: -0.54216, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65,11 +66,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 34
+  near clip plane: 0.1
+  far clip plane: 5000
+  field of view: 40
   orthographic: 1
-  orthographic size: 3
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -226,6 +227,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: -881936651771174391}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+--- !u!1 &1443290089864978481 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3930086621309378627, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2559418920463816962 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 74592756940380528, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
@@ -236,9 +242,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 911473755738892535, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
   m_PrefabInstance: {fileID: 2489892756996440178}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3731915640331621322 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7978252334861413448, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4535151144451779547 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7170302673964078167, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4593836510105678198 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7111898828100931324, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
   m_PrefabInstance: {fileID: 2489892756996440178}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &4770894293968131866 stripped
@@ -248,7 +264,6 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &1692881636651919560
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -294,7 +309,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -304,6 +318,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 1
 --- !u!82 &-4455612587817557720
 AudioSource:
@@ -536,18 +551,23 @@ MonoBehaviour:
   attackDuration: 0.5
   lockMovementDuringAttack: 1
   attackInstantiationOffset: {x: 0, y: -0.15}
-  frontObject: {fileID: 0}
-  backObject: {fileID: 0}
-  sideObject: {fileID: 0}
+  frontObject: {fileID: 4593836510105678198}
+  backObject: {fileID: 1443290089864978481}
+  sideObject: {fileID: 3731915640331621322}
   vfxFrontObject: {fileID: 2559418920463816962}
   vfxBackObject: {fileID: 3326986705294010501}
   vfxSideObject: {fileID: 4535151144451779547}
-  shadowObject: {fileID: 0}
+  shadowObject: {fileID: 8893181554572654189}
   enableLogs: 1
   enableDebugGizmos: 1
 --- !u!4 &5753460239599878015 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+  m_PrefabInstance: {fileID: 2489892756996440178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8893181554572654189 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -2745210311206455777, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
   m_PrefabInstance: {fileID: 2489892756996440178}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8199493562039672848
@@ -605,5 +625,40 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7635100821656696301, guid: cd02227d127ae6d478d1d961f452e602, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9078144548483558230}
   m_SourcePrefab: {fileID: 100100000, guid: cd02227d127ae6d478d1d961f452e602, type: 3}
+--- !u!114 &9078144548483558230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8254251433927265478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain
+  ShowDebugText: 0
+  ShowCameraFrustum: 1
+  IgnoreTimeScale: 0
+  WorldUpOverride: {fileID: 0}
+  ChannelMask: -1
+  UpdateMethod: 2
+  BlendUpdateMethod: 1
+  LensModeOverride:
+    Enabled: 0
+    DefaultMode: 2
+  DefaultBlend:
+    Style: 1
+    Time: 2
+    CustomCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  CustomBlends: {fileID: 0}
