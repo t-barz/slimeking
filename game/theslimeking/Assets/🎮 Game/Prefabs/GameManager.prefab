@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 1613470520231748210}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.78364, y: -5.22052, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,30 +46,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.GameManager
   enableDebugLogs: 0
   persistBetweenScenes: 1
-  currentGameState: 0
-  isPaused: 0
-  currentLives: 3
-  maxLives: 3
-  gameTime: 7
-  currentDay: 1
-  currentSeason: 0
-  currentWeather: 0
-  timeMultiplier: 1
-  currentSlimeStage: 0
-  totalCrystalFragments: 0
-  allyCount: 0
-  currentBiome: Ninho
-  currentBiomeType: 0
-  gameSettings:
-    masterVolume: 1
-    musicVolume: 0.8
-    sfxVolume: 1
-    fullscreen: 1
-    resolutionIndex: 0
-    vSync: 1
-    showTutorials: 1
-    showDamageNumbers: 1
-    uiScale: 1
-    subtitles: 0
-    colorBlindMode: 0
-    textSize: 1

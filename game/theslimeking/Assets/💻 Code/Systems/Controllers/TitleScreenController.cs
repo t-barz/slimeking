@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using PixeLadder.EasyTransition;
+using SlimeKing.Core; // acesso ao GameManager
 
 /// <summary>
 /// Controller específico para a tela inicial, gerencia a sequência de apresentação
@@ -329,6 +330,9 @@ public class TitleScreenController : MonoBehaviour
         canSkip = true;
         Log("Showing company logo");
 
+        // Pré-carrega a cena principal assim que a primeira animação inicia
+        GameManager.Instance?.PreloadScene(gameSceneName);
+
         yield return StartCoroutine(FadeGameObject(companyLogo, 1f, companyLogoFadeInDuration));
     }
 
@@ -519,18 +523,38 @@ public class TitleScreenController : MonoBehaviour
         // Bloqueia novos inputs durante a transição
         currentState = TitleScreenState.TransitionStarted;
         Log("Starting game with Easy Transition - inputs blocked");
-
-        // Usa o Easy Transition para fazer a transição
-        if (SceneTransitioner.Instance != null)
+        // Se a cena foi pré-carregada, usa ativação coordenada
+        if (GameManager.Instance != null && GameManager.Instance.HasPreloadedScene(gameSceneName))
         {
-            // Se o usuário configurou um efeito customizado, usa ele, senão usa o padrão do SceneTransitioner
             TransitionEffect effectToUse = useCustomTransitionEffect ? customTransitionEffect : null;
-            SceneTransitioner.Instance.LoadScene(gameSceneName, effectToUse);
+            if (SceneTransitioner.Instance != null)
+            {
+                // Usa nova API que realiza fade out, ativa cena pré-carregada e fade in
+                SceneTransitioner.Instance.ActivatePreloadedWithTransition(
+                    gameSceneName,
+                    () => GameManager.Instance.ActivatePreloadedScene(() => { StartCoroutine(UnloadTitleSceneAfterActivation()); }),
+                    effectToUse
+                );
+            }
+            else
+            {
+                Log("SceneTransitioner não encontrado; ativando preload diretamente");
+                GameManager.Instance.ActivatePreloadedScene(() => { StartCoroutine(UnloadTitleSceneAfterActivation()); });
+            }
         }
         else
         {
-            Log("SceneTransitioner instance not found, loading scene directly");
-            SceneManager.LoadScene(gameSceneName);
+            // Caminho original sem preload
+            if (SceneTransitioner.Instance != null)
+            {
+                TransitionEffect effectToUse = useCustomTransitionEffect ? customTransitionEffect : null;
+                SceneTransitioner.Instance.LoadScene(gameSceneName, effectToUse);
+            }
+            else
+            {
+                Log("SceneTransitioner instance not found, loading scene directly");
+                SceneManager.LoadScene(gameSceneName);
+            }
         }
     }
 
@@ -562,6 +586,37 @@ public class TitleScreenController : MonoBehaviour
     #endregion
 
     #region Utility Methods
+
+    /// <summary>
+    /// Executa efeito de transição (se disponível) e ativa a cena pré-carregada.
+    /// </summary>
+    // Removido: lógica substituída por SceneTransitioner.ActivatePreloadedWithTransition
+
+    /// <summary>
+    /// Descarrega a cena de título após ativação da cena principal.
+    /// </summary>
+    private IEnumerator UnloadTitleSceneAfterActivation()
+    {
+        yield return null; // espera um frame para garantir cena ativa definida
+        var titleScene = SceneManager.GetActiveScene();
+        // Evita descarregar se já mudamos para a cena principal
+        if (titleScene.name == gameSceneName)
+        {
+            Log("Título já não é a cena ativa; nenhuma descarrega necessária");
+            yield break;
+        }
+
+        Log($"Descarregando cena de título: {titleScene.name}");
+        var unloadOp = SceneManager.UnloadSceneAsync(titleScene);
+        if (unloadOp != null)
+        {
+            while (!unloadOp.isDone)
+            {
+                yield return null;
+            }
+        }
+        Log("Cena de título descarregada");
+    }
 
     /// <summary>
     /// Define a visibilidade de um GameObject manipulando o alpha
