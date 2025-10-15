@@ -38,7 +38,7 @@ Revisão e simplificação da arquitetura base seguindo rigorosamente os princí
 - [x] **Evolução do Slime** - Sistema de fragmentos de cristal  
 - [x] **Estados do Jogo** - Gerenciamento robusto de states
 - [x] **Sistema de Aliados** - Contagem para evolução final
-- [x] **Configurações** - GameSettings serializável integrado
+- [x] **Configurações** - (Removido do GameManager; será delegado a AudioManager/UI Settings)
 - [x] **Debug Tools** - Context Menus para testes no Editor
 
 ---
@@ -214,7 +214,7 @@ Revisão e simplificação da arquitetura base seguindo rigorosamente os princí
 3. **Estrutura clara** - Regions bem definidas e responsabilidades separadas
 4. **Debug tools incluídos** - Context Menus para testes no Editor
 5. **Comunicação desacoplada** - Uso efetivo do sistema GameEvents
-6. **Configurações centralizadas** - GameSettings integrado ao manager
+6. **Separação de responsabilidades** - Configurações removidas do GameManager e delegadas para futuros managers especializados
 
 ### ⚠️ **Erros Identificados na Versão Anterior**
 

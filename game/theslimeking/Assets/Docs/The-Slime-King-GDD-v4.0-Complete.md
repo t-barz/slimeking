@@ -446,9 +446,11 @@ public enum SlimeStage
 - **Adulto → Grande Slime:** 25 fragmentos totais
 - **Grande Slime → Rei Slime:** 50 fragmentos totais + 10 aliados
 
-### 17.4 Sistema de Configurações Expandido
+### 17.4 Sistema de Configurações (Revisado)
 
-#### GameSettings (Serializable)
+> Nota (Refatoração Arquitetural): A antiga estrutura `GameSettings` foi removida do `GameManager` em favor de uma separação de responsabilidades. Configurações de áudio serão tratadas por `AudioManager`; gráficos e acessibilidade por um futuro `UISettingsManager`. Abaixo permanece o modelo original apenas como referência histórica (não implementado atualmente).
+
+#### (Obsoleto) GameSettings (Serializable)
 
 ```csharp
 [System.Serializable]
