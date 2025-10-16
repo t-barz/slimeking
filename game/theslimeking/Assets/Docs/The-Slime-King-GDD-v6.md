@@ -1,10 +1,10 @@
-# The Slime King – Game Design Document v4.0 Completo
+# The Slime King – Game Design Document v6.0 Completo
 
 ## 1. Conceito e Visão Geral
 
 ### 1.1 Conceito Central
 
-**The Slime King** é um RPG de aventura 2D top-down em pixel art de mundo aberto, com exploração, quebra-cabeças e personalização. O jogador controla um slime branco recém-nascido, que evolui até se tornar o lendário Rei Slime em um mundo de fantasia habitado por criaturas únicas das Montanhas Cristalinas.
+**The Slime King** é um RPG de aventura 2D top-down em pixel art de mundo aberto, com exploração, quebra-cabeças e personalização. Nesse jogo, o jogador controla um slime branco recém-nascido e vivencia seu cotidiano cheio de desafios e descobertas que aos poucos o levam a evoluir até se tornar o lendário Rei Slime em um mundo de fantasia habitado por criaturas únicas das Montanhas Cristalinas.
 
 ### 1.2 Premissa Narrativa
 
@@ -26,10 +26,10 @@ O jogador explora diversas áreas das Montanhas Cristalinas em busca dos cristai
 
 O Slime cresce em tamanho e poder em quatro estágios evolutivos:
 
-- **Filhote:** Estado inicial, movimentação básica
-- **Adulto:** Desbloqueia habilidades elementais básicas (4 slots: ZL/L2, L/L1, R/R1, ZR/R2)
-- **Grande Slime:** Acesso a combinações elementais avançadas e maior potência
-- **Rei Slime:** Maestria completa dos elementos e liderança sobre criaturas
+- **Filhote:** Estado inicial, movimentação básica. Não possui habilidades elementais e nem seguidores.
+- **Adulto:** Desbloqueia habilidades elementais básicas (4 slots: ZL/L2, L/L1, R/R1, ZR/R2). Pode ter até 1 seguidor aliado.
+- **Grande Slime:** Acesso a combinações elementais avançadas e maior potência. Pode ter até 3 seguidores aliados.
+- **Rei Slime:** Maestria completa dos elementos e liderança sobre criaturas. Pode ter até 5 seguidores aliados.
 
 #### Sistema de Habilidades Elementais
 
@@ -151,7 +151,7 @@ A região mais elevada das Montanhas Cristalinas, caracterizada por condições 
 
 ### 4.1 Sistema de Dia e Noite
 
-O ciclo dia-noite opera em tempo acelerado, com cada dia completo durando aproximadamente 24 minutos reais (1 minuto real = 1 hora do jogo).
+O ciclo dia-noite opera em tempo acelerado, com cada dia completo durando aproximadamente 240 minutos reais (10 minutos reais = 1 hora do jogo).
 
 **Fases do Dia:**
 
@@ -234,7 +234,8 @@ Estação de descanso com cristais que brilham conforme elementos absorvidos.
 ### 6.1 Acesso e Interface
 
 - Acesso pelo botão de **Inventário** (Xbox: Vista / PlayStation: Touchpad / Switch: - / Teclado: Tab)
-- Tela do inventário com itens organizados em categorias claras
+- Interface minimalista com foco em usabilidade
+- O tamanho do inventário é limitado pelo tamanho do Slime (evolui com ele)
 
 ### 6.2 Estrutura de Itens
 
@@ -245,8 +246,9 @@ Estação de descanso com cristais que brilham conforme elementos absorvidos.
 ### 6.3 Características
 
 - Sem sistema de crafting nem armazenamento complexo
-- Sem limite rígido no inventário
 - Foco em facilitar jogabilidade relaxante
+- Incentivo à exploração e interação
+- Repetitibilidade de desafios e de revisitação de áreas
 
 ### 6.4 Feedback Visual
 
@@ -363,266 +365,65 @@ Algumas habilidades especiais são desbloqueadas após contato prolongado ou rep
 - Knockback alvo: (dano recebido × multiplicador) / peso
 - Knockback atacante: (poder de ataque × multiplicador) / peso
 
+**Respawn:**
+
+- Inimigos reaparecem na mudança das estações
+- Certos inimigos só aparecem em determinadas estações, dessa forma, podem não reaparecer durante 1 ano de jogo
+
 ---
 
 ## 17. Arquitetura Técnica e Sistemas
 
 ### 17.1 Estrutura de Estados do Jogo
 
-O jogo opera através de uma máquina de estados centralizada no `GameManager`, com estados claramente definidos:
-
-#### Estados Principais (GameState)
-
-```csharp
-public enum GameState
-{
-    Splash,         // Tela de splash (logos, loading inicial)
-    MainMenu,       // Menu principal/tela inicial
-    Options,        // Menu de configurações/opções
-    Credits,        // Tela de créditos
-    Loading,        // Carregando bioma/área de jogo
-    Exploring,      // Explorando mundo (estado principal)
-    Interacting,    // Dialogando com NPCs/criaturas
-    Paused,         // Jogo pausado (menu pause)
-    Inventory,      // Menu de inventário aberto
-    SkillTree,      // Árvore de habilidades aberta
-    Death,          // Slime foi derrotado
-    Evolution,      // Processo de evolução do Slime
-    Victory         // Área/objetivo completado
-}
-```
+O jogo opera através de uma máquina de estados centralizada, com estados claramente definidos, como tela de splash, menu principal, opções, créditos, carregamento, exploração, interação, pausa, inventário, árvore de habilidades, derrota, evolução e vitória.
 
 #### Transições Válidas
 
-- **MainMenu** → Options, Credits, Loading
-- **Exploring** → Paused, Inventory, SkillTree, Interacting, Death, Evolution, Victory, MainMenu
-- **Paused** → Exploring, Options, MainMenu
-- **Death** → Exploring (respawn), MainMenu (game over)
+- Menu principal pode levar a opções, créditos ou carregamento
+- Exploração pode levar a pausa, inventário, árvore de habilidades, interação, derrota, evolução, vitória ou menu principal
+- Pausa pode retornar à exploração, opções ou menu principal
+- Derrota pode levar à exploração (respawn) ou menu principal (game over)
 
 ### 17.2 Sistema de Elementos Implementado
 
-#### Tipos Elementais (ElementType)
-
-```csharp
-public enum ElementType
-{
-    Fire,       // Fogo - Câmaras de Lava
-    Water,      // Água - Lago Espelhado
-    Earth,      // Terra - Área Rochosa
-    Air,        // Ar - Pico Nevado
-    Nature,     // Natureza - Floresta Calma
-    Shadow      // Sombra - Pântano das Névoas
-}
-```
+Os elementos principais do jogo são Fogo, Água, Terra, Ar, Natureza e Sombra, cada um associado a um bioma específico.
 
 #### Distribuição por Bioma
 
-| Bioma | Elemento Principal | Elementos Secundários |
-|:--|:--|:--|
-| Floresta Calma | Nature | Earth, Air |
-| Lago Espelhado | Water | Air |
-| Área Rochosa | Earth | Fire |
-| Pântano das Névoas | Shadow | Water, Nature |
-| Câmaras de Lava | Fire | Earth |
-| Pico Nevado | Air | Water |
+Cada bioma possui um elemento principal e elementos secundários, influenciando criaturas, desafios e recursos disponíveis.
 
 ### 17.3 Sistema de Progressão do Slime
 
-#### Estágios Evolutivos (SlimeStage)
-
-```csharp
-public enum SlimeStage
-{
-    Filhote,        // Estado inicial
-    Adulto,         // Habilidades básicas
-    GrandeSlime,    // Combinações avançadas
-    ReiSlime        // Maestria completa
-}
-```
-
-#### Requisitos de Evolução (Configuráveis no GameManager)
-
-- **Filhote → Adulto:** 10 fragmentos totais
-- **Adulto → Grande Slime:** 25 fragmentos totais
-- **Grande Slime → Rei Slime:** 50 fragmentos totais + 10 aliados
+O Slime evolui por estágios: Filhote, Adulto, Grande Slime e Rei Slime. A evolução depende da coleta de fragmentos e do número de aliados conquistados.
 
 ### 17.4 Sistema de Configurações (Revisado)
 
-> Nota (Refatoração Arquitetural): A antiga estrutura `GameSettings` foi removida do `GameManager` em favor de uma separação de responsabilidades. Configurações de áudio serão tratadas por `AudioManager`; gráficos e acessibilidade por um futuro `UISettingsManager`. Abaixo permanece o modelo original apenas como referência histórica (não implementado atualmente).
-
-#### (Obsoleto) GameSettings (Serializable)
-
-```csharp
-[System.Serializable]
-public class GameSettings
-{
-    [Header("Audio")]
-    public float masterVolume = 1f;
-    public float musicVolume = 1f;
-    public float sfxVolume = 1f;
-
-    [Header("Graphics")]
-    public bool fullscreen = true;
-    public int resolutionIndex = 0;
-    public bool vSync = true;
-
-    [Header("Gameplay")]
-    public bool showTutorials = true;
-    public bool showDamageNumbers = true;
-    public float uiScale = 1f;
-
-    [Header("Controls")]
-    public float mouseSensitivity = 1f;
-    public bool invertYAxis = false;
-
-    [Header("Accessibility")]
-    public bool subtitles = false;
-    public bool colorBlindMode = false;
-    public float textSize = 1f;
-}
-```
+O sistema de configurações foi dividido em áudio, gráficos, jogabilidade, controles e acessibilidade, cada um gerenciado por sistemas próprios para facilitar ajustes e personalização.
 
 ### 17.5 Arquitetura de Eventos Desacoplada
 
-#### Categorias de Eventos Implementadas
-
-**GameManagerEvents:** Estados globais do jogo
-
-```csharp
-OnGameStateChanged, OnGameStarted, OnGamePaused, OnSlimeEvolved, 
-OnLivesChanged, OnCrystalFragmentsChanged, OnFriendshipChanged
-```
-
-**PlayerEvents:** Ações do jogador
-
-```csharp
-OnPlayerDeath, OnPlayerRespawn, OnPlayerMove, OnPlayerTakeDamage
-```
-
-**SlimeEvents:** Sistema de evolução
-
-```csharp
-OnCrystalAbsorbed, OnEvolutionTriggered, OnNewAbilityUnlocked
-```
-
-**CreatureEvents:** Sistema social
-
-```csharp
-OnFriendshipIncreased, OnCreatureBefriended, OnCreatureVisit
-```
-
-**BiomeEvents:** Transições de mundo
-
-```csharp
-OnBiomeEntered, OnBiomeExited, OnSeasonChanged
-```
-
-**UIEvents:** Interface do usuário
-
-```csharp
-OnStartGameRequested, OnPauseRequested, OnInventoryOpened
-```
+O jogo utiliza um sistema de eventos para comunicação entre sistemas, como mudanças de estado, ações do jogador, evolução do slime, interações sociais, transições de bioma e interface do usuário.
 
 ### 17.6 Sistema de Atributos do Player
 
-#### PlayerAttributesSystem (Componente modular)
-
-```csharp
-// Atributos Base Configuráveis
-[SerializeField] private int baseHealthPoints = 10;
-[SerializeField] private int baseAttack = 1;
-[SerializeField] private int baseDefense = 0;
-[SerializeField] private float baseMoveSpeed = 5f;
-[SerializeField] private float baseAttackRange = 1f;
-[SerializeField] private float baseAttackDuration = 0.5f;
-[SerializeField] private float baseAcceleration = 10f;
-[SerializeField] private float baseDeceleration = 10f;
-```
-
-#### Propriedades Dinâmicas
-
-- **Vida:** Sistema de HP com máximo configurável
-- **Ataque/Defesa:** Valores escaláveis com equipamentos
-- **Movimento:** Aceleração/desaceleração suaves
-- **Combate:** Range e duração de ataques ajustáveis
+O sistema de atributos do jogador permite configurar vida, ataque, defesa, velocidade de movimento, alcance e duração dos ataques, além de aceleração e desaceleração. Esses valores podem ser ajustados por equipamentos e evolução.
 
 ### 17.7 Sistema de Input Moderno
 
-#### InputManager (Singleton persistente)
-
-Wrapper centralizado para o novo Input System do Unity, com contextos separados:
-
-**Contextos de Input:**
-
-- **UI:** Navegação em menus (Navigate, Submit, Cancel, Point, Click)
-- **Gameplay:** Controles de jogo (Move, Attack, Interact, SpecialAttack)
-- **System:** Controles globais (Pause, Skip, Quit)
-
-**Benefícios:**
-
-- Desacoplamento total do asset gerado
-- Habilitação/desabilitação contextual de mapas
-- API limpa para outros sistemas
-- Suporte multiplataforma automático
+O gerenciamento de controles é centralizado, com contextos separados para menus, gameplay e sistema, permitindo navegação intuitiva e suporte multiplataforma.
 
 ### 17.8 Sistema de Áudio Persistente
 
-#### AudioManager (DontDestroyOnLoad)
-
-```csharp
-// Configurações de Volume
-[Range(0f, 1f)] private float masterVolume = 1f;
-[Range(0f, 1f)] private float musicVolume = 0.7f;
-[Range(0f, 1f)] private float sfxVolume = 0.8f;
-
-// Biblioteca de Música
-[SerializeField] private AudioClip menuMusic;
-[SerializeField] private AudioClip gameplayMusic;
-```
-
-**Funcionalidades:**
-
-- Transições suaves com crossfade entre músicas
-- Música contínua entre mudanças de cena
-- Separação clara entre música e efeitos sonoros
-- Controle de volume por categoria
+O sistema de áudio permite transições suaves entre músicas, separação entre música e efeitos sonoros, e controle de volume por categoria.
 
 ### 17.9 Sistema de Combate Avançado
 
-#### AttackHandler (Detecção retangular otimizada)
+O sistema de combate utiliza detecção otimizada para ataques, com suporte a diferentes direções e objetos destrutíveis, visando performance e resposta rápida.
 
-```csharp
-// Configurações de Ataque
-[SerializeField] private Vector2 attackSize = new Vector2(2f, 1.5f);
-[SerializeField] private Vector2 attackOffset = Vector2.zero;
-[SerializeField] private LayerMask destructableLayerMask = -1;
-```
+### 17.10 Integração Técnica
 
-**Características Técnicas:**
-
-- Detecção retangular com `Physics2D.OverlapBox`
-- Offset dinâmico baseado na direção do ataque
-- Cache de componentes para performance otimizada
-- Suporte a objetos destrutíveis (BushDestruct, RockDestruct)
-- Sistema de direção automático (Sul/Norte/Leste/Oeste)
-
-### 17.10 Integração Unity 6 + URP
-
-#### Tecnologias Utilizadas
-
-- **Unity 6.3+** com Universal Render Pipeline (URP)
-- **Post Processing** para efeitos visuais
-- **Cinemachine** para controle de câmera avançado
-- **Input System** moderno e multiplataforma
-- **Namespace ExtraTools** para organização de código
-
-#### Performance e Otimização
-
-- Object pooling para ataques e efeitos
-- Cache de componentes para evitar GetComponent
-- WaitForSecondsRealtime cacheado para corrotinas
-- Sistema de eventos para reduzir dependências
-- Conditional compilation para logs de debug
+O projeto utiliza tecnologias modernas para gráficos, efeitos visuais, controle de câmera, sistema de input e organização de código, além de técnicas de otimização como pooling de objetos e cache de componentes.
 
 ---
 
@@ -700,35 +501,7 @@ O jogo utiliza o novo Input System do Unity com suporte completo a múltiplas pl
 
 ### 18.2 PlayerController Avançado
 
-#### Características Técnicas
-
-**Movimento Suave:**
-
-```csharp
-[SerializeField] private float baseMoveSpeed = 5f;
-[SerializeField] private float baseAcceleration = 10f;
-[SerializeField] private float baseDeceleration = 10f;
-```
-
-**Sistema de Direção Visual:**
-
-- Objetos frontais/traseiros/laterais independentes
-- VFX direcionais separados dos sprites principais
-- Flip automático para movimentos laterais
-- Rotação automática de objetos de ataque
-
-**Estados de Movimento:**
-
-- `_canMove`: Controla se movimento está habilitado
-- `_isMoving`: Indica se está em movimento
-- `_isAttacking`: Bloqueia movimento durante ataques (opcional)
-- `_isHiding`: Estado de agachamento/esconder
-
-**Movimentos Especiais:**
-
-- Sistema de `SpecialMovementPoint` para mecânicas específicas
-- Corrotinas gerenciadas para movimentos complexos
-- Cache de colliders para otimização
+O controle do personagem oferece movimento suave, resposta rápida e suporte a diferentes estados como ataque, agachamento e movimentos especiais, além de otimizações para melhor desempenho.
 
 ### 18.3 Interface Visual Adaptativa
 
@@ -757,29 +530,7 @@ O jogo utiliza o novo Input System do Unity com suporte completo a múltiplas pl
 
 ### 18.4 Sistema de Debug Integrado
 
-#### Ferramentas de Desenvolvimento
-
-**Logs Configuráveis:**
-
-```csharp
-[SerializeField] private bool enableDebugLogs = true;
-[SerializeField] private bool enableDebugMode = false;
-```
-
-**Visualização no Editor:**
-
-```csharp
-[SerializeField] private bool enableDebugGizmos = true;
-[SerializeField] private bool showDebugGUI = false;
-```
-
-**Funcionalidades Debug:**
-
-- Gizmos para ranges de ataque e colisões
-- GUI runtime para alteração de valores
-- Logs detalhados de estados e transições
-- Visualização de áreas de detecção
-- Compilação condicional para builds de release
+O sistema de debug oferece ferramentas para visualização de ranges, alteração de valores em tempo real, logs detalhados e visualização de áreas de detecção, facilitando o desenvolvimento e testes.
 
 ---
 
@@ -787,26 +538,7 @@ O jogo utiliza o novo Input System do Unity com suporte completo a múltiplas pl
 
 ### 19.1 Arquitetura de Dados Persistentes
 
-#### Dados Salvos pelo GameManager
-
-```csharp
-// Progressão do Slime
-[SerializeField] private SlimeStage currentSlimeStage = SlimeStage.Filhote;
-[SerializeField] private int currentLives = 3;
-[SerializeField] private float gameTime = 0f;
-[SerializeField] private float sessionTime = 0f;
-[SerializeField] private string currentBiome = "Ninho";
-
-// Sistema de Cristais
-private Dictionary<ElementType, int> crystalFragments;
-
-// Sistema Social
-private Dictionary<string, int> friendshipLevels;
-private List<string> unlockedHomeExpansions;
-
-// Configurações
-private GameSettings gameSettings;
-```
+O sistema de salvamento armazena o progresso do slime, vidas, tempo de jogo, bioma atual, fragmentos de cristais, níveis de amizade, expansões do lar desbloqueadas e configurações do jogador.
 
 ### 19.2 Slots de Salvamento
 
@@ -845,34 +577,7 @@ private GameSettings gameSettings;
 
 ### 20.1 Otimizações Implementadas
 
-#### Cache de Componentes
-
-```csharp
-// PlayerController - Components
-private Rigidbody2D _rigidbody;
-private Animator _animator;
-private SpriteRenderer _spriteRenderer;
-private PlayerAttributesSystem _attributesHandler;
-
-// AttackHandler - Component Cache
-private readonly Dictionary<Collider2D, BushDestruct> bushCache;
-private readonly Dictionary<Collider2D, RockDestruct> rockCache;
-```
-
-#### Object Pooling para Performance
-
-- Pool de objetos de ataque
-- Cache de arrays para detecção de colisão
-- WaitForSecondsRealtime reutilizáveis
-- Strings de hash cacheadas para tags
-
-#### Compilação Condicional
-
-```csharp
-[System.Diagnostics.Conditional("UNITY_EDITOR")]
-[System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
-private void Log(string message) { /* Logs apenas em debug */ }
-```
+O projeto utiliza cache de componentes, pooling de objetos, reutilização de arrays e strings otimizadas para garantir alta performance em todas as plataformas.
 
 ### 20.2 Métricas de Performance Alvo
 
@@ -955,7 +660,7 @@ private void Log(string message) { /* Logs apenas em debug */ }
 
 ### 22.2 Próximas Etapas Prioritárias
 
-#### Demo Alpha Completação (Q1 2025)
+#### Demo Alpha Completação (Q4 2025)
 
 - [ ] Implementar sistema de cristais e absorção
 - [ ] Criar sistema de evolução do slime
@@ -963,7 +668,7 @@ private void Log(string message) { /* Logs apenas em debug */ }
 - [ ] Implementar sistema básico de amizade
 - [ ] Sistema de salvamento funcional
 
-#### Demo Beta (Q2 2025)
+#### Demo Beta (Q1 2026)
 
 - [ ] Sistema de estações e clima dinâmico
 - [ ] Fauna completa dos 6 biomas
@@ -971,7 +676,7 @@ private void Log(string message) { /* Logs apenas em debug */ }
 - [ ] UI completa e polida
 - [ ] Sistema de inventário
 
-#### Demo Next (Q3 2025)
+#### Demo Next (Q3 2026)
 
 - [ ] Sistema climático avançado
 - [ ] Sistema de configurações completo
@@ -979,90 +684,23 @@ private void Log(string message) { /* Logs apenas em debug */ }
 - [ ] Compatibilidade Steam Deck
 - [ ] Sistema de achievements
 
-#### V1 Release (Q4 2025)
+#### V1 Release (Q4 2026)
 
 - [ ] Lançamento PC/Steam completo
 - [ ] Multiplayer local implementado
 - [ ] Sistema de conquistas
 - [ ] Conteúdo pós-lançamento planejado
 
-#### V2 Expansion (Q1 2026)
+#### V2 Expansion (Q1 2027)
 
 - [ ] Multiplayer remoto
 - [ ] Expansão Xbox Series
 - [ ] Novos biomas e criaturas
 - [ ] Sistema de temporadas
 
-#### V3 Multi-Platform (Q2 2026)
+#### V3 Multi-Platform (Q2 2027)
 
 - [ ] Lançamento Nintendo Switch
 - [ ] Lançamento PlayStation
 - [ ] Otimizações finais
 - [ ] Conteúdo adicional
-
-### 22.3 Dependências Técnicas Identificadas
-
-#### Sistemas Críticos Restantes
-
-1. **Sistema de Cristais:** Base para progressão do slime
-2. **IA das Criaturas:** Comportamentos sociais e de combate
-3. **Sistema de Biomas:** Transições e características únicas
-4. **Quest System:** Missões e objetivos
-5. **Sistema de Inventário:** Gerenciamento de itens
-
-#### Ferramentas de Desenvolvimento
-
-1. **Scene Setup Tools:** Automatização de configuração (✅ Implementado)
-2. **Asset Pipeline:** Otimização automática de sprites
-3. **Build Pipeline:** Configuração multi-plataforma
-4. **Testing Framework:** Testes automatizados de gameplay
-
----
-
-## 23. Conclusões e Considerações Finais
-
-### 23.1 Estado Atual da Implementação
-
-O projeto **The Slime King** demonstra uma arquitetura sólida e bem estruturada, seguindo as boas práticas estabelecidas no documento de diretrizes. A implementação atual revela:
-
-#### Pontos Fortes
-
-- **Arquitetura Limpa:** Separação clara de responsabilidades entre Manager, Controller, Handler e System
-- **Desacoplamento:** Sistema de eventos robusto reduz dependências diretas
-- **Extensibilidade:** Código preparado para expansões futuras
-- **Performance:** Otimizações implementadas desde o início
-- **Manutenibilidade:** Código bem documentado e organizado
-
-#### Sistemas Funcionais
-
-- Estado do jogo gerenciado centralmente
-- Input System moderno e multiplataforma
-- Movimento de personagem suave e responsivo
-- Sistema de combate otimizado
-- Áudio persistente entre cenas
-- Ferramentas de debug integradas
-
-### 23.2 Alinhamento com a Visão Original
-
-A implementação técnica está totalmente alinhada com a visão cozy e contemplativa do jogo:
-
-- **Sem Pressão:** Sistemas que permitem exploração no próprio ritmo
-- **Progressão Orgânica:** Evolução baseada em descoberta, não grind
-- **Interação Pacífica:** Foco em amizade com criaturas, não combate agressivo
-- **Personalização:** Sistema de lar expansível e customizável
-
-### 23.3 Próximos Marcos Críticos
-
-Para manter o cronograma de desenvolvimento, os seguintes sistemas são prioritários:
-
-1. **Sistema de Cristais** (3-4 semanas)
-2. **Sistema de Evolução** (2-3 semanas)
-3. **Primeiro Bioma Completo** (4-6 semanas)
-4. **Sistema de Salvamento** (2-3 semanas)
-
----
-
-**Status do Documento:** Versão 4.0 Completa - Atualizada com Análise de Código  
-**Data:** 7 de outubro de 2025  
-**Última Revisão:** Análise completa da implementação atual  
-**Próxima Revisão:** Após implementação dos sistemas de cristais e evolução
