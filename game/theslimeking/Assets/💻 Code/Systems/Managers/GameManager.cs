@@ -25,6 +25,12 @@ public class GameManager : ManagerSingleton<GameManager>
         Application.targetFrameRate = 60; // manter consistente
         Time.timeScale = 1f;              // garantir tempo normal
 
+        // Garante que CameraManager seja inicializado
+        if (CameraManager.HasInstance)
+        {
+            CameraManager.Instance.OnSceneLoaded();
+        }
+
         // Estado inicial simples (usar GameState se definido em enums do projeto)
         // Como este GameManager está reduzido, apenas registra o bootstrap.
         Log("GameManager bootstrap concluído");
@@ -141,6 +147,12 @@ public class GameManager : ManagerSingleton<GameManager>
                 // Limpa artefatos de carregamento simultâneo (EventSystems e Global Light2D)
                 CleanupDuplicateEventSystems();
                 CleanupDuplicateGlobalLights();
+
+                // Atualiza configurações de câmera após ativação da cena
+                if (CameraManager.HasInstance)
+                {
+                    CameraManager.Instance.OnSceneLoaded();
+                }
             }
             OnPreloadedSceneActivated?.Invoke(preloadedSceneName);
             onActivated?.Invoke();

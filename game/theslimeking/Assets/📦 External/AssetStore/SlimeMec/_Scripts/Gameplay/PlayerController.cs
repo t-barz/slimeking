@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance { get; private set; }
 
-    // ...existing code...
     #region Inspector Configuration
 
     [Header("⚙️ Configurações de Movimento")]
@@ -77,7 +76,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject vfxSideObject;
     [SerializeField] private GameObject shadowObject;
 
-    [Header("🔧 Ferramentas de Debug")]
+    [Header("� Configurações de Áudio")]
+    [Tooltip("AudioClip para som de movimento/caminhada do jogador")]
+    [SerializeField] private AudioClip movementSound;
+
+    [Tooltip("AudioClip para som de ataque básico")]
+    [SerializeField] private AudioClip attackSound;
+
+    [Tooltip("AudioClip para som de pulo/jump")]
+    [SerializeField] private AudioClip jumpSound;
+
+    [Tooltip("AudioClip para som de deslizamento/slide")]
+    [SerializeField] private AudioClip slideSound;
+
+    [Tooltip("AudioClip para som de agachamento/squat")]
+    [SerializeField] private AudioClip squatSound;
+
+    [Header("�🔧 Ferramentas de Debug")]
     [Tooltip("Habilita logs detalhados no Console para debug de movimento e ações")]
     [SerializeField] private bool enableLogs = false;
 
@@ -109,6 +124,10 @@ public class PlayerController : MonoBehaviour
     private bool _isAttacking = false;           // Se o jogador está executando um ataque
     private bool _isHiding = false;              // Se o jogador está escondido (Crouch pressionado)
 
+    // === SISTEMA DE ÁUDIO ===
+    // Controle de reprodução de sons para evitar spam
+    private bool _wasMovingLastFrame = false;    // Flag para detectar início de movimento
+
     // === SISTEMA DE MOVIMENTO ESPECIAL ===
     // Controle de movimentos especiais (Jump/Shrink)
     private bool _isPerformingSpecialMovement = false;  // Flag que indica se está executando movimento especial
@@ -130,6 +149,7 @@ public class PlayerController : MonoBehaviour
     // Valores mágicos extraídos para facilitar manutenção
     private const float MOVEMENT_THRESHOLD = 0.1f;  // Threshold mínimo para considerar movimento
     private const float DEBUG_LABEL_HEIGHT = 3f;    // Altura do label de debug no Scene View
+    private const float DEFAULT_AUDIO_VOLUME = 1f; // Volume padrão dos sons (100%)
 
     // === SISTEMA DE DIREÇÃO VISUAL ===
     /// <summary>
@@ -699,6 +719,9 @@ public class PlayerController : MonoBehaviour
         {
             // Tecla pressionada - ativa esconderijo
             _isHiding = true;
+            
+            // TODO: Integrar som de agachamento
+            // PlaySquatSound();
         }
         else if (context.canceled)
         {
@@ -887,11 +910,15 @@ public class PlayerController : MonoBehaviour
             case SpecialMovementPoint.MovementType.Jump:
                 _animator.SetTrigger(JumpTrigger);
                 Debug.Log("PlayerController: Trigger 'Jump' ativado no Animator");
+                
+                PlayJumpSound();
                 break;
 
             case SpecialMovementPoint.MovementType.Shrink:
                 _animator.SetTrigger(ShrinkTrigger);
                 Debug.Log("PlayerController: Trigger 'Shrink' ativado no Animator");
+                
+                PlaySlideSound();
                 break;
 
             default:
@@ -1275,6 +1302,7 @@ public class PlayerController : MonoBehaviour
         if (_animator != null)
         {
             _animator.SetTrigger(Attack01);
+            PlayAttackSound();
         }
 
         // Executa ataque usando AttackHandler (se disponível)
@@ -1691,6 +1719,199 @@ public class PlayerController : MonoBehaviour
                 return SlimeMec.Gameplay.AttackDirection.South;
         }
     }
+
+    #endregion
+
+    #region Audio Control Methods
+
+    /// <summary>
+    /// Reproduz o som de movimento/caminhada uma única vez.
+    /// Usado durante movimentação do jogador.
+    /// Volume padrão: 60%
+    /// </summary>
+    private void PlayMovementSound()
+    {
+        if (movementSound != null)
+        {
+            AudioSource.PlayClipAtPoint(movementSound, transform.position, DEFAULT_AUDIO_VOLUME);
+
+            if (enableLogs)
+                Debug.Log("PlayerController: Som de movimento reproduzido (volume 60%)");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de ataque básico uma única vez.
+    /// Usado durante execução de ataques.
+    /// Volume padrão: 60%
+    /// </summary>
+    private void PlayAttackSound()
+    {
+        if (attackSound != null)
+        {
+            AudioSource.PlayClipAtPoint(attackSound, transform.position, DEFAULT_AUDIO_VOLUME);
+
+            if (enableLogs)
+                Debug.Log("PlayerController: Som de ataque reproduzido (volume 60%)");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de pulo/jump uma única vez.
+    /// Usado durante movimentos especiais de pulo.
+    /// Volume padrão: 60%
+    /// </summary>
+    private void PlayJumpSound()
+    {
+        if (jumpSound != null)
+        {
+            AudioSource.PlayClipAtPoint(jumpSound, transform.position, DEFAULT_AUDIO_VOLUME);
+
+            if (enableLogs)
+                Debug.Log("PlayerController: Som de pulo reproduzido (volume 60%)");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de deslizamento/slide uma única vez.
+    /// Usado durante movimentos especiais de deslizamento.
+    /// Volume padrão: 60%
+    /// </summary>
+    private void PlaySlideSound()
+    {
+        if (slideSound != null)
+        {
+            AudioSource.PlayClipAtPoint(slideSound, transform.position, DEFAULT_AUDIO_VOLUME);
+
+            if (enableLogs)
+                Debug.Log("PlayerController: Som de deslizamento reproduzido (volume 60%)");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de agachamento/squat uma única vez.
+    /// Usado quando o jogador se agacha.
+    /// Volume padrão: 60%
+    /// </summary>
+    private void PlaySquatSound()
+    {
+        if (squatSound != null)
+        {
+            AudioSource.PlayClipAtPoint(squatSound, transform.position, DEFAULT_AUDIO_VOLUME);
+
+            if (enableLogs)
+                Debug.Log("PlayerController: Som de agachamento reproduzido (volume 60%)");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de movimento com volume customizado.
+    /// </summary>
+    /// <param name="volume">Volume do som (0.0f a 1.0f)</param>
+    private void PlayMovementSound(float volume)
+    {
+        if (movementSound != null)
+        {
+            AudioSource.PlayClipAtPoint(movementSound, transform.position, volume);
+
+            if (enableLogs)
+                Debug.Log($"PlayerController: Som de movimento reproduzido com volume {volume:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de ataque com volume customizado.
+    /// </summary>
+    /// <param name="volume">Volume do som (0.0f a 1.0f)</param>
+    private void PlayAttackSound(float volume)
+    {
+        if (attackSound != null)
+        {
+            AudioSource.PlayClipAtPoint(attackSound, transform.position, volume);
+
+            if (enableLogs)
+                Debug.Log($"PlayerController: Som de ataque reproduzido com volume {volume:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de pulo com volume customizado.
+    /// </summary>
+    /// <param name="volume">Volume do som (0.0f a 1.0f)</param>
+    private void PlayJumpSound(float volume)
+    {
+        if (jumpSound != null)
+        {
+            AudioSource.PlayClipAtPoint(jumpSound, transform.position, volume);
+
+            if (enableLogs)
+                Debug.Log($"PlayerController: Som de pulo reproduzido com volume {volume:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de deslizamento com volume customizado.
+    /// </summary>
+    /// <param name="volume">Volume do som (0.0f a 1.0f)</param>
+    private void PlaySlideSound(float volume)
+    {
+        if (slideSound != null)
+        {
+            AudioSource.PlayClipAtPoint(slideSound, transform.position, volume);
+
+            if (enableLogs)
+                Debug.Log($"PlayerController: Som de deslizamento reproduzido com volume {volume:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Reproduz o som de agachamento com volume customizado.
+    /// </summary>
+    /// <param name="volume">Volume do som (0.0f a 1.0f)</param>
+    private void PlaySquatSound(float volume)
+    {
+        if (squatSound != null)
+        {
+            AudioSource.PlayClipAtPoint(squatSound, transform.position, volume);
+
+            if (enableLogs)
+                Debug.Log($"PlayerController: Som de agachamento reproduzido com volume {volume:F2}");
+        }
+    }
+
+    #endregion
+
+    #region Public Audio Properties
+
+    /// <summary>
+    /// AudioClip para som de movimento/caminhada do jogador.
+    /// Usado pelo sistema de áudio para reproduzir som durante movimentação.
+    /// </summary>
+    public AudioClip MovementSound => movementSound;
+
+    /// <summary>
+    /// AudioClip para som de ataque básico.
+    /// Usado pelo sistema de áudio durante execução de ataques.
+    /// </summary>
+    public AudioClip AttackSound => attackSound;
+
+    /// <summary>
+    /// AudioClip para som de pulo/jump.
+    /// Usado pelo sistema de áudio durante movimentos especiais de pulo.
+    /// </summary>
+    public AudioClip JumpSound => jumpSound;
+
+    /// <summary>
+    /// AudioClip para som de deslizamento/slide.
+    /// Usado pelo sistema de áudio durante movimentos especiais de deslizamento.
+    /// </summary>
+    public AudioClip SlideSound => slideSound;
+
+    /// <summary>
+    /// AudioClip para som de agachamento/squat.
+    /// Usado pelo sistema de áudio quando o jogador se agacha.
+    /// </summary>
+    public AudioClip SquatSound => squatSound;
 
     #endregion
 

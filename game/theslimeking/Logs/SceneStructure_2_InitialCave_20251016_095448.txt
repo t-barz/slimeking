@@ -1,0 +1,186 @@
+======================================
+ESTRUTURA DA CENA: 2_InitialCave
+Exportado em: 2025-10-16 09:54:48
+Caminho da cena: Assets/🎮 Game/Scenes/2_InitialCave.unity
+Total de GameObjects: 4
+======================================
+
+[1/4] ROOT OBJECT:
+├── Main Camera
+│   │   Active: True
+│   │   Tag: MainCamera
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, -10.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (6)
+│   │   │   ├── Transform
+│   │   │   ├── Camera
+│   │   │   │   Clear Flags: SolidColor
+│   │   │   │   Projection: True
+│   │   │   │   Size/FOV: 5
+│   │   │   │   Near/Far: 0,3/1000
+│   │   │   │   Depth: -1
+│   │   │   ├── AudioListener
+│   │   │   ├── CinemachineCamera
+│   │   │   ├── CinemachineFollow
+│   │   │   ├── UniversalAdditionalCameraData
+
+[2/4] ROOT OBJECT:
+├── EventSystem
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (3)
+│   │   │   ├── Transform
+│   │   │   ├── EventSystem
+│   │   │   ├── InputSystemUIInputModule
+
+[3/4] ROOT OBJECT:
+├── Global Volume
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── Volume
+│   │   │   │   Is Global: True
+│   │   │   │   Priority: 1
+│   │   │   │   Profile: InitialCaveVolumeProfile
+
+[4/4] ROOT OBJECT:
+├── chr_whiteslime
+│   │   Active: True
+│   │   Tag: Player
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (10)
+│   │   │   ├── Transform
+│   │   │   ├── SortingGroup
+│   │   │   ├── SpriteRenderer
+│   │   │   ├── Animator
+│   │   │   ├── AudioSource
+│   │   │   │   Clip: None
+│   │   │   │   Volume: 1
+│   │   │   │   Loop: False
+│   │   │   │   Play On Awake: False
+│   │   │   ├── PlayerInput
+│   │   │   ├── Rigidbody2D
+│   │   │   ├── CircleCollider2D
+│   │   │   ├── PlayerAttributesHandler
+│   │   │   ├── PlayerController
+│   │   Children: (8)
+    │   ├── back
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── vfx_back
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── vfx_front
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── front
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── side
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── vfx_side
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── shadow
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (2)
+    │   │   │   ├── Transform
+    │   │   │   ├── SpriteRenderer
+    │   ├── Main Camera
+    │   │   Active: True
+    │   │   Tag: MainCamera
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 0.00, -10.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (5)
+    │   │   │   ├── Transform
+    │   │   │   ├── Camera
+    │   │   │   │   Clear Flags: SolidColor
+    │   │   │   │   Projection: True
+    │   │   │   │   Size/FOV: 10
+    │   │   │   │   Near/Far: 0,1/5000
+    │   │   │   │   Depth: -1
+    │   │   │   ├── AudioListener
+    │   │   │   ├── UniversalAdditionalCameraData
+    │   │   │   ├── CinemachineBrain
+
+======================================
+RESUMO DA EXPORTAÇÃO
+Total de objetos raiz: 4
+Arquivo gerado: SceneStructure_2_InitialCave_20251016_095448.txt
+======================================

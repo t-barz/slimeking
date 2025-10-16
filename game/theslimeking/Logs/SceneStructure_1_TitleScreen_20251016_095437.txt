@@ -1,0 +1,336 @@
+======================================
+ESTRUTURA DA CENA: 1_TitleScreen
+Exportado em: 2025-10-16 09:54:37
+Caminho da cena: Assets/🎮 Game/Scenes/1_TitleScreen.unity
+Total de GameObjects: 7
+======================================
+
+[1/7] ROOT OBJECT:
+├── Main Camera
+│   │   Active: True
+│   │   Tag: MainCamera
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, -10.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (4)
+│   │   │   ├── Transform
+│   │   │   ├── Camera
+│   │   │   │   Clear Flags: SolidColor
+│   │   │   │   Projection: True
+│   │   │   │   Size/FOV: 5
+│   │   │   │   Near/Far: 0,3/1000
+│   │   │   │   Depth: -1
+│   │   │   ├── AudioListener
+│   │   │   ├── UniversalAdditionalCameraData
+
+[2/7] ROOT OBJECT:
+├── Global Light 2D
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── Light2D
+
+[3/7] ROOT OBJECT:
+├── Canvas
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: UI (5)
+│   │   Transform: RectTransform
+│   │   │   Position: (0.00, 0.00)
+│   │   │   Size: (1280.00, 720.00)
+│   │   │   Anchors: (0.00, 0.00) - (0.00, 0.00)
+│   │   │   Pivot: (0.50, 0.50)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (0.01, 0.01, 0.01)
+│   │   Components: (4)
+│   │   │   ├── RectTransform
+│   │   │   ├── Canvas
+│   │   │   │   Render Mode: ScreenSpaceCamera
+│   │   │   │   Sort Order: 0
+│   │   │   │   Pixel Perfect: True
+│   │   │   ├── CanvasScaler
+│   │   │   ├── GraphicRaycaster
+│   │   Children: (5)
+    │   ├── ui_wslogo
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: RectTransform
+    │   │   │   Position: (0.00, 0.00)
+    │   │   │   Size: (-1136.00, -633.00)
+    │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+    │   │   │   Pivot: (0.50, 0.50)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── RectTransform
+    │   │   │   ├── CanvasRenderer
+    │   │   │   ├── Image
+    │   │   │   │   Sprite: uii_logows
+    │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+    │   │   │   │   Material: Default UI Material
+    │   │   │   │   Raycast Target: True
+    │   ├── ui_background
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: RectTransform
+    │   │   │   Position: (0.00, 0.00)
+    │   │   │   Size: (196.00, 114.00)
+    │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+    │   │   │   Pivot: (0.50, 0.50)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── RectTransform
+    │   │   │   ├── CanvasRenderer
+    │   │   │   ├── Image
+    │   │   │   │   Sprite: uii_titleA
+    │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+    │   │   │   │   Material: Default UI Material
+    │   │   │   │   Raycast Target: True
+    │   ├── ui_gamelogo
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: RectTransform
+    │   │   │   Position: (0.00, 0.00)
+    │   │   │   Size: (100.00, 48.00)
+    │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+    │   │   │   Pivot: (0.50, 0.50)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (0.75, 0.75, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── RectTransform
+    │   │   │   ├── CanvasRenderer
+    │   │   │   ├── Image
+    │   │   │   │   Sprite: uii_logo
+    │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+    │   │   │   │   Material: Default UI Material
+    │   │   │   │   Raycast Target: True
+    │   ├── ui_wssmalllogo
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: RectTransform
+    │   │   │   Position: (523.00, 277.00)
+    │   │   │   Size: (-1136.00, -633.00)
+    │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+    │   │   │   Pivot: (0.50, 0.50)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── RectTransform
+    │   │   │   ├── CanvasRenderer
+    │   │   │   ├── Image
+    │   │   │   │   Sprite: uii_logows
+    │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+    │   │   │   │   Material: Default UI Material
+    │   │   │   │   Raycast Target: True
+    │   ├── ui_pressstart
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: RectTransform
+    │   │   │   Position: (0.00, -261.00)
+    │   │   │   Size: (-1180.00, -620.00)
+    │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+    │   │   │   Pivot: (0.50, 0.50)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (1)
+    │   │   │   ├── RectTransform
+    │   │   Children: (6)
+        │   ├── ui_keyboard
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (0.00, -55.00)
+        │   │   │   Size: (-50.00, -72.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.25, 1.25, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── Image
+        │   │   │   │   Sprite: uii_inputAct1_0
+        │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+        │   │   │   │   Material: Default UI Material
+        │   │   │   │   Raycast Target: True
+        │   ├── ui_gamepad
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (-0.50, -52.30)
+        │   │   │   Size: (-49.00, -49.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.00, 1.00, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── Image
+        │   │   │   │   Sprite: uii_inputAct1_2
+        │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+        │   │   │   │   Material: Default UI Material
+        │   │   │   │   Raycast Target: True
+        │   ├── ui_xbox
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (-0.50, -52.30)
+        │   │   │   Size: (-49.00, -49.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.00, 1.00, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── Image
+        │   │   │   │   Sprite: uii_inputAct1_2
+        │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+        │   │   │   │   Material: Default UI Material
+        │   │   │   │   Raycast Target: True
+        │   ├── ui_playstation
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (-0.50, -52.30)
+        │   │   │   Size: (-49.00, -49.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.00, 1.00, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── Image
+        │   │   │   │   Sprite: uii_inputAct1_2
+        │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+        │   │   │   │   Material: Default UI Material
+        │   │   │   │   Raycast Target: True
+        │   ├── ui_switch
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (-0.50, -52.30)
+        │   │   │   Size: (-49.00, -49.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.00, 1.00, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── Image
+        │   │   │   │   Sprite: uii_inputAct1_2
+        │   │   │   │   Color: RGBA(1.000, 1.000, 1.000, 1.000)
+        │   │   │   │   Material: Default UI Material
+        │   │   │   │   Raycast Target: True
+        │   ├── txt_pressgroup
+        │   │   Active: True
+        │   │   Tag: Untagged
+        │   │   Layer: UI (5)
+        │   │   Transform: RectTransform
+        │   │   │   Position: (0.00, 16.00)
+        │   │   │   Size: (100.00, -50.00)
+        │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+        │   │   │   Pivot: (0.50, 0.50)
+        │   │   │   Rotation: (0.00, 0.00, 0.00)
+        │   │   │   Scale: (1.00, 1.00, 1.00)
+        │   │   Components: (3)
+        │   │   │   ├── RectTransform
+        │   │   │   ├── CanvasRenderer
+        │   │   │   ├── TextMeshProUGUI
+        │   │   Children: (1)
+            │   ├── txt_press
+            │   │   Active: True
+            │   │   Tag: Untagged
+            │   │   Layer: UI (5)
+            │   │   Transform: RectTransform
+            │   │   │   Position: (-1.00, 2.00)
+            │   │   │   Size: (0.00, 0.00)
+            │   │   │   Anchors: (0.00, 0.00) - (1.00, 1.00)
+            │   │   │   Pivot: (0.50, 0.50)
+            │   │   │   Rotation: (0.00, 0.00, 0.00)
+            │   │   │   Scale: (1.00, 1.00, 1.00)
+            │   │   Components: (3)
+            │   │   │   ├── RectTransform
+            │   │   │   ├── CanvasRenderer
+            │   │   │   ├── TextMeshProUGUI
+
+[4/7] ROOT OBJECT:
+├── EventSystem
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (3)
+│   │   │   ├── Transform
+│   │   │   ├── EventSystem
+│   │   │   ├── InputSystemUIInputModule
+
+[5/7] ROOT OBJECT:
+├── TitleScreenController
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.65, -4.52, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── TitleScreenController
+
+[6/7] ROOT OBJECT:
+├── SceneTransitioner
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (0.00, 0.00, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── SceneTransitioner
+
+[7/7] ROOT OBJECT:
+├── GameManager
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (1.78, -5.22, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── GameManager
+
+======================================
+RESUMO DA EXPORTAÇÃO
+Total de objetos raiz: 7
+Arquivo gerado: SceneStructure_1_TitleScreen_20251016_095437.txt
+======================================
