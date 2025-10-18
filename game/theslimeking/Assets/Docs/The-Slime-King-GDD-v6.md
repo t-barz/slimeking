@@ -292,7 +292,7 @@ Algumas habilidades especiais são desbloqueadas após contato prolongado ou rep
 ### 8.2 Exemplos de Desbloqueios
 
 - **Caminhante da Chuva:** Após 1 hora cumulativa sob chuva, desbloqueia "Resistência Hídrica"
-- **Força do Venenoso:** Após ser envenenado 50 vezes, ganha "Contra-Veneno"
+- **Força do Venenoso:** Após ser envenenado 10 vezes (por inimigos, alimentos ou armadilhas), ganha "Contra-Veneno"
 - **Amigo do Cristal:** Após interações repetidas com cristais específicos
 
 ### 8.3 Feedback
