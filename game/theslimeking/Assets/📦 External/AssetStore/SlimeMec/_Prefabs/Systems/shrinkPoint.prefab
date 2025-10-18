@@ -34,7 +34,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3935972820056276741
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -80,7 +79,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 7227142199702825361, guid: 294729e4c68b2204cb1c6906440c739f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -90,6 +88,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &302953994576123762
 GameObject:
@@ -125,7 +124,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2580031667021209316
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -171,7 +169,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 3085921490513101051, guid: 294729e4c68b2204cb1c6906440c739f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -181,6 +178,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &640780088299360220
 GameObject:
@@ -193,8 +191,8 @@ GameObject:
   - component: {fileID: 362953838950197177}
   - component: {fileID: 7443413255274591676}
   - component: {fileID: 8666777910157809020}
-  - component: {fileID: 6923749237538971216}
   - component: {fileID: 8422915306117876068}
+  - component: {fileID: 6504820874451659794}
   m_Layer: 0
   m_Name: shrinkPoint
   m_TagString: Untagged
@@ -211,7 +209,7 @@ Transform:
   m_GameObject: {fileID: 640780088299360220}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: -3.169, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -256,8 +254,36 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!61 &6923749237538971216
-BoxCollider2D:
+--- !u!114 &8422915306117876068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640780088299360220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f141845830a51254f95ae77d98aa46cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.SpecialMovementPoint
+  keyboardButtons: {fileID: 5529499523756065853}
+  gamepadButtons: {fileID: 8141466259948656402}
+  playstationButtons: {fileID: 4843624984446467226}
+  xboxButtons: {fileID: 171215981094964197}
+  switchButtons: {fileID: 5919402610862521150}
+  outlineController: {fileID: 0}
+  enableOutlineOnInteraction: 0
+  interactionOutlineColor: {r: 0, g: 1, b: 1, a: 1}
+  enableDebugLogs: 0
+  inputCheckInterval: 0.1
+  movementType: 1
+  destinationPoint: {fileID: 0}
+  movementDuration: 0.75
+  playerLayers:
+    serializedVersion: 2
+    m_Bits: 1
+--- !u!58 &6504820874451659794
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -291,45 +317,7 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.48979592, y: -0.14285713}
-    oldSize: {x: 0.765625, y: 0.765625}
-    newSize: {x: 0.765625, y: 0.765625}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &8422915306117876068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640780088299360220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f141845830a51254f95ae77d98aa46cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.SpecialMovementPoint
-  keyboardButtons: {fileID: 5529499523756065853}
-  gamepadButtons: {fileID: 8141466259948656402}
-  playstationButtons: {fileID: 4843624984446467226}
-  xboxButtons: {fileID: 171215981094964197}
-  switchButtons: {fileID: 5919402610862521150}
-  outlineController: {fileID: 0}
-  enableOutlineOnInteraction: 0
-  interactionOutlineColor: {r: 0, g: 1, b: 1, a: 1}
-  enableDebugLogs: 0
-  inputCheckInterval: 0.1
-  movementType: 0
-  destinationPoint: {fileID: 0}
-  movementDuration: 0.75
-  playerLayers:
-    serializedVersion: 2
-    m_Bits: 1
+  m_Radius: 0.3
 --- !u!1 &3496044924950070516
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,7 +352,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7213761901075494058
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -410,7 +397,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 6911024362770921401, guid: 294729e4c68b2204cb1c6906440c739f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -420,6 +406,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3691297558165881492
 GameObject:
@@ -455,7 +442,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8713463999483727677
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -501,7 +487,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 4074112732595103010, guid: 294729e4c68b2204cb1c6906440c739f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -511,6 +496,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6269591778560477921
 GameObject:
@@ -546,7 +532,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5320246693821047445
 SpriteRenderer:
-  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -592,7 +577,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_MaskInteraction: 0
   m_Sprite: {fileID: 615479217850191414, guid: 294729e4c68b2204cb1c6906440c739f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -602,4 +586,5 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
