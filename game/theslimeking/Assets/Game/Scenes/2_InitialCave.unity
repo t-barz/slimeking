@@ -6082,6 +6082,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: env_brown_rockA2
       objectReference: {fileID: 0}
+    - target: {fileID: 6648215447601921533, guid: 9bac254a4a321394bb7dcf49a049c186, type: 3}
+      propertyPath: maxDropCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6648215447601921533, guid: 9bac254a4a321394bb7dcf49a049c186, type: 3}
+      propertyPath: minDropCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6648215447601921533, guid: 9bac254a4a321394bb7dcf49a049c186, type: 3}
+      propertyPath: prefabList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6648215447601921533, guid: 9bac254a4a321394bb7dcf49a049c186, type: 3}
+      propertyPath: 'prefabList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5864117989572817364, guid: 02dd5b6781f2762498bf0e67612ff48e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

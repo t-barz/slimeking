@@ -152,9 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea310a0ceb225445975f37a4ebe5c46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropController
-  prefabList: []
-  minDropCount: 1
-  maxDropCount: 3
+  prefabList:
+  - {fileID: 5864117989572817364, guid: 02dd5b6781f2762498bf0e67612ff48e, type: 3}
+  minDropCount: 0
+  maxDropCount: 1
   useCurrentPosition: 1
   enableDebugLogs: 0
 --- !u!114 &3308091152172358588

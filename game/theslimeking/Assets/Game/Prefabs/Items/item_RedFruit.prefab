@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -4.745598
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.2050407
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -77,7 +77,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_Name
-      value: redFruit
+      value: item_RedFruit
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_SpriteSortPoint
@@ -85,11 +85,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5222057
+      value: 0.14
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1000669
+      value: -0.87136
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -301,8 +301,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  activationDelay: 1
-  showDelayFeedback: 0
-  delayTintColor: {r: 1, g: 1, b: 1, a: 1}
+  activationDelay: 0.5
+  showDelayFeedback: 1
+  delayTintColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   enableAttraction: 1
   optimizationInterval: 0.5
