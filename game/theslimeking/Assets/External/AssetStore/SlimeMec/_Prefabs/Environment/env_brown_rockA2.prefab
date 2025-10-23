@@ -26,19 +26,23 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 0547896dc48bd6a42a0de7ff86b626a8, type: 2}
     - target: {fileID: 3626916397498700004, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_FlipX
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_SpriteSortPoint
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3854085
+      value: 4.082
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.4431773
+      value: 10.682
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -50,15 +54,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c8f9441f4a719be4eb3f7b5c226f515a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -128,10 +132,10 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0.25}
+  m_Offset: {x: 0, y: 0.15}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.53125, y: -0.13636363}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 0.5, y: 0.6875}
     newSize: {x: 0.5, y: 0.6875}
     adaptiveTilingThreshold: 0.5

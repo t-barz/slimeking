@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using SlimeMec.Visual;
+using System.Collections;
 
 namespace SlimeMec.Gameplay
 {
@@ -49,7 +50,14 @@ namespace SlimeMec.Gameplay
         [SerializeField] private Transform xboxButtons;         // Botões de Xbox
         [SerializeField] private Transform switchButtons;       // Botões de Nintendo Switch
 
-        [Header("Outline Effect")]
+        [Header("Fade Animation Settings")]
+        [Tooltip("Duração do fade in/out dos botões (segundos)")]
+        [SerializeField] private float fadeDuration = 0.3f;
+
+        [Tooltip("Curva de animação para o fade")]
+        [SerializeField] private AnimationCurve fadeCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+        [Header("Outline Settings")]
         [SerializeField] private OutlineController outlineController; // Controlador de outline otimizado
         [SerializeField] private bool enableOutlineOnInteraction = true;    // Ativar outline quando player se aproxima
         [SerializeField] private Color interactionOutlineColor = Color.cyan; // Cor do outline de interação
@@ -74,6 +82,11 @@ namespace SlimeMec.Gameplay
 
         // Timer para verificação de input
         private float _inputCheckTimer = 0f;
+
+        // Sistema de fade
+        private Coroutine _currentFadeCoroutine;
+        private Transform _currentActiveButton;
+        private bool _isVisible = false;
 
         // Hash da tag para performance
         private static readonly int PlayerTagHash = "Player".GetHashCode();
@@ -145,7 +158,7 @@ namespace SlimeMec.Gameplay
             }
 
             // Desativa todos os renderers inicialmente
-            HideAllButtons();
+            HideAllButtonsImmediate();
             _isPlayerInRange = false;
 
             // Detecta o tipo de input inicial
@@ -191,42 +204,109 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
-        /// Desativa todos os renderers de botões.
+        /// Desativa todos os botões imediatamente (usado na inicialização).
         /// </summary>
-        protected void HideAllButtons()
+        private void HideAllButtonsImmediate()
         {
+            // Desativa todos os renderers diretamente
             if (_keyboardRenderer != null) _keyboardRenderer.enabled = false;
             if (_gamepadRenderer != null) _gamepadRenderer.enabled = false;
             if (_playstationRenderer != null) _playstationRenderer.enabled = false;
             if (_xboxRenderer != null) _xboxRenderer.enabled = false;
             if (_switchRenderer != null) _switchRenderer.enabled = false;
+
+            // Também desativa usando SpriteRenderer se existir
+            SetButtonAlpha(keyboardButtons, 0f);
+            SetButtonAlpha(gamepadButtons, 0f);
+            SetButtonAlpha(playstationButtons, 0f);
+            SetButtonAlpha(xboxButtons, 0f);
+            SetButtonAlpha(switchButtons, 0f);
+
+            // Reseta o estado
+            _isVisible = false;
+            _currentActiveButton = null;
         }
 
         /// <summary>
-        /// Ativa a exibição dos botões de interação baseado no input atual.
+        /// Define o alpha de um botão específico.
+        /// </summary>
+        private void SetButtonAlpha(Transform buttonTransform, float alpha)
+        {
+            if (buttonTransform == null) return;
+
+            SpriteRenderer spriteRenderer = buttonTransform.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                Color color = spriteRenderer.color;
+                color.a = alpha;
+                spriteRenderer.color = color;
+                spriteRenderer.enabled = alpha > 0f;
+            }
+        }
+
+        /// <summary>
+        /// Desativa todos os renderers de botões com fade suave.
+        /// </summary>
+        protected void HideAllButtons()
+        {
+            if (!_isVisible) return;
+
+            // Para qualquer fade em progresso
+            if (_currentFadeCoroutine != null)
+            {
+                StopCoroutine(_currentFadeCoroutine);
+            }
+
+            // Inicia fade out do botão ativo
+            if (_currentActiveButton != null)
+            {
+                _currentFadeCoroutine = StartCoroutine(FadeOut(_currentActiveButton));
+            }
+
+            _isVisible = false;
+        }
+
+        /// <summary>
+        /// Ativa a exibição dos botões de interação com fade suave baseado no input atual.
         /// </summary>
         protected void ShowInteractionButtons()
         {
-            // Desativa todos primeiro
-            HideAllButtons();
+            // Obtém o transform correspondente ao input atual
+            Transform targetButton = GetButtonTransformForInputType(_currentInputType);
 
-            // Ativa apenas o renderer correspondente ao input atual
-            Renderer targetRenderer = GetRendererForInputType(_currentInputType);
+            // Se já está visível com o mesmo botão, não precisa fazer nada
+            if (_isVisible && _currentActiveButton == targetButton && targetButton != null)
+                return;
 
-            if (targetRenderer != null)
+            // Para qualquer fade em progresso
+            if (_currentFadeCoroutine != null)
             {
-                targetRenderer.enabled = true;
-                _isPlayerInRange = true;
+                StopCoroutine(_currentFadeCoroutine);
+            }
+
+            // Se há um botão ativo diferente, fade out primeiro
+            if (_currentActiveButton != null && _currentActiveButton != targetButton)
+            {
+                _currentFadeCoroutine = StartCoroutine(FadeOutThenIn(_currentActiveButton, targetButton));
+            }
+            else if (targetButton != null)
+            {
+                // Fade in direto do novo botão
+                _currentActiveButton = targetButton;
+                _currentFadeCoroutine = StartCoroutine(FadeIn(targetButton));
             }
             else
             {
-                // Fallback para keyboard se o renderer específico não existir
-                if (_keyboardRenderer != null)
+                // Fallback para keyboard se o botão específico não existir
+                if (keyboardButtons != null)
                 {
-                    _keyboardRenderer.enabled = true;
-                    _isPlayerInRange = true;
+                    _currentActiveButton = keyboardButtons;
+                    _currentFadeCoroutine = StartCoroutine(FadeIn(keyboardButtons));
                 }
             }
+
+            _isPlayerInRange = true;
+            _isVisible = true;
 
             // Ativa o outline de interação
             if (outlineController != null && enableOutlineOnInteraction)
@@ -271,6 +351,112 @@ namespace SlimeMec.Gameplay
                 _ => _keyboardRenderer // Fallback
             };
         }
+
+        /// <summary>
+        /// Obtém o transform correspondente ao tipo de input.
+        /// </summary>
+        private Transform GetButtonTransformForInputType(InputType inputType)
+        {
+            return inputType switch
+            {
+                InputType.Keyboard => keyboardButtons,
+                InputType.Gamepad => gamepadButtons,
+                InputType.PlayStation => playstationButtons,
+                InputType.Xbox => xboxButtons,
+                InputType.Switch => switchButtons,
+                _ => keyboardButtons // Fallback
+            };
+        }
+
+        #endregion
+
+        #region Fade Animation Methods
+        /// <summary>
+        /// Faz fade in de um botão específico.
+        /// </summary>
+        private IEnumerator FadeIn(Transform buttonTransform)
+        {
+            if (buttonTransform == null) yield break;
+
+            SpriteRenderer spriteRenderer = buttonTransform.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null) yield break;
+
+            // Ativa o renderer e define alpha inicial
+            spriteRenderer.enabled = true;
+            Color startColor = spriteRenderer.color;
+            startColor.a = 0f;
+            spriteRenderer.color = startColor;
+
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / fadeDuration;
+                float curveValue = fadeCurve.Evaluate(t);
+
+                Color currentColor = spriteRenderer.color;
+                currentColor.a = curveValue;
+                spriteRenderer.color = currentColor;
+
+                yield return null;
+            }
+
+            // Garante alpha final
+            Color finalColor = spriteRenderer.color;
+            finalColor.a = 1f;
+            spriteRenderer.color = finalColor;
+
+            _currentFadeCoroutine = null;
+        }
+
+        /// <summary>
+        /// Faz fade out de um botão específico.
+        /// </summary>
+        private IEnumerator FadeOut(Transform buttonTransform)
+        {
+            if (buttonTransform == null) yield break;
+
+            SpriteRenderer spriteRenderer = buttonTransform.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null) yield break;
+
+            Color startColor = spriteRenderer.color;
+            float startAlpha = startColor.a;
+
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / fadeDuration;
+                float curveValue = fadeCurve.Evaluate(1f - t); // Inverte a curva para fade out
+
+                Color currentColor = spriteRenderer.color;
+                currentColor.a = startAlpha * curveValue;
+                spriteRenderer.color = currentColor;
+
+                yield return null;
+            }
+
+            // Desativa o renderer no final
+            spriteRenderer.enabled = false;
+            _currentActiveButton = null;
+            _currentFadeCoroutine = null;
+        }
+
+        /// <summary>
+        /// Faz fade out de um botão e depois fade in de outro.
+        /// </summary>
+        private IEnumerator FadeOutThenIn(Transform outButton, Transform inButton)
+        {
+            // Fade out do botão atual
+            yield return StartCoroutine(FadeOut(outButton));
+
+            // Fade in do novo botão
+            if (inButton != null)
+            {
+                _currentActiveButton = inButton;
+                yield return StartCoroutine(FadeIn(inButton));
+            }
+        }
         #endregion
 
         #region Trigger Events
@@ -281,14 +467,12 @@ namespace SlimeMec.Gameplay
         /// <param name="other">Collider que entrou no trigger</param>
         private void OnTriggerEnter2D(Collider2D other)
         {
-            _currentInputType = DetectCurrentInputType();
-            ShowInteractionButtons();
             // Verifica se é o Player usando CompareTag para performance
             if (other.CompareTag("Player"))
             {
+                _currentInputType = DetectCurrentInputType();
                 ShowInteractionButtons();
             }
-
         }
 
         /// <summary>
