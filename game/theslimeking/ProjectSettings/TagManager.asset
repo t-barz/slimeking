@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Attack
+  - Destructable
   layers:
   - Default
   - TransparentFX
@@ -39,8 +40,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Scenario
+  - name: Ground
     uniqueID: 2061501095
+    locked: 0
+  - name: GroundProps
+    uniqueID: 2015047577
+    locked: 0
+  - name: Walls
+    uniqueID: 678911223
     locked: 0
   - name: Default
     uniqueID: 0
