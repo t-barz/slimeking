@@ -8,33 +8,33 @@ Este documento detalha a organização completa do projeto **The Slime King** se
 
 ```
 Assets/
-├── 🎨 Art/                  # Todo conteúdo visual
+├── Art/                  # Todo conteúdo visual
 │   ├── Sprites/             # Todas as imagens e texturas
 │   ├── Materials/           # Materiais Unity para rendering
 │   └── Animations/          # Sistema de animação completo
 │       ├── Controllers/     # Animator Controllers (.controller)
 │       └── Clips/          # Animation Clips (.anim)
-├── 🔊 Audio/                # Todo conteúdo sonoro
+├── Audio/                # Todo conteúdo sonoro
 │   ├── Music/               # Background music, trilhas sonoras
 │   └── SFX/                 # Sound effects, feedbacks sonoros
-├── 💻 Code/                 # Scripts organizados por função
+├── Code/                 # Scripts organizados por função
 │   ├── Gameplay/            # PlayerController, inimigos, mecânicas
 │   ├── Systems/             # Managers, sistemas globais, Input System
 │   └── Editor/              # Ferramentas de desenvolvimento
-├── 🎮 Game/                 # Conteúdo específico do jogo
+├── Game/                 # Conteúdo específico do jogo
 │   ├── Scenes/              # Todas as cenas do jogo (.unity)
 │   ├── Prefabs/             # GameObjects pré-configurados
 │   └── Data/                # ScriptableObjects, configurações
-├── ⚙️ Settings/             # Configurações do Unity
+├── Settings/             # Configurações do Unity
 │   └── PostProcessing/      # Volume Profiles, efeitos visuais
-└── 📦 External/             # Assets de terceiros
+└── External/             # Assets de terceiros
     ├── AssetStore/          # Assets da Unity Asset Store
     ├── Plugins/             # Plugins externos
     ├── Libraries/           # Bibliotecas de terceiros
     └── Tools/               # Ferramentas externas
 ```
 
-## 🎨 **Art/** - Conteúdo Visual
+## **Art/** - Conteúdo Visual
 
 ### **Sprites/**
 
@@ -55,7 +55,7 @@ Assets/
 - **Controllers/**: Animator Controllers que gerenciam as máquinas de estado
 - **Clips/**: Animation Clips individuais para cada animação
 
-## 🔊 **Audio/** - Conteúdo Sonoro
+## **Audio/** - Conteúdo Sonoro
 
 ### **Music/**
 
@@ -71,7 +71,7 @@ Assets/
 - Sons ambientes
 - Efeitos de impacto e explosões
 
-## 💻 **Code/** - Scripts Organizados
+## **Code/** - Scripts Organizados
 
 ### **Gameplay/**
 
@@ -94,7 +94,7 @@ Assets/
 - **Build Scripts**: Automatização de build
 - **Utilities**: Utilitários de desenvolvimento
 
-## 🎮 **Game/** - Conteúdo Específico
+## **Game/** - Conteúdo Específico
 
 ### **Scenes/**
 
@@ -118,7 +118,7 @@ Assets/
 - **Game Config**: Configurações de balanceamento
 - **Localization**: Arquivos de localização
 
-## ⚙️ **Settings/** - Configurações Unity
+## **Settings/** - Configurações Unity
 
 ### **PostProcessing/**
 
@@ -127,7 +127,7 @@ Assets/
 - **Gameplay Effects**: Efeitos de hit, evolução, etc.
 - **Custom Effects**: Efeitos customizados
 
-## 📦 **External/** - Assets Terceiros
+## **External/** - Assets Terceiros
 
 ### **AssetStore/**
 
@@ -153,7 +153,7 @@ Assets/
 - Utilities externos
 - Scripts de build externos
 
-## 🛠️ Como Usar
+## Como Usar
 
 ### **1. Ferramenta Automática**
 
@@ -256,21 +256,21 @@ Menu: Extra Tools > Debug > Validar Configurações
 
 ### **Gameplay Scripts**
 
-- `PlayerController` → `💻 Code/Gameplay/`
-- `SlimeManager` → `💻 Code/Systems/`
-- `InputHandler` → `💻 Code/Systems/`
+- `PlayerController` → `Code/Gameplay/`
+- `SlimeManager` → `Code/Systems/`
+- `InputHandler` → `Code/Systems/`
 
 ### **Assets Visuais**
 
-- Sprites do Slime → `🎨 Art/Sprites/Player/`
-- Animações do Slime → `🎨 Art/Animations/Player/`
-- UI do jogo → `🎨 Art/Sprites/UI/`
+- Sprites do Slime → `Art/Sprites/Player/`
+- Animações do Slime → `Art/Animations/Player/`
+- UI do jogo → `Art/Sprites/UI/`
 
 ### **Áudio**
 
-- Trilha principal → `🔊 Audio/Music/`
-- Sons do Slime → `🔊 Audio/SFX/Player/`
-- Efeitos ambientes → `🔊 Audio/SFX/Environment/`
+- Trilha principal → `Audio/Music/`
+- Sons do Slime → `Audio/SFX/Player/`
+- Efeitos ambientes → `Audio/SFX/Environment/`
 
 ## 🔍 Validação e Manutenção
 
