@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: eb36794843e70004193c6c1865f4d7f3
+guid: 5d813e1e3a4770f478a01bace605ef8a
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects:
@@ -7,17 +7,17 @@ ScriptedImporter:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Destroy
-    second: {fileID: 7400000, guid: 50af3714708516d4cb62b801b5541945, type: 2}
+    second: {fileID: 7400000, guid: 6a7c3c06d985f624789fb37fdc6e251b, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Idle
-    second: {fileID: 7400000, guid: 447ffe77071679f4ea2aec0cba8dff35, type: 2}
+    second: {fileID: 7400000, guid: 30a36788983ce4e49ba93a9bef139251, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Shake
-    second: {fileID: 7400000, guid: 677bc2ff00dc5344cbca090ab6e134f6, type: 2}
+    second: {fileID: 7400000, guid: b9109f6ab73f0b74d9a7c45f47361096, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -117,7 +117,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638970024328889258
+  platformSettingsDirtyTick: 638970037686429051
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -142,7 +142,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: grassA
+  - name: Frame_0
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 7
@@ -154,7 +154,7 @@ ScriptedImporter:
       y: 24
       width: 14
       height: 12
-    spriteID: d1ebbaa0a89ef104ea97e4cbc13038c5
+    spriteID: ec1a626a85ce4874ca01f6650934df59
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -175,7 +175,7 @@ ScriptedImporter:
       y: 44
       width: 12
       height: 12
-    spriteID: dab5d8b8c53d62b4c85902e675e0e9bc
+    spriteID: fa82a705cfc6fd6419f532f7d9e2ad68
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -196,7 +196,7 @@ ScriptedImporter:
       y: 4
       width: 16
       height: 12
-    spriteID: e4a61f62f72f4254eaa2e68f921b3545
+    spriteID: 87d361bf262f8264dbea85bc365a79c3
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -217,7 +217,7 @@ ScriptedImporter:
       y: 45
       width: 21
       height: 11
-    spriteID: b5e7b59d4a40b594bb11830368798957
+    spriteID: 7cc8a81fe9c02f84ba02021a16b3ef7c
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -238,7 +238,7 @@ ScriptedImporter:
       y: 24
       width: 22
       height: 13
-    spriteID: 76d5a3aff95f5de43a0bae6005e727fd
+    spriteID: 09803ecbf18cf11408899d32d1ef61bc
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -259,7 +259,7 @@ ScriptedImporter:
       y: 4
       width: 24
       height: 12
-    spriteID: b278fbe4bc95f10418cdc48cedc50fc1
+    spriteID: 914ee33234b645f488bf461091f4d7bf
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -273,12 +273,12 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 438173865
+      value0: 2004257806
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: grassA
+    name: grassB
     layerFlags: 0
     layerType: 0
     blendMode: 0
@@ -291,7 +291,7 @@ ScriptedImporter:
         y: 9
         width: 14
         height: 12
-      spriteId: d1ebbaa0a89ef104ea97e4cbc13038c5
+      spriteId: ec1a626a85ce4874ca01f6650934df59
     - name: Frame_1
       frameIndex: 1
       additiveSortOrder: 0
@@ -300,7 +300,7 @@ ScriptedImporter:
         y: 9
         width: 12
         height: 12
-      spriteId: dab5d8b8c53d62b4c85902e675e0e9bc
+      spriteId: fa82a705cfc6fd6419f532f7d9e2ad68
     - name: Frame_2
       frameIndex: 2
       additiveSortOrder: 0
@@ -309,7 +309,7 @@ ScriptedImporter:
         y: 9
         width: 16
         height: 12
-      spriteId: e4a61f62f72f4254eaa2e68f921b3545
+      spriteId: 87d361bf262f8264dbea85bc365a79c3
     - name: Frame_3
       frameIndex: 3
       additiveSortOrder: 0
@@ -318,7 +318,7 @@ ScriptedImporter:
         y: 9
         width: 21
         height: 11
-      spriteId: b5e7b59d4a40b594bb11830368798957
+      spriteId: 7cc8a81fe9c02f84ba02021a16b3ef7c
     - name: Frame_4
       frameIndex: 4
       additiveSortOrder: 0
@@ -327,7 +327,7 @@ ScriptedImporter:
         y: 8
         width: 22
         height: 13
-      spriteId: 76d5a3aff95f5de43a0bae6005e727fd
+      spriteId: 09803ecbf18cf11408899d32d1ef61bc
     - name: Frame_5
       frameIndex: 5
       additiveSortOrder: 0
@@ -336,7 +336,7 @@ ScriptedImporter:
         y: 8
         width: 24
         height: 12
-      spriteId: b278fbe4bc95f10418cdc48cedc50fc1
+      spriteId: 914ee33234b645f488bf461091f4d7bf
     linkedCells: []
     tileCells: []
     tileSetIndex: 0

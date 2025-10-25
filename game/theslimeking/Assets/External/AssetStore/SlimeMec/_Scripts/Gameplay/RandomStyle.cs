@@ -48,6 +48,13 @@ public class RandomStyle : MonoBehaviour
     [Tooltip("Valor máximo para o canal Alpha")]
     [SerializeField] private float maxAlpha = 1f;
 
+    [Header("🔀 Direção Aleatória")]
+    [Tooltip("Permite direção aleatória no eixo X (flipX)")]
+    [SerializeField] private bool allowRandomFlipX = false;
+
+    [Tooltip("Permite direção aleatória no eixo Y (flipY)")]
+    [SerializeField] private bool allowRandomFlipY = false;
+
     [Header("🔍 Debug")]
     [Tooltip("Se true, mostra logs das alterações aplicadas")]
     [SerializeField] private bool enableLogs = false;
@@ -117,6 +124,21 @@ public class RandomStyle : MonoBehaviour
         if (enableLogs)
         {
             Debug.Log($"RandomStyle aplicado em '{gameObject.name}' - Escala: {transform.localScale}, Cor: {GetCurrentColor()}");
+        }
+    }
+
+    private void OnValidate()
+    {
+        // Flip aleatório só no editor, quando o objeto é colocado ou alterado na cena
+        if (allowRandomFlipX)
+        {
+            float flipX = Random.value < 0.5f ? 1f : -1f;
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x) * flipX, transform.localScale.y, transform.localScale.z);
+        }
+        if (allowRandomFlipY)
+        {
+            float flipY = Random.value < 0.5f ? 1f : -1f;
+            transform.localScale = new Vector3(transform.localScale.x, Mathf.Abs(transform.localScale.y) * flipY, transform.localScale.z);
         }
     }
 
