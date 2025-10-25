@@ -9,6 +9,7 @@
 - **Todas as atividades de desenvolvimento devem estar registradas no Roadmap.md - nunca implemente algo que não esteja documentado lá.**
 - Sempre verifique se existe alguma documentação relacionada na pasta Assets/Docs antes de implementar algo novo.
 - Utilize o idioma inglês para nomes de arquivos, pastas, classes e variáveis.
+- Nunca crie códigos de exemplo ou testes a não ser que seja solicitado.
 - Use camelCase para nomes de variáveis e métodos, e PascalCase para nomes de classes.
 - Utilize o idioma português para comentários e documentação, mantendo a clareza e a compreensão do código.
 - Sempre utilize as funcionalidades mais recentes do C# e do Unity, evitando práticas obsoletas.
