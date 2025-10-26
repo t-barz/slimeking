@@ -4,18 +4,18 @@
 
 A transição cellular entre **TitleScreen** e **InitialCave** foi implementada usando o **Easy Transition** existente no projeto.
 
-## 📦 **Componentes Necessários**
+## Componentes Necessários
 
-### 1. **SceneTransitioner (Singleton)**
+### 1. SceneTransitioner (Singleton)
 
-- **Prefab**: `Assets/📦 External/AssetStore/Easy Transition/Prefabs/SceneTransitioner.prefab`
+- **Prefab**: `Assets/External/AssetStore/Easy Transition/Prefabs/SceneTransitioner.prefab`
 - **Função**: Gerencia todas as transições entre cenas
 - **Configuração**: Deve ser adicionado na primeira cena (TitleScreen)
 
-### 2. **CellularEffect Asset**
+### 2. CellularEffect Asset
 
-- **Asset**: `Assets/📦 External/AssetStore/Easy Transition/Transition Effects/CellularEffect.asset`
-- **Material**: `Assets/📦 External/AssetStore/Easy Transition/Materials/CellularEffectMaterial.mat`
+- **Asset**: `Assets/External/AssetStore/Easy Transition/Transition Effects/CellularEffect.asset`
+- **Material**: `Assets/External/AssetStore/Easy Transition/Materials/CellularEffectMaterial.mat`
 - **Configuração**: Já pré-configurado com efeito cellular
 
 ## 🔧 **Configuração no Inspector**
