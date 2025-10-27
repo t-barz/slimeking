@@ -7,7 +7,7 @@ namespace PixeLadder.EasyTransition
 
     /// <summary>
     /// Gerenciador unificado para teletransporte entre cenas.
-    /// Responsável por pré-carregamento de cenas, reprodução de áudio e orquestração de teletransporte cross-scene.
+    /// Responsável por reprodução de áudio e orquestração de teletransporte cross-scene.
     /// Implementa padrão Singleton para acesso global.
     /// </summary>
     public class TeleportManager : MonoBehaviour
@@ -22,13 +22,6 @@ namespace PixeLadder.EasyTransition
         #endregion
 
         #region Serialized Fields
-
-        [Header("Scene Management")]
-        [Tooltip("Número máximo de cenas que podem ser mantidas pré-carregadas em memória")]
-        [SerializeField] private int maxPreloadedScenes = 2;
-
-        [Tooltip("Tempo de espera (em segundos) antes de descarregar uma cena pré-carregada quando o Player sai da zona de proximidade")]
-        [SerializeField] private float unloadDelay = 5f;
 
         [Header("Audio")]
         [Tooltip("AudioSource usado para reproduzir sons de teletransporte")]
@@ -46,18 +39,6 @@ namespace PixeLadder.EasyTransition
         /// Previne múltiplos teletransportes simultâneos.
         /// </summary>
         private bool isTeleporting = false;
-
-        /// <summary>
-        /// Dicionário de operações de pré-carregamento de cenas em andamento.
-        /// Key: nome da cena, Value: AsyncOperation
-        /// </summary>
-        private Dictionary<string, AsyncOperation> preloadOperations;
-
-        /// <summary>
-        /// Rastreamento de quando cada cena foi usada pela última vez (para LRU cache).
-        /// Key: nome da cena, Value: Time.time quando foi usada
-        /// </summary>
-        private Dictionary<string, float> sceneLastUsedTime;
 
         #endregion
 
@@ -87,10 +68,6 @@ namespace PixeLadder.EasyTransition
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            // Inicializa estruturas de dados
-            preloadOperations = new Dictionary<string, AsyncOperation>();
-            sceneLastUsedTime = new Dictionary<string, float>();
 
             // Valida AudioSource
             if (audioSource == null)
@@ -214,265 +191,6 @@ namespace PixeLadder.EasyTransition
             }
 
             return true;
-        }
-
-        #endregion
-
-        #region Scene Preloading
-
-        /// <summary>
-        /// Inicia o pré-carregamento de uma cena em background.
-        /// Se a cena já estiver pré-carregada, apenas atualiza o timestamp de uso.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena a ser pré-carregada</param>
-        public void PreloadScene(string sceneName)
-        {
-            // Validação de entrada
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                Debug.LogWarning("TeleportManager: Nome da cena para pré-carregamento está vazio ou nulo.");
-                return;
-            }
-
-            // Verifica se a cena existe nas Build Settings
-            if (!IsSceneInBuildSettings(sceneName))
-            {
-                Debug.LogError($"TeleportManager: Não é possível pré-carregar cena '{sceneName}' - não encontrada nas Build Settings.");
-                return;
-            }
-
-            // Verifica se a cena já está pré-carregada
-            if (IsScenePreloaded(sceneName))
-            {
-                Debug.Log($"TeleportManager: Cena '{sceneName}' já está pré-carregada. Atualizando timestamp de uso.");
-                MarkSceneAsUsed(sceneName);
-                return;
-            }
-
-            // Verifica se a cena já está carregada (ativa)
-            Scene scene = SceneManager.GetSceneByName(sceneName);
-            if (scene.isLoaded)
-            {
-                Debug.Log($"TeleportManager: Cena '{sceneName}' já está carregada (ativa). Não é necessário pré-carregar.");
-                return;
-            }
-
-            // Inicia pré-carregamento assíncrono
-            Debug.Log($"TeleportManager: Iniciando pré-carregamento de '{sceneName}'...");
-            StartCoroutine(PreloadSceneAsync(sceneName));
-        }
-
-        /// <summary>
-        /// Verifica se uma cena está pré-carregada e pronta para ativação instantânea.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena a ser verificada</param>
-        /// <returns>True se a cena está pré-carregada, false caso contrário</returns>
-        public bool IsScenePreloaded(string sceneName)
-        {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                return false;
-            }
-
-            // Verifica se existe uma operação de pré-carregamento para esta cena
-            if (!preloadOperations.ContainsKey(sceneName))
-            {
-                return false;
-            }
-
-            // Verifica se a operação está completa (90% = pronta para ativação)
-            AsyncOperation operation = preloadOperations[sceneName];
-            return operation != null && operation.progress >= 0.9f;
-        }
-
-        /// <summary>
-        /// Obtém o progresso de carregamento de uma cena (0.0 a 1.0).
-        /// </summary>
-        /// <param name="sceneName">Nome da cena</param>
-        /// <returns>Progresso de 0.0 a 1.0, ou 0.0 se a cena não está sendo pré-carregada</returns>
-        public float GetPreloadProgress(string sceneName)
-        {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                return 0f;
-            }
-
-            // Verifica se existe uma operação de pré-carregamento
-            if (!preloadOperations.ContainsKey(sceneName))
-            {
-                return 0f;
-            }
-
-            AsyncOperation operation = preloadOperations[sceneName];
-            if (operation == null)
-            {
-                return 0f;
-            }
-
-            // Retorna progresso (0.0 a 0.9 durante carregamento, 0.9 quando pronto)
-            return operation.progress;
-        }
-
-        /// <summary>
-        /// Cancela o pré-carregamento de uma cena e agenda seu descarregamento após um delay.
-        /// Útil quando o Player sai da zona de proximidade antes de usar o teletransporte.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena a ser descarregada</param>
-        public void CancelPreload(string sceneName)
-        {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                return;
-            }
-
-            // Verifica se a cena está pré-carregada
-            if (!preloadOperations.ContainsKey(sceneName))
-            {
-                return;
-            }
-
-            Debug.Log($"TeleportManager: Player saiu da zona de proximidade. " +
-                     $"Agendando descarregamento de '{sceneName}' em {unloadDelay} segundos...");
-
-            // Agenda descarregamento com delay
-            StartCoroutine(UnloadSceneDelayed(sceneName, unloadDelay));
-        }
-
-        /// <summary>
-        /// Coroutine que descarrega uma cena após um delay configurável.
-        /// Verifica se o Player retornou à zona de proximidade antes de descarregar.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena a ser descarregada</param>
-        /// <param name="delay">Tempo de espera em segundos antes de descarregar</param>
-        private IEnumerator UnloadSceneDelayed(string sceneName, float delay)
-        {
-            // Aguarda o delay configurado
-            yield return new WaitForSeconds(delay);
-
-            // Verifica se a cena ainda está pré-carregada
-            // (pode ter sido descarregada por outro motivo durante o delay)
-            if (!preloadOperations.ContainsKey(sceneName))
-            {
-                yield break;
-            }
-
-            // Verifica se a cena é a cena ativa atual
-            // (Player pode ter usado o teletransporte durante o delay)
-            Scene currentScene = SceneManager.GetActiveScene();
-            if (currentScene.name == sceneName)
-            {
-                Debug.Log($"TeleportManager: Cancelando descarregamento de '{sceneName}' - é a cena ativa atual.");
-                yield break;
-            }
-
-            // Descarrega a cena
-            Debug.Log($"TeleportManager: Descarregando cena '{sceneName}' após delay de proximidade.");
-
-            // Remove das estruturas de dados
-            preloadOperations.Remove(sceneName);
-            sceneLastUsedTime.Remove(sceneName);
-
-            // Descarrega a cena se estiver carregada
-            Scene scene = SceneManager.GetSceneByName(sceneName);
-            if (scene.isLoaded)
-            {
-                AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(sceneName);
-                
-                if (unloadOperation != null)
-                {
-                    // Aguarda conclusão do descarregamento
-                    yield return unloadOperation;
-                    
-                    // Libera recursos não utilizados
-                    yield return Resources.UnloadUnusedAssets();
-                    
-                    Debug.Log($"TeleportManager: Cena '{sceneName}' descarregada com sucesso.");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Marca uma cena como usada recentemente, atualizando seu timestamp no cache LRU.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena</param>
-        private void MarkSceneAsUsed(string sceneName)
-        {
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                return;
-            }
-
-            // Atualiza timestamp de último uso
-            sceneLastUsedTime[sceneName] = Time.time;
-        }
-
-        /// <summary>
-        /// Aplica o limite de cenas pré-carregadas em memória.
-        /// Se o limite for excedido, descarrega a cena menos recentemente usada (LRU).
-        /// </summary>
-        private void EnforceCacheLimit()
-        {
-            // Verifica se o limite foi excedido
-            while (preloadOperations.Count > maxPreloadedScenes)
-            {
-                UnloadLeastRecentlyUsedScene();
-            }
-        }
-
-        /// <summary>
-        /// Descarrega a cena menos recentemente usada (Least Recently Used).
-        /// Usa LINQ para encontrar a cena com o timestamp mais antigo.
-        /// </summary>
-        private void UnloadLeastRecentlyUsedScene()
-        {
-            if (preloadOperations.Count == 0)
-            {
-                return;
-            }
-
-            // Encontra a cena com o timestamp mais antigo (menos recentemente usada)
-            string lruSceneName = null;
-            float oldestTime = float.MaxValue;
-
-            foreach (var kvp in sceneLastUsedTime)
-            {
-                if (preloadOperations.ContainsKey(kvp.Key) && kvp.Value < oldestTime)
-                {
-                    oldestTime = kvp.Value;
-                    lruSceneName = kvp.Key;
-                }
-            }
-
-            // Se encontrou uma cena LRU, descarrega
-            if (!string.IsNullOrEmpty(lruSceneName))
-            {
-                Debug.Log($"TeleportManager: Limite de cache atingido ({maxPreloadedScenes}). " +
-                         $"Descarregando cena menos recentemente usada: '{lruSceneName}'");
-
-                // Remove das estruturas de dados
-                preloadOperations.Remove(lruSceneName);
-                sceneLastUsedTime.Remove(lruSceneName);
-
-                // Descarrega a cena se estiver carregada
-                Scene scene = SceneManager.GetSceneByName(lruSceneName);
-                if (scene.isLoaded)
-                {
-                    SceneManager.UnloadSceneAsync(lruSceneName);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Coroutine que realiza o pré-carregamento assíncrono de uma cena.
-        /// NOTA: Pré-carregamento não é suportado com LoadSceneMode.Single.
-        /// Este método foi mantido para compatibilidade mas não faz pré-carregamento real.
-        /// </summary>
-        /// <param name="sceneName">Nome da cena a ser pré-carregada</param>
-        private IEnumerator PreloadSceneAsync(string sceneName)
-        {
-            Debug.LogWarning($"TeleportManager: Pré-carregamento de '{sceneName}' solicitado, mas não é suportado com LoadSceneMode.Single. " +
-                           "A cena será carregada normalmente durante o teletransporte.");
-            yield break;
         }
 
         #endregion
@@ -722,7 +440,7 @@ namespace PixeLadder.EasyTransition
         }
 
         /// <summary>
-        /// Coroutine auxiliar que carrega a cena (se necessário) e transfere o player.
+        /// Coroutine auxiliar que carrega a cena diretamente e transfere o player.
         /// Executada durante o mid-transition quando a tela está escura.
         /// </summary>
         private IEnumerator LoadAndTransferPlayer(
@@ -732,84 +450,65 @@ namespace PixeLadder.EasyTransition
             AudioClip midSound,
             bool enableDebugLogs)
         {
-            // Verifica se a cena está pré-carregada
-            if (IsScenePreloaded(destinationSceneName))
+            // Reproduz som do meio da transição
+            PlayTeleportSound(midSound);
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"TeleportManager: Carregando cena '{destinationSceneName}' usando LoadSceneMode.Single...");
+            }
+
+            // IMPORTANTE: Salva referência do player ANTES de carregar a nova cena
+            GameObject playerObject = PlayerController.Instance != null ? PlayerController.Instance.gameObject : null;
+            
+            if (playerObject != null)
+            {
+                // Aplica DontDestroyOnLoad para prevenir destruição durante transição
+                DontDestroyOnLoad(playerObject);
+                
+                if (enableDebugLogs)
+                {
+                    Debug.Log("TeleportManager: DontDestroyOnLoad aplicado ao Player antes do carregamento.");
+                }
+            }
+
+            // Carrega cena usando LoadSceneMode.Single
+            // Isso automaticamente descarrega TODAS as cenas anteriores
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync(destinationSceneName, LoadSceneMode.Single);
+            
+            if (loadOperation == null)
+            {
+                Debug.LogError($"TeleportManager: Falha ao carregar cena '{destinationSceneName}'!");
+                yield break;
+            }
+
+            // Aguarda carregamento completo
+            while (!loadOperation.isDone)
             {
                 if (enableDebugLogs)
                 {
-                    Debug.Log($"TeleportManager: Cena '{destinationSceneName}' já está pré-carregada. Ativando...");
+                    Debug.Log($"TeleportManager: Progresso de carregamento: {loadOperation.progress * 100f:F1}%");
                 }
-
-                // Ativa a cena pré-carregada instantaneamente
-                AsyncOperation operation = preloadOperations[destinationSceneName];
-                operation.allowSceneActivation = true;
-
-                // Aguarda ativação completa
-                while (!operation.isDone)
-                {
-                    yield return null;
-                }
-
-                // Remove do cache de preload
-                preloadOperations.Remove(destinationSceneName);
-                sceneLastUsedTime.Remove(destinationSceneName);
-
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"TeleportManager: Cena '{destinationSceneName}' ativada com sucesso.");
-                }
+                yield return null;
             }
-            else
+
+            if (enableDebugLogs)
             {
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"TeleportManager: Carregando cena '{destinationSceneName}' usando LoadSceneMode.Single...");
-                }
-
-                // IMPORTANTE: Salva referência do player ANTES de carregar a nova cena
-                GameObject playerObject = PlayerController.Instance != null ? PlayerController.Instance.gameObject : null;
-                
-                if (playerObject != null)
-                {
-                    // Aplica DontDestroyOnLoad para prevenir destruição durante transição
-                    DontDestroyOnLoad(playerObject);
-                    
-                    if (enableDebugLogs)
-                    {
-                        Debug.Log("TeleportManager: DontDestroyOnLoad aplicado ao Player antes do carregamento.");
-                    }
-                }
-
-                // Carrega cena usando LoadSceneMode.Single
-                // Isso automaticamente descarrega TODAS as cenas anteriores
-                AsyncOperation loadOperation = SceneManager.LoadSceneAsync(destinationSceneName, LoadSceneMode.Single);
-                
-                if (loadOperation == null)
-                {
-                    Debug.LogError($"TeleportManager: Falha ao carregar cena '{destinationSceneName}'!");
-                    yield break;
-                }
-
-                // Aguarda carregamento completo
-                yield return loadOperation;
-
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"TeleportManager: Cena '{destinationSceneName}' carregada com sucesso usando Single mode.");
-                    Debug.Log($"TeleportManager: Cena ativa: {SceneManager.GetActiveScene().name}");
-                    Debug.Log($"TeleportManager: Total de cenas carregadas: {SceneManager.sceneCount}");
-                }
+                Debug.Log($"TeleportManager: Cena '{destinationSceneName}' carregada com sucesso.");
+                Debug.Log($"TeleportManager: Cena ativa: {SceneManager.GetActiveScene().name}");
+                Debug.Log($"TeleportManager: Total de cenas carregadas: {SceneManager.sceneCount}");
             }
+
+            // Aguarda um frame adicional para garantir que a cena foi inicializada
+            yield return null;
 
             // Reposiciona o player na nova cena
             RepositionPlayerInNewScene(destinationPosition, enableDebugLogs);
 
-            // Play mid sound após transferência
             if (enableDebugLogs)
             {
-                Debug.Log("TeleportManager: Player reposicionado. Reproduzindo som do meio...");
+                Debug.Log("TeleportManager: Player reposicionado na nova cena.");
             }
-            PlayTeleportSound(midSound);
         }
 
         /// <summary>

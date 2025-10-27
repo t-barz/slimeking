@@ -29,13 +29,6 @@ namespace PixeLadder.EasyTransition
         [Tooltip("Nome da cena de destino (deve estar nas Build Settings)")]
         [SerializeField] private string destinationSceneName = "";
 
-        [Header("Preloading Configuration")]
-        [Tooltip("Habilita pré-carregamento da cena de destino")]
-        [SerializeField] private bool enablePreloading = true;
-
-        [Tooltip("Raio de proximidade para iniciar pré-carregamento (0 = desabilitado)")]
-        [SerializeField] private float preloadProximityRadius = 5f;
-
         [Header("Audio Configuration")]
         [Tooltip("Som reproduzido no início do teletransporte")]
         [SerializeField] private AudioClip teleportStartSound;
@@ -68,9 +61,7 @@ namespace PixeLadder.EasyTransition
         #region Private Fields
 
         private BoxCollider2D triggerCollider;
-        private CircleCollider2D preloadTrigger;
         private bool isTeleporting = false;
-        private bool isInPreloadZone = false;
         private Transform cameraTransform;
         private Rigidbody2D playerRigidbody;
 
@@ -106,12 +97,10 @@ namespace PixeLadder.EasyTransition
         private void OnValidate()
         {
             UpdateTriggerSize();
-            ConfigurePreloadTrigger();
         }
 
         /// <summary>
-        /// Detecta quando o Player entra no trigger e inicia o teletransporte ou pré-carregamento.
-        /// Distingue entre trigger de ativação (BoxCollider2D) e trigger de proximidade (CircleCollider2D).
+        /// Detecta quando o Player entra no trigger e inicia o teletransporte imediatamente.
         /// </summary>
         /// <param name="other">Collider que entrou no trigger</param>
         private void OnTriggerEnter2D(Collider2D other)
@@ -124,78 +113,19 @@ namespace PixeLadder.EasyTransition
                 return;
             }
 
-            // Calcula distância do Player ao centro do TeleportPoint
-            float distanceToPlayer = Vector2.Distance(transform.position, other.transform.position);
-
-            // Determina qual trigger foi ativado baseado na distância
-            // Se está dentro do trigger de ativação (BoxCollider2D)
-            float activationDistance = Mathf.Max(triggerSize.x, triggerSize.y) / 2f;
-            
-            if (distanceToPlayer <= activationDistance)
+            // Previne múltiplos teletransportes simultâneos
+            if (isTeleporting)
             {
-                // Trigger de ativação - inicia teletransporte
-                
-                // Previne múltiplos teletransportes simultâneos
-                if (isTeleporting)
-                {
-                    if (enableDebugLogs)
-                        Debug.Log("TeleportPoint: Já está teletransportando, ignorando trigger.", this);
-                    return;
-                }
-
                 if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Player detectado, iniciando teletransporte para {destinationPosition}", this);
-
-                // Inicia o processo de teletransporte
-                StartCoroutine(ExecuteTeleport());
-            }
-            else if (IsCrossSceneTeleport() && enablePreloading && preloadProximityRadius > 0 && 
-                     distanceToPlayer <= preloadProximityRadius && !isInPreloadZone)
-            {
-                // Trigger de proximidade - inicia pré-carregamento
-                isInPreloadZone = true;
-
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Player entrou na zona de proximidade. Iniciando pré-carregamento de '{destinationSceneName}'", this);
-
-                // Chama TeleportManager para iniciar pré-carregamento
-                if (TeleportManager.Instance != null)
-                {
-                    TeleportManager.Instance.PreloadScene(destinationSceneName);
-                }
-                else
-                {
-                    Debug.LogWarning("TeleportPoint: TeleportManager.Instance não encontrado. Pré-carregamento não será executado.", this);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Detecta quando o Player sai do trigger e cancela o pré-carregamento se necessário.
-        /// </summary>
-        /// <param name="other">Collider que saiu do trigger</param>
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            // Valida se é o Player
-            if (!other.CompareTag("Player"))
-            {
+                    Debug.Log("TeleportPoint: Já está teletransportando, ignorando trigger.", this);
                 return;
             }
 
-            // Verifica se o Player estava na zona de pré-carregamento
-            if (isInPreloadZone && IsCrossSceneTeleport() && enablePreloading)
-            {
-                isInPreloadZone = false;
+            if (enableDebugLogs)
+                Debug.Log($"TeleportPoint: Player detectado, iniciando teletransporte.", this);
 
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Player saiu da zona de proximidade. Cancelando pré-carregamento de '{destinationSceneName}'", this);
-
-                // Chama TeleportManager para cancelar pré-carregamento
-                if (TeleportManager.Instance != null)
-                {
-                    TeleportManager.Instance.CancelPreload(destinationSceneName);
-                }
-            }
+            // Inicia o processo de teletransporte imediatamente
+            StartCoroutine(ExecuteTeleport());
         }
 
         #endregion
@@ -209,39 +139,6 @@ namespace PixeLadder.EasyTransition
         private bool IsCrossSceneTeleport()
         {
             return isCrossSceneTeleport && !string.IsNullOrEmpty(destinationSceneName);
-        }
-
-        /// <summary>
-        /// Configura o trigger de proximidade para pré-carregamento quando necessário.
-        /// </summary>
-        private void ConfigurePreloadTrigger()
-        {
-            // Remove trigger existente se não for mais necessário
-            if (preloadTrigger != null && (!isCrossSceneTeleport || !enablePreloading || preloadProximityRadius <= 0))
-            {
-                if (Application.isPlaying)
-                {
-                    Destroy(preloadTrigger);
-                }
-                else
-                {
-                    DestroyImmediate(preloadTrigger);
-                }
-                preloadTrigger = null;
-                return;
-            }
-
-            // Cria ou atualiza trigger de proximidade se necessário
-            if (isCrossSceneTeleport && enablePreloading && preloadProximityRadius > 0)
-            {
-                if (preloadTrigger == null)
-                {
-                    preloadTrigger = gameObject.AddComponent<CircleCollider2D>();
-                    preloadTrigger.isTrigger = true;
-                }
-
-                preloadTrigger.radius = preloadProximityRadius;
-            }
         }
 
         /// <summary>
@@ -474,13 +371,6 @@ namespace PixeLadder.EasyTransition
                 Vector3 center = transform.position + (Vector3)triggerOffset;
                 Vector3 size = triggerSize;
                 DrawWireCube(center, size);
-            }
-
-            // Desenha zona de proximidade para pré-carregamento (se habilitado)
-            if (IsCrossSceneTeleport() && enablePreloading && preloadProximityRadius > 0)
-            {
-                Gizmos.color = new Color(0f, 1f, 1f, 0.3f); // Cyan transparente
-                Gizmos.DrawWireSphere(transform.position, preloadProximityRadius);
             }
 
             // Desenha linha e seta para o destino se configurado
