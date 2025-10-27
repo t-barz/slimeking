@@ -5,6 +5,7 @@
 - Lembre-se que estamos utilizando Unity 6.2+ e que todo o código precisa ser compatível com essa versão.
 - Sempre busque as funcionalidades mais recentes do C# 10 e do Unity 6.2+, evitando práticas obsoletas.
 - Sempre busque a simplicidade e clareza no código.
+- Sempre avalie a utilização de um sistema utilizando Eventos.
 - **SEMPRE consulte o Roadmap.md para verificar prioridades e tarefas pendentes antes de iniciar qualquer desenvolvimento.**
 - **Todas as atividades de desenvolvimento devem estar registradas no Roadmap.md - nunca implemente algo que não esteja documentado lá.**
 - Sempre verifique se existe alguma documentação relacionada na pasta Assets/Docs antes de implementar algo novo.

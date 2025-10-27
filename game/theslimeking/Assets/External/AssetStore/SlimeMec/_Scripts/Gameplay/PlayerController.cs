@@ -1627,26 +1627,6 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Desabilita temporariamente o movimento do jogador.
-    /// </summary>
-    private void DisableMovement(float duration = 0f)
-    {
-        _canMove = false;
-        if (duration > 0f)
-        {
-            StartCoroutine(EnableMovementAfterDelay(duration));
-        }
-    }
-
-    /// <summary>
-    /// Habilita o movimento do jogador.
-    /// </summary>
-    private void EnableMovement()
-    {
-        _canMove = true;
-    }
-
-    /// <summary>
     /// Ativa/desativa logs de debug para troubleshooting.
     /// Útil para depuração de problemas de animação e movimento.
     /// </summary>
@@ -1912,6 +1892,36 @@ public class PlayerController : MonoBehaviour
     /// Usado pelo sistema de áudio quando o jogador se agacha.
     /// </summary>
     public AudioClip SquatSound => squatSound;
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>
+    /// Desabilita o movimento e ataque do jogador.
+    /// Usado durante teletransporte, cutscenes ou outras situações onde o controle deve ser bloqueado.
+    /// </summary>
+    public void DisableMovement()
+    {
+        _canMove = false;
+        _canAttack = false;
+
+        if (enableLogs)
+            Debug.Log("PlayerController: Movimento e ataque desabilitados.");
+    }
+
+    /// <summary>
+    /// Reabilita o movimento e ataque do jogador.
+    /// Restaura o controle normal após situações onde foi bloqueado.
+    /// </summary>
+    public void EnableMovement()
+    {
+        _canMove = true;
+        _canAttack = true;
+
+        if (enableLogs)
+            Debug.Log("PlayerController: Movimento e ataque reabilitados.");
+    }
 
     #endregion
 
