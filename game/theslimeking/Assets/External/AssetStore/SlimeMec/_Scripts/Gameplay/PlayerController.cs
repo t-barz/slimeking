@@ -1715,8 +1715,6 @@ public class PlayerController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(movementSound, transform.position, DEFAULT_AUDIO_VOLUME);
 
-            if (enableLogs)
-                Debug.Log("PlayerController: Som de movimento reproduzido (volume 60%)");
         }
     }
 
@@ -1731,8 +1729,6 @@ public class PlayerController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(attackSound, transform.position, DEFAULT_AUDIO_VOLUME);
 
-            if (enableLogs)
-                Debug.Log("PlayerController: Som de ataque reproduzido (volume 60%)");
         }
     }
 
@@ -1747,8 +1743,6 @@ public class PlayerController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(jumpSound, transform.position, DEFAULT_AUDIO_VOLUME);
 
-            if (enableLogs)
-                Debug.Log("PlayerController: Som de pulo reproduzido (volume 60%)");
         }
     }
 
@@ -1763,8 +1757,6 @@ public class PlayerController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(slideSound, transform.position, DEFAULT_AUDIO_VOLUME);
 
-            if (enableLogs)
-                Debug.Log("PlayerController: Som de deslizamento reproduzido (volume 60%)");
         }
     }
 
@@ -1779,8 +1771,6 @@ public class PlayerController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(squatSound, transform.position, DEFAULT_AUDIO_VOLUME);
 
-            if (enableLogs)
-                Debug.Log("PlayerController: Som de agachamento reproduzido (volume 60%)");
         }
     }
 

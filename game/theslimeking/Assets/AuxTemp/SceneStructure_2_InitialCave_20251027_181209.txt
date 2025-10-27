@@ -1,11 +1,11 @@
 ======================================
 ESTRUTURA DA CENA: 2_InitialCave
-Exportado em: 2025-10-26 17:07:45
+Exportado em: 2025-10-27 18:12:09
 Caminho da cena: Assets/Game/Scenes/2_InitialCave.unity
-Total de GameObjects: 12
+Total de GameObjects: 13
 ======================================
 
-[1/12] ROOT OBJECT:
+[1/13] ROOT OBJECT:
 ├── Camera Manager
 │   │   Active: True
 │   │   Tag: Untagged
@@ -19,7 +19,7 @@ Total de GameObjects: 12
 │   │   │   ├── CameraManager
 │   │   │   ├── CinemachineBrain
 
-[2/12] ROOT OBJECT:
+[2/13] ROOT OBJECT:
 ├── Main Camera
 │   │   Active: True
 │   │   Tag: MainCamera
@@ -46,7 +46,7 @@ Total de GameObjects: 12
 │   │   │   │   Loop: False
 │   │   │   │   Play On Awake: True
 
-[3/12] ROOT OBJECT:
+[3/13] ROOT OBJECT:
 ├── EventSystem
 │   │   Active: True
 │   │   Tag: Untagged
@@ -60,7 +60,7 @@ Total de GameObjects: 12
 │   │   │   ├── EventSystem
 │   │   │   ├── InputSystemUIInputModule
 
-[4/12] ROOT OBJECT:
+[4/13] ROOT OBJECT:
 ├── Global Volume
 │   │   Active: True
 │   │   Tag: Untagged
@@ -76,7 +76,7 @@ Total de GameObjects: 12
 │   │   │   │   Priority: 1
 │   │   │   │   Profile: InitialCaveVolumeProfile
 
-[5/12] ROOT OBJECT:
+[5/13] ROOT OBJECT:
 ├── chr_whiteslime
 │   │   Active: True
 │   │   Tag: Player
@@ -179,7 +179,7 @@ Total de GameObjects: 12
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
 
-[6/12] ROOT OBJECT:
+[6/13] ROOT OBJECT:
 ├── Grid
 │   │   Active: True
 │   │   Tag: Untagged
@@ -254,7 +254,7 @@ Total de GameObjects: 12
     │   │   │   ├── Tilemap
     │   │   │   ├── TilemapRenderer
 
-[7/12] ROOT OBJECT:
+[7/13] ROOT OBJECT:
 ├── Scenario
 │   │   Active: True
 │   │   Tag: Untagged
@@ -711,7 +711,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (1.61, -1.91, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (-0.91, 1.00, 1.00)
+    │   │   │   Scale: (0.91, 1.00, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -800,7 +800,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (11.90, 3.31, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (-1.00, 1.00, 1.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -836,7 +836,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (12.19, 5.94, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (-1.00, 1.00, 1.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -854,7 +854,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (16.01, 4.63, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   │   Scale: (-1.00, 1.00, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -872,7 +872,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (16.39, 4.99, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (-1.00, 1.00, 1.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -908,7 +908,7 @@ Total de GameObjects: 12
     │   │   Transform: Transform
     │   │   │   Position: (16.71, 3.89, 0.00)
     │   │   │   Rotation: (0.00, 0.00, 0.00)
-    │   │   │   Scale: (-0.91, 0.94, 1.00)
+    │   │   │   Scale: (0.91, 0.94, 1.00)
     │   │   Components: (9)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
@@ -938,7 +938,7 @@ Total de GameObjects: 12
     │   │   │   ├── RandomStyle
     │   │   │   ├── CircleCollider2D
 
-[8/12] ROOT OBJECT:
+[8/13] ROOT OBJECT:
 ├── Mechanics
 │   │   Active: True
 │   │   Tag: Untagged
@@ -949,7 +949,7 @@ Total de GameObjects: 12
 │   │   │   Scale: (1.00, 1.00, 1.00)
 │   │   Components: (1)
 │   │   │   ├── Transform
-│   │   Children: (4)
+│   │   Children: (6)
     │   ├── shrinkPointA
     │   │   Active: True
     │   │   Tag: Untagged
@@ -1262,8 +1262,32 @@ Total de GameObjects: 12
     │   │   Components: (2)
     │   │   │   ├── Transform
     │   │   │   ├── SpriteRenderer
+    │   ├── teleportPoint
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (17.03, 5.52, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── Transform
+    │   │   │   ├── BoxCollider2D
+    │   │   │   ├── TeleportPoint
+    │   ├── teleportPoint (1)
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: Default (0)
+    │   │   Transform: Transform
+    │   │   │   Position: (12.45, 11.69, 0.00)
+    │   │   │   Rotation: (0.00, 0.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── Transform
+    │   │   │   ├── BoxCollider2D
+    │   │   │   ├── TeleportPoint
 
-[9/12] ROOT OBJECT:
+[9/13] ROOT OBJECT:
 ├── Particle System
 │   │   Active: True
 │   │   Tag: Untagged
@@ -1277,20 +1301,7 @@ Total de GameObjects: 12
 │   │   │   ├── ParticleSystem
 │   │   │   ├── ParticleSystemRenderer
 
-[10/12] ROOT OBJECT:
-├── teleportPoint
-│   │   Active: True
-│   │   Tag: Untagged
-│   │   Layer: Default (0)
-│   │   Transform: Transform
-│   │   │   Position: (0.00, 0.00, 0.00)
-│   │   │   Rotation: (0.00, 0.00, 0.00)
-│   │   │   Scale: (1.00, 1.00, 1.00)
-│   │   Components: (2)
-│   │   │   ├── Transform
-│   │   │   ├── BoxCollider2D
-
-[11/12] ROOT OBJECT:
+[10/13] ROOT OBJECT:
 ├── GameManager
 │   │   Active: True
 │   │   Tag: Untagged
@@ -1303,7 +1314,7 @@ Total de GameObjects: 12
 │   │   │   ├── Transform
 │   │   │   ├── GameManager
 
-[12/12] ROOT OBJECT:
+[11/13] ROOT OBJECT:
 ├── SceneTransitioner
 │   │   Active: True
 │   │   Tag: Untagged
@@ -1316,8 +1327,38 @@ Total de GameObjects: 12
 │   │   │   ├── Transform
 │   │   │   ├── SceneTransitioner
 
+[12/13] ROOT OBJECT:
+├── teleportPoint
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (2.59, 13.04, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (6)
+│   │   │   ├── Transform
+│   │   │   ├── BoxCollider2D
+│   │   │   ├── TeleportPoint
+│   │   │   ├── CircleCollider2D
+│   │   │   ├── CircleCollider2D
+│   │   │   ├── CircleCollider2D
+
+[13/13] ROOT OBJECT:
+├── TeleportManager
+│   │   Active: True
+│   │   Tag: Untagged
+│   │   Layer: Default (0)
+│   │   Transform: Transform
+│   │   │   Position: (5.12, 11.63, 0.00)
+│   │   │   Rotation: (0.00, 0.00, 0.00)
+│   │   │   Scale: (1.00, 1.00, 1.00)
+│   │   Components: (2)
+│   │   │   ├── Transform
+│   │   │   ├── TeleportManager
+
 ======================================
 RESUMO DA EXPORTAÇÃO
-Total de objetos raiz: 12
-Arquivo gerado: SceneStructure_2_InitialCave_20251026_170745.txt
+Total de objetos raiz: 13
+Arquivo gerado: SceneStructure_2_InitialCave_20251027_181209.txt
 ======================================

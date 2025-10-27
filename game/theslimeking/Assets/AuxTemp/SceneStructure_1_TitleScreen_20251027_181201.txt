@@ -1,7 +1,7 @@
 ======================================
 ESTRUTURA DA CENA: 1_TitleScreen
-Exportado em: 2025-10-16 09:54:37
-Caminho da cena: Assets/🎮 Game/Scenes/1_TitleScreen.unity
+Exportado em: 2025-10-27 18:12:01
+Caminho da cena: Assets/Game/Scenes/1_TitleScreen.unity
 Total de GameObjects: 7
 ======================================
 
@@ -45,7 +45,7 @@ Total de GameObjects: 7
 │   │   Layer: UI (5)
 │   │   Transform: RectTransform
 │   │   │   Position: (0.00, 0.00)
-│   │   │   Size: (1280.00, 720.00)
+│   │   │   Size: (1280.00, 720.09)
 │   │   │   Anchors: (0.00, 0.00) - (0.00, 0.00)
 │   │   │   Pivot: (0.50, 0.50)
 │   │   │   Rotation: (0.00, 0.00, 0.00)
@@ -58,7 +58,7 @@ Total de GameObjects: 7
 │   │   │   │   Pixel Perfect: True
 │   │   │   ├── CanvasScaler
 │   │   │   ├── GraphicRaycaster
-│   │   Children: (5)
+│   │   Children: (6)
     │   ├── ui_wslogo
     │   │   Active: True
     │   │   Tag: Untagged
@@ -275,6 +275,18 @@ Total de GameObjects: 7
             │   │   │   ├── RectTransform
             │   │   │   ├── CanvasRenderer
             │   │   │   ├── TextMeshProUGUI
+    │   ├── Particle System
+    │   │   Active: True
+    │   │   Tag: Untagged
+    │   │   Layer: UI (5)
+    │   │   Transform: Transform
+    │   │   │   Position: (0.00, 96.00, 0.00)
+    │   │   │   Rotation: (0.00, 180.00, 0.00)
+    │   │   │   Scale: (1.00, 1.00, 1.00)
+    │   │   Components: (3)
+    │   │   │   ├── Transform
+    │   │   │   ├── ParticleSystem
+    │   │   │   ├── ParticleSystemRenderer
 
 [4/7] ROOT OBJECT:
 ├── EventSystem
@@ -332,5 +344,5 @@ Total de GameObjects: 7
 ======================================
 RESUMO DA EXPORTAÇÃO
 Total de objetos raiz: 7
-Arquivo gerado: SceneStructure_1_TitleScreen_20251016_095437.txt
+Arquivo gerado: SceneStructure_1_TitleScreen_20251027_181201.txt
 ======================================

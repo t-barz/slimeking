@@ -22,6 +22,30 @@ namespace PixeLadder.EasyTransition
         [Tooltip("Tempo de espera após reposicionamento antes do fade in (segundos)")]
         [SerializeField] private float delayBeforeFadeIn = 1f;
 
+        [Header("Cross-Scene Configuration")]
+        [Tooltip("Habilita teletransporte entre cenas diferentes")]
+        [SerializeField] private bool isCrossSceneTeleport = false;
+
+        [Tooltip("Nome da cena de destino (deve estar nas Build Settings)")]
+        [SerializeField] private string destinationSceneName = "";
+
+        [Header("Preloading Configuration")]
+        [Tooltip("Habilita pré-carregamento da cena de destino")]
+        [SerializeField] private bool enablePreloading = true;
+
+        [Tooltip("Raio de proximidade para iniciar pré-carregamento (0 = desabilitado)")]
+        [SerializeField] private float preloadProximityRadius = 5f;
+
+        [Header("Audio Configuration")]
+        [Tooltip("Som reproduzido no início do teletransporte")]
+        [SerializeField] private AudioClip teleportStartSound;
+
+        [Tooltip("Som reproduzido durante a transição (whoosh/portal)")]
+        [SerializeField] private AudioClip teleportMidSound;
+
+        [Tooltip("Som reproduzido ao completar o teletransporte")]
+        [SerializeField] private AudioClip teleportEndSound;
+
         [Header("Trigger Configuration")]
         [Tooltip("Tamanho do BoxCollider2D trigger")]
         [SerializeField] private Vector2 triggerSize = new Vector2(1f, 1f);
@@ -44,7 +68,9 @@ namespace PixeLadder.EasyTransition
         #region Private Fields
 
         private BoxCollider2D triggerCollider;
+        private CircleCollider2D preloadTrigger;
         private bool isTeleporting = false;
+        private bool isInPreloadZone = false;
         private Transform cameraTransform;
         private Rigidbody2D playerRigidbody;
 
@@ -80,10 +106,12 @@ namespace PixeLadder.EasyTransition
         private void OnValidate()
         {
             UpdateTriggerSize();
+            ConfigurePreloadTrigger();
         }
 
         /// <summary>
-        /// Detecta quando o Player entra no trigger e inicia o teletransporte.
+        /// Detecta quando o Player entra no trigger e inicia o teletransporte ou pré-carregamento.
+        /// Distingue entre trigger de ativação (BoxCollider2D) e trigger de proximidade (CircleCollider2D).
         /// </summary>
         /// <param name="other">Collider que entrou no trigger</param>
         private void OnTriggerEnter2D(Collider2D other)
@@ -96,24 +124,125 @@ namespace PixeLadder.EasyTransition
                 return;
             }
 
-            // Previne múltiplos teletransportes simultâneos
-            if (isTeleporting)
+            // Calcula distância do Player ao centro do TeleportPoint
+            float distanceToPlayer = Vector2.Distance(transform.position, other.transform.position);
+
+            // Determina qual trigger foi ativado baseado na distância
+            // Se está dentro do trigger de ativação (BoxCollider2D)
+            float activationDistance = Mathf.Max(triggerSize.x, triggerSize.y) / 2f;
+            
+            if (distanceToPlayer <= activationDistance)
             {
+                // Trigger de ativação - inicia teletransporte
+                
+                // Previne múltiplos teletransportes simultâneos
+                if (isTeleporting)
+                {
+                    if (enableDebugLogs)
+                        Debug.Log("TeleportPoint: Já está teletransportando, ignorando trigger.", this);
+                    return;
+                }
+
                 if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Já está teletransportando, ignorando trigger.", this);
+                    Debug.Log($"TeleportPoint: Player detectado, iniciando teletransporte para {destinationPosition}", this);
+
+                // Inicia o processo de teletransporte
+                StartCoroutine(ExecuteTeleport());
+            }
+            else if (IsCrossSceneTeleport() && enablePreloading && preloadProximityRadius > 0 && 
+                     distanceToPlayer <= preloadProximityRadius && !isInPreloadZone)
+            {
+                // Trigger de proximidade - inicia pré-carregamento
+                isInPreloadZone = true;
+
+                if (enableDebugLogs)
+                    Debug.Log($"TeleportPoint: Player entrou na zona de proximidade. Iniciando pré-carregamento de '{destinationSceneName}'", this);
+
+                // Chama TeleportManager para iniciar pré-carregamento
+                if (TeleportManager.Instance != null)
+                {
+                    TeleportManager.Instance.PreloadScene(destinationSceneName);
+                }
+                else
+                {
+                    Debug.LogWarning("TeleportPoint: TeleportManager.Instance não encontrado. Pré-carregamento não será executado.", this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Detecta quando o Player sai do trigger e cancela o pré-carregamento se necessário.
+        /// </summary>
+        /// <param name="other">Collider que saiu do trigger</param>
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            // Valida se é o Player
+            if (!other.CompareTag("Player"))
+            {
                 return;
             }
 
-            if (enableDebugLogs)
-                Debug.Log($"TeleportPoint: Player detectado, iniciando teletransporte para {destinationPosition}", this);
+            // Verifica se o Player estava na zona de pré-carregamento
+            if (isInPreloadZone && IsCrossSceneTeleport() && enablePreloading)
+            {
+                isInPreloadZone = false;
 
-            // Inicia o processo de teletransporte
-            StartCoroutine(ExecuteTeleport());
+                if (enableDebugLogs)
+                    Debug.Log($"TeleportPoint: Player saiu da zona de proximidade. Cancelando pré-carregamento de '{destinationSceneName}'", this);
+
+                // Chama TeleportManager para cancelar pré-carregamento
+                if (TeleportManager.Instance != null)
+                {
+                    TeleportManager.Instance.CancelPreload(destinationSceneName);
+                }
+            }
         }
 
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Determina se este é um teletransporte entre cenas ou na mesma cena.
+        /// </summary>
+        /// <returns>True se é teletransporte entre cenas, false se é na mesma cena</returns>
+        private bool IsCrossSceneTeleport()
+        {
+            return isCrossSceneTeleport && !string.IsNullOrEmpty(destinationSceneName);
+        }
+
+        /// <summary>
+        /// Configura o trigger de proximidade para pré-carregamento quando necessário.
+        /// </summary>
+        private void ConfigurePreloadTrigger()
+        {
+            // Remove trigger existente se não for mais necessário
+            if (preloadTrigger != null && (!isCrossSceneTeleport || !enablePreloading || preloadProximityRadius <= 0))
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(preloadTrigger);
+                }
+                else
+                {
+                    DestroyImmediate(preloadTrigger);
+                }
+                preloadTrigger = null;
+                return;
+            }
+
+            // Cria ou atualiza trigger de proximidade se necessário
+            if (isCrossSceneTeleport && enablePreloading && preloadProximityRadius > 0)
+            {
+                if (preloadTrigger == null)
+                {
+                    preloadTrigger = gameObject.AddComponent<CircleCollider2D>();
+                    preloadTrigger.isTrigger = true;
+                }
+
+                preloadTrigger.radius = preloadProximityRadius;
+            }
+        }
 
         /// <summary>
         /// Aplica as configurações de tamanho e offset ao BoxCollider2D.
@@ -133,6 +262,7 @@ namespace PixeLadder.EasyTransition
 
         /// <summary>
         /// Executa o processo completo de teletransporte com transição visual.
+        /// Roteia para same-scene ou cross-scene baseado na configuração.
         /// </summary>
         private IEnumerator ExecuteTeleport()
         {
@@ -146,43 +276,81 @@ namespace PixeLadder.EasyTransition
                 yield break;
             }
 
-            if (enableDebugLogs)
-                Debug.Log($"TeleportPoint: Iniciando teletransporte para {destinationPosition}", this);
-
-            // Cache do Rigidbody2D do Player
-            if (playerRigidbody == null)
+            // Determina o tipo de teletransporte e roteia adequadamente
+            if (IsCrossSceneTeleport())
             {
-                playerRigidbody = PlayerController.Instance.GetComponent<Rigidbody2D>();
-            }
+                // === CROSS-SCENE TELEPORT PATH ===
+                if (enableDebugLogs)
+                    Debug.Log($"TeleportPoint: Iniciando teletransporte cross-scene para '{destinationSceneName}' na posição {destinationPosition}", this);
 
-            // Desabilita movimento do Player
-            PlayerController.Instance.DisableMovement();
+                // Valida se TeleportManager existe
+                if (TeleportManager.Instance == null)
+                {
+                    Debug.LogError("TeleportPoint: TeleportManager.Instance não encontrado. " +
+                                  "Adicione o TeleportManager à cena para usar teletransporte cross-scene.", this);
+                    isTeleporting = false;
+                    yield break;
+                }
 
-            // Zera a velocidade do Rigidbody2D para parar o movimento imediatamente
-            if (playerRigidbody != null)
-            {
-                playerRigidbody.linearVelocity = Vector2.zero;
+                // Delega para TeleportManager que orquestra todo o processo cross-scene
+                TeleportManager.Instance.ExecuteCrossSceneTeleport(
+                    destinationSceneName: destinationSceneName,
+                    destinationPosition: destinationPosition,
+                    transitionEffect: transitionEffect,
+                    delayBeforeFadeIn: delayBeforeFadeIn,
+                    startSound: teleportStartSound,
+                    midSound: teleportMidSound,
+                    endSound: teleportEndSound,
+                    enableDebugLogs: enableDebugLogs
+                );
+
+                // Libera flag de teletransporte (TeleportManager gerencia seu próprio lock)
+                isTeleporting = false;
 
                 if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Velocidade do Player zerada.", this);
+                    Debug.Log("TeleportPoint: Teletransporte cross-scene delegado ao TeleportManager.", this);
             }
+            else
+            {
+                // === SAME-SCENE TELEPORT PATH (existing logic unchanged) ===
+                if (enableDebugLogs)
+                    Debug.Log($"TeleportPoint: Iniciando teletransporte same-scene para {destinationPosition}", this);
 
-            // Executa transição visual com callback de reposicionamento
-            yield return TeleportTransitionHelper.ExecuteTransition(
-                transitionEffect,
-                RepositionPlayerAndCamera,
-                delayBeforeFadeIn,
-                enableDebugLogs
-            );
+                // Cache do Rigidbody2D do Player
+                if (playerRigidbody == null)
+                {
+                    playerRigidbody = PlayerController.Instance.GetComponent<Rigidbody2D>();
+                }
 
-            // Reabilita movimento do Player
-            PlayerController.Instance.EnableMovement();
+                // Desabilita movimento do Player
+                PlayerController.Instance.DisableMovement();
 
-            // Libera flag de teletransporte
-            isTeleporting = false;
+                // Zera a velocidade do Rigidbody2D para parar o movimento imediatamente
+                if (playerRigidbody != null)
+                {
+                    playerRigidbody.linearVelocity = Vector2.zero;
 
-            if (enableDebugLogs)
-                Debug.Log("TeleportPoint: Teletransporte completo!", this);
+                    if (enableDebugLogs)
+                        Debug.Log("TeleportPoint: Velocidade do Player zerada.", this);
+                }
+
+                // Executa transição visual com callback de reposicionamento
+                yield return TeleportTransitionHelper.ExecuteTransition(
+                    transitionEffect,
+                    RepositionPlayerAndCamera,
+                    delayBeforeFadeIn,
+                    enableDebugLogs
+                );
+
+                // Reabilita movimento do Player
+                PlayerController.Instance.EnableMovement();
+
+                // Libera flag de teletransporte
+                isTeleporting = false;
+
+                if (enableDebugLogs)
+                    Debug.Log("TeleportPoint: Teletransporte same-scene completo!", this);
+            }
         }
 
         /// <summary>
@@ -290,7 +458,7 @@ namespace PixeLadder.EasyTransition
             if (!enableGizmos)
                 return;
 
-            // Desenha área do trigger
+            // Desenha área do trigger de ativação
             Gizmos.color = gizmoColor;
 
             // Se o collider existe, usa suas configurações
@@ -306,6 +474,13 @@ namespace PixeLadder.EasyTransition
                 Vector3 center = transform.position + (Vector3)triggerOffset;
                 Vector3 size = triggerSize;
                 DrawWireCube(center, size);
+            }
+
+            // Desenha zona de proximidade para pré-carregamento (se habilitado)
+            if (IsCrossSceneTeleport() && enablePreloading && preloadProximityRadius > 0)
+            {
+                Gizmos.color = new Color(0f, 1f, 1f, 0.3f); // Cyan transparente
+                Gizmos.DrawWireSphere(transform.position, preloadProximityRadius);
             }
 
             // Desenha linha e seta para o destino se configurado
@@ -332,12 +507,24 @@ namespace PixeLadder.EasyTransition
 
 #if UNITY_EDITOR
                 // Label com informações de debug
+                string labelText;
+                if (IsCrossSceneTeleport())
+                {
+                    // Cross-scene teleport - mostra nome da cena de destino
+                    labelText = $"TeleportPoint (Cross-Scene)\n→ {destinationSceneName}\n{destinationPosition}";
+                }
+                else
+                {
+                    // Same-scene teleport
+                    labelText = $"TeleportPoint\n→ {destinationPosition}";
+                }
+
                 UnityEditor.Handles.Label(
                     transform.position + Vector3.up * 0.5f,
-                    $"TeleportPoint\n→ {destinationPosition}",
+                    labelText,
                     new UnityEngine.GUIStyle()
                     {
-                        normal = new UnityEngine.GUIStyleState() { textColor = gizmoColor },
+                        normal = new UnityEngine.GUIStyleState() { textColor = IsCrossSceneTeleport() ? Color.yellow : gizmoColor },
                         alignment = UnityEngine.TextAnchor.MiddleCenter,
                         fontSize = 10
                     }
