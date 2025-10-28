@@ -158,8 +158,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DropController
   prefabList:
   - {fileID: 5864117989572817364, guid: 02dd5b6781f2762498bf0e67612ff48e, type: 3}
-  minDropCount: 0
-  maxDropCount: 1
+  - {fileID: 1427671403894958163, guid: caad6fda238a75d48aef6b697e23327c, type: 3}
+  minDropCount: 1
+  maxDropCount: 3
   useCurrentPosition: 1
   enableDebugLogs: 0
 --- !u!114 &3308091152172358588
