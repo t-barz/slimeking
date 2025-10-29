@@ -1,4 +1,21 @@
 using UnityEngine;
+using SlimeMec.Gameplay;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+/// <summary>
+/// Estados possíveis do sistema de quicadas.
+/// </summary>
+public enum BounceState
+{
+    NotLaunched,        // Objeto criado mas não lançado
+    Launching,          // Aplicando força inicial
+    Bouncing,           // Executando quicadas
+    Stopping,           // Parando movimento
+    Stopped,            // Completamente parado
+    ReadyForCollection  // Colliders habilitados, pronto para coleta
+}
 
 /// <summary>
 /// Controlador para simulação de efeito de quicadas em objetos com sistema de sombra.
@@ -97,6 +114,9 @@ public class BounceHandler : MonoBehaviour
     private Rigidbody2D _rigidbody2D;
     private bool _hasBeenLaunched = false;
 
+    // Gerenciamento de estados
+    private BounceState _currentState = BounceState.NotLaunched;
+
     // Variáveis para controle de quicadas
     private Vector2 _initialLaunchDirection;
     private float _initialLaunchForce;
@@ -107,6 +127,9 @@ public class BounceHandler : MonoBehaviour
     private Vector3 _initialPosition;
     private Vector3 _initialShadowScale;
     private bool _hasShadow = false;
+
+    // Variáveis para controle de colliders
+    private Collider2D[] _colliders;
     #endregion
 
     #region Unity Lifecycle
@@ -123,8 +146,14 @@ public class BounceHandler : MonoBehaviour
             Debug.LogError($"BounceHandler em '{gameObject.name}': Rigidbody2D não encontrado!", this);
         }
 
+        // Cachear colliders para performance
+        _colliders = GetComponents<Collider2D>();
+
         // Inicializa sistema de sombra
         InitializeShadowSystem();
+
+        // Desabilita todos os colliders após inicialização
+        DisableAllColliders();
     }
 
     /// <summary>
@@ -149,7 +178,10 @@ public class BounceHandler : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (_hasShadow && _hasBeenLaunched)
+        // Só atualiza a sombra se o objeto foi lançado e não está parado ou pronto para coleta
+        if (_hasShadow && _hasBeenLaunched && 
+            _currentState != BounceState.Stopped && 
+            _currentState != BounceState.ReadyForCollection)
         {
             UpdateShadowEffect();
         }
@@ -199,16 +231,25 @@ public class BounceHandler : MonoBehaviour
         // Salva posição inicial para cálculo da sombra
         _initialPosition = transform.position;
 
+        // Atualiza estado para Launching
+        _currentState = BounceState.Launching;
+
         // Aplica impulso ao Rigidbody2D
         _rigidbody2D.AddForce(launchVelocity, ForceMode2D.Impulse);
 
         // Marca como lançado
         _hasBeenLaunched = true;
 
-        // Inicia sistema de quicadas se configurado
+        // Atualiza estado para Bouncing se há quicadas configuradas
         if (bounceCount > 0 && timeToBounce > 0f)
         {
+            _currentState = BounceState.Bouncing;
             Invoke(nameof(ProcessNextBounce), _currentBounceInterval);
+        }
+        else
+        {
+            // Se não há quicadas, vai direto para Stopping
+            _currentState = BounceState.Stopping;
         }
 
         // Log de debug
@@ -253,16 +294,25 @@ public class BounceHandler : MonoBehaviour
         // Salva posição inicial para cálculo da sombra
         _initialPosition = transform.position;
 
+        // Atualiza estado para Launching
+        _currentState = BounceState.Launching;
+
         // Aplica força
         Vector2 launchVelocity = launchDirection.normalized * force;
         _rigidbody2D.AddForce(launchVelocity, ForceMode2D.Impulse);
 
         _hasBeenLaunched = true;
 
-        // Inicia sistema de quicadas se configurado
+        // Atualiza estado para Bouncing se há quicadas configuradas
         if (bounceCount > 0 && timeToBounce > 0f)
         {
+            _currentState = BounceState.Bouncing;
             Invoke(nameof(ProcessNextBounce), _currentBounceInterval);
+        }
+        else
+        {
+            // Se não há quicadas, vai direto para Stopping
+            _currentState = BounceState.Stopping;
         }
 
         if (enableDebugLogs)
@@ -278,6 +328,9 @@ public class BounceHandler : MonoBehaviour
     /// </summary>
     public void StopMovementManually()
     {
+        // Atualiza estado para Stopping
+        _currentState = BounceState.Stopping;
+
         // Cancela o invoke automático se estiver agendado
         CancelInvoke(nameof(ProcessNextBounce));
 
@@ -292,8 +345,12 @@ public class BounceHandler : MonoBehaviour
     {
         _hasBeenLaunched = false;
 
+        // Reseta estado para NotLaunched
+        _currentState = BounceState.NotLaunched;
+
         // Cancela invokes agendados
         CancelInvoke(nameof(ProcessNextBounce));
+        CancelInvoke(nameof(EnableCollidersAndNotify));
 
         // Reseta variáveis de quicada
         _currentBounceIndex = 0;
@@ -318,6 +375,24 @@ public class BounceHandler : MonoBehaviour
 
         if (enableDebugLogs)
             Debug.Log($"BounceHandler: Estado de lançamento resetado para '{gameObject.name}'", this);
+    }
+
+    /// <summary>
+    /// Habilita todos os colliders do objeto.
+    /// Método público para controle externo.
+    /// </summary>
+    public void EnableColliders()
+    {
+        EnableAllColliders();
+    }
+
+    /// <summary>
+    /// Desabilita todos os colliders do objeto.
+    /// Método público para controle externo.
+    /// </summary>
+    public void DisableColliders()
+    {
+        DisableAllColliders();
     }
     #endregion
 
@@ -350,28 +425,31 @@ public class BounceHandler : MonoBehaviour
 
     /// <summary>
     /// Atualiza o efeito de sombra baseado na velocidade vertical do objeto.
-    /// A sombra diminui quando o objeto está subindo (velocidade Y positiva)
-    /// e aumenta quando está descendo (velocidade Y negativa).
+    /// A sombra diminui quando o objeto está em movimento (subindo ou descendo)
+    /// e aumenta quando está parado ou próximo ao chão.
     /// </summary>
     private void UpdateShadowEffect()
     {
-        if (!_hasShadow || shadowObject == null || _rigidbody2D == null)
+        if (!_hasShadow || shadowObject == null)
             return;
 
-        // Obtém a velocidade vertical atual
-        float verticalVelocity = _rigidbody2D.linearVelocity.y;
+        // Verificação de null para _rigidbody2D antes de acessar velocidade
+        if (_rigidbody2D == null)
+            return;
 
-        // Calcula altura simulada baseada na velocidade vertical
-        // Velocidade positiva = subindo = altura maior
-        // Velocidade negativa = descendo = altura menor
-        float simulatedHeight = Mathf.Max(0f, verticalVelocity / maxSimulatedHeight);
+        // Usa o valor absoluto da velocidade vertical para simular altura
+        // Isso garante que a sombra diminui tanto ao subir quanto ao descer,
+        // representando a distância do objeto em relação ao chão
+        float speed = Mathf.Abs(_rigidbody2D.linearVelocity.y);
 
-        // Normaliza a altura (0 = no chão, 1 = altura máxima)
-        float normalizedHeight = Mathf.Clamp01(Mathf.Abs(simulatedHeight));
+        // Normaliza a velocidade para um valor entre 0 e 1
+        // 0 = parado (no chão, sombra máxima)
+        // 1 = velocidade máxima (altura máxima, sombra mínima)
+        float normalizedHeight = Mathf.Clamp01(speed / maxSimulatedHeight);
 
-        // Calcula escala da sombra (inversa à altura)
-        // Quando objeto está alto (subindo), sombra fica pequena
-        // Quando objeto está baixo (descendo/parado), sombra fica grande
+        // Interpola a escala da sombra baseada na altura normalizada
+        // Quando normalizedHeight = 0 (parado), shadowScale = maxShadowScale
+        // Quando normalizedHeight = 1 (altura máxima), shadowScale = minShadowScale
         float shadowScale = Mathf.Lerp(maxShadowScale, minShadowScale, normalizedHeight);
 
         // Aplica escala mantendo proporção original
@@ -385,9 +463,31 @@ public class BounceHandler : MonoBehaviour
         // Log de debug detalhado (apenas se muito verboso)
         if (enableDebugLogs && Time.frameCount % 60 == 0) // Log a cada 60 frames
         {
-            Debug.Log($"BounceHandler: Sombra atualizada - VelY: {verticalVelocity:F2}, " +
-                     $"Altura Simulada: {simulatedHeight:F2}, Altura Norm: {normalizedHeight:F2}, " +
-                     $"Escala: {shadowScale:F2}", this);
+            Debug.Log($"BounceHandler: Sombra atualizada - Speed: {speed:F2}, " +
+                     $"Altura Norm: {normalizedHeight:F2}, Escala: {shadowScale:F2}", this);
+        }
+    }
+
+    /// <summary>
+    /// Restaura a sombra ao tamanho máximo (objeto no chão).
+    /// Chamado quando o movimento para completamente.
+    /// </summary>
+    private void ResetShadowToMaxScale()
+    {
+        if (!_hasShadow || shadowObject == null)
+            return;
+
+        // Restaura a sombra ao tamanho máximo
+        Vector3 maxScale = _initialShadowScale * maxShadowScale;
+        shadowObject.transform.localScale = maxScale;
+
+        // Atualiza posição da sombra com offset
+        Vector3 shadowPosition = transform.position + (Vector3)shadowOffset;
+        shadowObject.transform.position = shadowPosition;
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"BounceHandler: Sombra resetada ao tamanho máximo para '{gameObject.name}'", this);
         }
     }    /// <summary>
          /// Processa a próxima quicada no sistema de quicadas sequenciais.
@@ -403,7 +503,8 @@ public class BounceHandler : MonoBehaviour
         // Verifica se ainda há quicadas para processar
         if (_currentBounceIndex > bounceCount)
         {
-            // Todas as quicadas foram processadas, para o movimento
+            // Todas as quicadas foram processadas, atualiza estado e para o movimento
+            _currentState = BounceState.Stopping;
             StopMovement();
             return;
         }
@@ -455,10 +556,82 @@ public class BounceHandler : MonoBehaviour
             // Opcional: tornar o objeto kinematic para evitar que se mova novamente
             _rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
 
+            // Atualiza estado para Stopped
+            _currentState = BounceState.Stopped;
+
+            // Reseta a sombra ao tamanho máximo quando o movimento para
+            ResetShadowToMaxScale();
+
             if (enableDebugLogs)
             {
-                Debug.Log($"BounceHandler: Movimento interrompido para '{gameObject.name}' após as quicadas", this);
+                Debug.Log($"BounceHandler: Movimento interrompido para '{gameObject.name}' após as quicadas. Estado: {_currentState}", this);
             }
+
+            // Chama método de sincronização com ItemCollectable
+            OnMovementStopped();
+        }
+    }
+
+    /// <summary>
+    /// Chamado quando o movimento para completamente.
+    /// Sincroniza com ItemCollectable para aguardar o delay de ativação antes de habilitar colliders.
+    /// </summary>
+    private void OnMovementStopped()
+    {
+        // Busca componente ItemCollectable no objeto
+        var itemCollectable = GetComponent<ItemCollectable>();
+        
+        // Obtém o delay de ativação do ItemCollectable se existir
+        float delay = 0f;
+        if (itemCollectable != null)
+        {
+            // Usa reflexão para acessar o campo privado activationDelay
+            var field = itemCollectable.GetType().GetField("activationDelay", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+            if (field != null)
+            {
+                delay = (float)field.GetValue(itemCollectable);
+                
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"BounceHandler: Sincronizando com ItemCollectable - Delay de ativação: {delay}s", this);
+                }
+            }
+        }
+        
+        // Usa Invoke para agendar habilitação de colliders após o delay
+        if (delay > 0f)
+        {
+            Invoke(nameof(EnableCollidersAndNotify), delay);
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"BounceHandler: Colliders serão habilitados em {delay}s", this);
+            }
+        }
+        else
+        {
+            // Se não há delay, habilita imediatamente
+            EnableCollidersAndNotify();
+        }
+    }
+
+    /// <summary>
+    /// Habilita colliders e atualiza estado para ReadyForCollection.
+    /// Chamado após o delay de ativação do ItemCollectable.
+    /// </summary>
+    private void EnableCollidersAndNotify()
+    {
+        // Habilita todos os colliders
+        EnableAllColliders();
+        
+        // Atualiza estado para ReadyForCollection
+        _currentState = BounceState.ReadyForCollection;
+        
+        if (enableDebugLogs)
+        {
+            Debug.Log($"BounceHandler: '{gameObject.name}' pronto para coleta. Estado: {_currentState}", this);
         }
     }
 
@@ -472,9 +645,68 @@ public class BounceHandler : MonoBehaviour
         float angleInRadians = angleInDegrees * Mathf.Deg2Rad;
         return new Vector2(Mathf.Cos(angleInRadians), Mathf.Sin(angleInRadians));
     }
+
+    /// <summary>
+    /// Desabilita todos os Collider2D do objeto.
+    /// </summary>
+    private void DisableAllColliders()
+    {
+        if (_colliders == null || _colliders.Length == 0)
+            return;
+
+        foreach (var collider in _colliders)
+        {
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+        }
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"BounceHandler: Colliders desabilitados para '{gameObject.name}' ({_colliders.Length} colliders)", this);
+        }
+    }
+
+    /// <summary>
+    /// Habilita todos os Collider2D do objeto.
+    /// </summary>
+    private void EnableAllColliders()
+    {
+        if (_colliders == null || _colliders.Length == 0)
+            return;
+
+        foreach (var collider in _colliders)
+        {
+            if (collider != null)
+            {
+                collider.enabled = true;
+            }
+        }
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"BounceHandler: Colliders habilitados para '{gameObject.name}' ({_colliders.Length} colliders)", this);
+        }
+    }
     #endregion
 
     #region Properties
+    /// <summary>
+    /// Estado atual do sistema de quicadas.
+    /// </summary>
+    public BounceState CurrentState => _currentState;
+
+    /// <summary>
+    /// Verifica se o objeto está em movimento (Launching ou Bouncing).
+    /// </summary>
+    public bool IsMoving => _currentState == BounceState.Launching || _currentState == BounceState.Bouncing;
+
+    /// <summary>
+    /// Verifica se o objeto está pronto para coleta (ReadyForCollection).
+    /// </summary>
+    public bool IsReadyForCollection => _currentState == BounceState.ReadyForCollection;
+
     /// <summary>
     /// Verifica se o item já foi lançado.
     /// </summary>
@@ -529,5 +761,264 @@ public class BounceHandler : MonoBehaviour
     /// Velocidade vertical máxima configurada para normalização da sombra.
     /// </summary>
     public float MaxSimulatedHeight => maxSimulatedHeight;
+    #endregion
+
+    #region Gizmos & Debug Visualization
+    /// <summary>
+    /// Desenha Gizmos para visualização no editor.
+    /// Mostra trajetória prevista, estado atual e raio de atração.
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        // Desenha indicador de estado com cor
+        DrawStateIndicator();
+    }
+
+    /// <summary>
+    /// Desenha Gizmos detalhados quando o objeto está selecionado.
+    /// </summary>
+    private void OnDrawGizmosSelected()
+    {
+        // Desenha trajetória prevista se não foi lançado ainda
+        if (!_hasBeenLaunched && Application.isPlaying)
+        {
+            DrawPredictedTrajectory();
+        }
+
+        // Desenha raio de atração do ItemCollectable se existir
+        DrawAttractionRadius();
+
+        // Desenha label com estado atual
+        DrawStateLabel();
+    }
+
+    /// <summary>
+    /// Desenha indicador visual do estado atual com cores diferentes.
+    /// Verde = pronto para coleta, Amarelo = quicando, Vermelho = parado, Cinza = não lançado
+    /// </summary>
+    private void DrawStateIndicator()
+    {
+        // Define cor baseada no estado
+        Color stateColor = _currentState switch
+        {
+            BounceState.NotLaunched => Color.gray,
+            BounceState.Launching => new Color(1f, 0.5f, 0f), // Laranja
+            BounceState.Bouncing => Color.yellow,
+            BounceState.Stopping => new Color(1f, 0.3f, 0f), // Laranja escuro
+            BounceState.Stopped => Color.red,
+            BounceState.ReadyForCollection => Color.green,
+            _ => Color.white
+        };
+
+        Gizmos.color = stateColor;
+
+        // Desenha esfera pequena acima do objeto
+        Vector3 indicatorPosition = transform.position + Vector3.up * 0.5f;
+        Gizmos.DrawSphere(indicatorPosition, 0.15f);
+
+        // Desenha linha conectando ao objeto
+        Gizmos.DrawLine(transform.position, indicatorPosition);
+    }
+
+    /// <summary>
+    /// Desenha trajetória prevista baseada em força e ângulo configurados.
+    /// </summary>
+    private void DrawPredictedTrajectory()
+    {
+        // Usa valores médios de força e ângulo
+        float avgForce = (minLaunchForce + maxLaunchForce) / 2f;
+        float avgAngle = (minAngle + maxAngle) / 2f;
+
+        // Converte ângulo para direção
+        Vector2 direction = AngleToVector2(avgAngle);
+        direction.y *= verticalForceMultiplier;
+        direction.Normalize();
+
+        // Calcula velocidade inicial
+        Vector2 velocity = direction * avgForce;
+
+        // Simula trajetória
+        Vector3 currentPos = transform.position;
+        Vector3 previousPos = currentPos;
+        float timeStep = 0.05f;
+        int steps = 50;
+
+        Gizmos.color = new Color(0f, 1f, 1f, 0.5f); // Ciano semi-transparente
+
+        for (int i = 0; i < steps; i++)
+        {
+            float time = i * timeStep;
+
+            // Calcula posição usando física básica: p = p0 + v*t + 0.5*g*t^2
+            Vector2 gravity = Physics2D.gravity;
+            currentPos = transform.position + (Vector3)(velocity * time + 0.5f * gravity * time * time);
+
+            // Desenha linha entre pontos
+            Gizmos.DrawLine(previousPos, currentPos);
+
+            // Desenha pontos de quicada previstos
+            if (i > 0 && bounceCount > 0)
+            {
+                float bounceTime = timeToBounce;
+                for (int b = 0; b < bounceCount; b++)
+                {
+                    if (Mathf.Abs(time - bounceTime) < timeStep)
+                    {
+                        Gizmos.color = Color.cyan;
+                        Gizmos.DrawWireSphere(currentPos, 0.2f);
+                        Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
+                    }
+                    bounceTime += timeToBounce / Mathf.Pow(2f, b + 1);
+                }
+            }
+
+            previousPos = currentPos;
+
+            // Para se atingir o chão (aproximação)
+            if (currentPos.y < transform.position.y - 2f)
+                break;
+        }
+
+        // Desenha indicadores de ângulo mínimo e máximo
+        DrawAngleIndicators();
+    }
+
+    /// <summary>
+    /// Desenha indicadores visuais dos ângulos mínimo e máximo de lançamento.
+    /// </summary>
+    private void DrawAngleIndicators()
+    {
+        float indicatorLength = 1.5f;
+
+        // Ângulo mínimo (verde)
+        Vector2 minDir = AngleToVector2(minAngle);
+        Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)minDir * indicatorLength);
+
+        // Ângulo máximo (azul)
+        Vector2 maxDir = AngleToVector2(maxAngle);
+        Gizmos.color = new Color(0f, 0f, 1f, 0.3f);
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)maxDir * indicatorLength);
+
+        // Desenha arco entre os ângulos
+        DrawArc(transform.position, indicatorLength, minAngle, maxAngle, 20);
+    }
+
+    /// <summary>
+    /// Desenha um arco entre dois ângulos.
+    /// </summary>
+    private void DrawArc(Vector3 center, float radius, float startAngle, float endAngle, int segments)
+    {
+        Gizmos.color = new Color(1f, 1f, 0f, 0.2f);
+
+        float angleStep = (endAngle - startAngle) / segments;
+        Vector3 previousPoint = center + (Vector3)AngleToVector2(startAngle) * radius;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = startAngle + angleStep * i;
+            Vector3 currentPoint = center + (Vector3)AngleToVector2(angle) * radius;
+            Gizmos.DrawLine(previousPoint, currentPoint);
+            previousPoint = currentPoint;
+        }
+    }
+
+    /// <summary>
+    /// Desenha raio de atração do ItemCollectable se existir.
+    /// </summary>
+    private void DrawAttractionRadius()
+    {
+        var itemCollectable = GetComponent<ItemCollectable>();
+        if (itemCollectable == null) return;
+
+        // Usa reflexão para acessar o campo privado attractionRadius
+        var field = itemCollectable.GetType().GetField("attractionRadius",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        if (field != null)
+        {
+            float attractionRadius = (float)field.GetValue(itemCollectable);
+
+            // Cor baseada no estado de prontidão
+            if (_currentState == BounceState.ReadyForCollection)
+            {
+                Gizmos.color = new Color(0f, 1f, 0f, 0.3f); // Verde semi-transparente
+            }
+            else
+            {
+                Gizmos.color = new Color(1f, 0.5f, 0f, 0.2f); // Laranja semi-transparente
+            }
+
+            // Desenha esfera de atração
+            Gizmos.DrawWireSphere(transform.position, attractionRadius);
+
+            // Desenha círculo preenchido no chão
+            DrawCircleOnGround(transform.position, attractionRadius);
+        }
+    }
+
+    /// <summary>
+    /// Desenha um círculo no chão para melhor visualização do raio de atração.
+    /// </summary>
+    private void DrawCircleOnGround(Vector3 center, float radius)
+    {
+        int segments = 32;
+        float angleStep = 360f / segments;
+
+        Vector3 previousPoint = center + new Vector3(Mathf.Cos(0), 0, 0) * radius;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = angleStep * i * Mathf.Deg2Rad;
+            Vector3 currentPoint = center + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+            Gizmos.DrawLine(previousPoint, currentPoint);
+            previousPoint = currentPoint;
+        }
+    }
+
+    /// <summary>
+    /// Desenha label com estado atual e contador de quicadas usando Handles.
+    /// </summary>
+    private void DrawStateLabel()
+    {
+#if UNITY_EDITOR
+        // Posição do label acima do objeto
+        Vector3 labelPosition = transform.position + Vector3.up * 1f;
+
+        // Monta texto do label
+        string stateText = $"Estado: {_currentState}";
+        
+        if (_hasBeenLaunched && bounceCount > 0)
+        {
+            stateText += $"\nQuicadas: {_currentBounceIndex}/{bounceCount}";
+        }
+
+        if (_currentState == BounceState.Bouncing || _currentState == BounceState.Launching)
+        {
+            if (_rigidbody2D != null)
+            {
+                stateText += $"\nVel: {_rigidbody2D.linearVelocity.magnitude:F1}";
+            }
+        }
+
+        // Define estilo do label
+        UnityEditor.Handles.color = Color.white;
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.white;
+        style.fontSize = 11;
+        style.fontStyle = FontStyle.Bold;
+        style.alignment = TextAnchor.MiddleCenter;
+
+        // Adiciona sombra ao texto para melhor legibilidade
+        GUIStyle shadowStyle = new GUIStyle(style);
+        shadowStyle.normal.textColor = Color.black;
+
+        // Desenha sombra
+        UnityEditor.Handles.Label(labelPosition + Vector3.right * 0.02f + Vector3.down * 0.02f, stateText, shadowStyle);
+        
+        // Desenha texto principal
+        UnityEditor.Handles.Label(labelPosition, stateText, style);
+#endif
+    }
     #endregion
 }

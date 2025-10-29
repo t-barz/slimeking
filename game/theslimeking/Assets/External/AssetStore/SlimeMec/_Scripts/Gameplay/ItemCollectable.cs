@@ -65,6 +65,14 @@ namespace SlimeMec.Gameplay
         {
             FindPlayer();
             SetupVisuals();
+
+            // Desabilita collider se BounceHandler existir (será habilitado quando pronto)
+            var bounceHandler = GetComponent<BounceHandler>();
+            if (bounceHandler != null && _collider != null)
+            {
+                _collider.enabled = false;
+                Debug.Log($"[ItemCollectable] Collider desabilitado - aguardando BounceHandler estar pronto");
+            }
         }
 
         private void Update()
@@ -169,6 +177,14 @@ namespace SlimeMec.Gameplay
 
             if (timeSinceSpawn >= activationDelay)
             {
+                // Verifica se BounceHandler existe e está pronto
+                var bounceHandler = GetComponent<BounceHandler>();
+                if (bounceHandler != null && !bounceHandler.IsReadyForCollection)
+                {
+                    // Aguarda BounceHandler estar pronto
+                    return;
+                }
+
                 ActivateAttraction();
             }
         }
@@ -510,6 +526,35 @@ namespace SlimeMec.Gameplay
 
             float elapsed = Time.time - _spawnTime;
             return Mathf.Max(0f, activationDelay - elapsed);
+        }
+
+        /// <summary>
+        /// Controla o collider do ItemCollectable
+        /// </summary>
+        public void SetColliderEnabled(bool enabled)
+        {
+            if (_collider != null)
+            {
+                _collider.enabled = enabled;
+                Debug.Log($"[ItemCollectable] Collider {(enabled ? "habilitado" : "desabilitado")}");
+            }
+        }
+
+        /// <summary>
+        /// Retorna o valor do delay de ativação
+        /// </summary>
+        public float ActivationDelay => activationDelay;
+
+        /// <summary>
+        /// Verifica se o delay de ativação expirou
+        /// </summary>
+        public bool IsActivationDelayComplete
+        {
+            get
+            {
+                float timeSinceSpawn = Time.time - _spawnTime;
+                return timeSinceSpawn >= activationDelay;
+            }
         }
 
         #endregion
