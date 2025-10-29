@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: eb36794843e70004193c6c1865f4d7f3, type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.9109736
+      value: 0.9109736
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: eb36794843e70004193c6c1865f4d7f3, type: 3}
       propertyPath: m_LocalScale.y
@@ -183,16 +183,16 @@ MonoBehaviour:
   minScale: 0.95
   maxScale: 1.05
   uniformScale: 1
-  randomizeColor: 0
+  randomizeColor: 1
   possibleColors:
   - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
   - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  useColorInterpolation: 0
+  - {r: 0.45882356, g: 0.90196085, b: 0.62352943, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  useColorInterpolation: 1
   baseColor: {r: 0.45882356, g: 0.90196085, b: 0.62352943, a: 1}
-  colorVariation: 0.3
+  colorVariation: 1
   applyOnStart: 1
   randomizeAlpha: 0
   minAlpha: 0.7

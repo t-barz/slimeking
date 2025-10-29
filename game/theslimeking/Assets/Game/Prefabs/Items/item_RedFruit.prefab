@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.3006641
+      value: 0.1338796
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 12.3939495
+      value: 13.549224
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -85,11 +85,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.14
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.87136
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -206,7 +206,7 @@ MonoBehaviour:
   shadowObject: {fileID: 1787758591116441632}
   minShadowScale: 0.5
   maxShadowScale: 1
-  shadowOffset: {x: 0.1, y: -0.025}
+  shadowOffset: {x: 0, y: 0}
   maxSimulatedHeight: 8
   launchOnStart: 1
   autoDestroyTime: 0
@@ -301,8 +301,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  activationDelay: 0.5
-  showDelayFeedback: 1
+  activationDelay: 1
+  showDelayFeedback: 0
   delayTintColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   enableAttraction: 1
   optimizationInterval: 0.5

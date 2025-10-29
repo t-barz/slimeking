@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2841726453269676469}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.2120996, y: 23.759851, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -175,13 +175,13 @@ MonoBehaviour:
   verticalForceMultiplier: 1.2
   minAngle: 45
   maxAngle: 135
-  bounceCount: 2
+  bounceCount: 3
   timeToBounce: 0.1
-  forceReductionFactor: 0.8
+  forceReductionFactor: 0.5
   shadowObject: {fileID: 4808406553456778898}
   minShadowScale: 0.5
   maxShadowScale: 1
-  shadowOffset: {x: 0.1, y: -0.2}
+  shadowOffset: {x: 0, y: 0}
   maxSimulatedHeight: 8
   launchOnStart: 1
   autoDestroyTime: 0
@@ -199,8 +199,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.ItemCollectable
   itemData: {fileID: 11400000, guid: 93a95c4041c52c4479ff4ac120637395, type: 2}
-  attractionRadius: 1
-  attractionSpeed: 5
+  attractionRadius: 0.5
+  attractionSpeed: 3
   attractionCurve:
     serializedVersion: 2
     m_Curve:
@@ -225,9 +225,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  activationDelay: 0.5
-  showDelayFeedback: 1
-  delayTintColor: {r: 1, g: 1, b: 1, a: 0.5}
+  activationDelay: 1
+  showDelayFeedback: 0
+  delayTintColor: {r: 1, g: 1, b: 1, a: 1}
   enableAttraction: 1
   optimizationInterval: 0.1
 --- !u!1001 &2450691677628418554

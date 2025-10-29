@@ -88,11 +88,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a8b7d43c0beef0c4a882f64d25029b1a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.2119517
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a8b7d43c0beef0c4a882f64d25029b1a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 25.285717
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a8b7d43c0beef0c4a882f64d25029b1a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -236,7 +236,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -281,8 +281,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  activationDelay: 0.5
-  showDelayFeedback: 1
+  activationDelay: 1
+  showDelayFeedback: 0
   delayTintColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   enableAttraction: 1
   optimizationInterval: 0.5
