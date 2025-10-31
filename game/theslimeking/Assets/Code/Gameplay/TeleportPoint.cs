@@ -311,13 +311,6 @@ namespace PixeLadder.EasyTransition
         /// <returns>True se todas as validações passarem, false caso contrário</returns>
         private bool ValidateTeleport()
         {
-            // Valida se destinationPosition está configurado
-            if (destinationPosition == Vector3.zero)
-            {
-                Debug.LogWarning($"TeleportPoint '{gameObject.name}': Posição de destino não configurada! Configure o campo 'Destination Position' no Inspector.", this);
-                return false;
-            }
-
             // Valida se transitionEffect está atribuído
             if (transitionEffect == null)
             {

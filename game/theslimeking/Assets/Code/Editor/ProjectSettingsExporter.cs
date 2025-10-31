@@ -310,11 +310,12 @@ namespace SlimeKing.Core.EditorTools
             public Dictionary<string, object> urpAssetData = new();
         }
 
-        private const string MenuPath = "Tools/SlimeKing/Export Complete Project Settings";
+        // LEGACY MENU - Comentado para evitar duplicação. Use "Extra Tools" menu
+        // private const string MenuPath = "Tools/SlimeKing/Export Complete Project Settings";
         private bool enableDebugLogs = true;
         private string lastExportPath;
 
-        [MenuItem(MenuPath)]
+        // [MenuItem(MenuPath)]
         public static void Open()
         {
             GetWindow<ProjectSettingsExporterWindow>("Export Project Settings");

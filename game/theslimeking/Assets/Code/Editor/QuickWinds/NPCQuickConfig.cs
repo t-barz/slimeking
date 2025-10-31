@@ -58,12 +58,20 @@ namespace SlimeKing.Editor
         // Validation
         private ValidationResult lastValidationResult = null;
 
-        [MenuItem("QuickWinds/NPC Quick Config")]
+        // LEGACY MENU - Comentado para evitar duplicação. Use "Extra Tools" menu
+        // [MenuItem("QuickWinds/NPC Quick Config (Use Extra Tools)")]
         public static void ShowWindow()
         {
             NPCQuickConfig window = GetWindow<NPCQuickConfig>("NPC Quick Config");
             window.minSize = new Vector2(400, 600);
             window.Show();
+        }
+        
+        // LEGACY MENU - Comentado para evitar duplicação. Use "Extra Tools" menu via UnifiedExtraTools
+        // [MenuItem("Extra Tools/NPC/🎭 NPC Quick Config (Direct)")]
+        public static void ShowWindowDirect()
+        {
+            ShowWindow();
         }
 
         private void OnEnable()
