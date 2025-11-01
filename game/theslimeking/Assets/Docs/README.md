@@ -34,6 +34,7 @@ Bem-vindo à documentação completa de **The Slime King**!
 |:--|:--|:--|
 | **[Quick-Reference.md](Quick-Reference.md)** | Referência rápida de código | Programadores |
 | **[Implementation-Guide.md](Implementation-Guide.md)** | Guia de implementação | Programadores |
+| **[DIALOGUE_SYSTEM_README.md](DIALOGUE_SYSTEM_README.md)** | Sistema de Diálogos com NPCs | Programadores |
 
 ### 📊 Gestão
 
