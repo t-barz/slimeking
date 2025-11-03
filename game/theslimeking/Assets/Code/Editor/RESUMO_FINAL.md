@@ -61,7 +61,7 @@ Cada botão executa uma ferramenta específica.
 ### ❌ ANTES (Bagunçado)
 
 ```
-QuickWinds/
+QuickWins/
   └─ NPC Quick Config
 
 Tools/SlimeKing/Camera Setup/

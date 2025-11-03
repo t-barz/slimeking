@@ -69,7 +69,7 @@ Assets/
 │     ├─ EXECUTIVE_SUMMARY.md
 │     ├─ ExtraTools.cs (Legacy)
 │     ├─ CameraSetupTools.cs (Legacy)
-│     └─ QuickWinds/
+│     └─ QuickWins/
 │        └─ NPCQuickConfig.cs (Legacy)
 │
 └─ Docs/

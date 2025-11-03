@@ -15,7 +15,7 @@
 
 ### 🔄 Changed
 
-- Menu "QuickWinds" → Marcado como "(Use Extra Tools)"
+- Menu "QuickWins" → Marcado como "(Use Extra Tools)"
 - Menu "Tools/SlimeKing" → Marcado como "(Use Extra Tools)"
 - Menu "The Slime King" → Marcado como "(Legacy)"
 - Todos os menus antigos mantidos para compatibilidade
@@ -24,7 +24,7 @@
 
 Unificou funcionalidades de 3 menus em 1:
 
-#### De QuickWinds
+#### De QuickWins
 
 - NPC Quick Config
 - NPC Batch Configurator

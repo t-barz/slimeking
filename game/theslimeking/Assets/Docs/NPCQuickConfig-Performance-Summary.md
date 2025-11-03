@@ -10,7 +10,7 @@
 
 ### 1. AssetDatabase Batch Operations ✅
 
-**File:** `Assets/Code/Editor/QuickWinds/NPCDataGenerator.cs`
+**File:** `Assets/Code/Editor/QuickWins/NPCDataGenerator.cs`
 
 **New Method:**
 
@@ -31,7 +31,7 @@ public static void SaveAssetsBatch(List<(ScriptableObject asset, string path)> a
 
 ### 2. Gizmo Caching System ✅
 
-**File:** `Assets/Code/Editor/QuickWinds/NPCGizmosDrawer.cs`
+**File:** `Assets/Code/Editor/QuickWins/NPCGizmosDrawer.cs`
 
 **New Components:**
 
@@ -53,7 +53,7 @@ public static void SaveAssetsBatch(List<(ScriptableObject asset, string path)> a
 
 ### 3. Batch Configuration with Resource Sharing ✅
 
-**File:** `Assets/Code/Editor/QuickWinds/NPCBatchConfigurator.cs` (NEW)
+**File:** `Assets/Code/Editor/QuickWins/NPCBatchConfigurator.cs` (NEW)
 
 **New Class:** `NPCBatchConfigurator`
 
@@ -74,8 +74,8 @@ public static void SaveAssetsBatch(List<(ScriptableObject asset, string path)> a
 
 **Files:**
 
-- `Assets/Code/Editor/QuickWinds/NPCQuickConfig.cs`
-- `Assets/Code/Editor/QuickWinds/NPCBatchConfigurator.cs`
+- `Assets/Code/Editor/QuickWins/NPCQuickConfig.cs`
+- `Assets/Code/Editor/QuickWins/NPCBatchConfigurator.cs`
 
 **Implementation:**
 
@@ -99,7 +99,7 @@ Undo.CollapseUndoOperations(undoGroup);
 
 ### 5. Performance Profiling System ✅
 
-**File:** `Assets/Code/Editor/QuickWinds/NPCPerformanceProfiler.cs` (NEW)
+**File:** `Assets/Code/Editor/QuickWins/NPCPerformanceProfiler.cs` (NEW)
 
 **New Class:** `NPCPerformanceProfiler`
 

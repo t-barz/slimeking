@@ -42,7 +42,7 @@ Extra Tools/
 
 ### 3. Menus Antigos Marcados
 
-- ✅ QuickWinds → Marcado como "(Use Extra Tools)"
+- ✅ QuickWins → Marcado como "(Use Extra Tools)"
 - ✅ Tools/SlimeKing → Marcado como "(Use Extra Tools)"
 - ✅ The Slime King → Marcado como "(Legacy)"
 

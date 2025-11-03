@@ -13,7 +13,7 @@ Before starting the tests, ensure:
 - Unity Editor is open
 - The project is loaded
 - All NPCQuickConfig scripts are compiled without errors
-- Template assets exist in `Assets/Data/QuickWinds/Templates/NPCTemplates/`
+- Template assets exist in `Assets/Data/QuickWins/Templates/NPCTemplates/`
 
 ---
 
@@ -54,7 +54,7 @@ Before starting the tests, ensure:
    - In the Hierarchy, click on `TestNPC_CervoBroto`
 
 2. **Open NPCQuickConfig window:**
-   - Go to menu `QuickWinds > NPC Quick Config`
+   - Go to menu `QuickWins > NPC Quick Config`
    - The window should open and display the selected GameObject name
 
 3. **Select Cervo-Broto template:**
@@ -126,7 +126,7 @@ Before starting the tests, ensure:
    - In the Hierarchy, click on `TestNPC_Esquilo`
 
 2. **Open NPCQuickConfig window:**
-   - If not already open, go to `QuickWinds > NPC Quick Config`
+   - If not already open, go to `QuickWins > NPC Quick Config`
 
 3. **Select Esquilo Coletor template:**
    - In the Template dropdown, select `Esquilo Coletor`
@@ -185,7 +185,7 @@ Before starting the tests, ensure:
    - In the Hierarchy, click on `TestNPC_Abelha`
 
 2. **Open NPCQuickConfig window:**
-   - If not already open, go to `QuickWinds > NPC Quick Config`
+   - If not already open, go to `QuickWins > NPC Quick Config`
 
 3. **Select Abelha Cristalina template:**
    - In the Template dropdown, select `Abelha Cristalina`
@@ -237,7 +237,7 @@ Before starting the tests, ensure:
    - Click on empty space in Hierarchy or Scene view
 
 2. **Open NPCQuickConfig window:**
-   - Go to `QuickWinds > NPC Quick Config`
+   - Go to `QuickWins > NPC Quick Config`
 
 3. **Try to validate:**
    - Click `Validate Configuration` button
@@ -281,7 +281,7 @@ Before starting the tests, ensure:
    - Select `TestNPC_CervoBroto` in Hierarchy
 
 2. **Open NPCQuickConfig window:**
-   - Go to `QuickWinds > NPC Quick Config`
+   - Go to `QuickWins > NPC Quick Config`
 
 3. **Enable gizmos:**
    - Check the `Show Gizmos in Scene View` checkbox
@@ -346,7 +346,7 @@ Before starting the tests, ensure:
    - In Hierarchy, create empty GameObject named `TestCustomNPC`
 
 2. **Open NPCQuickConfig window:**
-   - Go to `QuickWinds > NPC Quick Config`
+   - Go to `QuickWins > NPC Quick Config`
 
 3. **Configure manually (don't select a template):**
    - Leave Template as `Custom`
@@ -478,7 +478,7 @@ After completing all tests, verify:
 
 **Issue: Template dropdown is empty**
 
-- Solution: Verify template assets exist in `Assets/Data/QuickWinds/Templates/NPCTemplates/`
+- Solution: Verify template assets exist in `Assets/Data/QuickWins/Templates/NPCTemplates/`
 
 **Issue: Components not being added**
 

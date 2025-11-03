@@ -10,7 +10,7 @@ Unificar as ferramentas de desenvolvimento dispersas em 3 menus diferentes em um
 
 ### Antes
 
-- ❌ 3 menus separados (QuickWinds, Tools, The Slime King)
+- ❌ 3 menus separados (QuickWins, Tools, The Slime King)
 - ❌ Ferramentas difíceis de encontrar
 - ❌ Interface inconsistente
 - ❌ Poluição no menu do Unity

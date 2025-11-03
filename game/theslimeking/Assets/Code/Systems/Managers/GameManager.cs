@@ -18,6 +18,12 @@ public class GameManager : ManagerSingleton<GameManager>
     public bool IsPreloadReady => preloadedSceneOperation != null && preloadedSceneOperation.progress >= 0.9f;
     public bool HasPreloadedScene(string sceneName) => preloadedSceneOperation != null && preloadedSceneName == sceneName;
 
+    #region Reputation System
+    // Sistema de reputação para quests
+    private int reputation = 0;
+    public event System.Action<int> OnReputationChanged; // evento disparado quando reputação muda
+    #endregion
+
     // Inicialização mínima seguindo KISS: define estado inicial e aplica configurações básicas de runtime.
     protected override void Initialize()
     {
@@ -161,6 +167,38 @@ public class GameManager : ManagerSingleton<GameManager>
     private void CleanupDuplicateGlobalLights()
     {
         // Não faz nada - LoadSceneMode.Single já garante que não há duplicados
+    }
+    #endregion
+
+    #region Reputation System Methods
+    /// <summary>
+    /// Adiciona reputação ao jogador.
+    /// Usado principalmente pelo Quest System ao completar quests.
+    /// </summary>
+    /// <param name="amount">Quantidade de reputação a adicionar (pode ser negativa)</param>
+    public void AddReputation(int amount)
+    {
+        reputation += amount;
+        
+        // Garante que reputação não fique negativa
+        if (reputation < 0)
+        {
+            reputation = 0;
+        }
+        
+        // Dispara evento de mudança de reputação
+        OnReputationChanged?.Invoke(reputation);
+        
+        Log($"Reputação alterada: {amount:+#;-#;0} (Total: {reputation})");
+    }
+
+    /// <summary>
+    /// Obtém a reputação atual do jogador.
+    /// </summary>
+    /// <returns>Valor atual de reputação</returns>
+    public int GetReputation()
+    {
+        return reputation;
     }
     #endregion
 }

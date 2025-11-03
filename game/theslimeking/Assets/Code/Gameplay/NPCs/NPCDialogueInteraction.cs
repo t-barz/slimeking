@@ -1,6 +1,7 @@
 using UnityEngine;
 using SlimeMec.Systems;
 using SlimeKing.Systems.UI;
+using TheSlimeKing.Quest;
 
 namespace SlimeMec.Gameplay.NPCs
 {
@@ -92,6 +93,11 @@ namespace SlimeMec.Gameplay.NPCs
         /// </summary>
         private bool isInitialized;
 
+        /// <summary>
+        /// Referência ao QuestGiverController no mesmo GameObject (se existir)
+        /// </summary>
+        private QuestGiverController questGiver;
+
         #endregion
 
         #region Unity Lifecycle
@@ -178,6 +184,13 @@ namespace SlimeMec.Gameplay.NPCs
             // Configura o collider como trigger
             interactionCollider.isTrigger = true;
             interactionCollider.radius = interactionRadius;
+
+            // Verifica se há QuestGiverController no mesmo GameObject
+            questGiver = GetComponent<QuestGiverController>();
+            if (questGiver != null)
+            {
+                Debug.Log($"[NPCDialogueInteraction] QuestGiverController found on {gameObject.name}. Quest integration enabled.");
+            }
 
             isInitialized = true;
             Debug.Log($"[NPCDialogueInteraction] Initialized on {gameObject.name} with dialogue ID: {dialogueId}");
@@ -301,6 +314,7 @@ namespace SlimeMec.Gameplay.NPCs
         /// Tenta iniciar o diálogo com o NPC.
         /// Verifica se o DialogueManager está disponível e se não há diálogo ativo.
         /// Aplica configurações customizadas se definidas.
+        /// Se há QuestGiverController, adiciona opções de quest ao diálogo.
         /// </summary>
         public void TryStartDialogue()
         {
@@ -338,6 +352,12 @@ namespace SlimeMec.Gameplay.NPCs
             if (interactionIcon != null)
             {
                 interactionIcon.Hide();
+            }
+
+            // Registra quest choices se há QuestGiverController
+            if (questGiver != null && DialogueChoiceHandler.Instance != null)
+            {
+                DialogueChoiceHandler.Instance.RegisterQuestGiver(questGiver);
             }
 
             // Inicia o diálogo via DialogueManager
@@ -426,6 +446,15 @@ namespace SlimeMec.Gameplay.NPCs
             useCustomPauseSettings = useCustom;
             pausePlayerDuringDialogue = shouldPause;
             Debug.Log($"[NPCDialogueInteraction] Custom pause settings: useCustom={useCustom}, shouldPause={shouldPause} on {gameObject.name}");
+        }
+
+        /// <summary>
+        /// Obtém o QuestGiverController anexado ao mesmo GameObject (se existir).
+        /// </summary>
+        /// <returns>QuestGiverController ou null se não existir</returns>
+        public QuestGiverController GetQuestGiver()
+        {
+            return questGiver;
         }
 
         #endregion

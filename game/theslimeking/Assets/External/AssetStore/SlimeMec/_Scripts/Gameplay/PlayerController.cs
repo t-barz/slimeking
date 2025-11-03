@@ -1915,6 +1915,71 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Equipment System Integration
+
+    private int _defenseBonus = 0;
+    private int _speedBonus = 0;
+
+    /// <summary>
+    /// Define o bônus de defesa dos equipamentos.
+    /// Chamado pelo InventoryManager quando equipamentos mudam.
+    /// </summary>
+    /// <param name="bonus">Valor total de bônus de defesa</param>
+    public void SetDefenseBonus(int bonus)
+    {
+        _defenseBonus = bonus;
+        
+        if (enableLogs)
+            Debug.Log($"PlayerController: Bônus de defesa atualizado para {_defenseBonus}");
+        
+        // TODO: Aplicar defesa ao sistema de combate quando implementado
+    }
+
+    /// <summary>
+    /// Define o bônus de velocidade dos equipamentos.
+    /// Chamado pelo InventoryManager quando equipamentos mudam.
+    /// </summary>
+    /// <param name="bonus">Valor total de bônus de velocidade</param>
+    public void SetSpeedBonus(int bonus)
+    {
+        _speedBonus = bonus;
+        
+        // Aplica o bônus à velocidade base
+        if (_attributesHandler != null)
+        {
+            float baseSpeed = _attributesHandler.CurrentSpeed;
+            moveSpeed = baseSpeed + _speedBonus;
+        }
+        else
+        {
+            // Se não houver AttributesHandler, aplica diretamente
+            moveSpeed += _speedBonus;
+        }
+        
+        if (enableLogs)
+            Debug.Log($"PlayerController: Bônus de velocidade atualizado para {_speedBonus}. Velocidade total: {moveSpeed}");
+    }
+
+    /// <summary>
+    /// Obtém o bônus de defesa atual.
+    /// </summary>
+    /// <returns>Valor do bônus de defesa</returns>
+    public int GetDefenseBonus()
+    {
+        return _defenseBonus;
+    }
+
+    /// <summary>
+    /// Obtém o bônus de velocidade atual.
+    /// </summary>
+    /// <returns>Valor do bônus de velocidade</returns>
+    public int GetSpeedBonus()
+    {
+        return _speedBonus;
+    }
+
+    #endregion
+
     #region TODO: Sistemas a Implementar
     /*
     PRÓXIMOS PASSOS PARA IMPLEMENTAÇÃO:

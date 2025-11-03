@@ -1,8 +1,12 @@
-# Dialogue System Test Scene
+# Test Scenes
 
-## Quick Start
+This folder contains automated test scenes for various game systems.
 
-### Creating the Test Scene
+## Available Test Scenes
+
+### 1. Dialogue System Test Scene
+
+#### Creating the Test Scene
 
 In Unity Editor, go to:
 
@@ -16,66 +20,131 @@ This will automatically create a complete test scene at:
 Assets/Game/Scenes/Tests/DialogueSystemTest.unity
 ```
 
-## What's Included
+### 2. Quest System Test Scene
 
-The test scene includes:
+#### Creating the Test Scene
 
-### NPCs
+In Unity Editor, go to:
 
-- **Merchant** (Yellow) - Single page dialogue
-- **Guard** (Red) - Multi-page dialogue (3 pages)
-- **Villager** (Green) - Multi-page dialogue (2 pages)
+```
+SlimeKing > Quest System > Create Test Scene
+```
 
-### Managers
+This will automatically create a complete test scene at:
 
-- DialogueManager
-- LocalizationManager
+```
+Assets/Game/Scenes/Tests/QuestSystemTest.unity
+```
 
-### UI
+## Dialogue System Test Scene
 
-- DialogueUI (dialogue box with typewriter effect)
-- Language Switcher (BR, EN, ES buttons)
+### What's Included
 
-### Player
+- **NPCs**: Merchant (Yellow), Guard (Red), Villager (Green)
+- **Managers**: DialogueManager, LocalizationManager
+- **UI**: DialogueUI with typewriter effect, Language Switcher
+- **Player**: Simple controller with WASD movement
 
-- Simple player controller with WASD movement
-- Interaction with E key
+### Testing
 
-## Testing
+1. Play the scene
+2. Move with WASD keys
+3. Approach an NPC to see interaction icon
+4. Press E to start dialogue
+5. Press E again to advance/complete text
+6. Click language buttons to test localization
 
-1. **Play the scene**
-2. **Move** with WASD keys
-3. **Approach an NPC** to see the interaction icon
-4. **Press E** to start dialogue
-5. **Press E again** to advance/complete text
-6. **Click language buttons** to test localization
+### Documentation
 
-## Documentation
-
-- **Full Guide**: `Assets/Docs/DIALOGUE_SYSTEM_README.md`
 - **Test Instructions**: `DIALOGUE_SYSTEM_TEST_INSTRUCTIONS.md`
 - **Completion Summary**: `TASK_15_COMPLETION_SUMMARY.md`
 
-## Dialogue Files
+## Quest System Test Scene
 
-Test dialogues are located in:
+### What's Included
+
+- **Managers**: QuestManager, GameManager
+- **NPC**: Quest Giver with visual indicators (! yellow/golden)
+- **Quest**: "Coletar Flores" - Collect 3 Frutas de Cura
+- **UI**: QuestNotificationPanel
+- **Player**: Simple controller with InventoryManager
+
+### Testing Tools
+
+#### 1. Automated Tests
+
+**Access**: Menu → **SlimeKing > Quest System > Run Automated Tests**
+
+- Validates all components exist
+- Tests integration points
+- Checks event system
+- Provides visual pass/fail results
+- 14+ automated tests
+
+#### 2. Manual Test Checklist
+
+**File**: `QUEST_SYSTEM_MANUAL_TEST_CHECKLIST.md`
+
+- 60+ detailed test cases
+- Step-by-step instructions
+- Expected results
+- Pass/fail checkboxes
+
+#### 3. Quick Testing Guide
+
+**File**: `QUEST_SYSTEM_TESTING_QUICK_GUIDE.md`
+
+- 5-minute quick start
+- Common issues and solutions
+- Fast reference
+
+### Testing
+
+1. Play the scene
+2. Move with WASD keys toward yellow NPC
+3. Press E to interact and accept quest
+4. Add items to inventory (manually via Inspector)
+5. Watch progress update automatically
+6. Return to NPC when complete (golden ! appears)
+7. Press E and turn in quest
+8. Verify rewards received
+
+### Documentation
+
+- **Quick Guide**: `QUEST_SYSTEM_TESTING_QUICK_GUIDE.md` ⭐ Start here!
+- **Test Instructions**: `QUEST_SYSTEM_TEST_INSTRUCTIONS.md`
+- **Manual Checklist**: `QUEST_SYSTEM_MANUAL_TEST_CHECKLIST.md`
+- **Test Report**: `TASK_14_TEST_COMPLETION_REPORT.md`
+- **Quick Start**: `QUEST_SYSTEM_TEST_README.md`
+- **Completion Summary**: `QUEST_SYSTEM_TEST_COMPLETION_SUMMARY.md`
+
+---
+
+## Notes
+
+- All test scenes are created programmatically
+- Scenes can be modified after creation and saved
+- Scene creation scripts are located in `Assets/Editor/`
+- Test data is created in `Assets/Data/` folders
+
+## Test Data Locations
+
+### Dialogue System
 
 ```
 Assets/Data/Dialogues/
-├── npc_merchant_greeting.json (single page)
-├── npc_guard_warning.json (multi-page)
-└── test_dialogue.json (multi-page)
+├── npc_merchant_greeting.json
+├── npc_guard_warning.json
+└── test_dialogue.json
 ```
 
-All dialogues support BR, EN, and ES languages.
+### Quest System
+
+```
+Assets/Data/Quests/
+└── TestQuest_CollectFlowers.asset
+```
 
 ---
 
-**Note**: The scene is created programmatically. If you need to modify it, you can either:
-
-1. Create it once and save your changes
-2. Modify the `DialogueSystemTestSceneSetup.cs` script
-
----
-
-**Last Updated**: 31/10/2025
+**Last Updated**: 03/11/2025

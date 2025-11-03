@@ -9,7 +9,7 @@ As ferramentas de desenvolvimento foram unificadas em um único menu **Extra Too
 ### Antes (3 menus separados)
 
 ```
-QuickWinds/
+QuickWins/
   └─ NPC Quick Config
 
 Tools/SlimeKing/Camera Setup/
@@ -80,7 +80,7 @@ Extra Tools → [Categoria] → [Ferramenta]
 
 | Menu Antigo | Novo Caminho |
 |-------------|--------------|
-| `QuickWinds/NPC Quick Config` | `Extra Tools/NPC/🎭 NPC Quick Config` |
+| `QuickWins/NPC Quick Config` | `Extra Tools/NPC/🎭 NPC Quick Config` |
 | `Tools/.../Add Camera Manager` | `Extra Tools/Camera/📷 Add Camera Manager` |
 | `Tools/.../Add Scene Validator` | `Extra Tools/Camera/✅ Add Scene Validator` |
 | `Tools/.../Setup Complete Scene` | `Extra Tools/Camera/🎬 Setup Complete Scene` |
@@ -110,7 +110,7 @@ Se você criou scripts que referenciam os menus antigos:
 ### Antes
 
 ```csharp
-[MenuItem("QuickWinds/My Tool")]
+[MenuItem("QuickWins/My Tool")]
 public static void MyTool() { }
 ```
 

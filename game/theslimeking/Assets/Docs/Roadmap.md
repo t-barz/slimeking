@@ -1,17 +1,126 @@
 # The Slime King - Roadmap de Desenvolvimento
 
-**Versão:** 2.1  
-**Última Atualização:** 29/10/2025  
-**Baseado em:** GDD v9.0 + TechMapping atual  
+**Versão:** 2.4  
+**Última Atualização:** 03/11/2025  
+**Baseado em:** GDD v9.0 + TechMapping atual + Análise de Código  
 **Metodologia:** Desenvolvimento Iterativo em 6 Milestones
 
-**Changelog v2.1:**
+**Changelog v2.4:**
 
-- ✅ Adicionado Sistema de Inventário detalhado (Fase 2.5)
-- ✅ Adicionado Sistema de Diálogo (Fase 2.6)
-- ✅ Adicionado Sistema de Save/Load (Fase 2.7)
-- ✅ Adicionado Sistema de Árvore de Habilidades (Fase 3.2)
-- ✅ Baseado no GDD v9.0 atualizado
+- ✅ Análise completa do código atual realizada
+- ✅ Sistema de NPC expandido descoberto (NPCController + AI + Friendship)
+- ✅ Sistema de IA básico implementado (Wander, Patrol, Static)
+- ✅ Sistema de Amizade básico implementado (NPCFriendship)
+- ✅ Dados de NPC estruturados (NPCData, DialogueData, FriendshipData)
+- ✅ Sistema de Quest UI adicionado (QuestChoiceUI, QuestNotificationController)
+- ✅ Progresso geral atualizado: 27% → 30%
+
+**Changelog v2.3:**
+
+- ✅ Sistema de Quest INICIADO (QuestManager + QuestEvents + QuestGiverController)
+- ✅ Correções de bugs críticos (delegate signature mismatch)
+- ✅ Ferramentas de Editor expandidas (QuestSystemTestSceneSetup)
+- ✅ Progresso geral atualizado: 25% → 27%
+
+**Changelog v2.2:**
+
+- ✅ Atualizado progresso de sistemas implementados (Nov 2025)
+- ✅ Sistema de Inventário COMPLETO (20 slots + 3 equipamentos + 4 quick slots)
+- ✅ Sistema de Diálogo COMPLETO (DialogueManager + UI + Localização)
+- ✅ Sistema de UI/UX expandido (Pause Menu, Confirmation Dialog, Interaction Icons)
+- ✅ Ferramentas de Editor expandidas (NPCDialogueQuickConfig, SceneSetupTool)
+- ✅ Progresso geral atualizado: 15% → 25%
+
+---
+
+## 🎉 Sistemas Recentemente Implementados (Novembro 2025)
+
+### Sistema de Quest ✅ COMPLETO (Core)
+
+- **QuestManager**: Gerenciamento centralizado de quests ✅
+- **QuestEvents**: Sistema de eventos para comunicação desacoplada ✅
+- **SaveEvents**: Sistema de eventos para save/load ✅
+- **QuestGiverController**: Controller para NPCs que oferecem quests ✅
+- **QuestNotificationController**: Notificações de quest na tela ✅
+- **CollectQuestData**: ScriptableObject para quests de coleta ✅
+- **ItemReward**: Sistema de recompensas de itens ✅
+- **QuestProgress**: Tracking de progresso de quests ✅
+- **QuestSaveData**: Persistência de dados de quest ✅
+- **QuestChoiceUI**: UI para escolhas de quest ✅
+- **QuestManagerEditor**: Editor customizado para QuestManager ✅
+- **QuestSystemTestSceneSetup**: Ferramenta de editor para setup de cena de teste ✅
+
+**Pendente:**
+
+- [ ] Quest Log UI (lista completa de quests)
+- [ ] Quest Tracker HUD (progresso na tela)
+- [ ] Tipos adicionais de quest (Defeat, Deliver, Explore, Interact, Escort)
+
+### Sistema de NPC 🚧 EM PROGRESSO
+
+- **NPCController**: Controller base para NPCs ✅
+- **NPCBehavior**: Comportamento base de NPCs ✅
+- **NPCDialogue**: Sistema de diálogo para NPCs ✅
+- **NPCDialogueInteraction**: Interação de diálogo com NPCs ✅
+- **NPCFriendship**: Sistema de amizade com NPCs ✅
+- **NPCData**: ScriptableObject com dados de NPC ✅
+- **NPCConfigData**: Configuração de NPCs ✅
+- **DialogueData**: Dados de diálogo ✅
+- **LocalizedDialogueData**: Diálogos localizados ✅
+- **FriendshipData**: Dados de amizade ✅
+- **NPCEnums**: Enumerações de NPC (tipos, estados) ✅
+
+**IA Básica Implementada:**
+
+- **NPCWanderAI**: IA de vagueio aleatório ✅
+- **NPCPatrolAI**: IA de patrulha em pontos ✅
+- **NPCStaticAI**: IA estática (sem movimento) ✅
+
+**Ferramentas de Editor:**
+
+- **NPCDialogueQuickConfig**: Setup rápido de NPCs com diálogo ✅
+- **NPCAnimatorSetup**: Setup de animadores ✅
+- **NPCGizmosDrawer**: Visualização de gizmos ✅
+- **NPCDataGenerator**: Gerador de dados de NPC ✅
+- **NPCComponentConfigurator**: Configurador de componentes ✅
+- **NPCBatchConfigurator**: Configuração em lote ✅
+
+**Pendente:**
+
+- [ ] Estados de IA avançados (Alert, Chase, Attack, Flee, Stunned)
+- [ ] Sistema de percepção (visão, audição, proximidade)
+- [ ] Integração completa com sistema de amizade
+- [ ] Comportamentos diários (schedule)
+
+### Sistema de Inventário ✅ COMPLETO
+
+- **InventoryManager**: Gerenciamento de 20 slots + 3 equipamentos + 4 quick slots
+- **InventoryUI**: Interface completa com grid, equipamentos e ações
+- **ItemData**: ScriptableObject robusto com tipos e raridades
+- **QuickSlotManager**: Sistema de quick slots integrado ao HUD
+- **InventorySaveData**: Sistema de persistência de dados
+
+### Sistema de Diálogo ✅ COMPLETO
+
+- **DialogueManager**: Gerenciamento centralizado de diálogos
+- **DialogueUI**: Interface com typewriter effect e escolhas
+- **LocalizationManager**: Suporte a múltiplos idiomas (PT-BR, EN)
+- **InteractionIcon**: Ícones flutuantes sobre NPCs
+- **NPCDialogueQuickConfig**: Ferramenta de editor para setup rápido
+
+### UI/UX Expandido ✅
+
+- **PauseMenu**: Menu de pausa completo com acesso ao inventário
+- **ConfirmationDialog**: Sistema de confirmação genérico
+- **ItemActionPanel**: Painel de ações para itens
+- **QuickSlotSelectionPanel**: Seleção de quick slots
+
+### Ferramentas de Editor ✅
+
+- **UnifiedExtraTools**: Ferramentas unificadas de desenvolvimento
+- **SceneSetupTool**: Setup automático de cenas
+- **DialogueSystemTestSceneSetup**: Cena de teste de diálogo
+- **QuestSystemTestSceneSetup**: Cena de teste de quest ✅ NOVO
 
 ---
 
@@ -19,11 +128,12 @@
 
 ### Status Atual
 
-- **Progresso Geral:** 15% completo
+- **Progresso Geral:** 30% completo ⬆️ (+3% desde última atualização)
 - **Milestone Atual:** ALPHA 1 (Vertical Slice Interno)
 - **Próximo Marco:** Janeiro 2026 ⚡
 - **Lançamento Previsto:** Maio 2027 ⚡
 - **Aceleração:** Gen AI (Vibe Coding) - Redução de 33-37% no tempo
+- **Sistemas Recentes:** Inventário, Diálogo, Quest (core completo), NPC (básico), UI/UX, Localização
 
 ### Milestones Planejados (Acelerados)
 
@@ -38,7 +148,7 @@
 
 | Milestone | Gameplay | Biomas | Reis | Sistemas | NPCs/Inimigos | Status |
 |-----------|----------|--------|------|----------|---------------|--------|
-| ALPHA 1 | 12-15 min | 2 (mínimo) | 0 | 35% | 3/2 | 🚧 Em Progresso |
+| ALPHA 1 | 12-15 min | 2 (mínimo) | 0 | 50% ⬆️ | 3/2 | 🚧 Em Progresso |
 | ALPHA 2 | 40-50 min | 2 (60%) | 1 | 60% | 7/4 | 📋 Planejado |
 | BETA | 8-10 horas | 5 (3 completos) | 3 | 90% | 20+/10+ | 📋 Planejado |
 | NEXT FEST | 2-2.5 horas | 3 (demo) | 2 | 95% | 15+/8+ | 📋 Planejado |
@@ -381,7 +491,8 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 ## 📅 Timeline Visual (Acelerada com Gen AI)
 
 ```
-2025 Nov ████████████████ (Atual - 15% completo)
+2025 Nov ██████████████████████████████ (Atual - 30% completo) ⬆️
+         ↑ Inventário + Diálogo + Quest + NPC + UI implementados
 2026 Jan ████████████████ ALPHA 1 ✓ ⚡
 2026 Abr ████████████████ ALPHA 2 ✓ ⚡
 2026 Out ████████████████ BETA ✓ ⚡
@@ -391,7 +502,8 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 ```
 
 **Total de Desenvolvimento:** 18 meses (Nov 2025 → Mai 2027)  
-**Economia com Gen AI:** ~9 meses (de 27 meses para 18 meses)
+**Economia com Gen AI:** ~9 meses (de 27 meses para 18 meses)  
+**Progresso Atual:** 30% (Nov 2025) - No prazo! ✅
 
 ### Comparação: Tradicional vs Gen AI
 
@@ -409,15 +521,22 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ## 🎯 Fase 1: Fundação Técnica (Core Systems)
 
-### 1.1 Arquitetura Base ✅
+### 1.1 Arquitetura Base ✅ COMPLETO
 
 - [x] Unity 6.2 com URP configurado
-- [x] Estrutura de pastas organizada
-- [x] Sistema de Managers (Singleton pattern)
+- [x] Estrutura de pastas organizada (Code/Data/Editor/Gameplay/Systems/Visual)
+- [x] Sistema de Managers (ManagerSingleton pattern) ⭐ ROBUSTO
 - [x] GameManager (ciclo de vida, preload de cenas)
 - [x] CameraManager (Cinemachine integrado)
+- [x] SimpleCameraFollow (câmera simples para testes)
 - [x] SceneTransitionManager (transições visuais)
+- [x] DialogueManager (gerenciamento de diálogos)
+- [x] DialogueChoiceHandler (escolhas em diálogos)
+- [x] LocalizationManager (i18n PT-BR/EN)
 - [x] Input System (Unity Input System)
+- [x] ScreenEffectsManager (vinheta, transições)
+
+**Nota:** Todos os managers utilizam o padrão ManagerSingleton<T> para garantir consistência e evitar duplicação de código.
 
 ### 1.2 Sistema de Cenas e Transições ✅
 
@@ -426,28 +545,67 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [x] Cross-scene teleport (teleporte entre cenas)
 - [x] ScreenEffectsManager (vinheta, transições)
 - [x] TeleportTransitionHelper (efeitos visuais)
-- [x] SceneSetupValidator (validação de cenas)
+- [x] SceneSetupValidator (validação automática de cenas) ⭐ ROBUSTO
+- [x] InitialCaveScreenController (controle da cena tutorial)
+- [x] TitleScreenController (tela inicial com sequência animada)
 
-### 1.3 Ferramentas de Editor ✅
+**Nota:** O SceneSetupValidator verifica automaticamente a presença de managers essenciais em cada cena, prevenindo erros de runtime.
 
-- [x] ExtraTools (ferramentas gerais)
+### 1.3 Ferramentas de Editor ✅ COMPLETO
+
+**Ferramentas Gerais:**
+
+- [x] UnifiedExtraTools (ferramentas gerais unificadas)
 - [x] CameraSetupTools (setup de câmera)
-- [x] BushQuickConfig (configuração de arbustos)
-- [x] ItemQuickConfig (configuração de itens)
+- [x] SceneSetupTool (setup automático de cenas)
 - [x] GizmosHelper (visualização de colliders)
 - [x] PolygonGizmosHelper (gizmos de polígonos)
-- [x] ProjectSettingsExporterWindow (exportação de settings)
+- [x] ProjectSettingsExporter (exportação de settings)
+- [x] CreateExampleItems (criação de itens de exemplo)
+
+**Ferramentas de Configuração Rápida:**
+
+- [x] BushQuickConfig (configuração de arbustos)
+- [x] ItemQuickConfig (configuração de itens)
+- [x] NPCDialogueQuickConfig (configuração rápida de NPCs com diálogo)
+
+**Ferramentas de NPC (QuickWins):**
+
+- [x] NPCAnimatorSetup (setup de animadores)
+- [x] NPCGizmosDrawer (visualização de gizmos de NPC)
+- [x] NPCDataGenerator (gerador de dados de NPC)
+- [x] NPCComponentConfigurator (configurador de componentes)
+- [x] NPCBatchConfigurator (configuração em lote)
+
+**Ferramentas de Setup de Cena:**
+
+- [x] DialogueSystemTestSceneSetup (setup de cena de teste de diálogo)
+- [x] QuestSystemTestSceneSetup (setup de cena de teste de quest) ⭐ NOVO
+
+**Editores Customizados:**
+
+- [x] QuestManagerEditor (editor customizado para QuestManager) ⭐ NOVO
+- [x] ItemRewardDrawer (drawer customizado para recompensas)
 
 ---
 
 ## 🎮 Fase 2: Gameplay Core
 
-### 2.1 Controle do Jogador 🚧
+### 2.1 Controle do Jogador 🚧 EM PROGRESSO
+
+**Implementado:**
 
 - [x] PlayerController (movimento básico 8 direções)
 - [x] PlayerInput (Unity Input System)
 - [x] Rigidbody2D physics
 - [x] Animação básica (Animator)
+- [x] AttackHandler (ataque básico)
+- [x] PlayerAttributesHandler (HP, atributos)
+- [x] SpecialMovementPoint (encolher/deslizar)
+- [x] InteractivePointHandler (pontos de interação)
+
+**Pendente:**
+
 - [ ] **Mecânica de Agachar (NOVA)** 📋
   - [ ] Input de agachar (segurar botão)
   - [ ] Animação de achatar verticalmente
@@ -478,92 +636,131 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [ ] Resistências elementais
 - [ ] Abordagens alternativas (stealth, diplomacia, tática)
 
-### 2.4 Sistema de Itens 🚧
+### 2.4 Sistema de Itens ✅ COMPLETO
+
+**Sistema de Coleta:**
 
 - [x] ItemCollectable (coleta de itens)
-- [x] CollectableItemData (ScriptableObject)
+- [x] CollectableItemData (ScriptableObject legado)
 - [x] BounceHandler (física de bounce)
 - [x] ItemBuffHandler (buffs temporários)
 - [x] DropController (drop de itens)
-- [ ] Sistema de Inventário (20-40 slots)
-- [ ] Categorização de itens
-- [ ] UI de inventário
 
-### 2.5 Sistema de Inventário 📋
+**Sistema Moderno de Itens:**
 
-- [ ] **Estrutura do Inventário**
-  - [ ] Grid 5x4 (20 slots iniciais)
-  - [ ] Expansível para 5x8 (40 slots)
-  - [ ] Drag and drop para reorganizar
-  - [ ] Stacking automático (máx 99 por slot)
+- [x] ItemData (ScriptableObject completo)
+- [x] ItemType (enum: Consumable, Material, Quest, Equipment)
+- [x] EquipmentType (enum: Amulet, Ring, Cape)
+- [x] ItemReward (sistema de recompensas)
+
+**Itens de Exemplo Criados:**
+
+- [x] CogumeloDeCura (item de cura)
+- [x] FrutaDeCura (item de cura)
+- [x] CristalElemental (cristal coletável)
+- [x] MaterialDeNinho (material de crafting)
+
+### 2.5 Sistema de Inventário ✅ COMPLETO
+
+- [x] **Estrutura do Inventário** ⭐ IMPLEMENTADO
+  - [x] Grid 5x4 (20 slots fixos)
+  - [x] InventoryManager (singleton)
+  - [x] InventorySlot (classe de dados)
+  - [x] Stacking automático (máx 99 por slot)
+  - [x] 3 slots de equipamento (Amulet, Ring, Cape)
+  - [x] 4 quick slots (direcionais do controle)
   
-- [ ] **UI do Inventário**
-  - [ ] Atalho: Tab/Touchpad/View/-
-  - [ ] Pausa o jogo quando aberto
-  - [ ] Informações detalhadas ao passar mouse
+- [x] **UI do Inventário** ⭐ IMPLEMENTADO
+  - [x] InventoryUI (painel principal)
+  - [x] InventorySlotUI (representação visual)
+  - [x] EquipmentSlotUI (slots de equipamento)
+  - [x] QuickSlotUI (HUD quick slots)
+  - [x] ItemActionPanel (ações: Usar/Equipar/Atribuir/Descartar)
+  - [x] QuickSlotSelectionPanel (seleção de quick slot)
+  - [x] ConfirmationDialog (confirmação de ações)
+  
+- [x] **Tipos de Itens** ⭐ IMPLEMENTADO
+  - [x] Consumíveis (poções, comida, buffs)
+  - [x] Materiais de Crafting
+  - [x] Itens de Quest (não descartáveis)
+  - [x] Equipamentos (amuletos, anéis, capas)
+  
+- [x] **Gerenciamento** ⭐ IMPLEMENTADO
+  - [x] Adicionar/Remover itens
+  - [x] Usar/Equipar/Descartar
+  - [x] Atribuir a quick slots
+  - [x] Sistema de save/load (InventorySaveData)
+  - [x] Integração com PauseMenu
+  
+- [ ] **Pendente (Alpha 2)**
+  - [ ] Drag and drop para reorganizar
   - [ ] Filtros por categoria
   - [ ] Borda colorida por raridade
-  
-- [ ] **Tipos de Itens**
-  - [ ] Consumíveis (poções, comida, buffs)
-  - [ ] Materiais de Crafting
-  - [ ] Itens de Quest (não descartáveis)
-  - [ ] Equipamentos (amuletos, anéis, capas)
-  
-- [ ] **Gerenciamento**
-  - [ ] Usar/Equipar/Descartar/Dividir Stack
+  - [ ] Dividir stacks
   - [ ] Sistema de favoritar
-  - [ ] Notificação de inventário cheio
-  - [ ] Itens no chão (5 min antes de desaparecer)
 
-### 2.6 Sistema de Diálogo 📋
+### 2.6 Sistema de Diálogo ✅ COMPLETO
 
-- [ ] **Tipos de Diálogo**
-  - [ ] Diálogo Linear (sem escolhas)
-  - [ ] Diálogo com Escolhas (2-4 opções)
-  - [ ] Diálogo Condicional (baseado em contexto)
+- [x] **DialogueManager** ⭐ IMPLEMENTADO
+  - [x] Singleton pattern (ManagerSingleton)
+  - [x] Sistema de eventos (OnDialogueStart/End)
+  - [x] Controle de fluxo de diálogo
+  - [x] Integração com LocalizationManager
+  - [x] Suporte a múltiplos idiomas
   
-- [ ] **UI de Diálogo**
-  - [ ] Caixa de diálogo (20% da tela, parte inferior)
-  - [ ] Portrait do NPC (64x64, animado)
-  - [ ] Efeito de digitação (30 char/s)
-  - [ ] Indicador de "mais texto"
-  - [ ] Botão de skip (após 2s)
+- [x] **UI de Diálogo** ⭐ IMPLEMENTADO
+  - [x] DialogueUI (implementa IDialogueUI)
+  - [x] Caixa de diálogo com fade in/out
+  - [x] Portrait do NPC (animado)
+  - [x] Efeito de digitação (typewriter)
+  - [x] Indicador de "mais texto"
+  - [x] Botão de continuar/skip
+  - [x] Sistema de escolhas (botões)
   
-- [ ] **Animações e Áudio**
-  - [ ] Portrait anima (idle breathing)
-  - [ ] Expressões (feliz, triste, surpreso, bravo)
+- [x] **LocalizationManager** ⭐ IMPLEMENTADO
+  - [x] Singleton pattern
+  - [x] Carregamento de JSON (PT-BR, EN)
+  - [x] Cache de diálogos em memória
+  - [x] Fallback para inglês
+  - [x] Suporte a múltiplos idiomas
+  
+- [x] **Ferramentas de Editor** ⭐ IMPLEMENTADO
+  - [x] NPCDialogueQuickConfig (setup rápido de NPCs)
+  - [x] DialogueSystemTestSceneSetup (cena de teste)
+  - [x] DialogueSystemSettings (configurações centralizadas)
+  
+- [x] **InteractionIcon** ⭐ IMPLEMENTADO
+  - [x] Ícone flutuante sobre NPCs
+  - [x] Animações (fade, bounce)
+  - [x] Segue posição do NPC em world space
+  
+- [ ] **Pendente (Alpha 2)**
+  - [ ] Expressões faciais (feliz, triste, surpreso, bravo)
   - [ ] Partículas emocionais
-  - [ ] Som de "blip" durante digitação
   - [ ] SFX de emoção
-  
-- [ ] **Sistema de Memória**
-  - [ ] Tracking de diálogos vistos
-  - [ ] NPCs não repetem informações
-  - [ ] Referências a conversas anteriores
-  
-- [ ] **Integração**
-  - [ ] Quest System (iniciar/progresso/conclusão)
-  - [ ] Friendship System (aumenta amizade)
-  - [ ] Reputation System (reações baseadas em reputação)
-  
-- [ ] **DialogueData ScriptableObject**
-  - [ ] Estrutura de nodes
-  - [ ] Sistema de escolhas
-  - [ ] Condições e efeitos
-  - [ ] Suporte a localização
+  - [ ] Sistema de memória (tracking de diálogos)
+  - [ ] Diálogos condicionais (baseado em progresso)
+  - [ ] Integração com Quest System
+  - [ ] Integração com Friendship System
 
-### 2.7 Sistema de Save/Load 📋
+### 2.7 Sistema de Save/Load 🚧 EM PROGRESSO
+
+**Estrutura de Dados Implementada:**
+
+- [x] InventorySaveData (dados de inventário) ✅
+- [x] QuestSaveData (dados de quests) ✅
+- [x] SaveEvents (sistema de eventos de save) ✅
+
+**Pendente:**
 
 - [ ] **Pontos de Save**
   - [ ] Save automático (cenas, quests, evolução, 5 min)
   - [ ] Save manual (pontos de descanso, fogueiras)
   - [ ] Animação e confirmação visual
   
-- [ ] **Dados Salvos**
+- [ ] **Dados Salvos Adicionais**
   - [ ] Progresso do Jogador (posição, evolução, HP, stamina, reputação, cristais)
-  - [ ] Inventário (itens, equipamentos, habilidades)
-  - [ ] Progresso de Mundo (quests, NPCs, diálogos, amizades, Reis)
+  - [ ] Progresso de Mundo (NPCs, diálogos, amizades, Reis)
   - [ ] Expansões do Lar
   - [ ] Mundo Persistente (itens coletados, baús, puzzles, áreas)
   - [ ] Configurações
@@ -590,10 +787,10 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
   - [ ] Opções: Respawn/Load Save/Main Menu
   
 - [ ] **Implementação Técnica**
+  - [ ] SaveManager centralizado
   - [ ] JSON serializado
   - [ ] Criptografia leve (anti-cheat)
   - [ ] Compressão
-  - [ ] SaveData ScriptableObject
 
 ---
 
@@ -695,20 +892,32 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ## 🤖 Fase 4: Sistema de IA
 
-### 4.1 IA de Inimigos 📋
+### 4.1 IA de NPCs 🚧 EM PROGRESSO
 
-- [ ] FSM (Finite State Machine) base
-- [ ] 10 estados de IA:
-  - [ ] Idle (ocioso)
-  - [ ] Patrol (patrulha)
-  - [ ] Alert (alerta)
-  - [ ] Investigate (investigar)
-  - [ ] Chase (perseguir)
-  - [ ] Attack (atacar)
-  - [ ] Search (procurar)
-  - [ ] Return (retornar)
-  - [ ] Flee (fugir)
-  - [ ] Stunned (atordoado)
+**Sistema Base Implementado:**
+
+- [x] NPCController (controller base) ✅
+- [x] NPCBehavior (comportamento base) ✅
+- [x] NPCData (ScriptableObject com dados) ✅
+- [x] NPCConfigData (configuração) ✅
+- [x] NPCEnums (tipos e estados) ✅
+
+**IA Básica Implementada:**
+
+- [x] NPCStaticAI (IA estática - sem movimento) ✅
+- [x] NPCWanderAI (IA de vagueio aleatório) ✅
+- [x] NPCPatrolAI (IA de patrulha em pontos) ✅
+
+**Estados de IA Pendentes:**
+
+- [ ] Alert (alerta)
+- [ ] Investigate (investigar)
+- [ ] Chase (perseguir)
+- [ ] Attack (atacar)
+- [ ] Search (procurar)
+- [ ] Return (retornar)
+- [ ] Flee (fugir)
+- [ ] Stunned (atordoado)
 
 ### 4.2 Sistema de Percepção 📋
 
@@ -718,13 +927,25 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [ ] Detecção de stealth (cobertura)
 - [ ] Sentidos aguçados (alguns inimigos)
 
-### 4.3 IA de NPCs Amigáveis 📋
+### 4.3 Sistema de Interação com NPCs 🚧 EM PROGRESSO
 
-- [ ] Sistema de diálogo
-- [ ] Sistema de amizade (5 níveis)
+**Implementado:**
+
+- [x] NPCDialogue (sistema de diálogo) ✅
+- [x] NPCDialogueInteraction (interação de diálogo) ✅
+- [x] NPCFriendship (sistema de amizade) ✅
+- [x] DialogueData (dados de diálogo) ✅
+- [x] LocalizedDialogueData (diálogos localizados) ✅
+- [x] FriendshipData (dados de amizade) ✅
+- [x] QuestGiverController (NPCs que dão quests) ✅
+
+**Pendente:**
+
+- [ ] Sistema de amizade completo (5 níveis com progressão)
 - [ ] Comportamento diário (schedule)
-- [ ] Reações ao jogador
-- [ ] Quest givers
+- [ ] Reações dinâmicas ao jogador
+- [ ] Memória de interações
+- [ ] Diálogos condicionais baseados em progresso
 
 ---
 
@@ -913,19 +1134,29 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ---
 
-### 5.4 Sistema de Ambiente 🚧
+### 5.4 Sistema de Ambiente 🚧 EM PROGRESSO
 
-- [x] WindManager (vento)
-- [x] WindController (controle de vento)
-- [x] WindEmulator (efeitos de vento)
-- [x] BushShake (arbustos balançando)
-- [x] SetupVisualEnvironment (variações visuais)
-- [x] RandomStyle (estilos aleatórios)
+**Implementado:**
+
+- [x] WindManager (gerenciamento de vento) ✅
+- [x] WindController (controle de vento) ✅
+- [x] WindEmulator (efeitos de vento) ✅
+- [x] BushShake (arbustos balançando) ✅
+- [x] BushDestruct (arbustos destrutíveis) ✅
+- [x] RockDestruct (rochas destrutíveis) ✅
+- [x] SetupVisualEnvironment (variações visuais) ✅
+- [x] RandomStyle (estilos aleatórios) ✅
+- [x] PuddleDrop (gotas em poças) ✅
+- [x] SelfDestruct (auto-destruição de objetos) ✅
+
+**Pendente:**
+
 - [ ] Sistema Dia/Noite (24 min = 1 dia)
 - [ ] Sistema Sazonal (7 dias = 1 estação)
 - [ ] Iluminação dinâmica (URP 2D Lights)
 - [ ] Bioluminescência
-- [ ] Partículas ambientais
+- [ ] Partículas ambientais avançadas
+- [ ] Clima dinâmico (chuva, neve, névoa)
 
 ---
 
@@ -1075,25 +1306,47 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ## 📜 Fase 9: Sistema de Quests
 
-### 9.1 Quest System Core 📋
+### 9.1 Quest System Core ✅ COMPLETO
 
-- [ ] Quest ScriptableObject
-- [ ] QuestManager
-- [ ] 6 tipos de objetivos:
-  - [ ] Collect (coletar)
-  - [ ] Defeat (derrotar)
-  - [ ] Deliver (entregar)
-  - [ ] Explore (explorar)
-  - [ ] Interact (interagir)
-  - [ ] Escort (escoltar)
+**Sistema Base:**
 
-### 9.2 Quest Tracking 📋
+- [x] **QuestManager** (singleton, gerenciamento centralizado) ✅
+- [x] **QuestEvents** (sistema de eventos desacoplado) ✅
+- [x] **SaveEvents** (eventos de save/load) ✅
+- [x] **QuestGiverController** (NPCs que oferecem quests) ✅
+- [x] **QuestNotificationController** (notificações na tela) ✅
+- [x] **QuestProgress** (tracking de progresso) ✅
+- [x] **QuestSaveData** (persistência de dados) ✅
 
-- [ ] Quest log UI
-- [ ] Quest tracker (HUD)
+**Tipos de Quest:**
+
+- [x] **CollectQuestData** (ScriptableObject para quests de coleta) ✅
+- [ ] DefeatQuestData (derrotar inimigos)
+- [ ] DeliverQuestData (entregar itens)
+- [ ] ExploreQuestData (explorar áreas)
+- [ ] InteractQuestData (interagir com objetos)
+- [ ] EscortQuestData (escoltar NPCs)
+
+**Sistema de Recompensas:**
+
+- [x] **ItemReward** (recompensas de itens) ✅
+- [x] **ItemRewardDrawer** (editor customizado) ✅
+
+### 9.2 Quest UI 🚧 EM PROGRESSO
+
+**Implementado:**
+
+- [x] QuestChoiceUI (escolhas de quest) ✅
+- [x] QuestNotificationController (notificações) ✅
+- [x] Notificações de progresso (eventos) ✅
+- [x] Sistema de recompensas (itens + reputação) ✅
+
+**Pendente:**
+
+- [ ] Quest log UI (lista completa de quests)
+- [ ] Quest tracker HUD (progresso na tela)
 - [ ] Marcadores no mapa
-- [ ] Notificações de progresso
-- [ ] Sistema de recompensas
+- [ ] Quest details panel (detalhes da quest)
 
 ### 9.3 Quests Principais 📋
 
@@ -1103,6 +1356,12 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [ ] Quests de amizade (por espécie)
 - [ ] Quests de Reis Monstros
 - [ ] Side quests opcionais
+
+### 9.4 Ferramentas de Editor ✅ COMPLETO
+
+- [x] **QuestSystemTestSceneSetup** (cena de teste automática) ✅
+- [x] **QuestManagerEditor** (inspetor customizado) ✅
+- [x] **ItemRewardDrawer** (drawer para recompensas) ✅
 
 ---
 
@@ -1209,8 +1468,10 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ## 🖥️ Fase 13: UI/UX
 
-### 13.1 HUD 📋
+### 13.1 HUD �
 
+- [x] QuickSlotUI (4 quick slots no HUD) ⭐ IMPLEMENTADO
+- [x] QuickSlotManager (gerenciamento de quick slots) ⭐ IMPLEMENTADO
 - [ ] HP Bar
 - [ ] Stamina Bar
 - [ ] Contador de Cristais Elementais
@@ -1219,11 +1480,13 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [ ] Minimapa
 - [ ] Indicador de stealth
 
-### 13.2 Menus 📋
+### 13.2 Menus 🚧
 
-- [ ] Menu principal
-- [ ] Menu de pausa
-- [ ] Inventário
+- [x] TitleScreenController (tela inicial) ⭐ IMPLEMENTADO
+- [x] PauseMenu (menu de pausa completo) ⭐ IMPLEMENTADO
+- [x] InventoryUI (inventário completo) ⭐ IMPLEMENTADO
+- [x] ConfirmationDialog (diálogos de confirmação) ⭐ IMPLEMENTADO
+- [ ] Menu principal (expandido)
 - [ ] Árvore de Habilidades
 - [ ] Quest Log
 - [ ] Mapa
@@ -1231,14 +1494,27 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - [ ] Configurações
 - [ ] Créditos
 
-### 13.3 Feedback Visual 📋
+### 13.3 Feedback Visual 🚧 EM PROGRESSO
+
+**Implementado:**
+
+- [x] InteractionIcon (ícone de interação sobre NPCs) ✅
+- [x] DialogueUI (feedback visual de diálogo) ✅
+- [x] InventorySlotUI (feedback visual de slots) ✅
+- [x] QuestNotificationController (notificações de quest) ✅
+- [x] OutlineController (outline de sprites) ✅
+- [x] OutlineUtility (utilitário para outline) ✅
+- [x] OutlineExample (exemplo de uso) ✅
+- [x] VFXOutlineObject (outline com VFX) ✅
+
+**Pendente:**
 
 - [ ] Dano flutuante
 - [ ] Indicadores de buff/debuff
-- [ ] Outline de interação
-- [ ] Marcadores de quest
+- [ ] Marcadores de quest no mundo
 - [ ] Notificações de conquista
 - [ ] Tutorial tooltips
+- [ ] Feedback de coleta de itens aprimorado
 
 ---
 
@@ -1349,39 +1625,95 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ---
 
-## 🎯 Prioridades Imediatas (Next Steps)
+## 🎯 Prioridades Imediatas (Next Steps - Dezembro 2025)
 
-### Sprint 1: Mecânica de Agachar
+> **📋 CHECKLIST COMPLETO:** Para detalhes completos do que falta para ALPHA 1, veja [ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)
 
-1. Implementar input de agachar
-2. Animação de achatar
-3. Sistema de detecção de cobertura
-4. Integração com IA (stealth)
-5. Primeiro puzzle usando agachar
+### ✅ Concluído Recentemente (Novembro 2025)
 
-### Sprint 2: Sistema de Evolução
+- ✅ Sistema de Inventário completo
+- ✅ Sistema de Diálogo completo
+- ✅ Sistema de Localização (PT-BR + EN)
+- ✅ Sistema de Quest (core completo)
+- ✅ Sistema de NPC (base + 3 tipos de IA)
+- ✅ Sistema de Amizade (estrutura básica)
+- ✅ Pause Menu e UI foundations
+- ✅ Ferramentas de Editor expandidas (12+ ferramentas)
+- ✅ Sistema de Outline visual
+- ✅ Sistema de Save/Load (estrutura de dados)
 
-1. Tracking de reputação
-2. Condições de evolução
-3. Sprites de evolução (24x24, 32x32)
-4. Animação de transformação
-5. Sistema de aura básico
+### 🎯 O que Falta para ALPHA 1 (30% → 55%)
 
-### Sprint 3: Primeiro Bioma Completo
+**Sistemas Pendentes:**
 
-1. Floresta Calma (level design)
-2. NPCs básicos (Cervos, Esquilos, Abelhas)
-3. Sistema de amizade
-4. Primeiro puzzle (Jardim Geométrico)
-5. Rainha Melífera (primeiro Rei Monstro)
+- 📋 Quest UI completa (log + tracker HUD) - 2 semanas
+- 📋 HUD completo (HP, Stamina, Cristais) - 1 semana
+- 📋 Ninho do Slime - Puzzle final - 1 semana
+- 📋 Floresta Calma (3 áreas + NPCs) - 6 semanas
+- 📋 Mecânica de Agachar (stealth) - 2 semanas
+- 📋 Sistema de Habilidades (2 habilidades) - 3 semanas
+- 📋 Polimento e balanceamento - 2 semanas
 
-### Sprint 4: Sistema de Habilidades
+**Total:** 16 semanas (4 meses) até 23/02/2026
 
-1. Árvore de Habilidades (UI)
-2. 4 habilidades Tier 1 (uma de cada elemento prioritário)
-3. Sistema de cooldown
-4. Sistema de Stamina
-5. VFX de habilidades
+### 🔥 Sprint 1: Quest UI + HUD (2 semanas) - 04/11 a 17/11
+
+**Quest UI:**
+
+- [ ] Quest log UI (lista de quests ativas)
+- [ ] Quest tracker HUD (progresso na tela)
+- [ ] Integração com coleta de itens
+- [ ] Testar fluxo completo
+
+**HUD Básico:**
+
+- [ ] HP Bar (visual + animações)
+- [ ] Stamina Bar (regeneração)
+- [ ] Contador de Cristais Elementais
+- [ ] Polimento e feedback visual
+
+### Sprint 2: Ninho do Slime - Puzzle (1 semana) - 18/11 a 24/11
+
+- [ ] Puzzle de placas de pressão
+- [ ] Mecânica de peso do slime
+- [ ] Polimento visual/sonoro da caverna
+- [ ] Transição para Floresta
+
+### Sprint 3-5: Floresta Calma (6 semanas) - 25/11 a 05/01
+
+**Sprint 3:** Clareira de Entrada (2 sem)
+**Sprint 4:** Caminho dos Cervos + Quest (2 sem)
+**Sprint 5:** Colmeia Pequena (2 sem)
+
+**Entregas:**
+
+- 3 áreas jogáveis
+- 7 NPCs (3 Cervos, 3 Abelhas, 1 Esquilo)
+- 1 quest funcional
+- 2 puzzles
+
+### Sprint 6: Mecânica de Agachar (2 semanas) - 06/01 a 19/01
+
+- [ ] Input e animação
+- [ ] Sistema de stealth básico
+- [ ] Integração com IA
+- [ ] Puzzle de stealth
+
+### Sprint 7: Sistema de Habilidades (3 semanas) - 20/01 a 09/02
+
+- [ ] Infraestrutura (cooldown, stamina)
+- [ ] 2 habilidades Tier 1 (Nature + Fire)
+- [ ] VFX e SFX
+- [ ] UI de habilidades
+
+### Sprint 8: Polimento Alpha (2 semanas) - 10/02 a 23/02
+
+- [ ] Balanceamento completo
+- [ ] Juice (shake, particles, sounds)
+- [ ] Bug fixing
+- [ ] Build standalone
+
+**📋 Detalhes completos:** [ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)
 
 ---
 
@@ -1390,7 +1722,7 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 ### Desenvolvimento Core (Fases 1-4)
 
 - **Estimativa:** 3-4 meses
-- **Status:** ~60% completo
+- **Status:** ~70% completo ⬆️ (+10%)
 
 ### Conteúdo Principal (Fases 5-11)
 
@@ -1405,7 +1737,7 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 ### UI/UX e Sistemas (Fases 13-14)
 
 - **Estimativa:** 2-3 meses
-- **Status:** ~15% completo
+- **Status:** ~35% completo ⬆️ (+20%)
 
 ### Testes e Polimento (Fases 15-16)
 
@@ -1414,7 +1746,46 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ### **Total Estimado:** 18-24 meses
 
-### **Progresso Atual:** ~15%
+### **Progresso Atual:** ~27% ⬆️ (+2% desde última atualização)
+
+### **Sistemas Recentemente Implementados (Nov 2025):**
+
+- ✅ Sistema de Inventário completo (20 slots + equipamentos + quick slots)
+- ✅ Sistema de Diálogo completo (manager + UI + localização)
+- ✅ Sistema de Quest completo (core) - QuestManager + Events + UI + Save ⭐ ATUALIZADO
+- ✅ Sistema de NPC expandido (Controller + 3 tipos de IA + Friendship) ⭐ NOVO
+- ✅ Sistema de Localização (PT-BR + EN)
+- ✅ Sistema de Outline visual (sprites interativos) ⭐ NOVO
+- ✅ Pause Menu funcional
+- ✅ Ferramentas de Editor robustas (12+ ferramentas) ⭐ EXPANDIDO
+- ✅ UI/UX foundations (ConfirmationDialog, InteractionIcon, ItemActionPanel, QuestNotification)
+- ✅ Sistema de Save/Load (estrutura de dados para Inventory + Quest) ⭐ NOVO
+- ✅ Sistema de Ambiente (vento, destruição, efeitos visuais) ⭐ NOVO
+
+### **Métricas de Progresso Detalhadas:**
+
+| Categoria | Progresso | Detalhes |
+|-----------|-----------|----------|
+| **Arquitetura Core** | 95% | Managers, Singletons, Scene Management, Events |
+| **Sistema de Inventário** | 85% | Funcional, falta drag-and-drop e filtros |
+| **Sistema de Diálogo** | 85% | Funcional, falta expressões e memória |
+| **UI/UX** | 40% | Foundations prontas, falta HUD completo e menus |
+| **Gameplay Core** | 45% | Movimento, combate, interação básicos |
+| **Biomas** | 10% | Apenas Ninho do Slime (tutorial) |
+| **NPCs/IA** | 30% | ⬆️ Sistema base + 3 tipos de IA implementados |
+| **Habilidades** | 0% | Não iniciado |
+| **Quests** | 60% | ⬆️ Core completo, falta UI completa e tipos adicionais |
+| **Save/Load** | 35% | ⬆️ Estrutura de dados pronta (Inventory + Quest) |
+| **Sistema de Ambiente** | 50% | ⬆️ Vento, destruição, efeitos visuais básicos |
+| **Ferramentas de Editor** | 80% | ⬆️ Conjunto robusto de ferramentas implementado |
+
+### **Próximos Marcos:**
+
+- 🎯 **35% (Dez 2025):** Quest UI + HUD + Ninho completo + Floresta iniciada
+- 🎯 **45% (Jan 2026):** Floresta Calma completa + Mecânica de Agachar
+- 🎯 **55% (Fev 2026):** Sistema de Habilidades + Polimento + **ALPHA 1 RELEASE** 🚀
+
+**📋 Cronograma detalhado:** [ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)
 
 ---
 
@@ -1428,6 +1799,15 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - Atmosfera cozy e contemplativa
 - Narrativa emergente (não linear)
 
+### Decisões Técnicas Implementadas
+
+- **Arquitetura de Managers:** Padrão ManagerSingleton<T> para consistência
+- **Sistema de Inventário:** Slots fixos (20) para simplicidade e performance
+- **Sistema de Diálogo:** JSON-based para fácil localização e edição
+- **UI Modular:** Componentes reutilizáveis (ConfirmationDialog, ItemActionPanel)
+- **Validação Automática:** SceneSetupValidator previne erros de configuração
+- **Ferramentas de Editor:** NPCDialogueQuickConfig acelera criação de conteúdo
+
 ### Desafios Técnicos
 
 - Sistema de aura visual escalável (10 níveis)
@@ -1435,6 +1815,21 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - Stealth com detecção de cobertura
 - Puzzles criativos e integrados à lore
 - Performance em Switch (30 FPS estável)
+- Integração de múltiplos sistemas (Inventário + Diálogo + Quests)
+
+### Lições Aprendidas (Nov 2025)
+
+- ✅ **Singleton Pattern:** ManagerSingleton<T> evita duplicação de código
+- ✅ **ScriptableObjects:** Excelente para dados de itens, NPCs, quests e configurações
+- ✅ **Modularidade:** UI modular facilita manutenção e expansão
+- ✅ **Sistema de Eventos:** QuestEvents e SaveEvents permitem comunicação desacoplada
+- ✅ **Validação:** SceneSetupValidator economiza tempo de debug
+- ✅ **Ferramentas de Editor:** Aceleram criação de conteúdo significativamente (12+ ferramentas)
+- ✅ **Organização de Código:** Estrutura clara (Code/Data/Editor/Gameplay/Systems/Visual)
+- ✅ **IA Modular:** NPCs com diferentes tipos de IA (Static, Wander, Patrol) facilita expansão
+- ⚠️ **Integração:** Sistemas complexos requerem planejamento cuidadoso
+- ⚠️ **Performance:** Testar em hardware alvo (Switch) desde cedo
+- ⚠️ **Documentação:** Manter TechMapping atualizado é essencial
 
 ### Oportunidades de Expansão
 
@@ -1443,14 +1838,170 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 - Modo New Game+
 - Desafios diários
 - Multiplayer cooperativo (futuro distante)
+- Sistema de mods (Steam Workshop)
 
 ---
 
-**Fim do Roadmap v1.0**
+## 📦 Inventário de Sistemas Implementados (Análise de Código - Nov 2025)
+
+### Managers (Assets/Code/Systems/Managers)
+
+- ✅ ManagerSingleton<T> - Base para todos os managers
+- ✅ GameManager - Ciclo de vida do jogo
+- ✅ CameraManager - Gerenciamento de câmeras
+- ✅ SceneTransitionManager - Transições de cena
+- ✅ DialogueManager - Sistema de diálogos
+- ✅ DialogueChoiceHandler - Escolhas em diálogos
+- ✅ LocalizationManager - Localização (PT-BR/EN)
+
+### Sistema de Inventário (Assets/Code/Systems/Inventory)
+
+- ✅ InventoryManager - Gerenciamento de inventário
+- ✅ InventorySlot - Dados de slot
+- ✅ InventorySaveData - Persistência
+- ✅ ItemData - ScriptableObject de itens
+- ✅ ItemType - Enum de tipos
+- ✅ EquipmentType - Enum de equipamentos
+- ✅ QuickSlotManager - Quick slots
+
+### Sistema de Quest (Assets/Code/Systems/QuestSystem + Gameplay/Quest)
+
+- ✅ QuestManager - Gerenciamento centralizado
+- ✅ QuestEvents - Sistema de eventos
+- ✅ SaveEvents - Eventos de save/load
+- ✅ QuestSaveData - Persistência
+- ✅ QuestGiverController - NPCs que dão quests
+- ✅ QuestNotificationController - Notificações
+- ✅ QuestProgress - Tracking de progresso
+- ✅ CollectQuestData - Quest de coleta
+- ✅ ItemReward - Recompensas
+
+### Sistema de NPC (Assets/Code/Gameplay/NPCs)
+
+- ✅ NPCController - Controller base
+- ✅ NPCBehavior - Comportamento base
+- ✅ NPCDialogue - Sistema de diálogo
+- ✅ NPCDialogueInteraction - Interação
+- ✅ NPCFriendship - Sistema de amizade
+- ✅ NPCStaticAI - IA estática
+- ✅ NPCWanderAI - IA de vagueio
+- ✅ NPCPatrolAI - IA de patrulha
+- ✅ NPCData - ScriptableObject
+- ✅ NPCConfigData - Configuração
+- ✅ DialogueData - Dados de diálogo
+- ✅ LocalizedDialogueData - Diálogos localizados
+- ✅ FriendshipData - Dados de amizade
+- ✅ NPCEnums - Enumerações
+
+### Sistema de UI (Assets/Code/Systems/UI)
+
+- ✅ InventoryUI - Interface de inventário
+- ✅ InventorySlotUI - Slot visual
+- ✅ EquipmentSlotUI - Slot de equipamento
+- ✅ QuickSlotUI - Quick slot visual
+- ✅ QuickSlotSelectionPanel - Seleção de quick slot
+- ✅ ItemActionPanel - Ações de item
+- ✅ DialogueUI - Interface de diálogo
+- ✅ QuestChoiceUI - Escolhas de quest
+- ✅ PauseMenu - Menu de pausa
+- ✅ ConfirmationDialog - Diálogo de confirmação
+- ✅ InteractionIcon - Ícone de interação
+
+### Sistema de Gameplay (Assets/External/AssetStore/SlimeMec/_Scripts/Gameplay)
+
+- ✅ PlayerController - Controle do jogador
+- ✅ PlayerAttributesHandler - Atributos do jogador
+- ✅ AttackHandler - Sistema de ataque
+- ✅ ItemCollectable - Coleta de itens
+- ✅ CollectableItemData - Dados de coletáveis
+- ✅ ItemBuffHandler - Buffs de itens
+- ✅ DropController - Drop de itens
+- ✅ BounceHandler - Física de bounce
+- ✅ BushDestruct - Arbustos destrutíveis
+- ✅ RockDestruct - Rochas destrutíveis
+- ✅ BushShake - Arbustos balançando
+- ✅ SpecialMovementPoint - Movimento especial
+- ✅ InteractivePointHandler - Pontos interativos
+- ✅ ScreenEffectsManager - Efeitos de tela
+- ✅ SetupVisualEnvironment - Ambiente visual
+- ✅ RandomStyle - Estilos aleatórios
+- ✅ WindManager - Gerenciamento de vento
+- ✅ WindController - Controle de vento
+- ✅ WindEmulator - Efeitos de vento
+- ✅ SelfDestruct - Auto-destruição
+- ✅ PerformanceSystemsIntegration - Integração de performance
+
+### Sistema de Teleporte (Assets/Code/Gameplay)
+
+- ✅ TeleportManager - Gerenciamento de teleporte
+- ✅ TeleportPoint - Pontos de teleporte
+- ✅ TeleportTransitionHelper - Transições de teleporte
+- ✅ PuddleDrop - Gotas em poças
+
+### Sistema Visual (Assets/Code/Visual + Shaders)
+
+- ✅ OutlineController - Outline de sprites
+- ✅ OutlineUtility - Utilitário de outline
+- ✅ OutlineExample - Exemplo de uso
+- ✅ VFXOutlineObject - Outline com VFX
+- ✅ GizmosHelper - Visualização de gizmos
+- ✅ PolygonGizmosHelper - Gizmos de polígonos
+- ✅ SpriteOutline.shader - Shader de outline
+- ✅ SpriteOutlineMaterial - Material de outline
+
+### Controllers (Assets/Code/Systems/Controllers)
+
+- ✅ InitialCaveScreenController - Tela inicial da caverna
+- ✅ TitleScreenController - Tela de título
+- ✅ SimpleCameraFollow - Câmera simples
+
+### Ferramentas de Editor (Assets/Code/Editor)
+
+- ✅ UnifiedExtraTools - Ferramentas unificadas
+- ✅ BushQuickConfig - Config de arbustos
+- ✅ ItemQuickConfig - Config de itens
+- ✅ NPCDialogueQuickConfig - Config de NPCs
+- ✅ CameraSetupTools - Setup de câmera
+- ✅ SceneSetupTool - Setup de cena
+- ✅ DialogueSystemTestSceneSetup - Teste de diálogo
+- ✅ CreateExampleItems - Criar itens de exemplo
+- ✅ ProjectSettingsExporter - Exportar settings
+- ✅ NPCAnimatorSetup - Setup de animadores (QuickWins)
+- ✅ NPCGizmosDrawer - Gizmos de NPC (QuickWins)
+- ✅ NPCDataGenerator - Gerador de dados (QuickWins)
+- ✅ NPCComponentConfigurator - Config de componentes (QuickWins)
+- ✅ NPCBatchConfigurator - Config em lote (QuickWins)
+- ✅ QuestManagerEditor - Editor de QuestManager (Assets/Editor/QuestSystem)
+- ✅ ItemRewardDrawer - Drawer de recompensas (Assets/Editor/QuestSystem)
+
+### Validadores (Assets/Code/Systems/Validators)
+
+- ✅ SceneSetupValidator - Validação de cena
+
+### Configurações (Assets/Code/Systems)
+
+- ✅ DialogueSystemSettings - Settings de diálogo
 
 ---
 
-## 🎯 Prioridades Imediatas (Roadmap para ALPHA)
+---
+
+## 📚 Documentos Relacionados
+
+- **[ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)** - Checklist completo e detalhado do ALPHA 1
+- **[Roadmap-Analysis-Summary.md](Roadmap-Analysis-Summary.md)** - Análise do código atual e descobertas
+- **[GDD v9.0](../GDD/)** - Game Design Document completo
+- **[TechMapping.md](../TechMapping.md)** - Mapeamento técnico de sistemas
+
+---
+
+**Fim do Roadmap v2.4**
+
+---
+
+## 🎯 Roadmap Detalhado para ALPHA 1
+
+> **⚠️ NOTA:** Esta seção contém um resumo. Para o checklist completo e detalhado, veja [ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)
 
 ### 🔥 Sprint 1: Finalizar Ninho do Slime (2 semanas)
 
@@ -1645,4 +2196,33 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ---
 
-**Fim do Roadmap v1.1 - Atualizado com foco em desenvolvimento iterativo (Alpha → Beta → Release)**
+## 📊 Resumo de Entregas ALPHA 1
+
+### Conteúdo
+
+✅ **Ninho do Slime** (100%) - Tutorial + Puzzle  
+✅ **Floresta Calma** (3 áreas) - Clareira, Caminho, Colmeia  
+✅ **7 NPCs** - 3 Cervos, 3 Abelhas, 1 Esquilo  
+✅ **1 Quest** - "Colete 5 Flores Cristalinas"  
+✅ **3 Puzzles** - Placas, Vinhas, Hexágonos  
+
+### Sistemas
+
+✅ **Quest System** (100%) - Log + Tracker + Integração  
+✅ **HUD Completo** - HP, Stamina, Cristais, Habilidades  
+✅ **Mecânica de Agachar** - Stealth básico  
+✅ **Sistema de Habilidades** - 2 habilidades Tier 1  
+✅ **Polimento** - Juice, balanceamento, build  
+
+### Métricas
+
+✅ 12-15 minutos de gameplay polido  
+✅ 60 FPS estável (PC)  
+✅ 0 bugs críticos  
+✅ Build standalone funcional  
+
+**📋 Checklist completo:** [ALPHA-1-Checklist.md](ALPHA-1-Checklist.md)
+
+---
+
+**Fim do Roadmap v2.4 - Atualizado com foco em ALPHA 1 (Nov 2025 → Fev 2026)**

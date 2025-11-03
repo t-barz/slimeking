@@ -1,5 +1,6 @@
 using UnityEngine;
 using SlimeMec.Items;
+using TheSlimeKing.Inventory;
 
 namespace SlimeMec.Gameplay
 {
@@ -12,6 +13,10 @@ namespace SlimeMec.Gameplay
     {
         [Header("🎯 Configuração do Item")]
         [SerializeField] private CollectableItemData itemData;
+        
+        [Header("💼 Integração com Inventário")]
+        [SerializeField] private ItemData inventoryItemData;
+        [SerializeField] private int itemQuantity = 1;
 
         [Header("🧲 Sistema de Atração")]
         [SerializeField] private float attractionRadius = 3f;
@@ -289,7 +294,7 @@ namespace SlimeMec.Gameplay
         public void CollectItem(GameObject collector = null)
         {
             // Evita múltiplas coletas
-            if (_isCollected || itemData == null) return;
+            if (_isCollected) return;
 
             // Marca como coletado imediatamente
             _isCollected = true;
@@ -309,17 +314,55 @@ namespace SlimeMec.Gameplay
             if (collector == null)
             {
                 Debug.LogWarning("[ItemCollectable] Coletor não encontrado!");
+                _isCollected = false; // Permite tentar novamente
+                if (_collider != null) _collider.enabled = true;
                 return;
             }
 
-            // Aplica efeitos do item
-            ApplyItemEffects(collector);
+            // Tenta adicionar ao inventário se inventoryItemData estiver configurado
+            if (inventoryItemData != null && InventoryManager.Instance != null)
+            {
+                bool addedToInventory = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
+                
+                if (!addedToInventory)
+                {
+                    // Inventário cheio - não destrói o item
+                    Debug.Log($"[ItemCollectable] Inventário cheio! Item '{inventoryItemData.itemName}' não foi coletado.");
+                    
+                    // Reverte estado de coleta
+                    _isCollected = false;
+                    if (_collider != null) _collider.enabled = true;
+                    
+                    // TODO: Mostrar notificação "Inventário Cheio!" (Task 7)
+                    return;
+                }
+                
+                Debug.Log($"[ItemCollectable] Item '{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity}).");
+                
+                // Executa efeitos visuais e sonoros
+                PlayCollectionEffects();
+                
+                // Remove o item da cena
+                DestroyItem();
+            }
+            // Fallback para sistema antigo (CollectableItemData)
+            else if (itemData != null)
+            {
+                // Aplica efeitos do item (sistema antigo)
+                ApplyItemEffects(collector);
 
-            // Executa efeitos visuais e sonoros
-            PlayCollectionEffects();
+                // Executa efeitos visuais e sonoros
+                PlayCollectionEffects();
 
-            // Remove o item da cena
-            DestroyItem();
+                // Remove o item da cena
+                DestroyItem();
+            }
+            else
+            {
+                Debug.LogWarning("[ItemCollectable] Nenhum ItemData configurado!");
+                _isCollected = false;
+                if (_collider != null) _collider.enabled = true;
+            }
         }
 
         /// <summary>

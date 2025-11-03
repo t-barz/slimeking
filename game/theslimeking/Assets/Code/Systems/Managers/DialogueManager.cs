@@ -221,6 +221,7 @@ namespace SlimeMec.Systems
 
         /// <summary>
         /// Encerra o diálogo atual, limpando o estado e notificando componentes.
+        /// Verifica se há opções de quest disponíveis antes de fechar completamente.
         /// </summary>
         public void EndDialogue()
         {
@@ -240,14 +241,18 @@ namespace SlimeMec.Systems
             currentPages = null;
             currentPageIndex = 0;
 
-            // Oculta a UI do diálogo
-            if (dialogueUI != null)
+            // Verifica se há opções de quest disponíveis
+            bool hasQuestChoices = DialogueChoiceHandler.Instance != null && 
+                                   DialogueChoiceHandler.Instance.HasQuestChoices();
+
+            // Oculta a UI do diálogo apenas se não há opções de quest
+            if (dialogueUI != null && !hasQuestChoices)
             {
                 dialogueUI.HideDialogue();
             }
 
-            // Despausa o jogador se estava pausado
-            if (pausePlayerDuringDialogue)
+            // Despausa o jogador se estava pausado e não há opções de quest
+            if (pausePlayerDuringDialogue && !hasQuestChoices)
             {
                 UnpausePlayer();
             }

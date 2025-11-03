@@ -54,7 +54,7 @@ A janela possui abas organizadas por categoria para fácil navegação.
 
 Este menu unifica as funcionalidades dos seguintes menus:
 
-- **QuickWinds**: Ferramentas de NPC
+- **QuickWins**: Ferramentas de NPC
 - **Tools**: Ferramentas de câmera
 - **The Slime King**: Ferramentas gerais
 
