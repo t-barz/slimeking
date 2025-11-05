@@ -42,6 +42,7 @@ public class TitleScreenController : MonoBehaviour
     [SerializeField] private float backgroundFadeInDuration = 1f;
     [SerializeField] private float gameLogoFadeInDuration = 1f;
     [SerializeField] private float menuElementsFadeInDuration = 1f;
+    [SerializeField] private float inputUIEffectDuration = 0.5f;
     #endregion
 
     #region Sequence Delays
@@ -56,6 +57,11 @@ public class TitleScreenController : MonoBehaviour
     [SerializeField] private float logoMoveUpDistance = 10f;
     [SerializeField] private float logoMoveDownDistance = 15f;
     [SerializeField] private float logoMoveDuration = 1.5f;
+    #endregion
+
+    #region Input UI Effect
+    [Header("Input UI Effect")]
+    [SerializeField] private float inputUIScaleMultiplier = 1.5f;
     #endregion
 
     #region Audio
@@ -86,6 +92,9 @@ public class TitleScreenController : MonoBehaviour
     // Logo Animation
     private Vector3 gameLogoOriginalPosition;
     private Coroutine logoAnimationCoroutine;
+
+    // Input UI Effect
+    private Vector3 inputUIOriginalScale;
     #endregion
 
     #region Unity Lifecycle
@@ -136,6 +145,9 @@ public class TitleScreenController : MonoBehaviour
         {
             gameLogoOriginalPosition = gameLogo.transform.localPosition;
         }
+
+        // Inicializa a escala original do input UI
+        inputUIOriginalScale = Vector3.one;
 
         // Esconde todos os elementos inicialmente
         SetGameObjectVisibility(companyLogo, false);
@@ -254,6 +266,9 @@ public class TitleScreenController : MonoBehaviour
             {
                 SetInputUIActive(currentInputUI, true);
                 SetGameObjectVisibility(currentInputUI, true);
+
+                // Garante que a escala esteja resetada
+                currentInputUI.transform.localScale = inputUIOriginalScale;
             }
         }
     }
@@ -523,6 +538,13 @@ public class TitleScreenController : MonoBehaviour
         // Bloqueia novos inputs durante a transição
         currentState = TitleScreenState.TransitionStarted;
         Log("Starting game with Easy Transition - inputs blocked");
+
+        // Executa o efeito no Input UI Element antes da transição
+        if (currentInputUI != null)
+        {
+            StartCoroutine(InputUIEffect());
+        }
+
         // Se a cena foi pré-carregada, usa ativação coordenada
         if (GameManager.Instance != null && GameManager.Instance.HasPreloadedScene(gameSceneName))
         {
@@ -556,6 +578,110 @@ public class TitleScreenController : MonoBehaviour
                 SceneManager.LoadScene(gameSceneName);
             }
         }
+    }
+
+    #endregion
+
+    #region Input UI Effects
+
+    /// <summary>
+    /// Executa efeito de fade out e scale up no Input UI Element
+    /// </summary>
+    private IEnumerator InputUIEffect()
+    {
+        if (currentInputUI == null) yield break;
+
+        Log("Starting input UI effect");
+
+        Transform inputTransform = currentInputUI.transform;
+        Vector3 startScale = inputTransform.localScale;
+        Vector3 targetScale = startScale * inputUIScaleMultiplier;
+
+        // Prepara componentes para fade
+        CanvasGroup canvasGroup = currentInputUI.GetComponent<CanvasGroup>();
+        var images = currentInputUI.GetComponentsInChildren<UnityEngine.UI.Image>();
+        var texts = currentInputUI.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
+
+        float[] startAlphas = null;
+        float startCanvasAlpha = 1f;
+
+        // Guarda valores iniciais de alpha
+        if (canvasGroup != null)
+        {
+            startCanvasAlpha = canvasGroup.alpha;
+        }
+        else
+        {
+            startAlphas = new float[images.Length + texts.Length];
+            int index = 0;
+            foreach (var img in images) startAlphas[index++] = img.color.a;
+            foreach (var text in texts) startAlphas[index++] = text.color.a;
+        }
+
+        float elapsedTime = 0f;
+
+        // Executa o efeito
+        while (elapsedTime < inputUIEffectDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / inputUIEffectDuration;
+
+            // Aplica escala (scale up)
+            inputTransform.localScale = Vector3.Lerp(startScale, targetScale, progress);
+
+            // Aplica fade out
+            float currentAlpha = Mathf.Lerp(1f, 0f, progress);
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = Mathf.Lerp(startCanvasAlpha, 0f, progress);
+            }
+            else
+            {
+                int index = 0;
+                foreach (var img in images)
+                {
+                    Color color = img.color;
+                    color.a = Mathf.Lerp(startAlphas[index++], 0f, progress);
+                    img.color = color;
+                }
+
+                foreach (var text in texts)
+                {
+                    Color color = text.color;
+                    color.a = Mathf.Lerp(startAlphas[index++], 0f, progress);
+                    text.color = color;
+                }
+            }
+
+            yield return null;
+        }
+
+        // Aplica valores finais
+        inputTransform.localScale = targetScale;
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+        else
+        {
+            foreach (var img in images)
+            {
+                Color color = img.color;
+                color.a = 0f;
+                img.color = color;
+            }
+
+            foreach (var text in texts)
+            {
+                Color color = text.color;
+                color.a = 0f;
+                text.color = color;
+            }
+        }
+
+        Log("Input UI effect completed");
     }
 
     #endregion

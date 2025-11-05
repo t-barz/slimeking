@@ -28,7 +28,7 @@ namespace PixeLadder.EasyTransition
         [SerializeField] private AudioSource audioSource;
 
         [Tooltip("Volume padrão para sons de teletransporte (0.0 a 1.0)")]
-        [SerializeField] [Range(0f, 1f)] private float defaultVolume = 1f;
+        [SerializeField][Range(0f, 1f)] private float defaultVolume = 1f;
 
         #endregion
 
@@ -312,7 +312,7 @@ namespace PixeLadder.EasyTransition
                 if (playerRb != null)
                 {
                     playerRb.linearVelocity = Vector2.zero;
-                    
+
                     if (enableDebugLogs)
                     {
                         Debug.Log("TeleportManager: Velocidade do player zerada.");
@@ -460,12 +460,12 @@ namespace PixeLadder.EasyTransition
 
             // IMPORTANTE: Salva referência do player ANTES de carregar a nova cena
             GameObject playerObject = PlayerController.Instance != null ? PlayerController.Instance.gameObject : null;
-            
+
             if (playerObject != null)
             {
                 // Aplica DontDestroyOnLoad para prevenir destruição durante transição
                 DontDestroyOnLoad(playerObject);
-                
+
                 if (enableDebugLogs)
                 {
                     Debug.Log("TeleportManager: DontDestroyOnLoad aplicado ao Player antes do carregamento.");
@@ -475,7 +475,7 @@ namespace PixeLadder.EasyTransition
             // Carrega cena usando LoadSceneMode.Single
             // Isso automaticamente descarrega TODAS as cenas anteriores
             AsyncOperation loadOperation = SceneManager.LoadSceneAsync(destinationSceneName, LoadSceneMode.Single);
-            
+
             if (loadOperation == null)
             {
                 Debug.LogError($"TeleportManager: Falha ao carregar cena '{destinationSceneName}'!");
@@ -530,7 +530,7 @@ namespace PixeLadder.EasyTransition
             if (Camera.main != null)
             {
                 cameraOffset = Camera.main.transform.position - playerObject.transform.position;
-                
+
                 if (enableDebugLogs)
                 {
                     Debug.Log($"TeleportManager: Camera offset calculado: {cameraOffset}");
@@ -543,6 +543,17 @@ namespace PixeLadder.EasyTransition
             if (enableDebugLogs)
             {
                 Debug.Log($"TeleportManager: Player reposicionado para {destinationPosition}.");
+            }
+
+            // Garante que a Cinemachine Camera esteja seguindo o Player após reposicionamento
+            if (SlimeKing.Core.CameraManager.HasInstance)
+            {
+                SlimeKing.Core.CameraManager.Instance.ForceCinemachineSetup();
+
+                if (enableDebugLogs)
+                {
+                    Debug.Log("TeleportManager: Cinemachine Camera configurada via CameraManager.");
+                }
             }
 
             // Atualiza posição da câmera mantendo o offset

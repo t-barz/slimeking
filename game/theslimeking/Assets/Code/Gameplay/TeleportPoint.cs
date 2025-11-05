@@ -293,6 +293,15 @@ namespace PixeLadder.EasyTransition
             if (enableDebugLogs)
                 Debug.Log($"TeleportPoint: Player reposicionado de {oldPosition} para {destinationPosition}", this);
 
+            // Garante que a Cinemachine Camera esteja seguindo o Player após reposicionamento
+            if (SlimeKing.Core.CameraManager.HasInstance)
+            {
+                SlimeKing.Core.CameraManager.Instance.ForceCinemachineSetup();
+
+                if (enableDebugLogs)
+                    Debug.Log("TeleportPoint: Cinemachine Camera configurada via CameraManager.", this);
+            }
+
             // Reposiciona a câmera mantendo o offset
             if (cameraTransform != null)
             {

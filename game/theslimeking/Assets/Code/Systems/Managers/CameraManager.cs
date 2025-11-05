@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using Unity.Cinemachine;
 
 namespace SlimeKing.Core
 {
@@ -11,6 +12,7 @@ namespace SlimeKing.Core
 
         private Camera _mainCamera;
         private UniversalAdditionalCameraData _mainCameraData;
+        private CinemachineCamera _cinemachineCamera;
 
         protected override void Initialize()
         {
@@ -57,6 +59,7 @@ namespace SlimeKing.Core
 
             SetMainCamera(selectedCamera);
             CleanupDuplicateCameras(selectedCamera);
+            SetupCinemachineCamera();
             ForcePostProcessingRefresh();
         }
 
@@ -81,6 +84,76 @@ namespace SlimeKing.Core
             _mainCameraData.antialiasingQuality = AntialiasingQuality.High;
 
             Log($"Câmera principal definida: {camera.name} (Depth: {camera.depth})");
+        }
+
+        private void SetupCinemachineCamera()
+        {
+            // Encontra a câmera Cinemachine na cena
+            _cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+
+            if (_cinemachineCamera == null)
+            {
+                Log("Nenhuma Cinemachine Camera encontrada na cena");
+                return;
+            }
+
+            // Garante que a Cinemachine Camera esteja seguindo o Player
+            EnsureCinemachineFollowsPlayer();
+
+            Log($"Cinemachine Camera configurada: {_cinemachineCamera.name}");
+        }
+
+        private void EnsureCinemachineFollowsPlayer()
+        {
+            if (_cinemachineCamera == null) return;
+
+            // Encontra o Player na cena
+            Transform playerTransform = GetPlayerTransform();
+
+            if (playerTransform == null)
+            {
+                LogWarning("Player não encontrado - Cinemachine Camera não pode ser configurada para seguir");
+                return;
+            }
+
+            // Configura Follow se não estiver configurado ou estiver seguindo objeto incorreto
+            if (_cinemachineCamera.Follow != playerTransform)
+            {
+                _cinemachineCamera.Follow = playerTransform;
+                Log($"Cinemachine Camera agora segue o Player: {playerTransform.name}");
+            }
+
+            // Configura LookAt se não estiver configurado
+            if (_cinemachineCamera.LookAt == null)
+            {
+                _cinemachineCamera.LookAt = playerTransform;
+                Log("Cinemachine Camera LookAt configurado para o Player");
+            }
+        }
+
+        private Transform GetPlayerTransform()
+        {
+            // Tenta via PlayerController.Instance primeiro
+            if (PlayerController.Instance != null)
+            {
+                return PlayerController.Instance.transform;
+            }
+
+            // Fallback: busca por tag
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                return player.transform;
+            }
+
+            // Fallback: busca por nome
+            player = GameObject.Find("chr_whiteslime");
+            if (player != null)
+            {
+                return player.transform;
+            }
+
+            return null;
         }
 
         private void CleanupDuplicateCameras(Camera mainCamera)
@@ -158,9 +231,25 @@ namespace SlimeKing.Core
             RefreshMainCamera();
         }
 
+        /// <summary>
+        /// Força a configuração da Cinemachine Camera para seguir o Player
+        /// Útil quando o Player muda de posição ou após teletransportes
+        /// </summary>
+        public void ForceCinemachineSetup()
+        {
+            if (_cinemachineCamera == null)
+            {
+                _cinemachineCamera = FindFirstObjectByType<CinemachineCamera>();
+            }
+
+            EnsureCinemachineFollowsPlayer();
+        }
+
         public Camera GetMainCamera() => _mainCamera;
 
         public UniversalAdditionalCameraData GetMainCameraData() => _mainCameraData;
+
+        public CinemachineCamera GetCinemachineCamera() => _cinemachineCamera;
 
         private new void Log(string message)
         {

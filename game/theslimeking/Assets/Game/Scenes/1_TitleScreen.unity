@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -260.99997}
+  m_AnchoredPosition: {x: 0, y: -261}
   m_SizeDelta: {x: -1180, y: -620}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &172730255
@@ -206,12 +206,14 @@ MonoBehaviour:
   backgroundFadeInDuration: 2
   gameLogoFadeInDuration: 2
   menuElementsFadeInDuration: 2
+  inputUIEffectDuration: 0.25
   delayBeforeGameLogo: 0.5
   delayBeforeMenuElements: 0.3
   enableLogoAnimation: 1
   logoMoveUpDistance: 10
   logoMoveDownDistance: 14
   logoMoveDuration: 4
+  inputUIScaleMultiplier: 1.5
   titleMusic: {fileID: 8300000, guid: 0245bde84ad51c249aa3f96202195711, type: 3}
   gameSceneName: 2_InitialCave
   useCustomTransitionEffect: 1
