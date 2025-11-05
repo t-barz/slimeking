@@ -159,10 +159,13 @@ namespace SlimeMec.Gameplay
             {
                 // Ataque muito fraco - VFX de falha sem dano
                 PlayFailVFX(vfxPosition);
+                
+                // Aplica knockback no player
+                ApplyKnockbackToPlayer();
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (enableDebugLogs)
-                    Debug.Log($"RockDestruct: Ataque fraco ({playerAttack}) vs Resistência ({rockResistance}) - sem dano em {gameObject.name}");
+                    Debug.Log($"RockDestruct: Ataque fraco ({playerAttack}) vs Resistência ({rockResistance}) - sem dano em {gameObject.name}. Knockback aplicado!");
 #endif
                 return;
             }
@@ -278,6 +281,22 @@ namespace SlimeMec.Gameplay
             if (vfxFailHit != null)
             {
                 Instantiate(vfxFailHit, position, Quaternion.identity);
+            }
+        }
+        
+        /// <summary>
+        /// Aplica knockback no player quando ataque é bloqueado
+        /// </summary>
+        private void ApplyKnockbackToPlayer()
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                PlayerController playerController = player.GetComponent<PlayerController>();
+                if (playerController != null)
+                {
+                    playerController.ApplyKnockback(transform.position);
+                }
             }
         }
         #endregion

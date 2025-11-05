@@ -92,6 +92,13 @@ public class PlayerController : MonoBehaviour
     [Tooltip("AudioClip para som de agachamento/squat")]
     [SerializeField] private AudioClip squatSound;
 
+    [Header("⚔️ Knockback")]
+    [Tooltip("Força do knockback quando ataque é bloqueado")]
+    [SerializeField] private float knockbackForce = 3f;
+    
+    [Tooltip("Duração do knockback em segundos")]
+    [SerializeField] private float knockbackDuration = 0.2f;
+
     [Header("�🔧 Ferramentas de Debug")]
     [Tooltip("Habilita logs detalhados no Console para debug de movimento e ações")]
     [SerializeField] private bool enableLogs = false;
@@ -123,6 +130,7 @@ public class PlayerController : MonoBehaviour
     private bool _canAttack = true;              // Se o ataque está disponível (sem cooldown)
     private bool _isAttacking = false;           // Se o jogador está executando um ataque
     private bool _isHiding = false;              // Se o jogador está escondido (Crouch pressionado)
+    private bool _isKnockedBack = false;         // Se o jogador está em knockback
 
     // === SISTEMA DE ÁUDIO ===
     // Controle de reprodução de sons para evitar spam
@@ -2052,5 +2060,44 @@ public class PlayerController : MonoBehaviour
     4. Jogador pode usar o item pressionando UseItem1-4 conforme o slot
     5. Item é consumido e aplica efeito (cura, buff, etc.)
     */
+    #endregion
+    
+    #region Knockback System
+    
+    /// <summary>
+    /// Aplica knockback no player quando ataque é bloqueado
+    /// </summary>
+    /// <param name="targetPosition">Posição do objeto que bloqueou o ataque</param>
+    public void ApplyKnockback(Vector3 targetPosition)
+    {
+        if (_isKnockedBack) return;
+        
+        // Calcula direção oposta ao alvo
+        Vector2 direction = (transform.position - targetPosition).normalized;
+        
+        StartCoroutine(KnockbackCoroutine(direction));
+    }
+    
+    private IEnumerator KnockbackCoroutine(Vector2 direction)
+    {
+        _isKnockedBack = true;
+        _canMove = false;
+        _canAttack = false;
+        
+        // Aplica força de knockback
+        float elapsed = 0f;
+        while (elapsed < knockbackDuration)
+        {
+            _rigidbody.linearVelocity = direction * knockbackForce;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        _rigidbody.linearVelocity = Vector2.zero;
+        _isKnockedBack = false;
+        _canMove = true;
+        _canAttack = true;
+    }
+    
     #endregion
 }
