@@ -34,11 +34,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 5183df2b81757134280fae3b403394bd, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9109736
+      value: 0.88818705
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 5183df2b81757134280fae3b403394bd, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.94240296
+      value: 0.9188302
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 5183df2b81757134280fae3b403394bd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WindEmulator
   shakeTriggerName: Shake
   shakeIntervalRange: {x: 2, y: 5}
-  autoStart: 1
+  autoStart: 0
   enableLogs: 0
 --- !u!114 &-3024829002937789645
 MonoBehaviour:
