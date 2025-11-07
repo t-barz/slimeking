@@ -90,7 +90,7 @@ ScriptedImporter:
     fileImportMode: 1
     importHiddenLayers: 0
     layerImportMode: 1
-    defaultPivotSpace: 1
+    defaultPivotSpace: 0
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
@@ -105,7 +105,7 @@ ScriptedImporter:
     fileImportMode: 1
     importHiddenLayers: 0
     layerImportMode: 1
-    defaultPivotSpace: 1
+    defaultPivotSpace: 0
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
@@ -117,7 +117,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638968933181524035
+  platformSettingsDirtyTick: 638980560827962767
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -144,8 +144,8 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: Layer 1_Frame_0
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.5714286}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -165,8 +165,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 27}
   - name: Layer 1_Frame_1
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.61538464}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -186,8 +186,8 @@ ScriptedImporter:
     uvTransform: {x: 81, y: 4}
   - name: Layer 1_Frame_2
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.5714286}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -207,8 +207,8 @@ ScriptedImporter:
     uvTransform: {x: 57, y: 4}
   - name: Layer 1_Frame_3
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.61538464}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -228,8 +228,8 @@ ScriptedImporter:
     uvTransform: {x: 105, y: 4}
   - name: Layer 1_Frame_4
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.4666667}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -249,8 +249,8 @@ ScriptedImporter:
     uvTransform: {x: 33, y: 4}
   - name: Layer 1_Frame_5
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.47619048, y: -0.40000004}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -270,8 +270,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: Layer 1_Frame_6
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -291,8 +291,8 @@ ScriptedImporter:
     uvTransform: {x: 26, y: 27}
   - name: Layer 1_Frame_7
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -312,8 +312,8 @@ ScriptedImporter:
     uvTransform: {x: 56, y: 27}
   - name: Layer 1_Frame_8
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -333,8 +333,8 @@ ScriptedImporter:
     uvTransform: {x: 86, y: 27}
   - name: Layer 1_Frame_9
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -354,8 +354,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 49}
   - name: Layer 1_Frame_10
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -375,8 +375,8 @@ ScriptedImporter:
     uvTransform: {x: 34, y: 49}
   - name: Layer 1_Frame_11
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -396,8 +396,8 @@ ScriptedImporter:
     uvTransform: {x: 64, y: 49}
   - name: Layer 1_Frame_12
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -417,8 +417,8 @@ ScriptedImporter:
     uvTransform: {x: 94, y: 49}
   - name: Layer 1_Frame_13
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -438,8 +438,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 65}
   - name: Layer 1_Frame_14
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -459,8 +459,8 @@ ScriptedImporter:
     uvTransform: {x: 34, y: 65}
   - name: Layer 1_Frame_15
     originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 7
+    pivot: {x: 0.5, y: -0.625}
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:

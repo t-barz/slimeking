@@ -13,6 +13,7 @@ namespace GameObjectSprayTool
         private float minSpacing = 0.5f;
         private bool isBrushActive = false;
         private bool isEraserActive = false;
+        private bool isSelectiveEraserActive = false;
 
         // Services
         private SceneViewHandler sceneViewHandler;
@@ -36,6 +37,7 @@ namespace GameObjectSprayTool
         private const string PREF_SPACING = PREF_PREFIX + "MinSpacing";
         private const string PREF_BRUSH_ACTIVE = PREF_PREFIX + "BrushActive";
         private const string PREF_ERASER_ACTIVE = PREF_PREFIX + "EraserActive";
+        private const string PREF_SELECTIVE_ERASER_ACTIVE = PREF_PREFIX + "SelectiveEraserActive";
         private const string PREF_PREFAB_1 = PREF_PREFIX + "Prefab1_InstanceID";
         private const string PREF_PREFAB_2 = PREF_PREFIX + "Prefab2_InstanceID";
         private const string PREF_PREFAB_3 = PREF_PREFIX + "Prefab3_InstanceID";
@@ -121,7 +123,14 @@ namespace GameObjectSprayTool
             // Process eraser mode
             if (isEraserActive)
             {
-                HandleEraserMode(sceneView);
+                HandleEraserMode(sceneView, false);
+                return;
+            }
+
+            // Process selective eraser mode
+            if (isSelectiveEraserActive)
+            {
+                HandleEraserMode(sceneView, true);
                 return;
             }
         }
@@ -218,11 +227,13 @@ namespace GameObjectSprayTool
                 bool previousState = isBrushActive;
                 isBrushActive = !isBrushActive;
                 
-                // Deactivate eraser when activating brush
+                // Deactivate erasers when activating brush
                 if (isBrushActive)
                 {
                     isEraserActive = false;
+                    isSelectiveEraserActive = false;
                     EditorPrefs.SetBool(PREF_ERASER_ACTIVE, false);
+                    EditorPrefs.SetBool(PREF_SELECTIVE_ERASER_ACTIVE, false);
                 }
                 
                 EditorPrefs.SetBool(PREF_BRUSH_ACTIVE, isBrushActive);
@@ -253,14 +264,47 @@ namespace GameObjectSprayTool
             {
                 isEraserActive = !isEraserActive;
                 
-                // Deactivate brush when activating eraser
+                // Deactivate other modes when activating eraser
                 if (isEraserActive)
                 {
                     isBrushActive = false;
+                    isSelectiveEraserActive = false;
                     EditorPrefs.SetBool(PREF_BRUSH_ACTIVE, false);
+                    EditorPrefs.SetBool(PREF_SELECTIVE_ERASER_ACTIVE, false);
                 }
                 
                 EditorPrefs.SetBool(PREF_ERASER_ACTIVE, isEraserActive);
+                SceneView.RepaintAll();
+            }
+
+            GUI.backgroundColor = originalColor;
+
+            // Space between buttons
+            GUILayout.Space(10);
+
+            // Selective Eraser Button
+            GUIContent selectiveEraserContent = new GUIContent(
+                isSelectiveEraserActive ? "Sel. Eraser" : "Sel. Eraser",
+                EditorGUIUtility.IconContent("FilterSelectedOnly").image,
+                isSelectiveEraserActive ? "Click to deactivate selective eraser" : "Click to activate selective eraser (erases only prefab types in slots)"
+            );
+
+            GUI.backgroundColor = isSelectiveEraserActive ? new Color(1.0f, 0.6f, 0.2f) : Color.white;
+
+            if (GUILayout.Button(selectiveEraserContent, buttonStyle))
+            {
+                isSelectiveEraserActive = !isSelectiveEraserActive;
+                
+                // Deactivate other modes when activating selective eraser
+                if (isSelectiveEraserActive)
+                {
+                    isBrushActive = false;
+                    isEraserActive = false;
+                    EditorPrefs.SetBool(PREF_BRUSH_ACTIVE, false);
+                    EditorPrefs.SetBool(PREF_ERASER_ACTIVE, false);
+                }
+                
+                EditorPrefs.SetBool(PREF_SELECTIVE_ERASER_ACTIVE, isSelectiveEraserActive);
                 SceneView.RepaintAll();
             }
 
@@ -296,7 +340,9 @@ namespace GameObjectSprayTool
         /// Handles eraser mode in the Scene View.
         /// Erases GameObjects within the brush radius that are children of "SprayedObjects".
         /// </summary>
-        private void HandleEraserMode(SceneView sceneView)
+        /// <param name="sceneView">The scene view</param>
+        /// <param name="selectiveMode">If true, only erases objects matching prefab slots</param>
+        private void HandleEraserMode(SceneView sceneView, bool selectiveMode)
         {
             Event currentEvent = Event.current;
             
@@ -307,7 +353,7 @@ namespace GameObjectSprayTool
             // Draw eraser gizmo during Repaint
             if (currentEvent.type == EventType.Repaint)
             {
-                DrawEraserGizmo(mouseWorldPosition, brushRadius);
+                DrawEraserGizmo(mouseWorldPosition, brushRadius, selectiveMode);
             }
             
             // Force repaint on mouse move to update gizmo position
@@ -319,13 +365,13 @@ namespace GameObjectSprayTool
             // Handle left mouse button for erasing
             if (currentEvent.button == 0 && currentEvent.type == EventType.MouseDown)
             {
-                EraseObjectsInRadius(mouseWorldPosition, brushRadius);
+                EraseObjectsInRadius(mouseWorldPosition, brushRadius, selectiveMode);
                 currentEvent.Use();
                 sceneView.Repaint();
             }
             else if (currentEvent.button == 0 && currentEvent.type == EventType.MouseDrag)
             {
-                EraseObjectsInRadius(mouseWorldPosition, brushRadius);
+                EraseObjectsInRadius(mouseWorldPosition, brushRadius, selectiveMode);
                 currentEvent.Use();
                 sceneView.Repaint();
             }
@@ -339,20 +385,35 @@ namespace GameObjectSprayTool
         /// <summary>
         /// Draws the eraser gizmo in the Scene View.
         /// </summary>
-        private void DrawEraserGizmo(Vector3 position, float radius)
+        private void DrawEraserGizmo(Vector3 position, float radius, bool selectiveMode)
         {
-            // Red color for eraser
-            Handles.color = new Color(1.0f, 0.3f, 0.3f, 0.8f);
-            Handles.DrawWireDisc(position, Vector3.forward, radius);
-            
-            Handles.color = new Color(1.0f, 0.3f, 0.3f, 0.1f);
-            Handles.DrawSolidDisc(position, Vector3.forward, radius);
+            if (selectiveMode)
+            {
+                // Orange color for selective eraser
+                Handles.color = new Color(1.0f, 0.6f, 0.2f, 0.8f);
+                Handles.DrawWireDisc(position, Vector3.forward, radius);
+                
+                Handles.color = new Color(1.0f, 0.6f, 0.2f, 0.1f);
+                Handles.DrawSolidDisc(position, Vector3.forward, radius);
+            }
+            else
+            {
+                // Red color for normal eraser
+                Handles.color = new Color(1.0f, 0.3f, 0.3f, 0.8f);
+                Handles.DrawWireDisc(position, Vector3.forward, radius);
+                
+                Handles.color = new Color(1.0f, 0.3f, 0.3f, 0.1f);
+                Handles.DrawSolidDisc(position, Vector3.forward, radius);
+            }
         }
 
         /// <summary>
         /// Erases all GameObjects within the specified radius that are children of "SprayedObjects".
         /// </summary>
-        private void EraseObjectsInRadius(Vector3 center, float radius)
+        /// <param name="center">Center position of the eraser</param>
+        /// <param name="radius">Radius of the eraser</param>
+        /// <param name="selectiveMode">If true, only erases objects matching prefab slots</param>
+        private void EraseObjectsInRadius(Vector3 center, float radius, bool selectiveMode)
         {
             // Find the SprayedObjects parent
             GameObject parentObject = GameObject.Find("SprayedObjects");
@@ -376,19 +437,55 @@ namespace GameObjectSprayTool
                 
                 if (sqrDistance <= radiusSquared)
                 {
-                    objectsToDelete.Add(child.gameObject);
+                    // In selective mode, check if object matches any prefab slot
+                    if (selectiveMode)
+                    {
+                        if (IsObjectMatchingPrefabSlots(child.gameObject))
+                        {
+                            objectsToDelete.Add(child.gameObject);
+                        }
+                    }
+                    else
+                    {
+                        objectsToDelete.Add(child.gameObject);
+                    }
                 }
             }
 
             // Delete objects with Undo support
             if (objectsToDelete.Count > 0)
             {
-                Undo.SetCurrentGroupName("Erase GameObjects");
+                Undo.SetCurrentGroupName(selectiveMode ? "Selective Erase GameObjects" : "Erase GameObjects");
                 foreach (GameObject obj in objectsToDelete)
                 {
                     Undo.DestroyObjectImmediate(obj);
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if a GameObject matches any of the prefab slots.
+        /// </summary>
+        private bool IsObjectMatchingPrefabSlots(GameObject obj)
+        {
+            // Get the prefab source of the object
+            GameObject prefabSource = PrefabUtility.GetCorrespondingObjectFromSource(obj);
+            
+            if (prefabSource == null)
+            {
+                return false;
+            }
+
+            // Check if it matches any of the prefab slots
+            foreach (GameObject prefabSlot in prefabSlots)
+            {
+                if (prefabSlot != null && prefabSource == prefabSlot)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void LoadSettings()
@@ -410,6 +507,9 @@ namespace GameObjectSprayTool
             
             // Load eraser active state
             isEraserActive = EditorPrefs.GetBool(PREF_ERASER_ACTIVE, false);
+            
+            // Load selective eraser active state
+            isSelectiveEraserActive = EditorPrefs.GetBool(PREF_SELECTIVE_ERASER_ACTIVE, false);
 
             // Load prefab slots using InstanceID
             LoadPrefabSlot(0, PREF_PREFAB_1);

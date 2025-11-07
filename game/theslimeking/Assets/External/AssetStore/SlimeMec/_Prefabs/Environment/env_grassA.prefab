@@ -29,16 +29,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626916397498700004, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_SpriteSortPoint
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.83690995
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.865784
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -101,7 +113,7 @@ PrefabInstance:
       addedObject: {fileID: 8828128881079633166}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -3941160271426119341}
+      addedObject: {fileID: 1476078396436421551}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: c77326906aa8f6d49a30eebfa1e134d7, type: 3}
 --- !u!1 &8963292276566518505 stripped
 GameObject:
@@ -170,11 +182,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropController
   prefabList:
-  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
-  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
-  - {fileID: 2158057401322710460, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
-  minDropCount: 1
-  maxDropCount: 3
+  - {fileID: 4725840364202951042, guid: 858ce07296f3a5542acd83d53163080a, type: 3}
+  minDropCount: 0
+  maxDropCount: 1
   useCurrentPosition: 1
   enableDebugLogs: 0
 --- !u!114 &6416572688939747380
@@ -205,7 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5fa1b96a297d4d4480463172b976076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BushShake
---- !u!114 &-3941160271426119341
+--- !u!114 &1476078396436421551
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,18 +224,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 8963292276566518505}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b9b5e5cba0a66044a68d5343fa9e60e, type: 3}
+  m_Script: {fileID: 11500000, guid: b64b2d85e06921848a8c98ec571db54f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  applyRandomVariations: 1
-  applyFlipVariations: 1
-  enableFlipX: 1
-  enableFlipY: 0
-  applyScaleVariations: 1
-  enableScaleVariation: 1
-  scaleRange: {x: 0.95, y: 1.05}
+  m_EditorClassIdentifier: Assembly-CSharp::RandomStyle
+  randomizeScale: 1
+  minScale: 0.8
+  maxScale: 1.2
   uniformScale: 1
-  applyColorVariations: 0
-  enableColorVariation: 0
-  colorTintRange: {r: 0.2, g: 0.2, b: 0.2, a: 0}
-  showDebugLogs: 0
+  randomizeColor: 1
+  possibleColors:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0.9764706, b: 0.7137255, a: 1}
+  - {r: 0.7764706, g: 1, b: 0.7764706, a: 1}
+  useColorInterpolation: 1
+  baseColor: {r: 1, g: 1, b: 1, a: 1}
+  colorVariation: 0.3
+  applyOnStart: 1
+  randomizeAlpha: 0
+  minAlpha: 0.7
+  maxAlpha: 1
+  allowRandomFlipX: 1
+  allowRandomFlipY: 0
+  enableLogs: 0
