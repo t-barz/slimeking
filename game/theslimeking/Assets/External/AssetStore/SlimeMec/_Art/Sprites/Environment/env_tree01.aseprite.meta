@@ -85,7 +85,7 @@ ScriptedImporter:
     fileImportMode: 1
     importHiddenLayers: 0
     layerImportMode: 0
-    defaultPivotSpace: 0
+    defaultPivotSpace: 1
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
@@ -100,7 +100,7 @@ ScriptedImporter:
     fileImportMode: 1
     importHiddenLayers: 0
     layerImportMode: 0
-    defaultPivotSpace: 0
+    defaultPivotSpace: 1
     defaultPivotAlignment: 7
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
@@ -112,7 +112,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638980560442146435
+  platformSettingsDirtyTick: 638983621733936153
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -139,8 +139,8 @@ ScriptedImporter:
   animatedSpriteImportData:
   - name: sombra_Frame_0
     originalName: 
-    pivot: {x: 0.5106383, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -160,8 +160,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 55}
   - name: sombra_Frame_1
     originalName: 
-    pivot: {x: 0.5106383, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -181,8 +181,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 74}
   - name: sombra_Frame_2
     originalName: 
-    pivot: {x: 0.47826087, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -202,8 +202,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 131}
   - name: sombra_Frame_3
     originalName: 
-    pivot: {x: 0.4888889, y: -0.2}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -223,8 +223,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 207}
   - name: sombra_Frame_4
     originalName: 
-    pivot: {x: 0.4888889, y: -0.2}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -244,8 +244,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 225}
   - name: sombra_Frame_5
     originalName: 
-    pivot: {x: 0.51111114, y: -0.2}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -265,8 +265,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 243}
   - name: sombra_Frame_6
     originalName: 
-    pivot: {x: 0.5106383, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -286,8 +286,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 93}
   - name: sombra_Frame_7
     originalName: 
-    pivot: {x: 0.5106383, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -307,8 +307,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 112}
   - name: sombra_Frame_8
     originalName: 
-    pivot: {x: 0.5, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -328,8 +328,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 150}
   - name: tronco_Frame_0
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -349,8 +349,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 261}
   - name: tronco_Frame_1
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -370,8 +370,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 287}
   - name: tronco_Frame_2
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -391,8 +391,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 313}
   - name: tronco_Frame_3
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -412,8 +412,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 339}
   - name: tronco_Frame_4
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -433,8 +433,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 365}
   - name: tronco_Frame_5
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -454,8 +454,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 391}
   - name: tronco_Frame_6
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -475,8 +475,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 417}
   - name: tronco_Frame_7
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -496,8 +496,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 443}
   - name: tronco_Frame_8
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -517,8 +517,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 469}
   - name: copa_Frame_0
     originalName: 
-    pivot: {x: 0.5, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -538,8 +538,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 55}
   - name: copa_Frame_1
     originalName: 
-    pivot: {x: 0.5, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -559,8 +559,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 106}
   - name: copa_Frame_2
     originalName: 
-    pivot: {x: 0.4901961, y: -0.39534885}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -580,8 +580,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 463}
   - name: copa_Frame_3
     originalName: 
-    pivot: {x: 0.48076925, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -601,8 +601,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 157}
   - name: copa_Frame_4
     originalName: 
-    pivot: {x: 0.4615385, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -622,8 +622,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 208}
   - name: copa_Frame_5
     originalName: 
-    pivot: {x: 0.4716981, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -643,8 +643,8 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: copa_Frame_6
     originalName: 
-    pivot: {x: 0.5, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -664,8 +664,8 @@ ScriptedImporter:
     uvTransform: {x: -2, y: 241}
   - name: copa_Frame_7
     originalName: 
-    pivot: {x: 0.4901961, y: -0.39534885}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -685,8 +685,8 @@ ScriptedImporter:
     uvTransform: {x: 58, y: -13}
   - name: copa_Frame_8
     originalName: 
-    pivot: {x: 0.48076925, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -706,8 +706,8 @@ ScriptedImporter:
     uvTransform: {x: -3, y: 292}
   - name: sombra_Frame_9
     originalName: 
-    pivot: {x: 0.4888889, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -727,8 +727,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 169}
   - name: sombra_Frame_10
     originalName: 
-    pivot: {x: 0.51111114, y: -0.18181819}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -748,8 +748,8 @@ ScriptedImporter:
     uvTransform: {x: 65, y: 188}
   - name: tronco_Frame_9
     originalName: 
-    pivot: {x: 0.52380955, y: -0.22222222}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -769,8 +769,8 @@ ScriptedImporter:
     uvTransform: {x: 94, y: 261}
   - name: copa_Frame_9
     originalName: 
-    pivot: {x: 0.4615385, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
@@ -790,8 +790,8 @@ ScriptedImporter:
     uvTransform: {x: -4, y: 343}
   - name: copa_Frame_10
     originalName: 
-    pivot: {x: 0.48076925, y: -0.41860464}
-    alignment: 9
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 7
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
     rect:
