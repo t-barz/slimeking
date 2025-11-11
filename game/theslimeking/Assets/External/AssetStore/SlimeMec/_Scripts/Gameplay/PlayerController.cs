@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
 using SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 
 /// <summary>
 /// Controlador principal do personagem jogador para o jogo SlimeKing.
@@ -95,7 +96,7 @@ public class PlayerController : MonoBehaviour
     [Header("⚔️ Knockback")]
     [Tooltip("Força do knockback quando ataque é bloqueado")]
     [SerializeField] private float knockbackForce = 3f;
-    
+
     [Tooltip("Duração do knockback em segundos")]
     [SerializeField] private float knockbackDuration = 0.2f;
 
@@ -116,6 +117,7 @@ public class PlayerController : MonoBehaviour
     private Animator _animator;                   // Controle de animações
     private SpriteRenderer _spriteRenderer;      // Flip de sprite
     private PlayerAttributesHandler _attributesHandler; // Sistema de atributos (opcional)
+    private InteractionHandler _interactionHandler; // Sistema de interações (será criado automaticamente)
 
     // === SISTEMA DE INPUT ===
     // Gerenciamento de entrada do usuário via novo Input System
@@ -199,6 +201,13 @@ public class PlayerController : MonoBehaviour
 
         // Obtém componente opcional de atributos
         _attributesHandler = GetComponent<PlayerAttributesHandler>();
+
+        // Obtém ou cria componente de interação
+        _interactionHandler = GetComponent<InteractionHandler>();
+        if (_interactionHandler == null)
+        {
+            _interactionHandler = gameObject.AddComponent<InteractionHandler>();
+        }
 
         // Validações críticas - sem estes componentes o jogador não funciona
         ValidateRequiredComponents();
@@ -662,10 +671,14 @@ public class PlayerController : MonoBehaviour
 
     /// <summary>
     /// Processa input de interação contextual via tecla E.
-    /// Usado para coletar itens próximos e interagir com elementos do cenário.
+    /// Sistema prioritário de interações:
+    /// 1. SpecialMovementPoints (Jump/Shrink)
+    /// 2. Objetos IInteractable (PushableObject, etc.)
+    /// 3. Outros sistemas futuros
     /// 
     /// FUNCIONALIDADES IMPLEMENTADAS:
     /// • Detecção e ativação de SpecialMovementPoints (Jump/Shrink) - OTIMIZADO
+    /// • Sistema genérico de IInteractable - NOVO
     /// 
     /// FUTURAS IMPLEMENTAÇÕES:
     /// • Detecção de CollectibleItems próximos
@@ -678,22 +691,35 @@ public class PlayerController : MonoBehaviour
         // Verifica se já está executando um movimento especial
         if (_isPerformingSpecialMovement)
         {
-            Debug.Log("PlayerController: Já executando movimento especial. Ignorando input de interação.");
+            if (enableLogs) Debug.Log("PlayerController: Já executando movimento especial. Ignorando input de interação.");
             return;
         }
 
-        // Verifica se há um SpecialMovementPoint em contato (otimizado)
+        // PRIORIDADE 1: SpecialMovementPoints (compatibilidade com sistema existente)
         if (_currentSpecialMovementPoint != null)
         {
-            Debug.Log($"PlayerController: Ativando movimento especial - {_currentSpecialMovementPoint.GetMovementName()}");
+            if (enableLogs) Debug.Log($"PlayerController: Ativando movimento especial - {_currentSpecialMovementPoint.GetMovementName()}");
             StartSpecialMovement(_currentSpecialMovementPoint);
             return;
-        }        // TODO: Implementar outras interações
-        // - Coleta de itens
-        // - Diálogo com NPCs
-        // - Ativação de switches
+        }
 
-        Debug.Log("PlayerController: Nenhuma interação disponível no momento.");
+        // PRIORIDADE 2: Sistema genérico IInteractable (PushableObject, etc.)
+        if (_interactionHandler != null && _interactionHandler.HasAvailableInteraction)
+        {
+            bool interactionSuccess = _interactionHandler.ProcessInteractionInput();
+            if (enableLogs)
+            {
+                string status = interactionSuccess ? "bem-sucedida" : "falhou";
+                Debug.Log($"PlayerController: Interação {status} com objeto IInteractable");
+            }
+
+            if (interactionSuccess)
+                return; // Interação executada com sucesso
+        }
+
+        // FUTURO: Outros sistemas de interação podem ser adicionados aqui
+
+        if (enableLogs) Debug.Log("PlayerController: Nenhuma interação disponível no momento.");
     }
 
     /// <summary>
@@ -727,7 +753,7 @@ public class PlayerController : MonoBehaviour
         {
             // Tecla pressionada - ativa esconderijo
             _isHiding = true;
-            
+
             // TODO: Integrar som de agachamento
             // PlaySquatSound();
         }
@@ -918,14 +944,14 @@ public class PlayerController : MonoBehaviour
             case SpecialMovementPoint.MovementType.Jump:
                 _animator.SetTrigger(JumpTrigger);
                 Debug.Log("PlayerController: Trigger 'Jump' ativado no Animator");
-                
+
                 PlayJumpSound();
                 break;
 
             case SpecialMovementPoint.MovementType.Shrink:
                 _animator.SetTrigger(ShrinkTrigger);
                 Debug.Log("PlayerController: Trigger 'Shrink' ativado no Animator");
-                
+
                 PlaySlideSound();
                 break;
 
@@ -1936,10 +1962,10 @@ public class PlayerController : MonoBehaviour
     public void SetDefenseBonus(int bonus)
     {
         _defenseBonus = bonus;
-        
+
         if (enableLogs)
             Debug.Log($"PlayerController: Bônus de defesa atualizado para {_defenseBonus}");
-        
+
         // TODO: Aplicar defesa ao sistema de combate quando implementado
     }
 
@@ -1951,7 +1977,7 @@ public class PlayerController : MonoBehaviour
     public void SetSpeedBonus(int bonus)
     {
         _speedBonus = bonus;
-        
+
         // Aplica o bônus à velocidade base
         if (_attributesHandler != null)
         {
@@ -1963,7 +1989,7 @@ public class PlayerController : MonoBehaviour
             // Se não houver AttributesHandler, aplica diretamente
             moveSpeed += _speedBonus;
         }
-        
+
         if (enableLogs)
             Debug.Log($"PlayerController: Bônus de velocidade atualizado para {_speedBonus}. Velocidade total: {moveSpeed}");
     }
@@ -2061,9 +2087,9 @@ public class PlayerController : MonoBehaviour
     5. Item é consumido e aplica efeito (cura, buff, etc.)
     */
     #endregion
-    
+
     #region Knockback System
-    
+
     /// <summary>
     /// Aplica knockback no player quando ataque é bloqueado
     /// </summary>
@@ -2071,19 +2097,19 @@ public class PlayerController : MonoBehaviour
     public void ApplyKnockback(Vector3 targetPosition)
     {
         if (_isKnockedBack) return;
-        
+
         // Calcula direção oposta ao alvo
         Vector2 direction = (transform.position - targetPosition).normalized;
-        
+
         StartCoroutine(KnockbackCoroutine(direction));
     }
-    
+
     private IEnumerator KnockbackCoroutine(Vector2 direction)
     {
         _isKnockedBack = true;
         _canMove = false;
         _canAttack = false;
-        
+
         // Aplica força de knockback
         float elapsed = 0f;
         while (elapsed < knockbackDuration)
@@ -2092,12 +2118,12 @@ public class PlayerController : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-        
+
         _rigidbody.linearVelocity = Vector2.zero;
         _isKnockedBack = false;
         _canMove = true;
         _canAttack = true;
     }
-    
+
     #endregion
 }
