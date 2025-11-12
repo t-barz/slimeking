@@ -71,12 +71,17 @@ namespace SlimeKing.Gameplay
         [Tooltip("Ativar logs de debug para este objeto")]
         [SerializeField] private bool enableDebugLogs = false;
 
+        [Header("🔗 Configurações de Objeto Conectado")]
+        [Tooltip("GameObject irmão que será movido junto (sem rotação) com este objeto (opcional)")]
+        [SerializeField] private GameObject siblingObject;
+
         #endregion
 
         #region Private Variables
 
         private Rigidbody2D _rigidbody2D;
         private AudioSource _audioSource;
+        private Rigidbody2D _siblingRigidbody2D; // Rigidbody2D do objeto irmão
 
         private bool _playerInRange = false;
         private bool _isMoving = false;
@@ -129,9 +134,11 @@ namespace SlimeKing.Gameplay
         {
             _rigidbody2D = GetComponent<Rigidbody2D>();
 
-            // Configura o Rigidbody2D para movimento controlado (Unity 6.2+)
-            _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-            _rigidbody2D.gravityScale = 0f; // Remove gravidade para jogo 2D top-down
+            // Configura o próprio Rigidbody2D
+            ConfigureRigidbodyForMovement(_rigidbody2D);
+
+            // Configura objeto irmão se especificado
+            SetupSiblingRigidbody();
 
             // Tenta obter AudioSource, cria um se não existir
             _audioSource = GetComponent<AudioSource>();
@@ -146,8 +153,61 @@ namespace SlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Converte a direção enum para Vector2
+        /// Configura o Rigidbody2D do objeto irmão se especificado
         /// </summary>
+        private void SetupSiblingRigidbody()
+        {
+            if (siblingObject != null)
+            {
+                _siblingRigidbody2D = siblingObject.GetComponent<Rigidbody2D>();
+
+                if (_siblingRigidbody2D != null)
+                {
+                    LogDebug($"Objeto irmão configurado: {siblingObject.name}");
+                    ConfigureSiblingRigidbodyForMovement(_siblingRigidbody2D);
+                }
+                else
+                {
+                    LogDebug($"AVISO: Objeto irmão '{siblingObject.name}' não possui Rigidbody2D");
+                }
+            }
+            else
+            {
+                LogDebug("Nenhum objeto irmão configurado - apenas este objeto será movido");
+            }
+        }
+
+        /// <summary>
+        /// Configura um Rigidbody2D para movimento controlado
+        /// </summary>
+        /// <param name="rigidbody">Rigidbody2D a ser configurado</param>
+        private void ConfigureRigidbodyForMovement(Rigidbody2D rigidbody)
+        {
+            rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            rigidbody.gravityScale = 0f;
+            rigidbody.mass = 100000f; // Massa alta para objetos pesados
+            rigidbody.linearDamping = 5f;
+            rigidbody.angularDamping = 5f;
+            rigidbody.freezeRotation = false;
+            rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }
+
+        /// <summary>
+        /// Configura um Rigidbody2D do objeto irmão (SEM rotação)
+        /// </summary>
+        /// <param name="rigidbody">Rigidbody2D do objeto irmão a ser configurado</param>
+        private void ConfigureSiblingRigidbodyForMovement(Rigidbody2D rigidbody)
+        {
+            rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            rigidbody.gravityScale = 0f;
+            rigidbody.mass = 100000f; // Massa alta para objetos pesados
+            rigidbody.linearDamping = 5f;
+            rigidbody.angularDamping = 5f;
+            rigidbody.freezeRotation = true; // ROTAÇÃO CONGELADA para objeto irmão
+            rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }        /// <summary>
+                 /// Converte a direção enum para Vector2
+                 /// </summary>
         private void SetupMovementDirection()
         {
             switch (pushDirection)
@@ -358,6 +418,32 @@ namespace SlimeKing.Gameplay
         /// </summary>
         public bool CanBeUsed => HasUsesRemaining();
 
+        /// <summary>
+        /// Retorna lista dos GameObjects que serão movidos
+        /// </summary>
+        public GameObject[] MovedObjects
+        {
+            get
+            {
+                var objects = new System.Collections.Generic.List<GameObject> { gameObject };
+                if (HasSiblingObject)
+                {
+                    objects.Add(siblingObject);
+                }
+                return objects.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Verifica se há um objeto irmão configurado e válido
+        /// </summary>
+        public bool HasSiblingObject => siblingObject != null && _siblingRigidbody2D != null;
+
+        /// <summary>
+        /// Retorna o GameObject irmão configurado
+        /// </summary>
+        public GameObject SiblingObject => siblingObject;
+
         #endregion
 
         #region Movement Logic
@@ -376,7 +462,7 @@ namespace SlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Corrotina que executa o movimento e rotação do objeto
+        /// Corrotina que executa o movimento e rotação dos objetos
         /// </summary>
         private IEnumerator PushMovementCoroutine()
         {
@@ -385,11 +471,13 @@ namespace SlimeKing.Gameplay
             // Reproduz som de início do movimento
             PlayPushSound();
 
-            LogDebug($"Iniciando movimento na direção {pushDirection} por {moveDuration} segundos");
+            string objectsInfo = HasSiblingObject
+                ? $"'{name}' (com rotação) e objeto irmão '{siblingObject.name}' (sem rotação)"
+                : $"'{name}'";
 
-            float elapsedTime = 0f;
+            LogDebug($"Iniciando movimento de {objectsInfo} na direção {pushDirection} por {moveDuration} segundos"); float elapsedTime = 0f;
             Vector2 targetVelocity = _moveDirection * moveSpeed;
-            float rotationDirection = GetRotationDirection(); // Calcula direção da rotação
+            float rotationDirection = GetRotationDirection();
 
             // Som contínuo de movimento
             if (movingSound != null)
@@ -403,10 +491,16 @@ namespace SlimeKing.Gameplay
 
             while (elapsedTime < moveDuration)
             {
-                // Aplica movimento
+                // Aplica movimento ao próprio objeto
                 _rigidbody2D.linearVelocity = targetVelocity;
 
-                // Aplica rotação direcional baseada no movimento
+                // Aplica movimento ao objeto irmão se configurado (SEM rotação)
+                if (HasSiblingObject)
+                {
+                    _siblingRigidbody2D.linearVelocity = targetVelocity;
+                }
+
+                // Aplica rotação APENAS ao próprio PushableObject
                 float rotationThisFrame = rotationSpeed * rotationDirection * Time.deltaTime;
                 transform.Rotate(0f, 0f, rotationThisFrame);
 
@@ -414,8 +508,13 @@ namespace SlimeKing.Gameplay
                 yield return null;
             }
 
-            // Para o movimento
+            // Para o movimento de ambos os objetos
             _rigidbody2D.linearVelocity = Vector2.zero;
+
+            if (HasSiblingObject)
+            {
+                _siblingRigidbody2D.linearVelocity = Vector2.zero;
+            }
 
             // Para o som
             if (_audioSource.isPlaying && _audioSource.loop)
@@ -498,12 +597,29 @@ namespace SlimeKing.Gameplay
             Gizmos.DrawLine(endPos, arrowHead1);
             Gizmos.DrawLine(endPos, arrowHead2);
 
-            // Desenha texto com informações
+            // Conecta visualmente com objeto irmão se configurado
+            if (HasSiblingObject)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(transform.position, siblingObject.transform.position);
+
+                // Desenha seta no objeto irmão (apenas movimento, sem rotação)
+                Vector3 siblingStart = siblingObject.transform.position;
+                Vector3 siblingEnd = siblingStart + direction * 1.5f; // Seta menor para indicar sem rotação
+                Gizmos.color = Color.blue; // Cor diferente para indicar que não rotaciona
+                Gizmos.DrawLine(siblingStart, siblingEnd);
+
+                Vector3 siblingArrow1 = siblingEnd + (Quaternion.Euler(0, 0, 45) * -direction * 0.3f);
+                Vector3 siblingArrow2 = siblingEnd + (Quaternion.Euler(0, 0, -45) * -direction * 0.3f);
+                Gizmos.DrawLine(siblingEnd, siblingArrow1);
+                Gizmos.DrawLine(siblingEnd, siblingArrow2);
+            }            // Desenha texto com informações
             Vector3 textPos = startPos + Vector3.up * 0.5f;
 
 #if UNITY_EDITOR
             string usesText = maxUses < 0 ? "∞" : $"{_currentUses}/{maxUses}";
-            UnityEditor.Handles.Label(textPos, $"{pushDirection}\nSpeed: {moveSpeed}\nDuration: {moveDuration}s\nUsos: {usesText}");
+            string siblingInfo = HasSiblingObject ? $"\nIrmão: {siblingObject.name} (sem rotação)" : "\nSem irmão";
+            UnityEditor.Handles.Label(textPos, $"{pushDirection}\nSpeed: {moveSpeed}\nDuration: {moveDuration}s\nUsos: {usesText}{siblingInfo}");
 #endif
         }
 

@@ -8,6 +8,9 @@ O `PushableObject` é um sistema completo para objetos que podem ser empurrados 
 
 - ✅ **Detecção de Player**: Automaticamente detecta quando o Player está próximo
 - ✅ **Movimento Direcional**: Suporte para 4 direções (Norte, Sul, Leste, Oeste)
+- ✅ **Movimento Hierárquico**: Move o objeto pai se existir, senão move a si mesmo
+  - 🏗️ **Objeto Composto**: PushableObject como parte de hierarquia maior
+  - 🎯 **Movimento Inteligente**: Detecta automaticamente o objeto a ser movido
 - ✅ **Rotação Direcional**: Objeto rotaciona no sentido correto baseado na direção
   - 🔄 **Leste/Sul**: Rotação horária
   - 🔄 **Norte/Oeste**: Rotação anti-horária
@@ -124,6 +127,64 @@ A rotação do objeto é automaticamente determinada pela direção do movimento
 ### 🔢 Sistema de Usos Limitados
 
 O PushableObject agora suporta controle de quantidade de interações:
+
+## 🏗️ Sistema de Movimento Hierárquico (Novo)
+
+O `PushableObject` agora suporta **objetos compostos**, permitindo que ele seja parte de estruturas mais complexas:
+
+### 📦 Funcionamento Inteligente
+
+- **Detecta Pai Automaticamente**: Se o PushableObject tem um objeto pai, move o pai
+- **Movimento de Fallback**: Se não há pai, move a si mesmo
+- **Rotação Local**: Sempre rotaciona apenas o próprio PushableObject
+
+### 🏗️ Casos de Uso Comuns
+
+**Objeto Simples** (comportamento tradicional):
+
+```
+📦 SimpleBox
+   ├── PushableObject (componente)
+   ├── Rigidbody2D
+   ├── SpriteRenderer
+   └── Colliders
+```
+
+**Objeto Composto** (novo):
+
+```
+🏗️ ComplexMachine (será movido)
+   ├── Rigidbody2D (aqui)
+   ├── 🎨 VisualParts
+   │   ├── MainSprite
+   │   └── Details
+   ├── ⚙️ Mechanics
+   │   ├── Gears
+   │   └── Pipes
+   └── 📦 PushableObject (detector + rotação apenas)
+       ├── CircleCollider2D (Trigger)
+       └── InteractionFeedback
+```
+
+### 🔧 Propriedades de Acesso
+
+```csharp
+// Verificar se está movendo o pai
+bool isMovingParent = pushableObject.IsMovingParent;
+
+// Obter o objeto que será movido
+GameObject movedObject = pushableObject.MovedObject;
+
+// Log de exemplo
+Debug.Log($"Movendo: {movedObject.name} (pai: {isMovingParent})");
+```
+
+### ✨ Vantagens do Sistema Hierárquico
+
+1. **🧩 Flexibilidade**: PushableObject pode ser parte de objetos maiores
+2. **🎯 Precisão**: Move exatamente o que deve ser movido
+3. **🔄 Rotação Independente**: Feedback visual no componente de detecção
+4. **🛡️ Compatibilidade**: Funciona com objetos simples existentes
 
 | Valor | Comportamento | Uso Recomendado |
 |-------|---------------|-----------------|
