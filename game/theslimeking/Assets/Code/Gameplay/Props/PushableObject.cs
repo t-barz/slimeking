@@ -11,9 +11,11 @@ namespace SlimeKing.Gameplay
     /// RESPONSABILIDADES:
     /// • Detecta colisão com o Player através de Trigger
     /// • Responde ao input de interação do Player
-    /// • Move o objeto em uma direção configurada (Norte, Sul, Leste, Oeste)
+    /// • Move o objeto em múltiplas direções configuradas (Norte, Sul, Leste, Oeste)
+    /// • Determina direção automaticamente baseada na posição do Player
     /// • Rotaciona o objeto durante o movimento
     /// • Controla velocidade e duração do movimento
+    /// • Suporta movimento de objeto irmão sincronizado (sem rotação)
     /// 
     /// DEPENDÊNCIAS:
     /// • Collider2D configurado como Trigger para detecção do Player
@@ -21,7 +23,9 @@ namespace SlimeKing.Gameplay
     /// 
     /// CONFIGURAÇÃO:
     /// • Anexar a um GameObject com Collider2D (isTrigger = true)
-    /// • Configurar direção de movimento, velocidade e duração no Inspector
+    /// • Selecionar múltiplas direções permitidas no Inspector
+    /// • Configurar velocidade e duração no Inspector
+    /// • Opcional: Configurar objeto irmão para movimento sincronizado
     /// </summary>
     [RequireComponent(typeof(Collider2D), typeof(Rigidbody2D))]
     public class PushableObject : MonoBehaviour, IInteractable
@@ -31,12 +35,14 @@ namespace SlimeKing.Gameplay
         /// <summary>
         /// Direções válidas para movimento do objeto empurrável
         /// </summary>
+        [System.Flags]
         public enum PushDirection
         {
-            North,  // Cima (Y+)
-            South,  // Baixo (Y-)
-            East,   // Direita (X+)
-            West    // Esquerda (X-)
+            None = 0,
+            North = 1 << 0,  // Cima (Y+)
+            South = 1 << 1,  // Baixo (Y-)
+            East = 1 << 2,   // Direita (X+)
+            West = 1 << 3    // Esquerda (X-)
         }
 
         #endregion
@@ -44,8 +50,8 @@ namespace SlimeKing.Gameplay
         #region Inspector Configuration
 
         [Header("⚙️ Configurações de Movimento")]
-        [Tooltip("Direção do movimento quando o objeto for empurrado")]
-        [SerializeField] private PushDirection pushDirection = PushDirection.North;
+        [Tooltip("Direções possíveis para movimento (selecione múltiplas)")]
+        [SerializeField] private PushDirection allowedDirections = PushDirection.North;
 
         [Tooltip("Velocidade de movimento do objeto (unidades por segundo)")]
         [SerializeField] private float moveSpeed = 3f;
@@ -88,6 +94,7 @@ namespace SlimeKing.Gameplay
         private int _currentUses = 0;  // Contador de usos atuais
 
         private Vector2 _moveDirection;
+        private PushDirection _currentDirection; // Direção atual sendo usada
         private Coroutine _movementCoroutine;
 
         #endregion
@@ -205,28 +212,144 @@ namespace SlimeKing.Gameplay
             rigidbody.angularDamping = 5f;
             rigidbody.freezeRotation = true; // ROTAÇÃO CONGELADA para objeto irmão
             rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        }        /// <summary>
-                 /// Converte a direção enum para Vector2
-                 /// </summary>
+        }
+
+        /// <summary>
+        /// Converte a direção enum para Vector2
+        /// </summary>
         private void SetupMovementDirection()
         {
-            switch (pushDirection)
+            // Este método agora será chamado dinamicamente quando necessário
+            LogDebug($"Direções permitidas configuradas: {allowedDirections}");
+        }
+
+        /// <summary>
+        /// Determina a direção de movimento baseada na posição do player
+        /// </summary>
+        /// <param name="playerTransform">Transform do player</param>
+        /// <returns>Direção válida para movimento ou None se não houver</returns>
+        private PushDirection DetermineMovementDirection(Transform playerTransform)
+        {
+            if (playerTransform == null) return PushDirection.None;
+
+            Vector2 playerPosition = playerTransform.position;
+
+            // Usa a posição do objeto que será movido para calcular direção
+            Vector2 targetObjectPosition;
+            if (HasSiblingObject)
+            {
+                targetObjectPosition = siblingObject.transform.position;
+                LogDebug($"Usando posição do objeto irmão: {targetObjectPosition}");
+            }
+            else
+            {
+                targetObjectPosition = transform.position;
+                LogDebug($"Usando posição própria: {targetObjectPosition}");
+            }
+
+            Vector2 pushDirection = (targetObjectPosition - playerPosition).normalized; // Direção do empurrão
+
+            LogDebug($"Player pos: {playerPosition}, Target Object pos: {targetObjectPosition}, Push direction: {pushDirection}");
+            LogDebug($"Allowed directions: {allowedDirections}");
+
+            // Encontra a direção mais próxima baseada na direção do empurrão
+            PushDirection bestDirection = PushDirection.None;
+            float bestDot = -1f;
+
+            // Verifica cada direção permitida
+            if ((allowedDirections & PushDirection.North) != 0)
+            {
+                float dot = Vector2.Dot(pushDirection, Vector2.up); // Empurrão para norte
+                LogDebug($"Norte - dot: {dot}, pushDirection: {pushDirection}, Vector2.up: {Vector2.up}");
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestDirection = PushDirection.North;
+                    LogDebug($"Norte é a melhor direção até agora com dot: {dot}");
+                }
+            }
+
+            if ((allowedDirections & PushDirection.South) != 0)
+            {
+                Vector2 southVector = new Vector2(0, -1); // Explícito para debug
+                float dot = Vector2.Dot(pushDirection, southVector); // Empurrão para sul
+                LogDebug($"Sul - dot: {dot}, pushDirection: {pushDirection}, southVector: {southVector}");
+                LogDebug($"Comparando: bestDot atual = {bestDot}, novo dot = {dot}");
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestDirection = PushDirection.South;
+                    LogDebug($"Sul é a melhor direção até agora com dot: {dot}");
+                }
+            }
+
+            if ((allowedDirections & PushDirection.East) != 0)
+            {
+                float dot = Vector2.Dot(pushDirection, Vector2.right); // Empurrão para leste
+                LogDebug($"Leste - dot: {dot}, pushDirection: {pushDirection}, Vector2.right: {Vector2.right}");
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestDirection = PushDirection.East;
+                    LogDebug($"Leste é a melhor direção até agora com dot: {dot}");
+                }
+            }
+
+            if ((allowedDirections & PushDirection.West) != 0)
+            {
+                Vector2 westVector = new Vector2(-1, 0); // Explícito para debug
+                float dot = Vector2.Dot(pushDirection, westVector); // Empurrão para oeste
+                LogDebug($"Oeste - dot: {dot}, pushDirection: {pushDirection}, westVector: {westVector}");
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestDirection = PushDirection.West;
+                    LogDebug($"Oeste é a melhor direção até agora com dot: {dot}");
+                }
+            }
+
+            LogDebug($"Melhor direção encontrada: {bestDirection} com dot: {bestDot}, threshold: 0.3");
+
+            // Só aceita se o player está numa posição razoável (dot > 0.3 para evitar movimentos diagonais)
+            if (bestDot > 0.3f)
+            {
+                LogDebug($"Direção aceita: {bestDirection}");
+                return bestDirection;
+            }
+
+            LogDebug($"Nenhuma direção válida - dot {bestDot} não passou do threshold 0.3");
+            return PushDirection.None;
+        }
+
+        /// <summary>
+        /// Converte direção para Vector2 de movimento
+        /// </summary>
+        /// <param name="direction">Direção a converter</param>
+        /// <returns>Vector2 normalizado</returns>
+        private Vector2 DirectionToVector(PushDirection direction)
+        {
+            Vector2 result;
+            switch (direction)
             {
                 case PushDirection.North:
-                    _moveDirection = Vector2.up;
+                    result = Vector2.up;
                     break;
                 case PushDirection.South:
-                    _moveDirection = Vector2.down;
+                    result = new Vector2(0, -1); // Explícito
                     break;
                 case PushDirection.East:
-                    _moveDirection = Vector2.right;
+                    result = Vector2.right;
                     break;
                 case PushDirection.West:
-                    _moveDirection = Vector2.left;
+                    result = new Vector2(-1, 0); // Explícito
+                    break;
+                default:
+                    result = Vector2.zero;
                     break;
             }
 
-            LogDebug($"Direção de movimento configurada: {pushDirection} -> {_moveDirection}");
+            LogDebug($"DirectionToVector: {direction} -> {result}");
+            return result;
         }
 
         /// <summary>
@@ -261,10 +384,11 @@ namespace SlimeKing.Gameplay
         /// <summary>
         /// Calcula a direção da rotação baseada na direção do movimento
         /// </summary>
+        /// <param name="direction">Direção do movimento</param>
         /// <returns>1f para sentido horário, -1f para sentido anti-horário</returns>
-        private float GetRotationDirection()
+        private float GetRotationDirection(PushDirection direction)
         {
-            switch (pushDirection)
+            switch (direction)
             {
                 case PushDirection.East:   // Leste -> horário
                 case PushDirection.South:  // Sul -> horário
@@ -304,9 +428,20 @@ namespace SlimeKing.Gameplay
                 return false;
             }
 
+            // Determina a direção baseada na posição do player
+            PushDirection chosenDirection = DetermineMovementDirection(player);
+            if (chosenDirection == PushDirection.None)
+            {
+                LogDebug("Interação negada - player não está em posição válida para empurrar");
+                return false;
+            }
+
+            _currentDirection = chosenDirection;
+            _moveDirection = DirectionToVector(_currentDirection);
+
             IncrementUses();
             StartPushMovement();
-            LogDebug($"Player {player.name} empurrou o objeto {name}");
+            LogDebug($"Player {player.name} empurrou o objeto {name} na direção {_currentDirection}");
             return true;
         }
 
@@ -334,15 +469,34 @@ namespace SlimeKing.Gameplay
             if (!HasUsesRemaining())
                 return $"Objeto esgotado ({_currentUses}/{maxUses})";
 
+            // Mostra direções permitidas
+            string directionsText = GetAllowedDirectionsText();
+
             if (maxUses < 0)
             {
-                return $"Pressione [E] para empurrar ({pushDirection})";
+                return $"Pressione [E] para empurrar ({directionsText})";
             }
             else
             {
                 int remaining = GetRemainingUses();
-                return $"Pressione [E] para empurrar ({pushDirection}) [{remaining} restantes]";
+                return $"Pressione [E] para empurrar ({directionsText}) [{remaining} restantes]";
             }
+        }
+
+        /// <summary>
+        /// Retorna texto com as direções permitidas
+        /// </summary>
+        /// <returns>String formatada com direções</returns>
+        private string GetAllowedDirectionsText()
+        {
+            var directions = new System.Collections.Generic.List<string>();
+
+            if ((allowedDirections & PushDirection.North) != 0) directions.Add("Norte");
+            if ((allowedDirections & PushDirection.South) != 0) directions.Add("Sul");
+            if ((allowedDirections & PushDirection.East) != 0) directions.Add("Leste");
+            if ((allowedDirections & PushDirection.West) != 0) directions.Add("Oeste");
+
+            return string.Join("/", directions);
         }
 
         /// <summary>
@@ -384,8 +538,30 @@ namespace SlimeKing.Gameplay
                 return;
             }
 
-            IncrementUses();
-            StartPushMovement();
+            // Precisa do Transform do player para determinar direção
+            // Para compatibilidade, usa uma direção padrão se não conseguir determinar
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                PushDirection chosenDirection = DetermineMovementDirection(player.transform);
+                if (chosenDirection != PushDirection.None)
+                {
+                    _currentDirection = chosenDirection;
+                    _moveDirection = DirectionToVector(_currentDirection);
+
+                    IncrementUses();
+                    StartPushMovement();
+                    LogDebug($"Player empurrou objeto na direção {_currentDirection}");
+                }
+                else
+                {
+                    LogDebug("Player não está em posição válida para empurrar");
+                }
+            }
+            else
+            {
+                LogDebug("Player não encontrado para determinar direção");
+            }
         }
 
         /// <summary>
@@ -475,9 +651,13 @@ namespace SlimeKing.Gameplay
                 ? $"'{name}' (com rotação) e objeto irmão '{siblingObject.name}' (sem rotação)"
                 : $"'{name}'";
 
-            LogDebug($"Iniciando movimento de {objectsInfo} na direção {pushDirection} por {moveDuration} segundos"); float elapsedTime = 0f;
+            LogDebug($"Iniciando movimento de {objectsInfo} na direção {_currentDirection} por {moveDuration} segundos");
+            LogDebug($"Vetor de movimento: {_moveDirection}");
+
+            float elapsedTime = 0f;
             Vector2 targetVelocity = _moveDirection * moveSpeed;
-            float rotationDirection = GetRotationDirection();
+            LogDebug($"Velocidade alvo: {targetVelocity} (moveSpeed: {moveSpeed})");
+            float rotationDirection = GetRotationDirection(_currentDirection);
 
             // Som contínuo de movimento
             if (movingSound != null)
@@ -564,38 +744,21 @@ namespace SlimeKing.Gameplay
 
         private void OnDrawGizmosSelected()
         {
-            // Desenha seta indicando direção do movimento
-            Vector3 direction = Vector3.zero;
+            // Determina qual objeto usar como referência para as setas
+            Vector3 referencePosition = HasSiblingObject ? siblingObject.transform.position : transform.position;
 
-            switch (pushDirection)
-            {
-                case PushDirection.North:
-                    direction = Vector3.up;
-                    break;
-                case PushDirection.South:
-                    direction = Vector3.down;
-                    break;
-                case PushDirection.East:
-                    direction = Vector3.right;
-                    break;
-                case PushDirection.West:
-                    direction = Vector3.left;
-                    break;
-            }
+            // Desenha setas para todas as direções permitidas na posição do objeto que será movido
+            if ((allowedDirections & PushDirection.North) != 0)
+                DrawDirectionArrow(referencePosition, Vector3.up, Color.green);
 
-            Gizmos.color = Color.green;
-            Vector3 startPos = transform.position;
-            Vector3 endPos = startPos + direction * 2f;
+            if ((allowedDirections & PushDirection.South) != 0)
+                DrawDirectionArrow(referencePosition, Vector3.down, Color.green);
 
-            // Desenha linha da direção
-            Gizmos.DrawLine(startPos, endPos);
+            if ((allowedDirections & PushDirection.East) != 0)
+                DrawDirectionArrow(referencePosition, Vector3.right, Color.green);
 
-            // Desenha seta na ponta
-            Vector3 arrowHead1 = endPos + (Quaternion.Euler(0, 0, 45) * -direction * 0.5f);
-            Vector3 arrowHead2 = endPos + (Quaternion.Euler(0, 0, -45) * -direction * 0.5f);
-
-            Gizmos.DrawLine(endPos, arrowHead1);
-            Gizmos.DrawLine(endPos, arrowHead2);
+            if ((allowedDirections & PushDirection.West) != 0)
+                DrawDirectionArrow(referencePosition, Vector3.left, Color.green);
 
             // Conecta visualmente com objeto irmão se configurado
             if (HasSiblingObject)
@@ -603,24 +766,53 @@ namespace SlimeKing.Gameplay
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(transform.position, siblingObject.transform.position);
 
-                // Desenha seta no objeto irmão (apenas movimento, sem rotação)
-                Vector3 siblingStart = siblingObject.transform.position;
-                Vector3 siblingEnd = siblingStart + direction * 1.5f; // Seta menor para indicar sem rotação
-                Gizmos.color = Color.blue; // Cor diferente para indicar que não rotaciona
-                Gizmos.DrawLine(siblingStart, siblingEnd);
+                // Desenha um pequeno círculo no PushableObject (detector)
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, 0.3f);
 
-                Vector3 siblingArrow1 = siblingEnd + (Quaternion.Euler(0, 0, 45) * -direction * 0.3f);
-                Vector3 siblingArrow2 = siblingEnd + (Quaternion.Euler(0, 0, -45) * -direction * 0.3f);
-                Gizmos.DrawLine(siblingEnd, siblingArrow1);
-                Gizmos.DrawLine(siblingEnd, siblingArrow2);
-            }            // Desenha texto com informações
-            Vector3 textPos = startPos + Vector3.up * 0.5f;
+                // Desenha um círculo maior no objeto que será movido
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(siblingObject.transform.position, 0.5f);
+            }
+            else
+            {
+                // Se não há irmão, desenha círculo no próprio objeto
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(transform.position, 0.4f);
+            }
+
+            // Desenha texto com informações
+            Vector3 textPos = referencePosition + Vector3.up * 1f;
 
 #if UNITY_EDITOR
             string usesText = maxUses < 0 ? "∞" : $"{_currentUses}/{maxUses}";
             string siblingInfo = HasSiblingObject ? $"\nIrmão: {siblingObject.name} (sem rotação)" : "\nSem irmão";
-            UnityEditor.Handles.Label(textPos, $"{pushDirection}\nSpeed: {moveSpeed}\nDuration: {moveDuration}s\nUsos: {usesText}{siblingInfo}");
+            string directionsText = GetAllowedDirectionsText();
+            string positionInfo = HasSiblingObject ? "\n(Setas baseadas no objeto irmão)" : "\n(Setas baseadas neste objeto)";
+            UnityEditor.Handles.Label(textPos, $"Direções: {directionsText}\nSpeed: {moveSpeed}\nDuration: {moveDuration}s\nUsos: {usesText}{siblingInfo}{positionInfo}");
 #endif
+        }
+
+        /// <summary>
+        /// Desenha uma seta de direção nos Gizmos
+        /// </summary>
+        /// <param name="startPosition">Posição inicial da seta</param>
+        /// <param name="direction">Direção da seta</param>
+        /// <param name="color">Cor da seta</param>
+        private void DrawDirectionArrow(Vector3 startPosition, Vector3 direction, Color color)
+        {
+            Gizmos.color = color;
+            Vector3 endPos = startPosition + direction * 2f;
+
+            // Desenha linha da direção
+            Gizmos.DrawLine(startPosition, endPos);
+
+            // Desenha seta na ponta
+            Vector3 arrowHead1 = endPos + (Quaternion.Euler(0, 0, 45) * -direction * 0.5f);
+            Vector3 arrowHead2 = endPos + (Quaternion.Euler(0, 0, -45) * -direction * 0.5f);
+
+            Gizmos.DrawLine(endPos, arrowHead1);
+            Gizmos.DrawLine(endPos, arrowHead2);
         }
 
         #endregion
