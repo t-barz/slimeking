@@ -36,7 +36,7 @@ namespace SlimeKing.Gameplay
 
         [Header("🔧 Debug")]
         [Tooltip("Ativar logs de debug para interações")]
-        [SerializeField] private bool enableDebugLogs = false;
+        [SerializeField] private bool enableDebugLogs = true; // Temporariamente true para debug
 
         [Tooltip("Mostrar gizmos de range de interação")]
         [SerializeField] private bool showInteractionGizmos = true;
@@ -81,6 +81,10 @@ namespace SlimeKing.Gameplay
                     _nearbyInteractables.Add(interactable);
                     LogDebug($"Objeto interativo detectado: {other.name}");
                 }
+            }
+            else
+            {
+                LogDebug($"Objeto SEM IInteractable detectado: {other.name}");
             }
         }
 
@@ -150,21 +154,38 @@ namespace SlimeKing.Gameplay
         private void UpdateNearbyInteractables()
         {
             // Remove objetos nulos ou inválidos
+            int beforeCount = _nearbyInteractables.Count;
             _nearbyInteractables.RemoveAll(interactable =>
                 interactable == null ||
                 (interactable as MonoBehaviour) == null ||
                 !((MonoBehaviour)interactable).gameObject.activeInHierarchy
             );
 
+            if (beforeCount != _nearbyInteractables.Count)
+            {
+                LogDebug($"Removidos {beforeCount - _nearbyInteractables.Count} objetos inválidos. Total: {_nearbyInteractables.Count}");
+            }
+
             // Filtra apenas objetos que podem ser interagidos
             var availableInteractables = _nearbyInteractables
                 .Where(interactable => interactable.CanInteract(transform))
                 .ToList();
 
+            if (availableInteractables.Count != _nearbyInteractables.Count && _nearbyInteractables.Count > 0)
+            {
+                LogDebug($"Objetos disponíveis para interação: {availableInteractables.Count}/{_nearbyInteractables.Count}");
+            }
+
             // Determina o melhor objeto baseado na prioridade
+            var previousBest = _currentBestInteractable;
             _currentBestInteractable = availableInteractables
                 .OrderByDescending(interactable => interactable.GetInteractionPriority())
                 .FirstOrDefault();
+
+            if (_currentBestInteractable != previousBest)
+            {
+                LogDebug($"Melhor interação mudou de {previousBest?.GetType().Name} para {_currentBestInteractable?.GetType().Name}");
+            }
         }
 
         /// <summary>

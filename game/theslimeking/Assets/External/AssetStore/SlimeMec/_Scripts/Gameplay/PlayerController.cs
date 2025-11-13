@@ -716,6 +716,14 @@ public class PlayerController : MonoBehaviour
             if (interactionSuccess)
                 return; // Interação executada com sucesso
         }
+        else if (_interactionHandler != null && enableLogs)
+        {
+            Debug.Log($"PlayerController: InteractionHandler existe mas HasAvailableInteraction = {_interactionHandler.HasAvailableInteraction}");
+        }
+        else if (enableLogs)
+        {
+            Debug.Log("PlayerController: _interactionHandler é null");
+        }
 
         // FUTURO: Outros sistemas de interação podem ser adicionados aqui
 
