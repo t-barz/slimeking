@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3930924226687462509}
   - component: {fileID: 5847392018475629384}
   m_Layer: 0
-  m_Name: TeleportPoint
+  m_Name: teleportPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,8 +92,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destinationPosition: {x: 0, y: 0, z: 0}
-  transitionEffect: {fileID: 0}
+  transitionEffect: {fileID: 11400000, guid: 7cb3a7472a36ad5468072f6ca7b2d68f, type: 2}
   delayBeforeFadeIn: 1
+  isCrossSceneTeleport: 0
+  destinationSceneName: 
+  teleportStartSound: {fileID: 0}
+  teleportMidSound: {fileID: 0}
+  teleportEndSound: {fileID: 0}
   triggerSize: {x: 1, y: 1}
   triggerOffset: {x: 0, y: 0}
   enableDebugLogs: 0
