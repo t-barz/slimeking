@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using SlimeMec.Gameplay;
 using SlimeKing.Gameplay;
+using SlimeKing.Core;
 
 /// <summary>
 /// Controlador principal do personagem jogador para o jogo SlimeKing.
@@ -107,6 +108,22 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Mostra gizmos no Scene View para visualizar ranges de ataque e informações de debug")]
     [SerializeField] private bool enableDebugGizmos = true;
 
+    [Header("👤 Sistema de Stealth")]
+    [Tooltip("Tempo em segundos para ativar o stealth após agachar")]
+    [SerializeField] private float stealthActivationDelay = 2f;
+
+    [Tooltip("Duração da transição de fade em segundos")]
+    [SerializeField] private float fadeDuration = 0.5f;
+
+    [Tooltip("Valor alpha quando em stealth (0 = invisível, 1 = opaco)")]
+    [SerializeField, Range(0f, 1f)] private float stealthAlpha = 0.5f;
+
+    [Tooltip("Raio de detecção de cobertura em unidades")]
+    [SerializeField] private float coverDetectionRadius = 1.5f;
+
+    [Tooltip("Layers que contêm objetos que podem servir como cobertura")]
+    [SerializeField] private LayerMask coverLayers;
+
     #endregion
 
     #region Private Variables
@@ -144,6 +161,16 @@ public class PlayerController : MonoBehaviour
     private Coroutine _specialMovementCoroutine = null; // Referência à corrotina ativa de movimento especial
     private List<Collider2D> _playerColliders = new List<Collider2D>(); // Cache de todos os colliders do player
     private SpecialMovementPoint _currentSpecialMovementPoint = null; // SpecialMovementPoint em contato atual (otimização)
+
+    // === SISTEMA DE STEALTH ===
+    // Controle do sistema de stealth e invisibilidade
+    private bool _isInStealth = false;               // Se o jogador está em estado stealth (semi-transparente)
+    private bool _hasCover = false;                  // Se o jogador tem cobertura válida
+    private Coroutine _stealthTimerCoroutine = null; // Referência à corrotina do timer de stealth
+    private Coroutine _fadeCoroutine = null;         // Referência à corrotina de fade
+    private List<SpriteRenderer> _allSpriteRenderers = new List<SpriteRenderer>(); // Todos os SpriteRenderers para fade
+    private Dictionary<SpriteRenderer, Color> _originalColors = new Dictionary<SpriteRenderer, Color>(); // Cores originais
+    private float _currentAlpha = 1f;                // Alpha atual do sprite
 
     // === OTIMIZAÇÃO DE PERFORMANCE ===
     // Usando StringToHash para evitar overhead de strings nas chamadas do Animator
@@ -263,6 +290,9 @@ public class PlayerController : MonoBehaviour
         // Valida parâmetros do Animator
         ValidateAnimatorParameters();
 
+        // Inicializa sistema de stealth
+        InitializeStealthSystem();
+
         // Log de inicialização bem-sucedida
         LogSuccessfulInitialization();
     }
@@ -274,6 +304,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         UpdateAnimations();
+        UpdateStealthSystem();
     }
 
     /// <summary>
@@ -523,6 +554,9 @@ public class PlayerController : MonoBehaviour
         // Desenha posição de instanciamento do objeto de ataque
         DrawAttackInstantiationPosition();
 
+        // Desenha gizmos do sistema de stealth
+        DrawStealthGizmos();
+
         // FUTURO: Desenhar range de interação quando implementado
         // DrawInteractionRange();
 
@@ -559,6 +593,27 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
+    /// Desenha gizmos de debug para visualizar o sistema de stealth.
+    /// Mostra o raio de detecção de cobertura e estado atual do stealth.
+    /// </summary>
+    private void DrawStealthGizmos()
+    {
+        // Desenha raio de detecção de cobertura quando agachado
+        if (_isHiding)
+        {
+            Gizmos.color = _hasCover ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(transform.position, coverDetectionRadius);
+        }
+
+        // Indica estado de stealth visualmente
+        if (_isInStealth)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(transform.position, Vector3.one * 0.5f);
+        }
+    }
+
+    /// <summary>
     /// Desenha informações de debug como texto no Scene View.
     /// Apenas disponível no Editor Unity.
     /// </summary>
@@ -573,6 +628,10 @@ public class PlayerController : MonoBehaviour
                              $"Can Attack: {_canAttack}\n" +
                              $"Is Moving: {_isMoving}\n" +
                              $"Is Hiding: {_isHiding}\n" +
+                             $"In Stealth: {_isInStealth}\n" +
+                             $"Has Cover: {_hasCover}\n" +
+                             $"Alpha: {_currentAlpha:F2}\n" +
+                             $"Sprites: {_allSpriteRenderers.Count}\n" +
                              $"Facing Right: {_facingRight}\n" +
                              $"Visual Dir: {_currentVisualDirection}";
 
@@ -761,6 +820,13 @@ public class PlayerController : MonoBehaviour
         {
             // Tecla pressionada - ativa esconderijo
             _isHiding = true;
+            StartStealthTimer();
+
+            // Notifica GameManager sobre mudança de estado
+            if (GameManager.HasInstance)
+            {
+                GameManager.Instance.SetPlayerCrouchingState(true);
+            }
 
             // TODO: Integrar som de agachamento
             // PlaySquatSound();
@@ -769,6 +835,14 @@ public class PlayerController : MonoBehaviour
         {
             // Tecla solta - desativa esconderijo
             _isHiding = false;
+            StopStealthTimer();
+            ExitStealth();
+
+            // Notifica GameManager sobre mudança de estado
+            if (GameManager.HasInstance)
+            {
+                GameManager.Instance.SetPlayerCrouchingState(false);
+            }
         }
 
         // Atualiza parâmetro do Animator
@@ -2131,6 +2205,310 @@ public class PlayerController : MonoBehaviour
         _isKnockedBack = false;
         _canMove = true;
         _canAttack = true;
+    }
+
+    #endregion
+
+    #region Stealth System
+
+    /// <summary>
+    /// Inicializa o sistema de stealth coletando todos os SpriteRenderers dos subobjetos.
+    /// Chamado no Start() para garantir que todos os objetos visuais já foram inicializados.
+    /// </summary>
+    private void InitializeStealthSystem()
+    {
+        // Coleta todos os SpriteRenderers do player e subobjetos
+        CollectAllSpriteRenderers();
+
+        // Armazena as cores originais
+        StoreOriginalColors();
+
+        if (_allSpriteRenderers.Count > 0)
+        {
+            if (enableLogs)
+                Debug.Log($"PlayerController: Sistema de stealth inicializado com {_allSpriteRenderers.Count} SpriteRenderers");
+        }
+        else
+        {
+            Debug.LogWarning("PlayerController: Nenhum SpriteRenderer encontrado para sistema de stealth");
+        }
+    }
+
+    /// <summary>
+    /// Atualiza o sistema de stealth a cada frame.
+    /// Verifica se o jogador tem cobertura e atualiza o estado correspondente.
+    /// Chamado no Update() para detecção contínua de cobertura.
+    /// </summary>
+    private void UpdateStealthSystem()
+    {
+        if (_isHiding)
+        {
+            bool newCoverState = CheckForCover();
+            if (_hasCover != newCoverState)
+            {
+                _hasCover = newCoverState;
+                SlimeKing.Core.StealthEvents.PlayerCoverStateChanged(_hasCover);
+
+                if (enableLogs)
+                    Debug.Log($"PlayerController: Estado de cobertura mudou: {_hasCover}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verifica se o jogador tem cobertura válida usando Physics2D.OverlapCircle.
+    /// Cobertura é considerada válida se há um collider no coverLayers e 
+    /// o objeto está posicionado atrás do jogador (Y menor = atrás devido ao sorting Y).
+    /// </summary>
+    /// <returns>True se o jogador tem cobertura válida</returns>
+    private bool CheckForCover()
+    {
+        // Usa OverlapCircle para detectar objetos de cobertura próximos
+        Collider2D[] nearbyObjects = Physics2D.OverlapCircleAll(transform.position, coverDetectionRadius, coverLayers);
+
+        foreach (Collider2D obj in nearbyObjects)
+        {
+            // Verifica se o objeto está atrás do jogador usando sorting Y
+            // Y menor = mais atrás (sistema de profundidade 2D)
+            if (obj.transform.position.y < transform.position.y)
+            {
+                return true; // Encontrou cobertura válida
+            }
+        }
+
+        return false; // Nenhuma cobertura válida encontrada
+    }
+
+    /// <summary>
+    /// Inicia o timer de ativação do stealth.
+    /// Após stealthActivationDelay segundos, se ainda estiver agachado e com cobertura,
+    /// o jogador entra em modo stealth com fade visual.
+    /// </summary>
+    private void StartStealthTimer()
+    {
+        // Para timer anterior se existir
+        if (_stealthTimerCoroutine != null)
+        {
+            StopCoroutine(_stealthTimerCoroutine);
+        }
+
+        _stealthTimerCoroutine = StartCoroutine(StealthActivationTimer());
+    }
+
+    /// <summary>
+    /// Para o timer de ativação do stealth.
+    /// Chamado quando o jogador para de agachar antes do stealth ativar.
+    /// </summary>
+    private void StopStealthTimer()
+    {
+        if (_stealthTimerCoroutine != null)
+        {
+            StopCoroutine(_stealthTimerCoroutine);
+            _stealthTimerCoroutine = null;
+        }
+    }
+
+    /// <summary>
+    /// Corrotina do timer de ativação do stealth.
+    /// Aguarda o delay configurado e então ativa o stealth se as condições forem atendidas.
+    /// </summary>
+    /// <returns>IEnumerator para corrotina</returns>
+    private System.Collections.IEnumerator StealthActivationTimer()
+    {
+        yield return new WaitForSeconds(stealthActivationDelay);
+
+        // Verifica se ainda está agachado e tem cobertura
+        if (_isHiding && _hasCover && !_isInStealth)
+        {
+            EnterStealth();
+        }
+
+        _stealthTimerCoroutine = null;
+    }
+
+    /// <summary>
+    /// Ativa o modo stealth aplicando fade no sprite e notificando sistemas.
+    /// O jogador se torna semi-transparente e indetectável por inimigos.
+    /// </summary>
+    private void EnterStealth()
+    {
+        if (_isInStealth) return; // Já está em stealth
+
+        _isInStealth = true;
+        StartFade(stealthAlpha);
+        SlimeKing.Core.StealthEvents.PlayerEnteredStealth();
+
+        if (enableLogs)
+            Debug.Log($"PlayerController: Jogador entrou em modo stealth (Alpha: {stealthAlpha}, SpriteRenderers: {_allSpriteRenderers.Count})");
+    }
+
+    /// <summary>
+    /// Desativa o modo stealth restaurando a opacidade original do sprite.
+    /// O jogador volta a ser detectável por inimigos.
+    /// </summary>
+    private void ExitStealth()
+    {
+        if (!_isInStealth) return; // Já não está em stealth
+
+        _isInStealth = false;
+        StartFade(1f); // Restaura opacidade completa
+        SlimeKing.Core.StealthEvents.PlayerExitedStealth();
+
+        if (enableLogs)
+            Debug.Log($"PlayerController: Jogador saiu do modo stealth (Alpha restaurado: 1.0)");
+    }
+
+    /// <summary>
+    /// Inicia uma transição de fade suave para o alpha target.
+    /// Para qualquer fade em andamento e inicia uma nova corrotina.
+    /// </summary>
+    /// <param name="targetAlpha">Alpha alvo (0-1)</param>
+    private void StartFade(float targetAlpha)
+    {
+        // Para fade anterior se existir
+        if (_fadeCoroutine != null)
+        {
+            StopCoroutine(_fadeCoroutine);
+        }
+
+        _fadeCoroutine = StartCoroutine(FadeToAlpha(targetAlpha));
+    }
+
+    /// <summary>
+    /// Corrotina que executa uma transição suave de alpha em todos os SpriteRenderers.
+    /// Usa interpolação linear durante fadeDuration segundos.
+    /// </summary>
+    /// <param name="targetAlpha">Alpha alvo (0-1)</param>
+    /// <returns>IEnumerator para corrotina</returns>
+    private System.Collections.IEnumerator FadeToAlpha(float targetAlpha)
+    {
+        if (_allSpriteRenderers.Count == 0) yield break;
+
+        float startAlpha = _currentAlpha;
+        float elapsed = 0f;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = elapsed / fadeDuration;
+
+            // Interpolação linear suave
+            _currentAlpha = Mathf.Lerp(startAlpha, targetAlpha, progress);
+
+            // Aplica o novo alpha em todos os SpriteRenderers
+            ApplyAlphaToAllSprites(_currentAlpha);
+
+            yield return null;
+        }
+
+        // Garante que o alpha final seja exato
+        _currentAlpha = targetAlpha;
+        ApplyAlphaToAllSprites(_currentAlpha);
+
+        _fadeCoroutine = null;
+    }
+
+    /// <summary>
+    /// Coleta todos os SpriteRenderers do player e seus subobjetos visuais.
+    /// Inclui objetos principais (front, back, side) e VFX, mas exclui shadow.
+    /// </summary>
+    private void CollectAllSpriteRenderers()
+    {
+        _allSpriteRenderers.Clear();
+
+        // Adiciona SpriteRenderer do objeto principal se existir
+        if (_spriteRenderer != null)
+        {
+            _allSpriteRenderers.Add(_spriteRenderer);
+        }
+
+        // Coleta SpriteRenderers dos objetos visuais direcionais
+        AddSpriteRendererFromObject(frontObject);
+        AddSpriteRendererFromObject(backObject);
+        AddSpriteRendererFromObject(sideObject);
+
+        // Coleta SpriteRenderers dos VFX (eles também devem fazer fade)
+        AddSpriteRendererFromObject(vfxFrontObject);
+        AddSpriteRendererFromObject(vfxBackObject);
+        AddSpriteRendererFromObject(vfxSideObject);
+
+        // Nota: shadowObject não faz fade pois é apenas sombra
+
+        if (enableLogs)
+            Debug.Log($"PlayerController: Coletados {_allSpriteRenderers.Count} SpriteRenderers para stealth");
+    }
+
+    /// <summary>
+    /// Adiciona o SpriteRenderer de um GameObject à lista, se existir.
+    /// Verifica tanto no objeto quanto nos filhos.
+    /// </summary>
+    /// <param name="obj">GameObject para verificar</param>
+    private void AddSpriteRendererFromObject(GameObject obj)
+    {
+        if (obj == null) return;
+
+        // Verifica SpriteRenderer no próprio objeto
+        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && !_allSpriteRenderers.Contains(spriteRenderer))
+        {
+            _allSpriteRenderers.Add(spriteRenderer);
+        }
+
+        // Verifica SpriteRenderers nos filhos
+        SpriteRenderer[] childRenderers = obj.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var childRenderer in childRenderers)
+        {
+            if (!_allSpriteRenderers.Contains(childRenderer))
+            {
+                _allSpriteRenderers.Add(childRenderer);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Armazena as cores originais de todos os SpriteRenderers.
+    /// Necessário para restaurar as cores após o stealth.
+    /// </summary>
+    private void StoreOriginalColors()
+    {
+        _originalColors.Clear();
+
+        foreach (var spriteRenderer in _allSpriteRenderers)
+        {
+            if (spriteRenderer != null)
+            {
+                _originalColors[spriteRenderer] = spriteRenderer.color;
+            }
+        }
+
+        // Define alpha inicial baseado no primeiro SpriteRenderer
+        if (_allSpriteRenderers.Count > 0 && _allSpriteRenderers[0] != null)
+        {
+            _currentAlpha = _allSpriteRenderers[0].color.a;
+        }
+    }
+
+    /// <summary>
+    /// Aplica o alpha especificado a todos os SpriteRenderers, mantendo as cores RGB originais.
+    /// </summary>
+    /// <param name="alpha">Valor alpha a aplicar (0-1)</param>
+    private void ApplyAlphaToAllSprites(float alpha)
+    {
+        int appliedCount = 0;
+        foreach (var spriteRenderer in _allSpriteRenderers)
+        {
+            if (spriteRenderer != null && _originalColors.ContainsKey(spriteRenderer))
+            {
+                Color originalColor = _originalColors[spriteRenderer];
+                Color newColor = originalColor;
+                newColor.a = alpha;
+                spriteRenderer.color = newColor;
+                appliedCount++;
+            }
+        }
+
+        if (enableLogs && appliedCount > 0)
+            Debug.Log($"PlayerController: Alpha {alpha:F2} aplicado a {appliedCount} SpriteRenderers");
     }
 
     #endregion

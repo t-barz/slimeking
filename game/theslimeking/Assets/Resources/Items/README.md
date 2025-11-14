@@ -35,7 +35,6 @@ To create a new item manually:
    - **Type**: Consumable, Material, Quest, or Equipment
    - **Is Stackable**: Can multiple items stack in one slot?
    - **Heal Amount**: HP restored (for consumables)
-   - **Stamina Amount**: Stamina restored (for consumables)
    - **Equipment Type**: Amulet, Ring, or Cape (for equipment)
    - **Defense Bonus**: Defense increase (for equipment)
    - **Speed Bonus**: Speed increase (for equipment)
@@ -45,7 +44,7 @@ To create a new item manually:
 
 ### Consumable
 
-Items that can be used to restore health or stamina. They are removed after use.
+Items that can be used to restore health. They are removed after use.
 
 ### Material
 

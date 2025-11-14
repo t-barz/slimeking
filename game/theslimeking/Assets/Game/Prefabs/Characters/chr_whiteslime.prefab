@@ -422,8 +422,17 @@ MonoBehaviour:
   jumpSound: {fileID: 8300000, guid: d1be8e8c6977aa148aa806d7182af838, type: 3}
   slideSound: {fileID: 8300000, guid: 84c2b63cd10588941b17487dafca40ba, type: 3}
   squatSound: {fileID: 8300000, guid: f707224a3f88f5f468a7221b12d79d01, type: 3}
+  knockbackForce: 3
+  knockbackDuration: 0.2
   enableLogs: 1
   enableDebugGizmos: 0
+  stealthActivationDelay: 2
+  fadeDuration: 0.5
+  stealthAlpha: 0.25
+  coverDetectionRadius: 0.1
+  coverLayers:
+    serializedVersion: 2
+    m_Bits: 65
 --- !u!1 &8893181554572654189 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2745210311206455777, guid: 1175a259b24823f4581977e8a84039d6, type: 3}

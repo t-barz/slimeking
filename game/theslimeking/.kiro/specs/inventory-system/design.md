@@ -86,7 +86,6 @@ public class ItemData : ScriptableObject
     
     // Consumable
     public int healAmount;
-    public int staminaAmount;
     
     // Equipment
     public EquipmentType equipmentType;

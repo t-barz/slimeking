@@ -24,6 +24,15 @@ public class GameManager : ManagerSingleton<GameManager>
     public event System.Action<int> OnReputationChanged; // evento disparado quando reputação muda
     #endregion
 
+    #region Player Stealth State System
+    // Estado de stealth do jogador para consulta por sistemas de IA
+    private bool isPlayerInStealth = false;
+    private bool isPlayerCrouching = false;
+    private bool hasPlayerCover = false;
+
+    public event System.Action<bool> OnPlayerStealthStateChanged; // evento disparado quando estado stealth muda
+    #endregion
+
     // Inicialização mínima seguindo KISS: define estado inicial e aplica configurações básicas de runtime.
     protected override void Initialize()
     {
@@ -36,6 +45,11 @@ public class GameManager : ManagerSingleton<GameManager>
         {
             CameraManager.Instance.OnSceneLoaded();
         }
+
+        // Subscreve aos eventos de stealth
+        StealthEvents.OnPlayerEnteredStealth += HandlePlayerEnteredStealth;
+        StealthEvents.OnPlayerExitedStealth += HandlePlayerExitedStealth;
+        StealthEvents.OnPlayerCoverStateChanged += HandlePlayerCoverStateChanged;
 
         // Estado inicial simples (usar GameState se definido em enums do projeto)
         // Como este GameManager está reduzido, apenas registra o bootstrap.
@@ -152,7 +166,7 @@ public class GameManager : ManagerSingleton<GameManager>
     // NOTA: Estes métodos não são mais necessários com LoadSceneMode.Single
     // pois o Unity automaticamente descarrega todas as cenas anteriores.
     // Mantidos apenas para compatibilidade caso algum código antigo os chame.
-    
+
     /// <summary>
     /// OBSOLETO: Não é mais necessário com LoadSceneMode.Single.
     /// </summary>
@@ -170,6 +184,78 @@ public class GameManager : ManagerSingleton<GameManager>
     }
     #endregion
 
+    #region Player Stealth State Methods
+
+    /// <summary>
+    /// Verifica se o jogador está atualmente em estado de stealth.
+    /// Usado por sistemas de IA para determinar detectabilidade.
+    /// </summary>
+    /// <returns>True se o jogador está em stealth (semi-transparente e indetectável)</returns>
+    public bool IsPlayerInStealth()
+    {
+        return isPlayerInStealth;
+    }
+
+    /// <summary>
+    /// Verifica se o jogador está agachado.
+    /// </summary>
+    /// <returns>True se o jogador está agachado</returns>
+    public bool IsPlayerCrouching()
+    {
+        return isPlayerCrouching;
+    }
+
+    /// <summary>
+    /// Verifica se o jogador tem cobertura válida.
+    /// </summary>
+    /// <returns>True se o jogador está atrás de um objeto com collider</returns>
+    public bool HasPlayerCover()
+    {
+        return hasPlayerCover;
+    }
+
+    /// <summary>
+    /// Atualiza o estado de agachamento do jogador.
+    /// Chamado pelo PlayerController quando o estado muda.
+    /// </summary>
+    /// <param name="isCrouching">Se o jogador está agachado</param>
+    public void SetPlayerCrouchingState(bool isCrouching)
+    {
+        if (isPlayerCrouching != isCrouching)
+        {
+            isPlayerCrouching = isCrouching;
+            Log($"Player crouch state: {isCrouching}");
+        }
+    }
+
+    private void HandlePlayerEnteredStealth()
+    {
+        if (!isPlayerInStealth)
+        {
+            isPlayerInStealth = true;
+            OnPlayerStealthStateChanged?.Invoke(true);
+            Log("Player entered stealth mode");
+        }
+    }
+
+    private void HandlePlayerExitedStealth()
+    {
+        if (isPlayerInStealth)
+        {
+            isPlayerInStealth = false;
+            OnPlayerStealthStateChanged?.Invoke(false);
+            Log("Player exited stealth mode");
+        }
+    }
+
+    private void HandlePlayerCoverStateChanged(bool hasCover)
+    {
+        hasPlayerCover = hasCover;
+        Log($"Player cover state: {hasCover}");
+    }
+
+    #endregion
+
     #region Reputation System Methods
     /// <summary>
     /// Adiciona reputação ao jogador.
@@ -179,16 +265,16 @@ public class GameManager : ManagerSingleton<GameManager>
     public void AddReputation(int amount)
     {
         reputation += amount;
-        
+
         // Garante que reputação não fique negativa
         if (reputation < 0)
         {
             reputation = 0;
         }
-        
+
         // Dispara evento de mudança de reputação
         OnReputationChanged?.Invoke(reputation);
-        
+
         Log($"Reputação alterada: {amount:+#;-#;0} (Total: {reputation})");
     }
 
@@ -201,4 +287,14 @@ public class GameManager : ManagerSingleton<GameManager>
         return reputation;
     }
     #endregion
+
+    protected override void OnDestroy()
+    {
+        // Desinscreve dos eventos de stealth
+        StealthEvents.OnPlayerEnteredStealth -= HandlePlayerEnteredStealth;
+        StealthEvents.OnPlayerExitedStealth -= HandlePlayerExitedStealth;
+        StealthEvents.OnPlayerCoverStateChanged -= HandlePlayerCoverStateChanged;
+
+        base.OnDestroy();
+    }
 }

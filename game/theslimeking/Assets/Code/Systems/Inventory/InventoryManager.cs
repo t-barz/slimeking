@@ -76,7 +76,7 @@ namespace TheSlimeKing.Inventory
                     {
                         int spaceAvailable = 99 - slots[i].quantity;
                         int amountToAdd = Mathf.Min(quantity, spaceAvailable);
-                        
+
                         slots[i].quantity += amountToAdd;
                         quantity -= amountToAdd;
 
@@ -95,7 +95,7 @@ namespace TheSlimeKing.Inventory
             while (quantity > 0)
             {
                 int emptySlotIndex = FindEmptySlot();
-                
+
                 if (emptySlotIndex == -1)
                 {
                     // Inventário cheio
@@ -175,7 +175,7 @@ namespace TheSlimeKing.Inventory
 
         /// <summary>
         /// Usa um item consumível do slot especificado.
-        /// Aplica efeitos de cura/stamina e remove 1 unidade.
+        /// Aplica efeitos de cura e remove 1 unidade.
         /// </summary>
         /// <param name="slotIndex">Índice do slot</param>
         public void UseItem(int slotIndex)
@@ -233,7 +233,7 @@ namespace TheSlimeKing.Inventory
                 if (PlayerController.Instance != null)
                 {
                     PlayerAttributesHandler attributesHandler = PlayerController.Instance.GetComponent<PlayerAttributesHandler>();
-                    
+
                     if (attributesHandler != null)
                     {
                         int actualHeal = attributesHandler.Heal(item.healAmount);
@@ -248,13 +248,6 @@ namespace TheSlimeKing.Inventory
                 {
                     Debug.LogWarning("InventoryManager: PlayerController.Instance não encontrado. Cura não aplicada.");
                 }
-            }
-
-            // Aplica stamina (sistema ainda não implementado)
-            if (item.staminaAmount > 0)
-            {
-                // TODO: Integrar com sistema de stamina quando disponível
-                Debug.Log($"InventoryManager: Restauração de stamina ({item.staminaAmount}) não implementada ainda.");
             }
         }
 
@@ -344,7 +337,7 @@ namespace TheSlimeKing.Inventory
             if (equipment[equipmentSlotIndex] != null)
             {
                 ItemData previousItem = equipment[equipmentSlotIndex];
-                
+
                 // Tenta retornar ao inventário
                 if (!AddItem(previousItem, 1))
                 {
@@ -617,7 +610,7 @@ namespace TheSlimeKing.Inventory
 
             // Serializar todos os slots não-vazios
             System.Collections.Generic.List<ItemSaveData> itemList = new System.Collections.Generic.List<ItemSaveData>();
-            
+
             for (int i = 0; i < slots.Length; i++)
             {
                 if (!slots[i].IsEmpty)
@@ -631,7 +624,7 @@ namespace TheSlimeKing.Inventory
                     itemList.Add(itemData);
                 }
             }
-            
+
             saveData.items = itemList.ToArray();
 
             // Salvar IDs dos equipamentos
@@ -675,7 +668,7 @@ namespace TheSlimeKing.Inventory
                 {
                     // Carregar o ItemData do Resources
                     ItemData item = Resources.Load<ItemData>($"Items/{itemData.itemID}");
-                    
+
                     if (item == null)
                     {
                         Debug.LogWarning($"InventoryManager: Item '{itemData.itemID}' não encontrado em Resources/Items/");
@@ -703,7 +696,7 @@ namespace TheSlimeKing.Inventory
                     if (!string.IsNullOrEmpty(saveData.equipmentIDs[i]))
                     {
                         ItemData item = Resources.Load<ItemData>($"Items/{saveData.equipmentIDs[i]}");
-                        
+
                         if (item != null)
                         {
                             equipment[i] = item;
@@ -724,7 +717,7 @@ namespace TheSlimeKing.Inventory
                     if (!string.IsNullOrEmpty(saveData.quickSlotIDs[i]))
                     {
                         ItemData item = Resources.Load<ItemData>($"Items/{saveData.quickSlotIDs[i]}");
-                        
+
                         if (item != null)
                         {
                             quickSlots[i] = item;

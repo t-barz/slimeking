@@ -15,7 +15,7 @@ namespace TheSlimeKing.Editor
         public static void CreateItems()
         {
             string folderPath = "Assets/Resources/Items";
-            
+
             // Ensure the folder exists
             if (!Directory.Exists(folderPath))
             {
@@ -28,8 +28,7 @@ namespace TheSlimeKing.Editor
                 folderPath,
                 "PocaoDeCura",
                 "Poção de Cura",
-                healAmount: 30,
-                staminaAmount: 0
+                healAmount: 30
             );
 
             // 2. Cristal Mágico (Material)
@@ -71,7 +70,7 @@ namespace TheSlimeKing.Editor
 
             Debug.Log("✓ 5 example items created successfully in Assets/Resources/Items/");
             EditorUtility.DisplayDialog(
-                "Success", 
+                "Success",
                 "5 example items created successfully!\n\n" +
                 "- Poção de Cura (Consumable)\n" +
                 "- Cristal Mágico (Material)\n" +
@@ -83,10 +82,10 @@ namespace TheSlimeKing.Editor
             );
         }
 
-        private static void CreateConsumableItem(string folderPath, string fileName, string itemName, int healAmount, int staminaAmount)
+        private static void CreateConsumableItem(string folderPath, string fileName, string itemName, int healAmount)
         {
             string assetPath = $"{folderPath}/{fileName}.asset";
-            
+
             // Check if already exists
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
@@ -100,7 +99,6 @@ namespace TheSlimeKing.Editor
             item.type = ItemType.Consumable;
             item.isStackable = true;
             item.healAmount = healAmount;
-            item.staminaAmount = staminaAmount;
             item.isQuestItem = false;
 
             AssetDatabase.CreateAsset(item, assetPath);
@@ -110,7 +108,7 @@ namespace TheSlimeKing.Editor
         private static void CreateMaterialItem(string folderPath, string fileName, string itemName)
         {
             string assetPath = $"{folderPath}/{fileName}.asset";
-            
+
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
@@ -131,7 +129,7 @@ namespace TheSlimeKing.Editor
         private static void CreateQuestItem(string folderPath, string fileName, string itemName)
         {
             string assetPath = $"{folderPath}/{fileName}.asset";
-            
+
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
@@ -152,7 +150,7 @@ namespace TheSlimeKing.Editor
         private static void CreateEquipmentItem(string folderPath, string fileName, string itemName, EquipmentType equipmentType, int defenseBonus, int speedBonus)
         {
             string assetPath = $"{folderPath}/{fileName}.asset";
-            
+
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {

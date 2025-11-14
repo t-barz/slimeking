@@ -3,7 +3,7 @@
 ## Tarefas de Implementação
 
 - [x] 1. Criar estruturas de dados base
-  - Criar ScriptableObject ItemData com propriedades essenciais (nome, ícone, tipo, stackable, heal/stamina amounts, equipment stats, isQuestItem)
+  - Criar ScriptableObject ItemData com propriedades essenciais (nome, ícone, tipo, stackable, heal amounts, equipment stats, isQuestItem)
   - Criar classe InventorySlot com item, quantity, IsEmpty e CanStack
   - Criar enums ItemType (Consumable, Material, Quest, Equipment) e EquipmentType (Amulet, Ring, Cape)
   - _Requirements: 1.1, 1.2, 2.1_
@@ -22,7 +22,7 @@
   
   - [x] 2.3 Implementar métodos RemoveItem, UseItem e DiscardItem
     - RemoveItem: reduzir quantidade ou limpar slot se chegar a zero
-    - UseItem: aplicar efeitos de consumível (heal/stamina) e remover 1 unidade
+    - UseItem: aplicar efeitos de consumível (heal) e remover 1 unidade
     - DiscardItem: verificar se é quest item (bloquear), mostrar confirmação e limpar slot
     - _Requirements: 3.1, 3.2, 3.3, 5.2_
   
@@ -125,7 +125,6 @@
 
   - Modificar ApplyConsumableEffects no InventoryManager para integrar com PlayerAttributesHandler
   - Aplicar healAmount usando PlayerAttributesHandler.Heal() ou método equivalente
-  - Aplicar staminaAmount usando PlayerAttributesHandler ou sistema de stamina quando disponível
   - _Requirements: 3.2_
 
 - [x] 11. Criar Resources/Items folder e itens de exemplo

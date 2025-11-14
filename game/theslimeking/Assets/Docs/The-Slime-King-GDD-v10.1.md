@@ -1,4 +1,4 @@
-# The Slime King – Game Design Document v9.0
+# The Slime King – Game Design Document v10.1
 
 ## 📋 Índice
 
@@ -444,31 +444,31 @@ Cada Ritual de Reconhecimento marca permanentemente o slime com uma **Aura Eleme
 
 **Nature (Verde):**
 
-- **Tier 1 - Crescimento Rápido:** Cria vinhas que prendem inimigos por 3s (Cooldown: 8s, Stamina: 15)
-- **Tier 2 - Espinhos Defensivos:** Cria barreira de espinhos que reflete 30% do dano (Cooldown: 15s, Stamina: 20)
-- **Tier 3 - Jardim Selvagem:** Transforma área em jardim que cura aliados e danifica inimigos (Cooldown: 30s, Stamina: 30)
+- **Tier 1 - Crescimento Rápido:** Cria vinhas que prendem inimigos por 3s (Cooldown: 8s)
+- **Tier 2 - Espinhos Defensivos:** Cria barreira de espinhos que reflete 30% do dano (Cooldown: 15s)
+- **Tier 3 - Jardim Selvagem:** Transforma área em jardim que cura aliados e danifica inimigos (Cooldown: 30s)
 
 **Water (Azul):**
 
-- **Tier 1 - Jato d'Água:** Dispara jato que empurra inimigos (Cooldown: 5s, Stamina: 10)
-- **Tier 2 - Escudo Aquático:** Cria bolha que absorve 50% do dano por 5s (Cooldown: 12s, Stamina: 20)
-- **Tier 3 - Tsunami:** Onda massiva que atravessa tela inteira (Cooldown: 25s, Stamina: 30)
+- **Tier 1 - Jato d'Água:** Dispara jato que empurra inimigos (Cooldown: 5s)
+- **Tier 2 - Escudo Aquático:** Cria bolha que absorve 50% do dano por 5s (Cooldown: 12s)
+- **Tier 3 - Tsunami:** Onda massiva que atravessa tela inteira (Cooldown: 25s)
 
 **Fire (Vermelho):**
 
-- **Tier 1 - Bola de Fogo:** Projétil que causa dano em área (Cooldown: 6s, Stamina: 15)
-- **Tier 2 - Trilha Flamejante:** Deixa rastro de fogo que persiste por 8s (Cooldown: 14s, Stamina: 20)
-- **Tier 3 - Explosão Solar:** Explosão massiva centrada no slime (Cooldown: 35s, Stamina: 30)
+- **Tier 1 - Bola de Fogo:** Projétil que causa dano em área (Cooldown: 6s)
+- **Tier 2 - Trilha Flamejante:** Deixa rastro de fogo que persiste por 8s (Cooldown: 14s)
+- **Tier 3 - Explosão Solar:** Explosão massiva centrada no slime (Cooldown: 35s)
 
 **Shadow (Roxo):**
 
-- **Tier 1 - Passo Sombrio:** Teleporte curto (5 unidades) (Cooldown: 7s, Stamina: 15)
-- **Tier 2 - Camuflagem:** Torna-se invisível por 6s ou até atacar (Cooldown: 20s, Stamina: 25)
-- **Tier 3 - Clone Sombrio:** Cria clone que atrai inimigos por 10s (Cooldown: 30s, Stamina: 30)
+- **Tier 1 - Passo Sombrio:** Teleporte curto (5 unidades) (Cooldown: 7s)
+- **Tier 2 - Camuflagem:** Torna-se invisível por 6s ou até atacar (Cooldown: 20s)
+- **Tier 3 - Clone Sombrio:** Cria clone que atrai inimigos por 10s (Cooldown: 30s)
 
 ### 2.7 Sistema de Combate
 
-**Filosofia:** Combate é opcional e pode ser evitado através de stealth, diplomacia ou puzzles alternativos.
+**Filosofia:** Combate é direto e focado em mecânicas simples de ação.
 
 #### 2.7.1 Mecânicas de Combate
 
@@ -480,47 +480,18 @@ Cada Ritual de Reconhecimento marca permanentemente o slime com uma **Aura Eleme
 - **Cooldown:** 0.5 segundos
 - **Animação:** Slime se estica e bate no inimigo
 
-**Stamina:**
-
-- **Total:** 100 pontos
-- **Regeneração:** 10 pontos/segundo (fora de combate)
-- **Uso:** Habilidades elementais (10-30 pontos por habilidade)
-
 **Sistema de Dano:**
 
 - Inimigos têm HP visível em barra acima da cabeça
-- Dano exibido como números flutuantes
-- Críticos (10% chance): 1.5x dano, número amarelo
 - Resistências elementais: Alguns inimigos resistem a certos elementos
 
-#### 2.7.2 Abordagens de Combate
+#### 2.7.2 Mecânicas de Combate
 
-**Agressiva:**
+**Combate Direto:**
 
-- Confronto direto usando habilidades elementais
-- Maior risco, maior recompensa (mais drops)
-- Adequado para jogadores que gostam de ação
-
-**Stealth:**
-
-- Usar agachar para evitar detecção
-- Passar por inimigos sem confronto
-- Menor risco, sem recompensas de combate
-- Adequado para jogadores pacifistas
-
-**Tática:**
-
-- Usar ambiente a favor (empurrar inimigos em armadilhas)
-- Atrair inimigos para áreas vantajosas
-- Combinar habilidades para sinergias
-- Adequado para jogadores estratégicos
-
-**Diplomática:**
-
-- Alguns inimigos podem ser pacificados com itens
-- NPCs aliados podem intervir se amizade for alta
-- Certos Cristais de Pacto intimidam inimigos fracos
-- Adequado para jogadores sociais
+- Confronto usando habilidades elementais
+- Sistema balanceado de risco e recompensa
+- Foco em timing e posicionamento
 
 ### 2.8 Sistema de Seguidores
 
@@ -813,7 +784,6 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 **Consumíveis:**
 
 - **Poções de Cura:** Restaura HP instantaneamente (Pequena=25 HP, Média=50 HP, Grande=100 HP)
-- **Poções de Stamina:** Restaura Stamina instantaneamente (Pequena=25, Média=50, Grande=100)
 - **Comida:** Regeneração gradual de HP ao longo de 30 segundos
 - **Buffs Temporários:** Aumenta atributos por tempo limitado (Velocidade+20% por 60s, Dano+15% por 45s)
 
@@ -1077,127 +1047,127 @@ public class DialogueChoice
 **Tier 1 - Crescimento Rápido (10 cristais)**
 
 - Cria vinhas que prendem inimigos por 3s
-- Cooldown: 8s | Stamina: 15
+- Cooldown: 8s
 - Alcance: 8 unidades
 
 **Tier 2 - Espinhos Defensivos (30 cristais)**
 
 - Cria barreira de espinhos que reflete 30% do dano
-- Duração: 6s | Cooldown: 15s | Stamina: 20
+- Duração: 6s | Cooldown: 15s
 
 **Tier 3 - Jardim Selvagem (60 cristais)**
 
 - Transforma área (10u raio) em jardim que cura aliados (+5 HP/s) e danifica inimigos (10 DPS)
-- Duração: 10s | Cooldown: 30s | Stamina: 30
+- Duração: 10s | Cooldown: 30s
 
 #### Water (Azul)
 
 **Tier 1 - Jato d'Água (10 cristais)**
 
 - Dispara jato que empurra inimigos 5 unidades
-- Cooldown: 5s | Stamina: 10
+- Cooldown: 5s
 - Dano: 15
 
 **Tier 2 - Escudo Aquático (30 cristais)**
 
 - Cria bolha que absorve 50% do dano por 5s
-- Cooldown: 12s | Stamina: 20
+- Cooldown: 12s
 
 **Tier 3 - Tsunami (60 cristais)**
 
 - Onda massiva que atravessa tela inteira
 - Dano: 80 | Empurra inimigos
-- Cooldown: 25s | Stamina: 30
+- Cooldown: 25s
 
 #### Fire (Vermelho)
 
 **Tier 1 - Bola de Fogo (12 cristais)**
 
 - Projétil que causa dano em área (3u raio)
-- Dano: 25 | Cooldown: 6s | Stamina: 15
+- Dano: 25 | Cooldown: 6s
 
 **Tier 2 - Trilha Flamejante (32 cristais)**
 
 - Deixa rastro de fogo que persiste por 8s
-- Dano: 10 DPS | Cooldown: 14s | Stamina: 20
+- Dano: 10 DPS | Cooldown: 14s
 
 **Tier 3 - Explosão Solar (65 cristais)**
 
 - Explosão massiva centrada no slime (12u raio)
-- Dano: 120 | Cooldown: 35s | Stamina: 30
+- Dano: 120 | Cooldown: 35s
 
 #### Shadow (Roxo)
 
 **Tier 1 - Passo Sombrio (12 cristais)**
 
 - Teleporte curto (5 unidades) na direção do movimento
-- Cooldown: 7s | Stamina: 15
+- Cooldown: 7s
 - Invulnerável durante teleporte (0.3s)
 
 **Tier 2 - Camuflagem (35 cristais)**
 
 - Torna-se invisível por 6s ou até atacar
-- Cooldown: 20s | Stamina: 25
+- Cooldown: 20s
 - Inimigos perdem aggro
 
 **Tier 3 - Clone Sombrio (70 cristais)**
 
 - Cria clone que atrai inimigos por 10s
 - Clone tem 50% do HP do jogador
-- Cooldown: 30s | Stamina: 30
+- Cooldown: 30s
 
 #### Earth (Marrom)
 
 **Tier 1 - Pilar de Pedra (10 cristais)**
 
 - Ergue pilar de pedra que bloqueia projéteis
-- Duração: 8s | Cooldown: 10s | Stamina: 15
+- Duração: 8s | Cooldown: 10s
 - HP do pilar: 100
 
 **Tier 2 - Tremor (30 cristais)**
 
 - Causa tremor que atordoa inimigos em 8u raio por 2s
-- Dano: 20 | Cooldown: 15s | Stamina: 20
+- Dano: 20 | Cooldown: 15s
 
 **Tier 3 - Fortaleza de Pedra (60 cristais)**
 
 - Cria cúpula de pedra ao redor do slime
-- Duração: 8s | Imune a dano | Cooldown: 40s | Stamina: 30
+- Duração: 8s | Imune a dano | Cooldown: 40s
 
 #### Air (Branco)
 
 **Tier 1 - Rajada de Vento (10 cristais)**
 
 - Empurra inimigos e projéteis em cone (90°)
-- Alcance: 10u | Cooldown: 6s | Stamina: 12
+- Alcance: 10u | Cooldown: 6s
 
 **Tier 2 - Levitação (28 cristais)**
 
 - Flutua por 5s, ignora terreno e armadilhas
-- Velocidade +20% | Cooldown: 18s | Stamina: 20
+- Velocidade +20% | Cooldown: 18s
 
 **Tier 3 - Tornado (55 cristais)**
 
 - Cria tornado que suga inimigos e causa dano
-- Dano: 15 DPS | Duração: 6s | Cooldown: 28s | Stamina: 28
+- Dano: 15 DPS | Duração: 6s | Cooldown: 28s
 
 #### Ice (Ciano)
 
 **Tier 1 - Lança de Gelo (12 cristais)**
 
 - Projétil que congela inimigo por 2s
-- Dano: 20 | Cooldown: 7s | Stamina: 15
+- Dano: 20 | Cooldown: 7s
 
 **Tier 2 - Caminho Gelado (32 cristais)**
 
 - Cria trilha de gelo que aumenta velocidade de aliados (+30%) e diminui de inimigos (-50%)
-- Duração: 10s | Cooldown: 16s | Stamina: 20
+- Duração: 10s | Cooldown: 16s
 
 **Tier 3 - Nevasca (68 cristais)**
 
 - Tempestade de gelo em área (15u raio)
 - Dano: 12 DPS | Reduz velocidade 70% | Duração: 8s
-- Cooldown: 32s | Stamina: 30
+- Cooldown: 32s
 
 ### 9.4 UI da Árvore de Habilidades
 
@@ -1214,7 +1184,7 @@ public class DialogueChoice
 - Ícone visual
 - Descrição detalhada
 - Custo em cristais
-- Cooldown e custo de Stamina
+- Cooldown
 - Dano/Efeitos
 - Vídeo preview (GIF animado) ao passar mouse
 
@@ -1294,7 +1264,7 @@ O sistema de save em The Slime King é **automático e manual**. O jogo salva au
 
 - Posição no mundo (cena, coordenadas X/Y)
 - Estágio de evolução (Filhote, Adulto, Grande, Rei, Transcendente)
-- HP e Stamina atuais
+- HP atual
 - Reputação (pontos invisíveis)
 - Cristais Elementais (contador de cada tipo)
 - Cristais de Pacto coletados
@@ -1392,7 +1362,7 @@ O sistema de save em The Slime King é **automático e manual**. O jogo salva au
 - Morte não resulta em perda de progresso
 - Jogador respawna no último ponto de save
 - Todos itens e cristais mantidos
-- HP e Stamina restaurados
+- HP restaurado
 
 **Opções ao Morrer:**
 
@@ -1441,7 +1411,6 @@ public class SaveData
     public string currentScene;
     public EvolutionStage evolutionStage;
     public int currentHP;
-    public int currentStamina;
     public int reputation;
     
     // Inventory
@@ -1711,15 +1680,29 @@ Puzzles são **integrados à lore e mecânicas**. Cada puzzle faz sentido no con
 - Feedback visual claro
 - Sem time limits (exceto puzzles específicos de velocidade)
 
-### 11.2 Categorias
+### 14.2 Categorias de Puzzles
 
-1. **Elementais:** Usam habilidades elementais
-2. **Stealth:** Usam agachar e detecção de IA
-3. **Ambientais:** Interação com objetos
-4. **Lógica:** Padrões e sequências
-5. **Física:** Peso e momentum
+1. **Elementais:** Usam habilidades elementais para ativar mecanismos
+2. **Stealth Timing:** Usam agachar e timing para evitar deteção
+3. **Física & Empurrar:** Manipulação de objetos pesados e momentum
+4. **Quebra & Destruição:** ✅ RockDestruct + BushDestruct implementados
+5. **Busca & Transporte:** Coletar objetos e levá-los para locais específicos
+6. **Plataforma:** Navegação vertical e pulos precisos
+7. **Lógica:** Padrões, sequências e dedução
+8. **Ambientais:** Interação com elementos do cenário
 
-### 11.3 Exemplos de Puzzles
+### 14.3 Mecânicas Base Disponíveis
+
+**Já Implementadas:**
+
+- ✅ **Sistema de Agachar**: Stealth básico (parado)
+- ✅ **Física de Objetos**: Empurrar pedras e objetos ponderáveis
+- ✅ **Sistema de Ataque**: RockDestruct + BushDestruct implementados
+- ✅ **Inventário**: Coletar e transportar itens
+- ✅ **Movimento 8 Direções**: Navegação precisa
+- ✅ **Sistema de Colisão**: Detecção de plataformas e obstáculos
+
+### 14.4 Exemplos de Puzzles por Categoria
 
 #### Puzzle 1: Jardim Geométrico (Rainha Melífera)
 
@@ -1809,7 +1792,156 @@ Desfiladeiro com plataformas móveis sobre lava. Alcançar cristal antes que tim
 
 ---
 
-#### Puzzle 5: Equilíbrio do Pântano (Rainha Formicida)
+#### Puzzle 6: Passagem das Pedras (Ninho do Slime) ✅ **IMPLEMENTADO**
+
+**Tipo:** Física & Empurrar  
+**Dificuldade:** Fácil (Tutorial)
+
+**Descrição:**
+Pedra grande bloqueia acesso a escada. Jogador deve empurrar para posição correta para criar caminho.
+
+**Mecânica:**
+
+- **Empurrar**: Pressionar direção + movimento contra objeto
+- **Peso**: Pedra só se move lentamente, exige persistência
+- **Posicionamento**: Local específico libera acesso
+
+**Tutorial Integrado:**
+
+- Primeiro contato com mecânica de empurrar
+- Feedback visual claro (partículas de poeira)
+- Recompensa: cogumelos de cura acessíveis
+
+**Status:** ✅ Já implementado no bioma Ninho do Slime
+
+---
+
+#### Puzzle 7: Fendas Ocultas (Floresta Calma) ✅ **IMPLEMENTADO**
+
+**Tipo:** Stealth Timing + Plataforma  
+**Dificuldade:** Fácil-Médio
+
+**Descrição:**
+Passagens estreitas requerem agachar para atravessar. Timing certo para evitar patrulhas.
+
+**Mecânica:**
+
+- **Agachar**: Segurar botão para achatar e passar por fendas
+- **Timing**: Esperar momento certo quando guardas não estão olhando
+- **Movimento Restrito**: Não pode se mover enquanto agachado
+
+**Integração com Sistema:**
+
+- Usa sistema de agachar já implementado
+- IA de patrulha dos NPCs
+- Feedback visual (slime se achata)
+
+**Status:** ✅ Base implementada, pode ser expandida
+
+---
+
+#### Puzzle 8: Coleta dos Cristais Perdidos
+
+**Tipo:** Busca & Transporte  
+**Dificuldade:** Fácil
+
+**Descrição:**
+5 cristais espalhados pela área devem ser coletados e levados para altar central.
+
+**Mecânica:**
+
+- **Busca**: Explorar área para encontrar cristais escondidos
+- **Inventário**: Coletar automaticamente ao tocar
+- **Transporte**: Cristais ficam no inventário
+- **Entrega**: Ativar altar com todos os cristais
+
+**Sistema Base:**
+
+- ✅ Sistema de inventário funcional
+- ✅ ItemCollectable para pickup
+- ✅ Quest de coleta já implementada ("Colete 5 Flores Cristalinas")
+
+**Variação Atual:** Quest do Esquilo Coletor na Floresta Calma
+
+---
+
+#### Puzzle 9: Barreiras Destrutíveis ✅ IMPLEMENTADO
+
+**Tipo:** Quebra & Destruição  
+**Dificuldade:** Fácil-Médio
+
+**Descrição:**
+Arbustos espinhosos e rochas bloqueiam caminhos. Usar ataques para quebrar e criar novas rotas.
+
+**Mecânica:**
+
+- ✅ **AttackHandler**: Sistema de ataque básico implementado
+- ✅ **BushDestruct**: Arbustos destrutíveis (1 golpe)
+- ✅ **RockDestruct**: Rochas com sistema de resistência (2-4 golpes)
+- ✅ **DropController**: Integração para loot ao destruir
+- ✅ **Descoberta de Caminhos**: Revelar áreas secretas
+
+**Aplicações:**
+
+- ✅ Quebrar arbustos para revelar atalhos (já no Ninho do Slime)
+- ✅ Destruir rochas com sistema de resistência
+- 📋 Paredes frágeis para acessar tesouros (planejado)
+- Criar múltiplas rotas através de uma área
+
+**Sistema Base:** ✅ AttackHandler já implementado
+
+---
+
+#### Puzzle 10: Torres Flutuantes
+
+**Tipo:** Plataforma + Timing  
+**Dificuldade:** Médio
+
+**Descrição:**
+Sequência de plataformas móveis e fixas para alcançar cristal no alto.
+
+**Mecânica:**
+
+- **Movimento Preciso**: 8 direções para navegação exata
+- **Timing**: Algumas plataformas se movem ou desaparecem
+- **Planejamento**: Observar padrões antes de tentar
+
+**Sistema Base:**
+
+- ✅ PlayerController com movimento 8 direções
+- ✅ Sistema de colisão com plataformas
+- ✅ Rigidbody2D para física adequada
+
+**Potencial:** Pode usar habilidades elementais para criar plataformas temporárias
+
+---
+
+#### Puzzle 11: Sequência de Ativação
+
+**Tipo:** Lógica + Busca & Transporte  
+**Dificuldade:** Médio-Difícil
+
+**Descrição:**
+Três alavancas devem ser ativadas em ordem específica. Pistas espalhadas pela área.
+
+**Mecânica:**
+
+- **Exploração**: Encontrar 3 pistas que revelam a ordem
+- **Memorização**: Lembrar sequência correta
+- **Execução**: Ativar alavancas na ordem certa
+- **Reset**: Sequência errada reseta o puzzle
+
+**Sistema Base:**
+
+- ✅ Sistema de interação (InteractivePointHandler)
+- ✅ Sistema de quest para tracking
+- ✅ NPCController para NPCs que dão pistas
+
+**Recompensa:** 20 Cristais + acesso a área secreta
+
+---
+
+#### Puzzle 12: Equilíbrio do Pântano (Rainha Formicida)
 
 **Tipo:** Lógica + Diplomacia  
 **Dificuldade:** Médio
@@ -1833,7 +1965,7 @@ Três espécies em conflito: Rãs-Eco, Libélulas-Névoa, Jacarés-Musgo. Restau
 
 ---
 
-#### Puzzle 6: Reflexos Espelhados (Lago Espelhado)
+#### Puzzle 13: Reflexos Espelhados (Lago Espelhado)
 
 **Tipo:** Ambiental + Física  
 **Dificuldade:** Médio
@@ -1857,7 +1989,7 @@ Cristais no teto só podem ser atingidos através dos reflexos na água.
 
 ---
 
-#### Puzzle 7: Peso e Contrapeso (Área Rochosa)
+#### Puzzle 14: Peso e Contrapeso (Área Rochosa)
 
 **Tipo:** Física + Lógica  
 **Dificuldade:** Médio-Difícil
@@ -1883,7 +2015,7 @@ Cristais no teto só podem ser atingidos através dos reflexos na água.
 
 ---
 
-#### Puzzle 8: Infiltração Silenciosa (Pântano das Névoas)
+#### Puzzle 15: Infiltração Silenciosa (Pântano das Névoas)
 
 **Tipo:** Stealth Puro  
 **Dificuldade:** Difícil
@@ -1971,7 +2103,6 @@ Fortaleza de formigas com 8 guardas. Alcançar cristal no centro sem ser detecta
 **Elementos Mínimos:**
 
 - HP Bar (canto superior esquerdo)
-- Stamina Bar (abaixo do HP)
 - Cristais Elementais (contador, canto superior direito)
 - Habilidades Equipadas (canto inferior direito, com cooldowns)
 - Quest Tracker (canto superior direito, opcional)
@@ -2026,7 +2157,7 @@ Fortaleza de formigas com 8 guardas. Alcançar cristal no centro sem ser detecta
 
 ## 20. Conclusão
 
-**The Slime King v9.0** representa uma evolução significativa do conceito original, incorporando:
+**The Slime King v10.1** representa uma evolução significativa do conceito original, incorporando:
 
 ✅ **Narrativa Orgânica:** Progressão natural sem objetivos forçados  
 ✅ **Mecânica de Stealth:** Agachar (parado) adiciona profundidade ao gameplay  
@@ -2040,10 +2171,18 @@ O jogo mantém sua essência cozy e contemplativa enquanto oferece desafios sign
 
 ---
 
-**Versão:** 9.0  
+**Versão:** 10.0  
 **Data:** 2025  
 **Última Atualização:** 29/10/2025  
-**Changelog v9.0:**
+**Changelog v10.1:**
+
+- ✅ **Sistema de Puzzles Expandido**: 8 categorias detalhadas baseadas em mecânicas já implementadas
+- ✅ **Novos Tipos Documentados**: Física & Empurrar (✅), Quebra & Destruição (✅), Busca & Transporte (✅), Plataforma, Stealth Timing (✅)
+- ✅ **6 Novos Exemplos**: Puzzles práticos usando PlayerController, AttackHandler, Inventário, Sistema de Agachar
+- ✅ **Status de Implementação**: Marcados puzzles já funcionais (Passagem das Pedras, Fendas Ocultas)
+- ✅ **Integração com Sistemas**: Conectados com Quest System, NPCs, IA e física existente
+
+**Changelog v10.0:**
 
 - ✅ Adicionado Sistema de Diálogo (Seção 8)
 - ✅ Adicionado Sistema de Árvore de Habilidades (Seção 9)
@@ -2051,4 +2190,4 @@ O jogo mantém sua essência cozy e contemplativa enquanto oferece desafios sign
 - ✅ Expandido Sistema de Inventário (Seção 7)
 - ✅ Renumeradas seções 8-17 para 11-20
 
-**Fim do Game Design Document v9.0**
+**Fim do Game Design Document v10.1**

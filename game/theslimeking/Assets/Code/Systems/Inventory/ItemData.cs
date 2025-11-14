@@ -13,7 +13,6 @@ namespace TheSlimeKing.Inventory
 
         [Header("Consumable Properties")]
         public int healAmount;
-        public int staminaAmount;
 
         [Header("Equipment Properties")]
         public EquipmentType equipmentType;
