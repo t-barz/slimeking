@@ -1,9 +1,19 @@
 # The Slime King - Roadmap de Desenvolvimento
 
-**Versão:** 2.6  
-**Última Atualização:** 14/11/2025  
+**Versão:** 2.7  
+**Última Atualização:** 15/11/2025  
 **Baseado em:** GDD v10.1 + TechMapping atual + Análise Completa de Código  
 **Metodologia:** Desenvolvimento Iterativo em 6 Milestones
+
+**Changelog v2.7:**
+
+- ✅ **Sistema de HUD de Vida IMPLEMENTADO** ⭐
+- ✅ **HealthUIManager**: Gerenciador principal com layout em grid
+- ✅ **HeartUIElement**: Componente de coração com animações bounce
+- ✅ **Integração automática** com PlayerAttributesHandler via eventos
+- ✅ **Sprites visuais**: ui_hearthCounterOK/NOK implementados
+- ✅ **Documentação completa**: HEART_HUD_SETUP.md criado
+- ✅ Progresso geral atualizado: 55% → 60%
 
 **Changelog v2.6:**
 
@@ -143,7 +153,7 @@
 
 ### Status Atual
 
-- **Progresso Geral:** 55% completo ⬆️ (+15% desde última atualização)
+- **Progresso Geral:** 60% completo ⬆️ (+5% desde última atualização)
 - **Milestone Atual:** ALPHA 1 (Vertical Slice Interno)
 - **Próximo Marco:** Dezembro 2025 ⚡ (Adiantado!)
 - **Lançamento Previsto:** Maio 2027 ⚡

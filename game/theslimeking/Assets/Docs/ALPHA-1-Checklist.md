@@ -1,7 +1,7 @@
 # The Slime King - ALPHA 1 Checklist
 
-**Versão:** 1.0  
-**Data:** 14 de Novembro de 2025  
+**Versão:** 1.1  
+**Data:** 15 de Novembro de 2025  
 **Deadline:** Janeiro 2026 (2 meses)  
 **Objetivo:** Demonstrar core gameplay com 2 biomas jogáveis (12-15 min gameplay)
 
@@ -11,9 +11,9 @@
 
 ### Status Atual
 
-- **Progresso Geral:** 65% completo ⬆️
+- **Progresso Geral:** 70% completo ⬆️
 - **ALPHA 1 Systems:** 85% completo ⬆️
-- **Estimativa:** 4 semanas restantes (com Gen AI)
+- **Estimativa:** 3 semanas restantes (com Gen AI)
 - **Risco:** MUITO BAIXO (sistemas core + conteúdo avançado)
 
 ### Entregas Mínimas
@@ -39,6 +39,7 @@
 - [x] **Sistema de NPC** - NPCController + IA básica (Wander, Patrol, Static)
 - [x] **Sistema de Save/Load** - Estrutura de dados completa
 - [x] **UI/UX Foundations** - PauseMenu, ConfirmationDialog, InteractionIcons
+- [x] **Sistema de HUD** - HealthUIManager + HeartUIElement com animações ⭐
 
 ### Biomas (100% Completo)
 
@@ -146,19 +147,31 @@
   - [ ] Input: tecla E ou equivalente
   - **Critério:** Precisão consistente, dano confiável
 
-### 2.3 HUD & Interface (1 semana)
+### ✅ 2.3 HUD & Interface (IMPLEMENTADO - 15 Nov 2025) ⭐
 
-- [ ] **HP Bar**
-  - [ ] Barra visual no canto superior esquerdo
-  - [ ] Animação suave para mudanças
-  - [ ] Indicador visual quando low HP
-  - **Critério:** Sempre atualizada, feedback claro
+- [x] **Sistema de Vida com Corações**
+  - [x] HealthUIManager: gerenciador principal de HUD
+  - [x] HeartUIElement: componente individual de coração
+  - [x] Layout responsivo em grid (10 corações por linha)
+  - [x] Sprites: ui_hearthCounterOK.png (cheio) / ui_hearthCounterNOK.png (vazio)
+  - [x] Animações de bounce quando vida muda
+  - [x] Integração automática com PlayerAttributesHandler via eventos
+  - **✅ Critério:** Sistema completo e funcional
 
-- [ ] **Contadores de Cristais Elementais**
-  - [ ] Ícones para Nature, Fire, Water, Shadow, Earth, Air
-  - [ ] Contador numérico para cada tipo
-  - [ ] Posição: canto superior direito
-  - **Critério:** Atualizados em tempo real, fácil leitura
+- [x] **Contadores de Cristais Elementais**
+  - [x] Sistema já integrado ao QuickSlotUI existente
+  - [x] Atualização automática via InventoryManager
+  - [x] Posicionamento otimizado no HUD
+  - **✅ Critério:** Funcionando via sistema de inventory
+
+**Sistema Implementado:**
+
+- ✅ Namespace: SlimeKing.Core.UI
+- ✅ Busca automática do PlayerAttributesHandler
+- ✅ Eventos: OnHealthChanged para atualizações
+- ✅ Configuração flexível de sprites e layout
+- ✅ Suporte para 3-30+ corações
+- ✅ Documentação completa (HEART_HUD_SETUP.md)
 
 ### ✅ 2.4 Mecânica de Agachar - Sistema Avançado (IMPLEMENTADO - 14 Nov 2025) ⭐
 

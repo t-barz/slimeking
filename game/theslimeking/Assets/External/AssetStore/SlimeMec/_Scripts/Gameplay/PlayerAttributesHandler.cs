@@ -11,7 +11,7 @@ public class PlayerAttributesHandler : MonoBehaviour
     #region Inspector Configuration
 
     [Header("Configurações de Atributos Base")]
-    [SerializeField] private int baseHealthPoints = 10;
+    [SerializeField] private int baseHealthPoints = 3;
     [SerializeField] private int baseAttack = 1;
     [SerializeField] private int baseDefense = 0;
     [SerializeField] private int baseSpeed = 2;
