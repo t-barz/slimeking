@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ba111125c07462439c3293cacee2c6b, type: 3}
+  m_Name: CrystalElementalVermelho
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.CrystalElementalData
+  crystalType: 1
+  displayName: Fire Crystal
+  crystalTint: {r: 1, g: 1, b: 1, a: 1}
+  crystalValue: 1
+  collectVFX: {fileID: 3020195555755454379, guid: 30dc4419206001d42887a3a2c54cc601, type: 3}
+  collectSound: {fileID: 0}
+  description: Cristais vermelhos usados para habilidades de crescimento e cura.

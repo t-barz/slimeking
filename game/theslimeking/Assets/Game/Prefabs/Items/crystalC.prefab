@@ -198,9 +198,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d83d1bc58764b49bdf6abfdc80f2bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.ItemCollectable
-  itemData: {fileID: 11400000, guid: 93a95c4041c52c4479ff4ac120637395, type: 2}
+  itemData: {fileID: 0}
   inventoryItemData: {fileID: 0}
   itemQuantity: 1
+  crystalData: {fileID: 11400000, guid: ce3c9d4975f74d641b77754fd7b5ad51, type: 2}
   attractionRadius: 0.5
   attractionSpeed: 3
   attractionCurve:
