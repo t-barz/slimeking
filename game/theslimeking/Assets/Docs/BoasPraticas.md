@@ -6,6 +6,7 @@
 - Sempre busque as funcionalidades mais recentes do C# 10 e do Unity 6.2+, evitando práticas obsoletas.
 - Sempre busque a simplicidade e clareza no código.
 - Sempre avalie a utilização de um sistema utilizando Eventos.
+- NUNCA utilize emojis em nomes de arquivos, pastas, classes ou variáveis.
 - **SEMPRE consulte o Roadmap.md para verificar prioridades e tarefas pendentes antes de iniciar qualquer desenvolvimento.**
 - **Todas as atividades de desenvolvimento devem estar registradas no Roadmap.md - nunca implemente algo que não esteja documentado lá.**
 - Sempre verifique se existe alguma documentação relacionada na pasta Assets/Docs antes de implementar algo novo.
@@ -670,3 +671,77 @@ public class CoinPickup : MonoBehaviour
 - **EventArgs customizados:** Use object pooling para eventos frequentes
 - **Eventos frequentes:** Implemente throttling ou debouncing
 - **Delegates vazios:** Sempre use null-conditional operator (?.)
+
+## 💎 Configuração de Itens Coletáveis
+
+### **Cristais Elementais - Configuração Correta**
+
+**IMPORTANTE:** Para cristais funcionarem com atração magnética e coleta automática:
+
+#### **✅ Configuração Recomendada (Apenas CrystalData)**
+
+```csharp
+// GameObject: "Nature_Crystal"
+// Componente: ItemCollectable
+Crystal Data: [NatureCrystalData] ✅ Preencher
+Item Data: [VAZIO] ✅ Deixar vazio
+Inventory Item Data: [VAZIO] ✅ Deixar vazio
+Enable Attraction: true ✅
+```
+
+#### **🔧 Configuração Flexível (Híbrido)**
+
+```csharp
+// Para cristais com atração customizada
+Crystal Data: [CrystalElementalData] ✅
+Item Data: [CustomAttractConfig] ✅ Para configurações personalizadas
+Inventory Item Data: [VAZIO] ✅
+```
+
+#### **❌ Configurações Incorretas**
+
+```csharp
+// NÃO FUNCIONA: Cristal sem dados
+Crystal Data: [VAZIO] ❌
+Item Data: [VAZIO] ❌
+
+// FUNCIONA MAS VAI PARA INVENTÁRIO: Cristal como item
+Crystal Data: [VAZIO] ❌
+Item Data: [VAZIO]
+Inventory Item Data: [SomeItemData] ⚠️ Vai para inventário, não para contador
+```
+
+### **Sistema de Prioridades de Coleta**
+
+1. **🥇 Cristais:** `crystalData != null` → `GameManager.AddCrystal()`
+2. **🥈 Inventário:** `inventoryItemData != null` → `InventoryManager.AddItem()`  
+3. **🥉 Sistema Legado:** `itemData != null` → Aplica efeitos diretos
+
+### **Valores Padrão para Cristais**
+
+Quando apenas `crystalData` está configurado:
+
+- **Attraction Radius:** 2.5f unidades
+- **Attraction Speed:** 4.0f unidades/segundo
+- **Visual Color:** Baseado em `crystalData.crystalTint`
+- **Effects:** Baseado em `crystalData.collectVFX` e `collectSound`
+
+### **Logs de Depuração**
+
+Monitore estes logs para validar configuração:
+
+```
+[ItemCollectable] Cristal {name} inicializado com configurações padrão
+[ItemCollectable] {name} ativou atração magnética após 0.5s
+[ItemCollectable] Cristal {name} coletado (+{value} {type})
+```
+
+### **Troubleshooting Comum**
+
+| Problema | Causa | Solução |
+|----------|-------|---------|
+| Cristal não é atraído | `crystalData` e `itemData` vazios | Preencher `crystalData` |
+| Vai para inventário | `inventoryItemData` preenchido | Deixar `inventoryItemData` vazio |
+| Sem efeitos visuais | `collectVFX`/`collectSound` vazios no `CrystalElementalData` | Configurar efeitos no ScriptableObject |
+
+**📚 Documentação Completa:** Consulte `Assets/Docs/Crystal_Configuration_Guide.md`

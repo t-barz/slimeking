@@ -1,20 +1,20 @@
 # The Slime King - ALPHA 1 Checklist
 
-**Versão:** 1.1  
+**Versão:** 1.2  
 **Data:** 15 de Novembro de 2025  
 **Deadline:** Janeiro 2026 (2 meses)  
 **Objetivo:** Demonstrar core gameplay com 2 biomas jogáveis (12-15 min gameplay)
 
 ---
 
-## 📊 Resumo Executivo
+## 📈 Resumo Executivo
 
 ### Status Atual
 
-- **Progresso Geral:** 70% completo ⬆️
-- **ALPHA 1 Systems:** 85% completo ⬆️
-- **Estimativa:** 3 semanas restantes (com Gen AI)
-- **Risco:** MUITO BAIXO (sistemas core + conteúdo avançado)
+- **Progresso Geral:** 85% completo ⬆️
+- **ALPHA 1 Systems:** 95% completo ⬆️
+- **Estimativa:** 2 semanas restantes (com Gen AI)
+- **Risco:** MUITO BAIXO (sistemas core + conteúdo avançado)
 
 ### Entregas Mínimas
 
@@ -40,6 +40,7 @@
 - [x] **Sistema de Save/Load** - Estrutura de dados completa
 - [x] **UI/UX Foundations** - PauseMenu, ConfirmationDialog, InteractionIcons
 - [x] **Sistema de HUD** - HealthUIManager + HeartUIElement com animações ⭐
+- [x] **Sistema de Cristais Elementais** - GameManager + CrystalCounterUI + ItemCollectable ⭐ NOVO
 
 ### Biomas (100% Completo)
 
@@ -158,11 +159,13 @@
   - [x] Integração automática com PlayerAttributesHandler via eventos
   - **✅ Critério:** Sistema completo e funcional
 
-- [x] **Contadores de Cristais Elementais**
-  - [x] Sistema já integrado ao QuickSlotUI existente
-  - [x] Atualização automática via InventoryManager
-  - [x] Posicionamento otimizado no HUD
-  - **✅ Critério:** Funcionando via sistema de inventory
+- [x] **Contadores de Cristais Elementais** ⭐ NOVO
+  - [x] CrystalElementalData: ScriptableObject para configuração de cristais
+  - [x] GameManager: Sistema integrado de contadores por tipo elemental
+  - [x] CrystalCounterUI: Interface em tempo real com cores elemental-themed
+  - [x] ItemCollectable: Suporte completo para atração e coleta de cristais
+  - [x] Auto-criação de GameManager quando necessário
+  - **✅ Critério:** Sistema completo e funcional com 6 tipos elementais
 
 **Sistema Implementado:**
 
@@ -423,5 +426,53 @@
 
 ---
 
-**Última Atualização:** 14 de Novembro de 2025  
-**Próxima Revisão:** 21 de Novembro de 2025
+## 🆕 **IMPLEMENTAÇÕES RECENTES (15 Nov 2025)**
+
+### ✅ Sistema de Cristais Elementais COMPLETO
+
+**Arquivos Implementados:**
+
+- `CrystalType.cs` - Enum com 6 tipos elementais
+- `CrystalElementalData.cs` - ScriptableObject de configuração
+- `CrystalCounterUI.cs` - Interface em tempo real
+- `GameManager.cs` - Sistema integrado de contadores
+- `ItemCollectable.cs` - Correções críticas para atração/coleta
+
+**Funcionalidades:**
+
+- ✅ 6 tipos de cristais: Nature, Fire, Water, Shadow, Earth, Air
+- ✅ Atração magnética inteligente (2.5f unidades, 4.0f velocidade)
+- ✅ Coleta automática com detecção de proximidade (0.5f unidades)
+- ✅ Auto-criação de GameManager quando necessário
+- ✅ Sistema de timeout para evitar cristais "órfãos"
+- ✅ Interface colorizada por tipo elemental
+- ✅ Integração completa com eventos do GameManager
+
+**Correções Críticas:**
+
+- 🔧 ItemCollectable agora funciona com apenas `crystalData` configurado
+- 🔧 Não depende mais de `itemData` para atração magnética
+- 🔧 GameManager é criado automaticamente se não existir na cena
+- 🔧 Sistema de logs detalhado para debugging
+
+### ✅ HUD Context Menu Tool
+
+**Arquivo:** `HUDContextMenu.cs`
+
+- ✅ Menu de contexto para Canvas objects (clique direito)
+- ✅ Configuração automática de Heart HUD
+- ✅ Configuração automática de Crystal Counters
+- ✅ Setup completo de HUD em uma única operação
+- ✅ Posicionamento inteligente (top-left hearts, top-right crystals)
+
+**Documentação Criada:**
+
+- `HUD_ContextMenu_Guide.md` - Guia completo de uso
+- `Crystal_Configuration_Guide.md` - Configuração detalhada de cristais
+- `Crystal_Troubleshooting.md` - Solução de problemas
+- `GameManager_AutoCreation_Solution.md` - Sistema de auto-criação
+
+---
+
+**Última Atualização:** 15 de Novembro de 2025  
+**Próxima Revisão:** 22 de Novembro de 2025
