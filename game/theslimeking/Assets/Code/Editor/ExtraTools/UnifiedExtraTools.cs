@@ -571,11 +571,11 @@ namespace ExtraTools.Editor
             }
 
             var fileName = $"SceneStructure_{scene.name}_{System.DateTime.Now:yyyyMMdd_HHmmss}.txt";
-            var logsDir = Path.Combine(Application.dataPath, "..", "Logs");
-            if (!Directory.Exists(logsDir))
-                Directory.CreateDirectory(logsDir);
+            var auxTempDir = Path.Combine(Application.dataPath, "AuxTemp");
+            if (!Directory.Exists(auxTempDir))
+                Directory.CreateDirectory(auxTempDir);
 
-            var filePath = Path.Combine(logsDir, fileName);
+            var filePath = Path.Combine(auxTempDir, fileName);
 
             using (var writer = new StreamWriter(filePath))
             {
