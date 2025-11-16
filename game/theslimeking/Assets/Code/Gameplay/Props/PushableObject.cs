@@ -734,7 +734,7 @@ namespace SlimeKing.Gameplay
         {
             if (enableDebugLogs)
             {
-                Debug.Log($"[PushableObject-{name}] {message}");
+                UnityEngine.Debug.Log($"[PushableObject-{name}] {message}");
             }
         }
 

@@ -99,7 +99,7 @@ namespace SlimeKing.Systems.UI
             if (choices == null || choices.Count == 0)
             {
                 if (enableDebugLogs)
-                    Debug.Log("[QuestChoiceUI] Nenhuma opção de quest para exibir.");
+                    UnityEngine.Debug.Log("[QuestChoiceUI] Nenhuma opção de quest para exibir.");
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace SlimeKing.Systems.UI
             canvasGroup.alpha = 1f;
 
             if (enableDebugLogs)
-                Debug.Log($"[QuestChoiceUI] Exibindo {choices.Count} opções de quest.");
+                UnityEngine.Debug.Log($"[QuestChoiceUI] Exibindo {choices.Count} opções de quest.");
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SlimeKing.Systems.UI
             }
 
             if (enableDebugLogs)
-                Debug.Log("[QuestChoiceUI] Painel de escolhas ocultado.");
+                UnityEngine.Debug.Log("[QuestChoiceUI] Painel de escolhas ocultado.");
         }
         #endregion
 
@@ -155,22 +155,22 @@ namespace SlimeKing.Systems.UI
         {
             if (choicePanel == null)
             {
-                Debug.LogError("[QuestChoiceUI] choicePanel não está atribuído!");
+                UnityEngine.Debug.LogError("[QuestChoiceUI] choicePanel não está atribuído!");
             }
 
             if (choiceButtonContainer == null)
             {
-                Debug.LogError("[QuestChoiceUI] choiceButtonContainer não está atribuído!");
+                UnityEngine.Debug.LogError("[QuestChoiceUI] choiceButtonContainer não está atribuído!");
             }
 
             if (choiceButtonPrefab == null)
             {
-                Debug.LogError("[QuestChoiceUI] choiceButtonPrefab não está atribuído!");
+                UnityEngine.Debug.LogError("[QuestChoiceUI] choiceButtonPrefab não está atribuído!");
             }
 
             if (closeButton == null)
             {
-                Debug.LogWarning("[QuestChoiceUI] closeButton não está atribuído.");
+                UnityEngine.Debug.LogWarning("[QuestChoiceUI] closeButton não está atribuído.");
             }
         }
 
@@ -202,7 +202,7 @@ namespace SlimeKing.Systems.UI
             }
 
             if (enableDebugLogs)
-                Debug.Log($"[QuestChoiceUI] Botão criado: {choice.choiceText}");
+                UnityEngine.Debug.Log($"[QuestChoiceUI] Botão criado: {choice.choiceText}");
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace SlimeKing.Systems.UI
         private void OnChoiceButtonClicked(QuestDialogueChoice choice)
         {
             if (enableDebugLogs)
-                Debug.Log($"[QuestChoiceUI] Escolha selecionada: {choice.choiceText}");
+                UnityEngine.Debug.Log($"[QuestChoiceUI] Escolha selecionada: {choice.choiceText}");
 
             // Executa ação da escolha
             if (DialogueChoiceHandler.Instance != null)
@@ -246,7 +246,7 @@ namespace SlimeKing.Systems.UI
         private void OnCloseButtonClicked()
         {
             if (enableDebugLogs)
-                Debug.Log("[QuestChoiceUI] Botão de fechar clicado.");
+                UnityEngine.Debug.Log("[QuestChoiceUI] Botão de fechar clicado.");
 
             HideQuestChoices();
         }

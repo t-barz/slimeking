@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.1338796
+      value: -1.1734494
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.549224
+      value: 12.116543
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -275,6 +275,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.ItemCollectable
   itemData: {fileID: 11400000, guid: a345eea9fb80b5a4d9d571bcf5be2ca4, type: 2}
+  crystalData: {fileID: 0}
+  inventoryItemData: {fileID: 0}
+  itemQuantity: 1
   attractionRadius: 1
   attractionSpeed: 2
   attractionCurve:

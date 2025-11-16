@@ -1,6 +1,8 @@
 using UnityEngine;
 using SlimeMec.Items;
 using TheSlimeKing.Inventory;
+using SlimeKing.Core;
+using SlimeKing.Data;
 
 namespace SlimeMec.Gameplay
 {
@@ -11,10 +13,13 @@ namespace SlimeMec.Gameplay
     [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
     public class ItemCollectable : MonoBehaviour
     {
-        [Header("🎯 Configuração do Item")]
+        [Header("Item Configuration")]
         [SerializeField] private CollectableItemData itemData;
-        
-        [Header("💼 Integração com Inventário")]
+
+        [Header("Crystal Configuration")]
+        [SerializeField] private CrystalElementalData crystalData;
+
+        [Header("Inventory Integration")]
         [SerializeField] private ItemData inventoryItemData;
         [SerializeField] private int itemQuantity = 1;
 
@@ -82,7 +87,17 @@ namespace SlimeMec.Gameplay
 
         private void Update()
         {
-            if (!enableAttraction || itemData == null) return;
+            // Verifica se há dados válidos (prioridade para cristais)
+            bool hasValidData = crystalData != null || itemData != null;
+
+            if (!enableAttraction || !hasValidData)
+            {
+                if (!enableAttraction)
+                    Debug.LogWarning($"[ItemCollectable] {gameObject.name} enableAttraction=false");
+                if (!hasValidData)
+                    Debug.LogWarning($"[ItemCollectable] {gameObject.name} sem dados válidos (crystalData ou itemData)");
+                return;
+            }
 
             // Verifica se delay de ativação passou
             CheckActivationDelay();
@@ -125,15 +140,29 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void InitializeItem()
         {
-            if (itemData == null)
+            Debug.Log($"[ItemCollectable] InitializeItem chamado. crystalData={crystalData != null}, itemData={itemData != null}");
+
+            // Prioridade 1: Cristais (sistema preferido)
+            if (crystalData != null)
             {
-                Debug.LogWarning($"[ItemCollectable] {gameObject.name} não tem ItemData configurado!");
+                attractionRadius = crystalData.attractionRadius;
+                attractionSpeed = crystalData.attractionSpeed;
+                activationDelay = crystalData.activationDelay;
+                Debug.Log($"[ItemCollectable] Cristal {crystalData.crystalType} configurado: radius={attractionRadius}, speed={attractionSpeed}");
                 return;
             }
 
-            // Aplica configurações do item
-            attractionRadius = itemData.detectionRadius;
-            attractionSpeed = itemData.attractSpeed;
+            // Prioridade 2: Sistema legado
+            if (itemData != null)
+            {
+                // Usa configurações do itemData
+                attractionRadius = itemData.detectionRadius;
+                attractionSpeed = itemData.attractSpeed;
+                Debug.Log($"[ItemCollectable] Configurado com itemData: radius={attractionRadius}, speed={attractionSpeed}");
+                return;
+            }
+
+            Debug.LogWarning($"[ItemCollectable] {gameObject.name} não tem CrystalData nem ItemData configurado!");
         }
 
         /// <summary>
@@ -141,10 +170,29 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void SetupVisuals()
         {
-            if (itemData == null || _spriteRenderer == null) return;
+            if (_spriteRenderer == null) return;
 
-            // Salva cor original e aplica cor configurada
-            _originalColor = itemData.itemTint;
+            // Determina cor original baseada no tipo de dados (prioridade para cristais)
+            if (crystalData != null)
+            {
+                _originalColor = crystalData.crystalTint;
+
+                // Aplica sprite do cristal se configurado
+                if (crystalData.crystalSprite != null)
+                {
+                    _spriteRenderer.sprite = crystalData.crystalSprite;
+                }
+            }
+            else if (itemData != null)
+            {
+                _originalColor = itemData.itemTint;
+            }
+            else
+            {
+                _originalColor = Color.white;
+            }
+
+            // Aplica cor (com ou sem delay feedback)
             _spriteRenderer.color = showDelayFeedback ? delayTintColor : _originalColor;
         }
 
@@ -160,6 +208,11 @@ namespace SlimeMec.Gameplay
                 if (player != null)
                 {
                     s_cachedPlayerTransform = player.transform;
+                    Debug.Log($"[ItemCollectable] Player encontrado e cacheado: {player.name}");
+                }
+                else
+                {
+                    Debug.LogError($"[ItemCollectable] Nenhum GameObject com tag '{PLAYER_TAG}' encontrado na cena!");
                 }
             }
 
@@ -168,6 +221,10 @@ namespace SlimeMec.Gameplay
             if (_playerTransform == null)
             {
                 Debug.LogWarning("[ItemCollectable] Player não encontrado! Certifique-se que o player tem a tag 'Player'.");
+            }
+            else
+            {
+                Debug.Log($"[ItemCollectable] {gameObject.name} conectado ao player: {_playerTransform.name}");
             }
         }
 
@@ -207,7 +264,18 @@ namespace SlimeMec.Gameplay
                 _spriteRenderer.color = _originalColor;
             }
 
-            Debug.Log($"[ItemCollectable] {itemData?.itemName} ativou atração magnética após {activationDelay}s");
+            // Log do item ativado (prioridade para cristais)
+            string itemName = "Item Desconhecido";
+            if (crystalData != null)
+            {
+                itemName = crystalData.crystalName;
+            }
+            else if (itemData != null)
+            {
+                itemName = itemData.itemName;
+            }
+
+            Debug.Log($"[ItemCollectable] {itemName} ativou atração magnética após {activationDelay}s");
         }
 
         #endregion
@@ -223,8 +291,15 @@ namespace SlimeMec.Gameplay
 
             float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
 
+            // Debug periódico da distância
+            if (Time.frameCount % 60 == 0) // A cada segundo aproximadamente
+            {
+                Debug.Log($"[ItemCollectable] {gameObject.name} distância do player: {distanceToPlayer:F2} (limite: {attractionRadius})");
+            }
+
             if (distanceToPlayer <= attractionRadius)
             {
+                Debug.Log($"[ItemCollectable] {gameObject.name} player dentro do alcance! Iniciando atração");
                 StartAttraction();
             }
         }
@@ -238,7 +313,18 @@ namespace SlimeMec.Gameplay
             _attractionProgress = 0f;
             _startPosition = transform.position;
 
-            Debug.Log($"[ItemCollectable] {itemData.itemName} iniciou atração magnética");
+            // Nome do item baseado no tipo de dados
+            string itemName = "Item";
+            if (crystalData != null)
+            {
+                itemName = crystalData.crystalName;
+            }
+            else if (itemData != null)
+            {
+                itemName = itemData.itemName;
+            }
+
+            Debug.Log($"[ItemCollectable] {itemName} iniciou atração magnética");
         }
 
         /// <summary>
@@ -279,12 +365,23 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
+            Debug.Log($"[ItemCollectable] {gameObject.name} detectou trigger com {other.gameObject.name} (tag: {other.tag})");
+
             // Evita múltiplas coletas
-            if (_isCollected) return;
+            if (_isCollected)
+            {
+                Debug.Log($"[ItemCollectable] {gameObject.name} já foi coletado, ignorando trigger");
+                return;
+            }
 
             if (other.CompareTag(PLAYER_TAG))
             {
+                Debug.Log($"[ItemCollectable] {gameObject.name} iniciando coleta com player {other.gameObject.name}");
                 CollectItem(other.gameObject);
+            }
+            else
+            {
+                Debug.Log($"[ItemCollectable] {gameObject.name} ignorando trigger - não é player (esperado: {PLAYER_TAG})");
             }
         }
 
@@ -319,29 +416,59 @@ namespace SlimeMec.Gameplay
                 return;
             }
 
+            // Tenta coletar como cristal se crystalData estiver configurado (prioridade máxima)
+            if (crystalData != null)
+            {
+                Debug.Log($"[ItemCollectable] Processando cristal: {crystalData.crystalName}");
+
+                if (GameManager.Instance != null)
+                {
+                    Debug.Log($"[ItemCollectable] GameManager encontrado, chamando AddCrystal({crystalData.crystalType}, {crystalData.value})");
+                    GameManager.Instance.AddCrystal(crystalData.crystalType, crystalData.value);
+
+                    Debug.Log($"[ItemCollectable] Cristal '{crystalData.crystalName}' coletado (+{crystalData.value} {crystalData.crystalType})");
+
+                    // Executa efeitos visuais e sonoros
+                    PlayCrystalCollectionEffects();
+
+                    // Remove o cristal da cena
+                    DestroyItem();
+                    return;
+                }
+                else
+                {
+                    Debug.LogError($"[ItemCollectable] GameManager.Instance é null! Cristal não pode ser processado.");
+
+                    // Reverte estado de coleta para permitir tentar novamente
+                    _isCollected = false;
+                    if (_collider != null) _collider.enabled = true;
+                    return;
+                }
+            }
+
             // Tenta adicionar ao inventário se inventoryItemData estiver configurado
             if (inventoryItemData != null && InventoryManager.Instance != null)
             {
                 bool addedToInventory = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
-                
+
                 if (!addedToInventory)
                 {
                     // Inventário cheio - não destrói o item
                     Debug.Log($"[ItemCollectable] Inventário cheio! Item '{inventoryItemData.itemName}' não foi coletado.");
-                    
+
                     // Reverte estado de coleta
                     _isCollected = false;
                     if (_collider != null) _collider.enabled = true;
-                    
+
                     // TODO: Mostrar notificação "Inventário Cheio!" (Task 7)
                     return;
                 }
-                
+
                 Debug.Log($"[ItemCollectable] Item '{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity}).");
-                
+
                 // Executa efeitos visuais e sonoros
                 PlayCollectionEffects();
-                
+
                 // Remove o item da cena
                 DestroyItem();
             }
@@ -406,17 +533,65 @@ namespace SlimeMec.Gameplay
                     Debug.Log($"[ItemCollectable] {itemData.itemName} aplicou buffs");
                 }
             }
-        }        /// <summary>
-                 /// Executa efeitos visuais e sonoros da coleta
-                 /// </summary>
+        }
+
+
+
+        /// <summary>
+        /// Executa efeitos visuais e sonoros da coleta de cristais
+        /// </summary>
+        private void PlayCrystalCollectionEffects()
+        {
+            // Determina posição do efeito (preferencialmente na posição do player)
+            Vector3 effectPosition = _playerTransform != null ? _playerTransform.position : transform.position;
+
+            // Efeito de partículas (prioridade para cristal)
+            GameObject vfxPrefab = null;
+            if (crystalData != null && crystalData.collectVFX != null)
+            {
+                vfxPrefab = crystalData.collectVFX;
+            }
+
+            if (vfxPrefab != null)
+            {
+                var vfx = Instantiate(vfxPrefab, effectPosition, Quaternion.identity);
+                if (vfx != null)
+                {
+                    Destroy(vfx, 2f);
+                }
+            }
+
+            // Efeito sonoro (prioridade para cristal)
+            AudioClip collectSound = null;
+            if (crystalData != null && crystalData.collectSound != null)
+            {
+                collectSound = crystalData.collectSound;
+            }
+
+            if (collectSound != null)
+            {
+                AudioSource.PlayClipAtPoint(collectSound, effectPosition, 1f);
+            }
+        }
+
+        /// <summary>
+        /// Executa efeitos visuais e sonoros da coleta (sistema legado)
+        /// </summary>
         private void PlayCollectionEffects()
         {
-            if (itemData == null) return;
+            // Determina posição do efeito (preferencialmente na posição do player)
+            Vector3 effectPosition = _playerTransform != null ? _playerTransform.position : transform.position;
 
             // Efeito de partículas
-            if (itemData.vfxPrefab != null)
+            GameObject vfxPrefab = null;
+            if (itemData != null && itemData.vfxPrefab != null)
             {
-                var vfx = Instantiate(itemData.vfxPrefab, transform.position, Quaternion.identity);
+                vfxPrefab = itemData.vfxPrefab;
+            }
+
+            if (vfxPrefab != null)
+            {
+                var vfx = Instantiate(vfxPrefab, effectPosition, Quaternion.identity);
 
                 // Auto-destruição do VFX (protegido para evitar null reference)
                 if (vfx != null)
@@ -426,9 +601,15 @@ namespace SlimeMec.Gameplay
             }
 
             // Efeito sonoro
-            if (itemData.collectSound != null)
+            AudioClip collectSound = null;
+            if (itemData != null && itemData.collectSound != null)
             {
-                AudioSource.PlayClipAtPoint(itemData.collectSound, transform.position, 1f);
+                collectSound = itemData.collectSound;
+            }
+
+            if (collectSound != null)
+            {
+                AudioSource.PlayClipAtPoint(collectSound, effectPosition, 1f);
             }
         }
 
@@ -494,9 +675,24 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
+        /// Configura dados do cristal em runtime
+        /// </summary>
+        public void SetCrystalData(CrystalElementalData newCrystalData)
+        {
+            crystalData = newCrystalData;
+            InitializeItem();
+            SetupVisuals();
+        }
+
+        /// <summary>
         /// Retorna dados do item
         /// </summary>
         public CollectableItemData GetItemData() => itemData;
+
+        /// <summary>
+        /// Retorna dados do cristal
+        /// </summary>
+        public CrystalElementalData GetCrystalData() => crystalData;
 
         /// <summary>
         /// Força coleta do item
@@ -609,7 +805,9 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void OnDrawGizmosSelected()
         {
-            if (itemData == null) return;
+            // Verifica se tem dados válidos (prioridade para cristais)
+            bool hasValidData = crystalData != null || itemData != null;
+            if (!hasValidData) return;
 
             // Desenha raio de atração
             Gizmos.color = Color.yellow;
@@ -658,7 +856,19 @@ namespace SlimeMec.Gameplay
         {
             if (!Application.isPlaying) return;
 
-            string status = $"[ItemCollectable] {itemData?.itemName}\n";
+            string itemName = "Unknown";
+            if (crystalData != null)
+            {
+                itemName = crystalData.crystalName;
+            }
+            else if (itemData != null)
+            {
+                itemName = itemData.itemName;
+            }
+
+            string status = $"[ItemCollectable] {itemName}\n";
+            status += $"Crystal Data: {(crystalData != null ? crystalData.crystalType.ToString() : "None")}\n";
+            status += $"Item Data: {(itemData != null ? "Present" : "None")}\n";
             status += $"Collected: {_isCollected}\n";
             status += $"Attraction Enabled: {enableAttraction}\n";
             status += $"Attraction Active: {IsAttractionActive}\n";

@@ -30,7 +30,7 @@ namespace SlimeKing.Editor
 
             if (targetObject == null)
             {
-                Debug.LogError("⚠️ PushableObjectQuickConfig: Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogError("⚠️ PushableObjectQuickConfig: Nenhum GameObject selecionado!");
                 return;
             }
 
@@ -40,11 +40,11 @@ namespace SlimeKing.Editor
             try
             {
                 ConfigurePushableObjectComponents(targetObject);
-                Debug.Log($"✅ PushableObject configurado com sucesso: {targetObject.name}");
+                UnityEngine.Debug.Log($"✅ PushableObject configurado com sucesso: {targetObject.name}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Erro ao configurar PushableObject: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Erro ao configurar PushableObject: {e.Message}");
             }
         }
 
@@ -63,7 +63,7 @@ namespace SlimeKing.Editor
         /// <param name="targetObject">GameObject a ser configurado</param>
         public static void ConfigurePushableObjectComponents(GameObject targetObject)
         {
-            Debug.Log($"🔧 Iniciando configuração do PushableObject: {targetObject.name}");
+            UnityEngine.Debug.Log($"🔧 Iniciando configuração do PushableObject: {targetObject.name}");
 
             // 1. Configurar CircleCollider2D como Trigger
             ConfigureCollider(targetObject);
@@ -80,7 +80,7 @@ namespace SlimeKing.Editor
             // Marcar objeto como modificado
             EditorUtility.SetDirty(targetObject);
 
-            Debug.Log($"📦 Configuração do PushableObject concluída: {targetObject.name}");
+            UnityEngine.Debug.Log($"📦 Configuração do PushableObject concluída: {targetObject.name}");
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace SlimeKing.Editor
                 circleCollider.radius = 0.75f;
             }
 
-            Debug.Log($"🔴 CircleCollider2D configurado (raio: {circleCollider.radius:F2})");
+            UnityEngine.Debug.Log($"🔴 CircleCollider2D configurado (raio: {circleCollider.radius:F2})");
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SlimeKing.Editor
             rigidbody.freezeRotation = false;              // Permite rotação durante movimento
             rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // Melhor detecção de colisão
 
-            Debug.Log($"🎯 Rigidbody2D configurado para jogo 2D (massa: {rigidbody.mass})");
+            UnityEngine.Debug.Log($"🎯 Rigidbody2D configurado para jogo 2D (massa: {rigidbody.mass})");
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace SlimeKing.Editor
             // Não é possível modificar via código, pois são campos privados
             // O usuário pode ajustar no Inspector conforme necessário
 
-            Debug.Log($"📦 PushableObject adicionado com configurações padrão");
+            UnityEngine.Debug.Log($"📦 PushableObject adicionado com configurações padrão");
         }
 
         /// <summary>
@@ -176,13 +176,13 @@ namespace SlimeKing.Editor
             // Garante que o objeto está na layer padrão
             if (targetObject.layer == 0)
             {
-                Debug.Log($"🏷️ Layer mantida: Default");
+                UnityEngine.Debug.Log($"🏷️ Layer mantida: Default");
             }
 
             // Se não tem tag específica, mantém Untagged
             if (targetObject.CompareTag("Untagged"))
             {
-                Debug.Log($"🏷️ Tag mantida: Untagged");
+                UnityEngine.Debug.Log($"🏷️ Tag mantida: Untagged");
             }
 
             // Configura SpriteRenderer se existir
@@ -206,7 +206,7 @@ namespace SlimeKing.Editor
             // Define ordem de sorting baseada na posição Y (padrão para 2D top-down)
             spriteRenderer.sortingOrder = Mathf.RoundToInt(-targetObject.transform.position.y * 100);
 
-            Debug.Log($"🎨 SpriteRenderer configurado (sortingOrder: {spriteRenderer.sortingOrder})");
+            UnityEngine.Debug.Log($"🎨 SpriteRenderer configurado (sortingOrder: {spriteRenderer.sortingOrder})");
         }
 
         #region Métodos Helper Públicos
@@ -261,31 +261,31 @@ namespace SlimeKing.Editor
             GameObject selectedObject = Selection.activeGameObject;
             if (selectedObject == null)
             {
-                Debug.Log("⚠️ Nenhum GameObject selecionado!");
+                UnityEngine.Debug.Log("⚠️ Nenhum GameObject selecionado!");
                 return;
             }
 
-            Debug.Log($"📦 === DEBUG INFO: {selectedObject.name} ===");
+            UnityEngine.Debug.Log($"📦 === DEBUG INFO: {selectedObject.name} ===");
 
             // Verifica configuração
             bool isConfigured = IsPushableObjectConfigured(selectedObject);
-            Debug.Log($"✅ Configurado como PushableObject: {isConfigured}");
+            UnityEngine.Debug.Log($"✅ Configurado como PushableObject: {isConfigured}");
 
             // Componentes
             var pushable = selectedObject.GetComponent<PushableObject>();
             var collider = selectedObject.GetComponent<CircleCollider2D>();
             var rigidbody = selectedObject.GetComponent<Rigidbody2D>();
 
-            Debug.Log($"📦 PushableObject: {(pushable != null ? "✅" : "❌")}");
-            Debug.Log($"🔴 CircleCollider2D: {(collider != null ? "✅" : "❌")}");
-            if (collider != null) Debug.Log($"   - Trigger: {collider.isTrigger}, Raio: {collider.radius}");
+            UnityEngine.Debug.Log($"📦 PushableObject: {(pushable != null ? "✅" : "❌")}");
+            UnityEngine.Debug.Log($"🔴 CircleCollider2D: {(collider != null ? "✅" : "❌")}");
+            if (collider != null) UnityEngine.Debug.Log($"   - Trigger: {collider.isTrigger}, Raio: {collider.radius}");
 
-            Debug.Log($"🎯 Rigidbody2D: {(rigidbody != null ? "✅" : "❌")}");
-            if (rigidbody != null) Debug.Log($"   - BodyType: {rigidbody.bodyType}, Gravity: {rigidbody.gravityScale}, Mass: {rigidbody.mass}");
+            UnityEngine.Debug.Log($"🎯 Rigidbody2D: {(rigidbody != null ? "✅" : "❌")}");
+            if (rigidbody != null) UnityEngine.Debug.Log($"   - BodyType: {rigidbody.bodyType}, Gravity: {rigidbody.gravityScale}, Mass: {rigidbody.mass}");
 
             // Validação
             string validation = ValidatePushableObjectSetup(selectedObject);
-            if (validation != null) Debug.LogWarning($"⚠️ Validação: {validation}");
+            if (validation != null) UnityEngine.Debug.LogWarning($"⚠️ Validação: {validation}");
         }
 
         [MenuItem("GameObject/Quick Config/📦 Debug Pushable Object Info", true)]

@@ -403,7 +403,7 @@ namespace SlimeKing.Editor
             
             if (template == null)
             {
-                Debug.LogWarning($"⚠️ Template not found at: {templatePath}. Using default values.");
+                UnityEngine.Debug.LogWarning($"⚠️ Template not found at: {templatePath}. Using default values.");
                 return;
             }
 
@@ -430,7 +430,7 @@ namespace SlimeKing.Editor
             dialogueTriggerType = template.dialogueTriggerType;
             triggerRange = template.triggerRange;
 
-            Debug.Log($"✅ Template loaded: {template.templateName}");
+            UnityEngine.Debug.Log($"✅ Template loaded: {template.templateName}");
         }
 
         private void ValidateConfiguration()
@@ -472,11 +472,11 @@ namespace SlimeKing.Editor
             // Log results
             if (lastValidationResult.IsValid)
             {
-                Debug.Log("✅ Configuration is valid!");
+                UnityEngine.Debug.Log("✅ Configuration is valid!");
             }
             else
             {
-                Debug.LogWarning($"⚠️ Validation found {lastValidationResult.Errors.Count} errors and {lastValidationResult.Warnings.Count} warnings");
+                UnityEngine.Debug.LogWarning($"⚠️ Validation found {lastValidationResult.Errors.Count} errors and {lastValidationResult.Warnings.Count} warnings");
             }
             
             Repaint();
@@ -604,7 +604,7 @@ namespace SlimeKing.Editor
                 
                 EditorUtility.DisplayDialog("Success", message, "OK");
                 
-                Debug.Log($"✅ NPC '{npcName}' configured successfully!");
+                UnityEngine.Debug.Log($"✅ NPC '{npcName}' configured successfully!");
             }
             catch (System.Exception e)
             {
@@ -612,7 +612,7 @@ namespace SlimeKing.Editor
                 Undo.RevertAllInCurrentGroup();
                 
                 EditorUtility.DisplayDialog("Error", $"Failed to configure NPC:\n\n{e.Message}", "OK");
-                Debug.LogError($"❌ Error configuring NPC: {e.Message}\n{e.StackTrace}");
+                UnityEngine.Debug.LogError($"❌ Error configuring NPC: {e.Message}\n{e.StackTrace}");
             }
         }
 

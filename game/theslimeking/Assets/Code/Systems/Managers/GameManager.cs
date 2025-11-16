@@ -1,12 +1,17 @@
 using SlimeKing.Core;
+using SlimeKing.Data;
 using UnityEngine;
 using System.Collections; // Necessário para IEnumerator em corrotinas
+using System.Collections.Generic; // Para Dictionary de cristais
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems; // para limpeza de múltiplos EventSystems
 using UnityEngine.Rendering.Universal; // para Light2D (URP 2D)
 
 public class GameManager : ManagerSingleton<GameManager>
 {
+    [Header("Debug Settings")]
+    [SerializeField] private bool enableDebugLogs = true;
+
     // Referência à operação de carregamento assíncrono da cena pré-carregada
     private AsyncOperation preloadedSceneOperation;
     private string preloadedSceneName;
@@ -33,6 +38,13 @@ public class GameManager : ManagerSingleton<GameManager>
     public event System.Action<bool> OnPlayerStealthStateChanged; // evento disparado quando estado stealth muda
     #endregion
 
+    #region Crystal System
+    // Sistema de contadores de cristais elementais
+    private Dictionary<CrystalType, int> crystalCounts = new Dictionary<CrystalType, int>();
+    public event System.Action<CrystalType, int> OnCrystalCountChanged; // evento disparado quando contador de cristal muda
+    public event System.Action<CrystalType, int> OnCrystalCollected; // evento disparado quando cristal é coletado
+    #endregion
+
     // Inicialização mínima seguindo KISS: define estado inicial e aplica configurações básicas de runtime.
     protected override void Initialize()
     {
@@ -51,10 +63,42 @@ public class GameManager : ManagerSingleton<GameManager>
         StealthEvents.OnPlayerExitedStealth += HandlePlayerExitedStealth;
         StealthEvents.OnPlayerCoverStateChanged += HandlePlayerCoverStateChanged;
 
+        // Inicializa contadores de cristais
+        InitializeCrystalSystem();
+
         // Estado inicial simples (usar GameState se definido em enums do projeto)
         // Como este GameManager está reduzido, apenas registra o bootstrap.
         Log("GameManager bootstrap concluído");
     }
+
+    #region Logging
+    /// <summary>
+    /// Log condicional baseado na flag enableDebugLogs
+    /// </summary>
+    private void Log(string message)
+    {
+        if (enableDebugLogs)
+        {
+            Debug.Log($"[GameManager] {message}");
+        }
+    }
+
+    /// <summary>
+    /// Warning sempre ativo independente da flag
+    /// </summary>
+    private void LogWarning(string message)
+    {
+        Debug.LogWarning($"[GameManager] {message}");
+    }
+
+    /// <summary>
+    /// Error sempre ativo independente da flag
+    /// </summary>
+    private void LogError(string message)
+    {
+        Debug.LogError($"[GameManager] {message}");
+    }
+    #endregion
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -285,6 +329,115 @@ public class GameManager : ManagerSingleton<GameManager>
     public int GetReputation()
     {
         return reputation;
+    }
+    #endregion
+
+    #region Crystal System Methods
+    /// <summary>
+    /// Inicializa o sistema de contadores de cristais.
+    /// </summary>
+    private void InitializeCrystalSystem()
+    {
+        // Inicializa todos os tipos de cristais com contador zerado
+        foreach (CrystalType crystalType in System.Enum.GetValues(typeof(CrystalType)))
+        {
+            crystalCounts[crystalType] = 0;
+        }
+
+        Log("Sistema de cristais inicializado com todos os contadores zerados");
+    }
+
+    /// <summary>
+    /// Adiciona cristais do tipo especificado.
+    /// </summary>
+    /// <param name="crystalType">Tipo do cristal a ser adicionado</param>
+    /// <param name="amount">Quantidade a adicionar (padrão: 1)</param>
+    public void AddCrystal(CrystalType crystalType, int amount = 1)
+    {
+        if (amount <= 0)
+        {
+            LogWarning($"Tentativa de adicionar quantidade inválida de cristais: {amount}");
+            return;
+        }
+
+        // Adiciona ao contador
+        if (!crystalCounts.ContainsKey(crystalType))
+        {
+            crystalCounts[crystalType] = 0;
+        }
+
+        crystalCounts[crystalType] += amount;
+        int newCount = crystalCounts[crystalType];
+
+        // Dispara eventos
+        OnCrystalCollected?.Invoke(crystalType, amount);
+        OnCrystalCountChanged?.Invoke(crystalType, newCount);
+
+        Log($"Cristal {crystalType} adicionado: +{amount} (Total: {newCount})");
+    }
+
+    /// <summary>
+    /// Obtém a quantidade atual de cristais do tipo especificado.
+    /// </summary>
+    /// <param name="crystalType">Tipo do cristal</param>
+    /// <returns>Quantidade atual</returns>
+    public int GetCrystalCount(CrystalType crystalType)
+    {
+        return crystalCounts.ContainsKey(crystalType) ? crystalCounts[crystalType] : 0;
+    }
+
+    /// <summary>
+    /// Obtém todos os contadores de cristais.
+    /// </summary>
+    /// <returns>Dicionário com todos os contadores</returns>
+    public Dictionary<CrystalType, int> GetAllCrystalCounts()
+    {
+        return new Dictionary<CrystalType, int>(crystalCounts);
+    }
+
+    /// <summary>
+    /// Remove cristais do tipo especificado (para uso futuro em crafting/consumo).
+    /// </summary>
+    /// <param name="crystalType">Tipo do cristal</param>
+    /// <param name="amount">Quantidade a remover</param>
+    /// <returns>True se foi possível remover, false se não há cristais suficientes</returns>
+    public bool RemoveCrystal(CrystalType crystalType, int amount = 1)
+    {
+        if (amount <= 0)
+        {
+            LogWarning($"Tentativa de remover quantidade inválida de cristais: {amount}");
+            return false;
+        }
+
+        int currentCount = GetCrystalCount(crystalType);
+        if (currentCount < amount)
+        {
+            LogWarning($"Cristais insuficientes: {crystalType} (Atual: {currentCount}, Necessário: {amount})");
+            return false;
+        }
+
+        crystalCounts[crystalType] -= amount;
+        int newCount = crystalCounts[crystalType];
+
+        // Dispara evento de mudança
+        OnCrystalCountChanged?.Invoke(crystalType, newCount);
+
+        Log($"Cristal {crystalType} removido: -{amount} (Total: {newCount})");
+        return true;
+    }
+
+    /// <summary>
+    /// Obtém o total de cristais de todos os tipos.
+    /// </summary>
+    /// <returns>Soma de todos os cristais</returns>
+    public int GetTotalCrystalCount()
+    {
+        int total = 0;
+        foreach (var count in crystalCounts.Values)
+        {
+            total += count;
+        }
+        return total;
     }
     #endregion
 

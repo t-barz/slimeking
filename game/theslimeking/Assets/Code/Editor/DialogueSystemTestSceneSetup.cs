@@ -27,7 +27,7 @@ namespace SlimeKing.Editor
             System.IO.Directory.CreateDirectory("Assets/Game/Scenes/Tests");
             EditorSceneManager.SaveScene(newScene, scenePath);
             
-            Debug.Log($"[DialogueSystem] Test scene created at: {scenePath}");
+            UnityEngine.Debug.Log($"[DialogueSystem] Test scene created at: {scenePath}");
         }
         
         private static void SetupTestScene()
@@ -53,7 +53,7 @@ namespace SlimeKing.Editor
             }
             else
             {
-                Debug.LogWarning("[DialogueSystem] DialogueUI prefab not found. Please add it manually.");
+                UnityEngine.Debug.LogWarning("[DialogueSystem] DialogueUI prefab not found. Please add it manually.");
             }
             
             // Create Language Switcher UI
@@ -65,13 +65,13 @@ namespace SlimeKing.Editor
             // Create Player placeholder
             CreatePlayerPlaceholder();
             
-            Debug.Log("[DialogueSystem] Test scene setup complete!");
-            Debug.Log("NPCs created:");
-            Debug.Log("  - Merchant (single page dialogue)");
-            Debug.Log("  - Guard (multi-page dialogue)");
-            Debug.Log("  - Villager (multi-page dialogue)");
-            Debug.Log("\nUse WASD to move, E to interact");
-            Debug.Log("Use UI buttons to change language");
+            UnityEngine.Debug.Log("[DialogueSystem] Test scene setup complete!");
+            UnityEngine.Debug.Log("NPCs created:");
+            UnityEngine.Debug.Log("  - Merchant (single page dialogue)");
+            UnityEngine.Debug.Log("  - Guard (multi-page dialogue)");
+            UnityEngine.Debug.Log("  - Villager (multi-page dialogue)");
+            UnityEngine.Debug.Log("\nUse WASD to move, E to interact");
+            UnityEngine.Debug.Log("Use UI buttons to change language");
         }
         
         private static void CreateLanguageSwitcherUI(Transform parent)
@@ -136,7 +136,7 @@ namespace SlimeKing.Editor
                 if (LocalizationManager.Instance != null)
                 {
                     LocalizationManager.Instance.SetLanguage(language);
-                    Debug.Log($"[DialogueSystem] Language changed to: {language}");
+                    UnityEngine.Debug.Log($"[DialogueSystem] Language changed to: {language}");
                 }
             });
         }
@@ -258,7 +258,7 @@ namespace SlimeKing.Editor
     {
         private void Start()
         {
-            Debug.Log("[DialogueSystem] Language Switcher ready. Current language: " + 
+            UnityEngine.Debug.Log("[DialogueSystem] Language Switcher ready. Current language: " + 
                      (LocalizationManager.Instance != null ? LocalizationManager.Instance.GetCurrentLanguage().ToString() : "N/A"));
         }
     }

@@ -20,7 +20,7 @@ namespace SlimeKing.Core.EditorTools
         /// <param name="message">The message to log</param>
         private static void Log(string message)
         {
-            Debug.Log($"[SceneSetupTool] {message}");
+            UnityEngine.Debug.Log($"[SceneSetupTool] {message}");
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SlimeKing.Core.EditorTools
         /// <param name="message">The warning message to log</param>
         private static void LogWarning(string message)
         {
-            Debug.LogWarning($"[SceneSetupTool] {message}");
+            UnityEngine.Debug.LogWarning($"[SceneSetupTool] {message}");
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace SlimeKing.Core.EditorTools
         /// <param name="message">The error message to log</param>
         private static void LogError(string message)
         {
-            Debug.LogError($"[SceneSetupTool] {message}");
+            UnityEngine.Debug.LogError($"[SceneSetupTool] {message}");
         }
 
         #endregion

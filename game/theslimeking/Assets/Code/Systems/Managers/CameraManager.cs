@@ -254,17 +254,17 @@ namespace SlimeKing.Core
         private new void Log(string message)
         {
             if (enableLogs)
-                Debug.Log($"[CameraManager] {message}");
+                UnityEngine.Debug.Log($"[CameraManager] {message}");
         }
 
         private new void LogError(string message)
         {
-            Debug.LogError($"[CameraManager] {message}");
+            UnityEngine.Debug.LogError($"[CameraManager] {message}");
         }
 
         private new void LogWarning(string message)
         {
-            Debug.LogWarning($"[CameraManager] {message}");
+            UnityEngine.Debug.LogWarning($"[CameraManager] {message}");
         }
 
         // Debug via Inspector

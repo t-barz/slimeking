@@ -28,17 +28,17 @@ namespace SlimeKing.Editor
         {
             if (target == null)
             {
-                Debug.LogError("❌ NPCComponentConfigurator: Target GameObject is null!");
+                UnityEngine.Debug.LogError("❌ NPCComponentConfigurator: Target GameObject is null!");
                 return;
             }
 
             if (configData == null)
             {
-                Debug.LogError("❌ NPCComponentConfigurator: NPCConfigData is null!");
+                UnityEngine.Debug.LogError("❌ NPCComponentConfigurator: NPCConfigData is null!");
                 return;
             }
 
-            Debug.Log($"🔧 Configuring NPC components for: {target.name}");
+            UnityEngine.Debug.Log($"🔧 Configuring NPC components for: {target.name}");
 
             // 1. Set tags and layers
             SetTagsAndLayers(target, configData.behaviorType);
@@ -72,7 +72,7 @@ namespace SlimeKing.Editor
 
             // Mark object as modified
             EditorUtility.SetDirty(target);
-            Debug.Log($"✅ NPC components configured successfully for: {target.name}");
+            UnityEngine.Debug.Log($"✅ NPC components configured successfully for: {target.name}");
         }
 
         /// <summary>
@@ -102,13 +102,13 @@ namespace SlimeKing.Editor
             if (npcLayer != -1)
             {
                 target.layer = npcLayer;
-                Debug.Log($"🏷️ Tag set to '{target.tag}', Layer set to 'NPCs'");
+                UnityEngine.Debug.Log($"🏷️ Tag set to '{target.tag}', Layer set to 'NPCs'");
             }
             else
             {
-                Debug.LogWarning("⚠️ Layer 'NPCs' not found. Using default layer.");
+                UnityEngine.Debug.LogWarning("⚠️ Layer 'NPCs' not found. Using default layer.");
                 target.layer = 0;
-                Debug.Log($"🏷️ Tag set to '{target.tag}', Layer set to 'Default'");
+                UnityEngine.Debug.Log($"🏷️ Tag set to '{target.tag}', Layer set to 'Default'");
             }
         }
 
@@ -122,7 +122,7 @@ namespace SlimeKing.Editor
             if (spriteRenderer == null)
             {
                 spriteRenderer = target.AddComponent<SpriteRenderer>();
-                Debug.Log("🎨 SpriteRenderer added");
+                UnityEngine.Debug.Log("🎨 SpriteRenderer added");
             }
 
             // Set sorting layer to "Characters"
@@ -140,21 +140,21 @@ namespace SlimeKing.Editor
             if (materialToUse != null)
             {
                 spriteRenderer.material = materialToUse;
-                Debug.Log($"🎨 Material applied: {materialToUse.name}");
+                UnityEngine.Debug.Log($"🎨 Material applied: {materialToUse.name}");
             }
             else
             {
-                Debug.LogWarning($"⚠️ Material not found at: {DEFAULT_MATERIAL_PATH}. Using default sprite material.");
+                UnityEngine.Debug.LogWarning($"⚠️ Material not found at: {DEFAULT_MATERIAL_PATH}. Using default sprite material.");
             }
 
             // Preserve existing sprite if present
             if (spriteRenderer.sprite != null)
             {
-                Debug.Log($"🎨 Preserving existing sprite: {spriteRenderer.sprite.name}");
+                UnityEngine.Debug.Log($"🎨 Preserving existing sprite: {spriteRenderer.sprite.name}");
             }
             else
             {
-                Debug.LogWarning("⚠️ No sprite assigned. Please assign a sprite manually.");
+                UnityEngine.Debug.LogWarning("⚠️ No sprite assigned. Please assign a sprite manually.");
             }
         }
 
@@ -168,7 +168,7 @@ namespace SlimeKing.Editor
             if (animator == null)
             {
                 animator = target.AddComponent<Animator>();
-                Debug.Log("🎬 Animator added");
+                UnityEngine.Debug.Log("🎬 Animator added");
             }
 
             // Configure animator settings
@@ -179,11 +179,11 @@ namespace SlimeKing.Editor
             if (animatorController != null)
             {
                 animator.runtimeAnimatorController = animatorController;
-                Debug.Log($"🎬 Animator Controller applied: {animatorController.name}");
+                UnityEngine.Debug.Log($"🎬 Animator Controller applied: {animatorController.name}");
             }
             else
             {
-                Debug.LogWarning("⚠️ No Animator Controller provided. Create one using NPCAnimatorSetup.");
+                UnityEngine.Debug.LogWarning("⚠️ No Animator Controller provided. Create one using NPCAnimatorSetup.");
             }
         }
 
@@ -202,7 +202,7 @@ namespace SlimeKing.Editor
 
             if (existingColliders.Length > 0)
             {
-                Debug.Log($"🔘 Removed {existingColliders.Length} existing collider(s)");
+                UnityEngine.Debug.Log($"🔘 Removed {existingColliders.Length} existing collider(s)");
             }
 
             // Add CircleCollider2D
@@ -211,7 +211,7 @@ namespace SlimeKing.Editor
             circleCollider.radius = radius;
             circleCollider.offset = Vector2.zero;
 
-            Debug.Log($"🔘 CircleCollider2D configured (radius: {radius})");
+            UnityEngine.Debug.Log($"🔘 CircleCollider2D configured (radius: {radius})");
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace SlimeKing.Editor
             if (rigidbody == null)
             {
                 rigidbody = target.AddComponent<Rigidbody2D>();
-                Debug.Log("⚙️ Rigidbody2D added");
+                UnityEngine.Debug.Log("⚙️ Rigidbody2D added");
             }
 
             // Configure for 2D top-down movement
@@ -233,7 +233,7 @@ namespace SlimeKing.Editor
             rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-            Debug.Log("⚙️ Rigidbody2D configured (Dynamic, no gravity, rotation frozen)");
+            UnityEngine.Debug.Log("⚙️ Rigidbody2D configured (Dynamic, no gravity, rotation frozen)");
         }
 
         /// <summary>
@@ -246,24 +246,24 @@ namespace SlimeKing.Editor
             if (npcController == null)
             {
                 npcController = target.AddComponent<NPCController>();
-                Debug.Log("🎮 NPCController added");
+                UnityEngine.Debug.Log("🎮 NPCController added");
             }
 
             // Set NPCData reference
             npcController.npcData = npcData;
-            Debug.Log($"🎮 NPCController configured with NPCData: {npcData.name}");
+            UnityEngine.Debug.Log($"🎮 NPCController configured with NPCData: {npcData.name}");
 
             // 2. Add and configure NPCBehavior
             NPCBehavior npcBehavior = target.GetComponent<NPCBehavior>();
             if (npcBehavior == null)
             {
                 npcBehavior = target.AddComponent<NPCBehavior>();
-                Debug.Log("🧠 NPCBehavior added");
+                UnityEngine.Debug.Log("🧠 NPCBehavior added");
             }
 
             npcBehavior.behaviorType = configData.behaviorType;
             npcBehavior.detectionRange = configData.detectionRange;
-            Debug.Log($"🧠 NPCBehavior configured: {configData.behaviorType}, Detection Range: {configData.detectionRange}m");
+            UnityEngine.Debug.Log($"🧠 NPCBehavior configured: {configData.behaviorType}, Detection Range: {configData.detectionRange}m");
 
             // 3. Add appropriate AI script based on AIType
             ConfigureAIComponent(target, configData);
@@ -272,7 +272,7 @@ namespace SlimeKing.Editor
             if (configData.behaviorType == BehaviorType.QuestGiver)
             {
                 // TODO: Add QuestGiver component when quest system is implemented
-                Debug.Log("📜 QuestGiver behavior detected. QuestGiver component will be added when quest system is implemented.");
+                UnityEngine.Debug.Log("📜 QuestGiver behavior detected. QuestGiver component will be added when quest system is implemented.");
             }
         }
 
@@ -321,7 +321,7 @@ namespace SlimeKing.Editor
         private static void ConfigureStaticAI(GameObject target)
         {
             NPCStaticAI staticAI = target.AddComponent<NPCStaticAI>();
-            Debug.Log("🗿 NPCStaticAI added (NPC will remain stationary)");
+            UnityEngine.Debug.Log("🗿 NPCStaticAI added (NPC will remain stationary)");
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace SlimeKing.Editor
             wanderAI.wanderSpeed = aiSettings.wanderSpeed;
             wanderAI.pauseDuration = aiSettings.pauseDuration;
 
-            Debug.Log($"🚶 NPCWanderAI added (Radius: {aiSettings.wanderRadius}m, Speed: {aiSettings.wanderSpeed}m/s, Pause: {aiSettings.pauseDuration}s)");
+            UnityEngine.Debug.Log($"🚶 NPCWanderAI added (Radius: {aiSettings.wanderRadius}m, Speed: {aiSettings.wanderSpeed}m/s, Pause: {aiSettings.pauseDuration}s)");
         }
 
         /// <summary>
@@ -351,12 +351,12 @@ namespace SlimeKing.Editor
             if (aiSettings.patrolPoints == null || aiSettings.patrolPoints.Count < 2)
             {
                 aiSettings.patrolPoints = GenerateDefaultPatrolPoints(target.transform.position, 3f);
-                Debug.Log($"🔄 Auto-generated 4 patrol points in square pattern (radius: 3 units)");
+                UnityEngine.Debug.Log($"🔄 Auto-generated 4 patrol points in square pattern (radius: 3 units)");
             }
 
             patrolAI.patrolPoints = new List<Vector2>(aiSettings.patrolPoints);
 
-            Debug.Log($"🚶 NPCPatrolAI added ({aiSettings.patrolPoints.Count} points, Speed: {aiSettings.patrolSpeed}m/s, Wait: {aiSettings.waitAtPoint}s)");
+            UnityEngine.Debug.Log($"🚶 NPCPatrolAI added ({aiSettings.patrolPoints.Count} points, Speed: {aiSettings.patrolSpeed}m/s, Wait: {aiSettings.waitAtPoint}s)");
         }
 
         /// <summary>
@@ -382,7 +382,7 @@ namespace SlimeKing.Editor
         {
             if (friendshipData == null)
             {
-                Debug.LogWarning("⚠️ Friendship enabled but FriendshipData is null. Skipping friendship component.");
+                UnityEngine.Debug.LogWarning("⚠️ Friendship enabled but FriendshipData is null. Skipping friendship component.");
                 return;
             }
 
@@ -390,12 +390,12 @@ namespace SlimeKing.Editor
             if (npcFriendship == null)
             {
                 npcFriendship = target.AddComponent<NPCFriendship>();
-                Debug.Log("💖 NPCFriendship added");
+                UnityEngine.Debug.Log("💖 NPCFriendship added");
             }
 
             // Set FriendshipData reference
             npcFriendship.friendshipData = friendshipData;
-            Debug.Log($"💖 NPCFriendship configured with FriendshipData: {friendshipData.name}");
+            UnityEngine.Debug.Log($"💖 NPCFriendship configured with FriendshipData: {friendshipData.name}");
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace SlimeKing.Editor
         {
             if (dialogueData == null)
             {
-                Debug.LogWarning("⚠️ Dialogue enabled but DialogueData is null. Skipping dialogue component.");
+                UnityEngine.Debug.LogWarning("⚠️ Dialogue enabled but DialogueData is null. Skipping dialogue component.");
                 return;
             }
 
@@ -413,7 +413,7 @@ namespace SlimeKing.Editor
             if (npcDialogue == null)
             {
                 npcDialogue = target.AddComponent<NPCDialogue>();
-                Debug.Log("💬 NPCDialogue added");
+                UnityEngine.Debug.Log("💬 NPCDialogue added");
             }
 
             // Set DialogueData reference
@@ -421,7 +421,7 @@ namespace SlimeKing.Editor
             npcDialogue.triggerType = dialogueSettings.triggerType;
             npcDialogue.triggerRange = dialogueSettings.triggerRange;
 
-            Debug.Log($"💬 NPCDialogue configured (Trigger: {dialogueSettings.triggerType}, Range: {dialogueSettings.triggerRange}m)");
+            UnityEngine.Debug.Log($"💬 NPCDialogue configured (Trigger: {dialogueSettings.triggerType}, Range: {dialogueSettings.triggerRange}m)");
         }
     }
 }

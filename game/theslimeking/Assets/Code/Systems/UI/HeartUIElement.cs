@@ -52,7 +52,7 @@ namespace SlimeKing.Core.UI
 
                 if (wasChanged && enableLogs)
                 {
-                    Debug.Log($"[HeartUIElement] Estado alterado para: {(value ? "Cheio" : "Vazio")}");
+                    UnityEngine.Debug.Log($"[HeartUIElement] Estado alterado para: {(value ? "Cheio" : "Vazio")}");
                 }
             }
         }
@@ -70,12 +70,12 @@ namespace SlimeKing.Core.UI
             // Valida configuração
             if (heartFullSprite == null || heartEmptySprite == null)
             {
-                Debug.LogError($"[HeartUIElement] Sprites não configurados no objeto {gameObject.name}!");
+                UnityEngine.Debug.LogError($"[HeartUIElement] Sprites não configurados no objeto {gameObject.name}!");
             }
 
             if (enableLogs)
             {
-                Debug.Log($"[HeartUIElement] Inicializado: {gameObject.name}");
+                UnityEngine.Debug.Log($"[HeartUIElement] Inicializado: {gameObject.name}");
             }
         }
 
@@ -103,7 +103,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HeartUIElement] Animação de bounce iniciada em {gameObject.name}");
+                UnityEngine.Debug.Log($"[HeartUIElement] Animação de bounce iniciada em {gameObject.name}");
             }
         }
 
@@ -120,7 +120,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HeartUIElement] Sprites atualizados em {gameObject.name}");
+                UnityEngine.Debug.Log($"[HeartUIElement] Sprites atualizados em {gameObject.name}");
             }
         }
 

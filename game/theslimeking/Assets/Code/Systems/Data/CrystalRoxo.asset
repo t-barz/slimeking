@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49f6dbf8b7dd0a24d84bd8977feb3689, type: 3}
+  m_Name: CrystalRoxo
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Data.CrystalElementalData
+  crystalType: 3
+  crystalName: Shadow Crystal
+  description: Um cristal das sombras que pulsa com energia vital.
+  value: 1
+  attractionRadius: 2.5
+  attractionSpeed: 4
+  crystalTint: {r: 1, g: 1, b: 1, a: 1}
+  crystalSprite: {fileID: 21300000, guid: 1ed501e126576de49b57d248aebec7dc, type: 3}
+  collectVFX: {fileID: 3020195555755454379, guid: 9eef847c2e5eadf45ad246e29f8aa18d, type: 3}
+  collectSound: {fileID: 0}
+  activationDelay: 0.5
+  enableDebugLogs: 0

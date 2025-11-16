@@ -31,18 +31,18 @@ public static class ItemQuickConfig
         GameObject targetObject = menuCommand.context as GameObject;
         if (targetObject == null)
         {
-            Debug.LogError("⚠️ ItemQuickConfig: Nenhum GameObject selecionado!");
+            UnityEngine.Debug.LogError("⚠️ ItemQuickConfig: Nenhum GameObject selecionado!");
             return;
         }
         Undo.RegisterCompleteObjectUndo(targetObject, "Configure as Item");
         try
         {
             ConfigureItemComponents(targetObject);
-            Debug.Log($"✅ Item configurado com sucesso: {targetObject.name}");
+            UnityEngine.Debug.Log($"✅ Item configurado com sucesso: {targetObject.name}");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"❌ Erro ao configurar item: {e.Message}");
+            UnityEngine.Debug.LogError($"❌ Erro ao configurar item: {e.Message}");
         }
     }
 
@@ -99,12 +99,12 @@ public static class ItemQuickConfig
             if (itemSprite != null)
             {
                 spriteRenderer.sprite = itemSprite;
-                Debug.Log($"🎨 Sprite carregado: {itemSprite.name}");
+                UnityEngine.Debug.Log($"🎨 Sprite carregado: {itemSprite.name}");
             }
         }
         else
         {
-            Debug.LogWarning("⚠️ Nenhum sprite de item encontrado. Defina o sprite manualmente.");
+            UnityEngine.Debug.LogWarning("⚠️ Nenhum sprite de item encontrado. Defina o sprite manualmente.");
         }
     }
 
@@ -126,11 +126,11 @@ public static class ItemQuickConfig
             if (controller != null)
             {
                 animator.runtimeAnimatorController = controller;
-                Debug.Log($"🎬 Animator Controller configurado: {controller.name}");
+                UnityEngine.Debug.Log($"🎬 Animator Controller configurado: {controller.name}");
             }
             else
             {
-                Debug.LogWarning("⚠️ Animator Controller não encontrado para o item.");
+                UnityEngine.Debug.LogWarning("⚠️ Animator Controller não encontrado para o item.");
             }
         }
     }
@@ -147,7 +147,7 @@ public static class ItemQuickConfig
             circle.isTrigger = false;
             circle.offset = Vector2.zero;
             circle.radius = 0.18f;
-            Debug.Log("🔘 CircleCollider2D configurado para fruta");
+            UnityEngine.Debug.Log("🔘 CircleCollider2D configurado para fruta");
         }
         else
         {
@@ -156,7 +156,7 @@ public static class ItemQuickConfig
             circle.isTrigger = false;
             circle.offset = Vector2.zero;
             circle.radius = 0.22f;
-            Debug.Log("🟤 CircleCollider2D configurado para pedra");
+            UnityEngine.Debug.Log("🟤 CircleCollider2D configurado para pedra");
         }
     }
 
@@ -186,7 +186,7 @@ public static class ItemQuickConfig
         GameObject targetObject = menuCommand.context as GameObject;
         if (targetObject == null)
         {
-            Debug.LogError("⚠️ Nenhum GameObject selecionado para exportação!");
+            UnityEngine.Debug.LogError("⚠️ Nenhum GameObject selecionado para exportação!");
             return;
         }
         string defaultName = $"{targetObject.name}_Structure.txt";
@@ -194,7 +194,7 @@ public static class ItemQuickConfig
         if (string.IsNullOrEmpty(path)) return;
         string export = ExportStructureRecursive(targetObject, 0);
         File.WriteAllText(path, export);
-        Debug.Log($"✅ Estrutura exportada para: {path}");
+        UnityEngine.Debug.Log($"✅ Estrutura exportada para: {path}");
     }
 
     private static string ExportStructureRecursive(GameObject obj, int indent)

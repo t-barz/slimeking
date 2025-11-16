@@ -25,7 +25,7 @@ namespace SlimeKing.Editor
 
             if (targetObject == null)
             {
-                Debug.LogError("⚠️ BushQuickConfig: Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogError("⚠️ BushQuickConfig: Nenhum GameObject selecionado!");
                 return;
             }
 
@@ -35,11 +35,11 @@ namespace SlimeKing.Editor
             try
             {
                 ConfigureBushComponents(targetObject);
-                Debug.Log($"✅ Bush configurada com sucesso: {targetObject.name}");
+                UnityEngine.Debug.Log($"✅ Bush configurada com sucesso: {targetObject.name}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Erro ao configurar bush: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Erro ao configurar bush: {e.Message}");
             }
         }
 
@@ -103,7 +103,7 @@ namespace SlimeKing.Editor
             }
             else
             {
-                Debug.LogWarning($"⚠️ Material não encontrado em: {BUSH_MATERIAL_PATH}. Usando material padrão.");
+                UnityEngine.Debug.LogWarning($"⚠️ Material não encontrado em: {BUSH_MATERIAL_PATH}. Usando material padrão.");
             }
 
             // Se não há sprite, tentar carregar sprite padrão do bush
@@ -126,12 +126,12 @@ namespace SlimeKing.Editor
                 if (bushSprite != null)
                 {
                     spriteRenderer.sprite = bushSprite;
-                    Debug.Log($"🎨 Sprite carregado: {bushSprite.name}");
+                    UnityEngine.Debug.Log($"🎨 Sprite carregado: {bushSprite.name}");
                 }
             }
             else
             {
-                Debug.LogWarning("⚠️ Nenhum sprite de bush encontrado. Defina o sprite manualmente.");
+                UnityEngine.Debug.LogWarning("⚠️ Nenhum sprite de bush encontrado. Defina o sprite manualmente.");
             }
         }
 
@@ -154,16 +154,16 @@ namespace SlimeKing.Editor
                 if (bushController != null)
                 {
                     animator.runtimeAnimatorController = bushController;
-                    Debug.Log($"🎬 Animator Controller padrão configurado: {bushController.name}");
+                    UnityEngine.Debug.Log($"🎬 Animator Controller padrão configurado: {bushController.name}");
                 }
                 else
                 {
-                    Debug.LogWarning($"⚠️ Animator Controller não encontrado em: {BUSH_CONTROLLER_PATH}");
+                    UnityEngine.Debug.LogWarning($"⚠️ Animator Controller não encontrado em: {BUSH_CONTROLLER_PATH}");
                 }
             }
             else
             {
-                Debug.Log($"🎬 Animator mantendo controller existente: {animator.runtimeAnimatorController.name}");
+                UnityEngine.Debug.Log($"🎬 Animator mantendo controller existente: {animator.runtimeAnimatorController.name}");
             }
 
             // Configurar triggers necessárias para bush (baseado no bushA2.controller)
@@ -176,14 +176,14 @@ namespace SlimeKing.Editor
         {
             if (animator.runtimeAnimatorController == null)
             {
-                Debug.LogWarning("⚠️ Não é possível configurar triggers sem um AnimatorController!");
+                UnityEngine.Debug.LogWarning("⚠️ Não é possível configurar triggers sem um AnimatorController!");
                 return;
             }
 
             var controller = animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController;
             if (controller == null)
             {
-                Debug.LogWarning("⚠️ Controller não é editável. Triggers não podem ser adicionadas.");
+                UnityEngine.Debug.LogWarning("⚠️ Controller não é editável. Triggers não podem ser adicionadas.");
                 return;
             }
 
@@ -207,11 +207,11 @@ namespace SlimeKing.Editor
                 if (!triggerExists)
                 {
                     controller.AddParameter(triggerName, AnimatorControllerParameterType.Trigger);
-                    Debug.Log($"🎯 Trigger '{triggerName}' adicionada ao Animator");
+                    UnityEngine.Debug.Log($"🎯 Trigger '{triggerName}' adicionada ao Animator");
                 }
                 else
                 {
-                    Debug.Log($"✅ Trigger '{triggerName}' já existe no Animator");
+                    UnityEngine.Debug.Log($"✅ Trigger '{triggerName}' já existe no Animator");
                 }
             }
 
@@ -311,7 +311,7 @@ namespace SlimeKing.Editor
             circleCollider.offset = new Vector2(0f, 0.15f);
             circleCollider.radius = 0.15f;
 
-            Debug.Log("🔘 CircleCollider2D configurado como trigger");
+            UnityEngine.Debug.Log("🔘 CircleCollider2D configurado como trigger");
         }
 
         private static void ConfigureGameplayScripts(GameObject targetObject)
@@ -325,7 +325,7 @@ namespace SlimeKing.Editor
                 SetPrivateField(windEmulator, "shakeIntervalRange", new Vector2(2f, 5f));
                 SetPrivateField(windEmulator, "autoStart", true);
                 SetPrivateField(windEmulator, "enableLogs", false);
-                Debug.Log("💨 WindEmulator adicionado");
+                UnityEngine.Debug.Log("💨 WindEmulator adicionado");
             }
 
             // 2. BushDestruct - sistema de destruição
@@ -333,14 +333,14 @@ namespace SlimeKing.Editor
             {
                 var bushDestruct = targetObject.AddComponent<BushDestruct>();
                 SetPrivateField(bushDestruct, "enableDebugLogs", false);
-                Debug.Log("💥 BushDestruct adicionado");
+                UnityEngine.Debug.Log("💥 BushDestruct adicionado");
             }
 
             // 3. BushShake - movimento quando jogador passa
             if (targetObject.GetComponent<BushShake>() == null)
             {
                 targetObject.AddComponent<BushShake>();
-                Debug.Log("🌿 BushShake adicionado");
+                UnityEngine.Debug.Log("🌿 BushShake adicionado");
             }
 
             // 4. DropController - sistema de drop
@@ -351,7 +351,7 @@ namespace SlimeKing.Editor
                 SetPrivateField(dropController, "maxDropCount", 3);
                 SetPrivateField(dropController, "useCurrentPosition", true);
                 SetPrivateField(dropController, "enableDebugLogs", false);
-                Debug.Log("📦 DropController adicionado");
+                UnityEngine.Debug.Log("📦 DropController adicionado");
             }
         }
 
@@ -373,7 +373,7 @@ namespace SlimeKing.Editor
             SetPrivateField(randomStyle, "randomizeAlpha", false);
             SetPrivateField(randomStyle, "enableLogs", false);
 
-            Debug.Log("🎲 RandomStyle configurado");
+            UnityEngine.Debug.Log("🎲 RandomStyle configurado");
         }
 
         /// <summary>
@@ -393,12 +393,12 @@ namespace SlimeKing.Editor
                 }
                 else
                 {
-                    Debug.LogWarning($"⚠️ Campo '{fieldName}' não encontrado em {target.GetType().Name}");
+                    UnityEngine.Debug.LogWarning($"⚠️ Campo '{fieldName}' não encontrado em {target.GetType().Name}");
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning($"⚠️ Erro ao configurar campo '{fieldName}': {e.Message}");
+                UnityEngine.Debug.LogWarning($"⚠️ Erro ao configurar campo '{fieldName}': {e.Message}");
             }
         }
 
@@ -426,22 +426,22 @@ namespace SlimeKing.Editor
             GameObject selectedObject = Selection.activeGameObject;
             if (selectedObject == null)
             {
-                Debug.LogWarning("⚠️ Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogWarning("⚠️ Nenhum GameObject selecionado!");
                 return;
             }
 
-            Debug.Log($"=== BUSH INFO: {selectedObject.name} ===");
-            Debug.Log($"Tag: {selectedObject.tag}");
-            Debug.Log($"Layer: {LayerMask.LayerToName(selectedObject.layer)}");
-            Debug.Log($"Scale: {selectedObject.transform.localScale}");
+            UnityEngine.Debug.Log($"=== BUSH INFO: {selectedObject.name} ===");
+            UnityEngine.Debug.Log($"Tag: {selectedObject.tag}");
+            UnityEngine.Debug.Log($"Layer: {LayerMask.LayerToName(selectedObject.layer)}");
+            UnityEngine.Debug.Log($"Scale: {selectedObject.transform.localScale}");
 
             var components = selectedObject.GetComponents<Component>();
-            Debug.Log($"Componentes ({components.Length}):");
+            UnityEngine.Debug.Log($"Componentes ({components.Length}):");
             foreach (var component in components)
             {
-                Debug.Log($"  • {component.GetType().Name}");
+                UnityEngine.Debug.Log($"  • {component.GetType().Name}");
             }
-            Debug.Log("================================");
+            UnityEngine.Debug.Log("================================");
         }
 
         [MenuItem("GameObject/Quick Config/🔍 Show Bush Info", true)]
@@ -462,18 +462,18 @@ namespace SlimeKing.Editor
             GameObject targetObject = Selection.activeGameObject;
             if (targetObject == null)
             {
-                Debug.LogError("⚠️ Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogError("⚠️ Nenhum GameObject selecionado!");
                 return;
             }
             Animator animator = targetObject.GetComponent<Animator>();
             if (animator == null)
             {
-                Debug.LogError("⚠️ O objeto selecionado não possui Animator!");
+                UnityEngine.Debug.LogError("⚠️ O objeto selecionado não possui Animator!");
                 return;
             }
             ConfigureAnimatorTriggers(animator);
             ConfigureAnimatorTransitions(animator);
-            Debug.Log($"✅ Triggers e transições do Animator configuradas para '{targetObject.name}'");
+            UnityEngine.Debug.Log($"✅ Triggers e transições do Animator configuradas para '{targetObject.name}'");
         }
     }
 
@@ -558,7 +558,7 @@ namespace SlimeKing.Editor
             }
 
             EditorUtility.SetDirty(targetObject);
-            Debug.Log($"✅ Bush customizada configurada: {targetObject.name}");
+            UnityEngine.Debug.Log($"✅ Bush customizada configurada: {targetObject.name}");
         }
     }
 }

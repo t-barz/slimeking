@@ -36,7 +36,7 @@ namespace SlimeKing.Systems.UI
                 canvasGroup = GetComponent<CanvasGroup>();
                 if (canvasGroup == null)
                 {
-                    Debug.LogWarning("[InteractionIcon] CanvasGroup not found. Adding component.");
+                    UnityEngine.Debug.LogWarning("[InteractionIcon] CanvasGroup not found. Adding component.");
                     canvasGroup = gameObject.AddComponent<CanvasGroup>();
                 }
             }
@@ -53,7 +53,7 @@ namespace SlimeKing.Systems.UI
             mainCamera = Camera.main;
             if (mainCamera == null)
             {
-                Debug.LogError("[InteractionIcon] Main camera not found!");
+                UnityEngine.Debug.LogError("[InteractionIcon] Main camera not found!");
             }
             
             baseLocalPosition = iconTransform.localPosition;

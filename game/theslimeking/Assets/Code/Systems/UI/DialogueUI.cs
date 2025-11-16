@@ -89,7 +89,7 @@ namespace SlimeKing.Systems.UI
             if (canvasGroup == null)
             {
                 canvasGroup = dialogueBox.AddComponent<CanvasGroup>();
-                Debug.LogWarning("[DialogueUI] CanvasGroup not found on dialogueBox. Adding component.");
+                UnityEngine.Debug.LogWarning("[DialogueUI] CanvasGroup not found on dialogueBox. Adding component.");
             }
 
             // Inicializar invisível
@@ -130,7 +130,7 @@ namespace SlimeKing.Systems.UI
         {
             if (string.IsNullOrEmpty(text))
             {
-                Debug.LogWarning("[DialogueUI] ShowDialogue called with null or empty text");
+                UnityEngine.Debug.LogWarning("[DialogueUI] ShowDialogue called with null or empty text");
                 return;
             }
 
@@ -253,17 +253,17 @@ namespace SlimeKing.Systems.UI
         {
             if (dialogueText == null)
             {
-                Debug.LogError("[DialogueUI] dialogueText is not assigned!");
+                UnityEngine.Debug.LogError("[DialogueUI] dialogueText is not assigned!");
             }
 
             if (dialogueBox == null)
             {
-                Debug.LogError("[DialogueUI] dialogueBox is not assigned!");
+                UnityEngine.Debug.LogError("[DialogueUI] dialogueBox is not assigned!");
             }
 
             if (continueIndicator == null)
             {
-                Debug.LogWarning("[DialogueUI] continueIndicator is not assigned. Continuation indicator will not be shown.");
+                UnityEngine.Debug.LogWarning("[DialogueUI] continueIndicator is not assigned. Continuation indicator will not be shown.");
             }
         }
 

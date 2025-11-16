@@ -26,8 +26,10 @@ namespace SlimeKing.Core
         #region Inspector Settings
 
         [Header("Manager Base Settings")]
-        [SerializeField] protected bool enableDebugLogs = false;
         [SerializeField] protected bool persistBetweenScenes = true;
+
+        [Header("Configurações de Debug")]
+        [SerializeField] protected bool enableLogs = false;
 
         #endregion
 
@@ -35,6 +37,9 @@ namespace SlimeKing.Core
 
         protected virtual void Awake()
         {
+            // Initialize the logging system first
+            LogSystem.Initialize();
+
             // Implementação do padrão Singleton
             if (Instance == null)
             {
@@ -49,11 +54,11 @@ namespace SlimeKing.Core
                 // Chamar inicialização específica do Manager
                 Initialize();
 
-                Log($"{typeof(T).Name} initialized successfully");
+                Log($"initialized successfully");
             }
             else if (Instance != this)
             {
-                Log($"Duplicate {typeof(T).Name} detected. Destroying duplicate instance.");
+                Log($"Duplicate detected. Destroying duplicate instance.");
                 Destroy(gameObject);
             }
         }
@@ -62,7 +67,7 @@ namespace SlimeKing.Core
         {
             if (Instance == this)
             {
-                Log($"{typeof(T).Name} is being destroyed");
+                Log($"is being destroyed");
                 OnManagerDestroy();
             }
         }
@@ -89,40 +94,39 @@ namespace SlimeKing.Core
 
         #endregion
 
-        #region Utility Methods
+        #region Protected Logging Methods
 
         /// <summary>
-        /// Sistema de log centralizado para todos os Managers.
-        /// Só funciona se enableDebugLogs estiver ativo.
+        /// Log normal controlado pela flag enableLogs do Manager.
         /// </summary>
         /// <param name="message">Mensagem a ser logada</param>
         protected void Log(string message)
         {
-            if (enableDebugLogs)
+            if (enableLogs)
             {
-                Debug.Log($"[{typeof(T).Name}] {message}");
+                UnityEngine.Debug.Log($"[{typeof(T).Name}] {message}");
             }
         }
 
         /// <summary>
-        /// Log de warning centralizado para todos os Managers.
+        /// Log de warning controlado pela flag enableLogs do Manager.
         /// </summary>
-        /// <param name="message">Mensagem de warning</param>
+        /// <param name="message">Mensagem a ser logada</param>
         protected void LogWarning(string message)
         {
-            if (enableDebugLogs)
+            if (enableLogs)
             {
-                Debug.LogWarning($"[{typeof(T).Name}] {message}");
+                UnityEngine.Debug.LogWarning($"[{typeof(T).Name}] {message}");
             }
         }
 
         /// <summary>
-        /// Log de erro centralizado para todos os Managers.
+        /// Log de error - sempre ativo, independente da flag enableLogs.
         /// </summary>
-        /// <param name="message">Mensagem de erro</param>
+        /// <param name="message">Mensagem a ser logada</param>
         protected void LogError(string message)
         {
-            Debug.LogError($"[{typeof(T).Name}] {message}");
+            UnityEngine.Debug.LogError($"[{typeof(T).Name}] {message}");
         }
 
         #endregion

@@ -50,10 +50,10 @@ namespace SlimeKing.Editor
                     string guid = AssetDatabase.CreateFolder(currentPath, folders[i]);
                     if (string.IsNullOrEmpty(guid))
                     {
-                        Debug.LogError($"❌ Failed to create folder: {newPath}");
+                        UnityEngine.Debug.LogError($"❌ Failed to create folder: {newPath}");
                         return null;
                     }
-                    Debug.Log($"✅ Created directory: {newPath}");
+                    UnityEngine.Debug.Log($"✅ Created directory: {newPath}");
                 }
                 
                 currentPath = newPath;
@@ -77,7 +77,7 @@ namespace SlimeKing.Editor
         {
             if (configData == null || string.IsNullOrEmpty(configData.npcName))
             {
-                Debug.LogError("❌ NPCConfigData is null or npcName is empty");
+                UnityEngine.Debug.LogError("❌ NPCConfigData is null or npcName is empty");
                 return null;
             }
 
@@ -92,7 +92,7 @@ namespace SlimeKing.Editor
 
             if (string.IsNullOrEmpty(assetPath))
             {
-                Debug.LogWarning("⚠️ User cancelled NPCData creation");
+                UnityEngine.Debug.LogWarning("⚠️ User cancelled NPCData creation");
                 return null;
             }
 
@@ -122,7 +122,7 @@ namespace SlimeKing.Editor
             // Salva o asset
             SaveAsset(npcData, assetPath);
 
-            Debug.Log($"✅ NPCData created at: {assetPath}");
+            UnityEngine.Debug.Log($"✅ NPCData created at: {assetPath}");
             return npcData;
         }
 
@@ -135,7 +135,7 @@ namespace SlimeKing.Editor
         {
             if (string.IsNullOrEmpty(speciesName))
             {
-                Debug.LogError("❌ Species name is empty");
+                UnityEngine.Debug.LogError("❌ Species name is empty");
                 return null;
             }
 
@@ -149,7 +149,7 @@ namespace SlimeKing.Editor
             FriendshipData existingData = AssetDatabase.LoadAssetAtPath<FriendshipData>(assetPath);
             if (existingData != null)
             {
-                Debug.Log($"✅ Reusing existing FriendshipData at: {assetPath}");
+                UnityEngine.Debug.Log($"✅ Reusing existing FriendshipData at: {assetPath}");
                 return existingData;
             }
 
@@ -208,7 +208,7 @@ namespace SlimeKing.Editor
             // Salva o asset
             SaveAsset(friendshipData, assetPath);
 
-            Debug.Log($"✅ FriendshipData created at: {assetPath}");
+            UnityEngine.Debug.Log($"✅ FriendshipData created at: {assetPath}");
             return friendshipData;
         }
 
@@ -222,7 +222,7 @@ namespace SlimeKing.Editor
         {
             if (string.IsNullOrEmpty(npcName))
             {
-                Debug.LogError("❌ NPC name is empty");
+                UnityEngine.Debug.LogError("❌ NPC name is empty");
                 return null;
             }
 
@@ -237,7 +237,7 @@ namespace SlimeKing.Editor
 
             if (string.IsNullOrEmpty(assetPath))
             {
-                Debug.LogWarning("⚠️ User cancelled DialogueData creation");
+                UnityEngine.Debug.LogWarning("⚠️ User cancelled DialogueData creation");
                 return null;
             }
 
@@ -305,7 +305,7 @@ namespace SlimeKing.Editor
             // Salva o asset
             SaveAsset(dialogueData, assetPath);
 
-            Debug.Log($"✅ DialogueData created at: {assetPath}");
+            UnityEngine.Debug.Log($"✅ DialogueData created at: {assetPath}");
             return dialogueData;
         }
 
@@ -341,7 +341,7 @@ namespace SlimeKing.Editor
         {
             if (asset == null || string.IsNullOrEmpty(path))
             {
-                Debug.LogError("❌ Cannot save asset: asset is null or path is empty");
+                UnityEngine.Debug.LogError("❌ Cannot save asset: asset is null or path is empty");
                 return;
             }
 
@@ -350,11 +350,11 @@ namespace SlimeKing.Editor
                 // Cria ou atualiza o asset
                 AssetDatabase.CreateAsset(asset, path);
 
-                Debug.Log($"✅ Asset saved successfully: {path}");
+                UnityEngine.Debug.Log($"✅ Asset saved successfully: {path}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Failed to save asset at {path}: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Failed to save asset at {path}: {e.Message}");
             }
         }
 
@@ -367,7 +367,7 @@ namespace SlimeKing.Editor
         {
             if (assets == null || assets.Count == 0)
             {
-                Debug.LogWarning("⚠️ No assets to save in batch");
+                UnityEngine.Debug.LogWarning("⚠️ No assets to save in batch");
                 return;
             }
 
@@ -381,13 +381,13 @@ namespace SlimeKing.Editor
                     if (asset != null && !string.IsNullOrEmpty(path))
                     {
                         AssetDatabase.CreateAsset(asset, path);
-                        Debug.Log($"✅ Asset saved in batch: {path}");
+                        UnityEngine.Debug.Log($"✅ Asset saved in batch: {path}");
                     }
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Failed to save assets in batch: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Failed to save assets in batch: {e.Message}");
             }
             finally
             {
@@ -430,19 +430,19 @@ namespace SlimeKing.Editor
             switch (choice)
             {
                 case 0: // Overwrite
-                    Debug.Log($"⚠️ Overwriting existing asset: {assetPath}");
+                    UnityEngine.Debug.Log($"⚠️ Overwriting existing asset: {assetPath}");
                     // Deleta o asset existente
                     AssetDatabase.DeleteAsset(assetPath);
                     return assetPath;
 
                 case 1: // Cancel
-                    Debug.Log($"⚠️ User cancelled {assetType} creation");
+                    UnityEngine.Debug.Log($"⚠️ User cancelled {assetType} creation");
                     return null;
 
                 case 2: // Create New
                     // Gera novo nome com sufixo numérico
                     string newPath = GenerateUniqueAssetPath(assetPath, assetName, assetType);
-                    Debug.Log($"✅ Creating new asset with unique name: {newPath}");
+                    UnityEngine.Debug.Log($"✅ Creating new asset with unique name: {newPath}");
                     return newPath;
 
                 default:

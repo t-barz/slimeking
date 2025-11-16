@@ -23,25 +23,25 @@ namespace SlimeKing.Editor
         private static void Log(string message)
         {
             if (enableLogs)
-                Debug.Log($"[Extra Tools] {message}");
+                UnityEngine.Debug.Log($"[Extra Tools] {message}");
         }
 
         private static void LogWarning(string message)
         {
             if (enableLogs)
-                Debug.LogWarning($"[Extra Tools] {message}");
+                UnityEngine.Debug.LogWarning($"[Extra Tools] {message}");
         }
 
         private static void LogError(string message)
         {
             if (enableLogs)
-                Debug.LogError($"[Extra Tools] {message}");
+                UnityEngine.Debug.LogError($"[Extra Tools] {message}");
         }
 
         private static void DebugLog(string message)
         {
             if (enableDebug)
-                Debug.Log($"[Extra Tools DEBUG] {message}");
+                UnityEngine.Debug.Log($"[Extra Tools DEBUG] {message}");
         }
         #endregion
 

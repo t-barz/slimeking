@@ -801,12 +801,12 @@ namespace SlimeKing.Core.EditorTools
         private void Log(string message)
         {
             if (enableDebugLogs)
-                Debug.Log($"[ProjectSettingsExporter] {message}");
+                UnityEngine.Debug.Log($"[ProjectSettingsExporter] {message}");
         }
 
         private void LogError(string message)
         {
-            Debug.LogError($"[ProjectSettingsExporter] {message}");
+            UnityEngine.Debug.LogError($"[ProjectSettingsExporter] {message}");
         }
     }
 }

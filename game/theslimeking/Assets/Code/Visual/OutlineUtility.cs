@@ -23,7 +23,7 @@ namespace SlimeKing.Visual
         {
             if (gameObject == null)
             {
-                Debug.LogError("[OutlineUtility] GameObject é null!");
+                UnityEngine.Debug.LogError("[OutlineUtility] GameObject é null!");
                 return null;
             }
 
@@ -34,14 +34,14 @@ namespace SlimeKing.Visual
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
-                Debug.LogError($"[OutlineUtility] GameObject '{gameObject.name}' não tem SpriteRenderer!");
+                UnityEngine.Debug.LogError($"[OutlineUtility] GameObject '{gameObject.name}' não tem SpriteRenderer!");
                 return null;
             }
 
             // Aplica o material correto
             if (!SetupOutlineMaterial(spriteRenderer))
             {
-                Debug.LogWarning($"[OutlineUtility] Não foi possível configurar material para '{gameObject.name}', mas continuando...");
+                UnityEngine.Debug.LogWarning($"[OutlineUtility] Não foi possível configurar material para '{gameObject.name}', mas continuando...");
             }
 
             // Adiciona o OutlineController se não existir
@@ -58,7 +58,7 @@ namespace SlimeKing.Visual
             outlineController.SetFadeEnabled(true);
             outlineController.UpdateOutlineSize(0.04f);
 
-            Debug.Log($"[OutlineUtility] ✅ Outline configurado em '{gameObject.name}' - Cor: {outlineColor}, Raio: {detectionRadius}");
+            UnityEngine.Debug.Log($"[OutlineUtility] ✅ Outline configurado em '{gameObject.name}' - Cor: {outlineColor}, Raio: {detectionRadius}");
             return outlineController;
         }
 
@@ -72,7 +72,7 @@ namespace SlimeKing.Visual
         {
             if (gameObject == null)
             {
-                Debug.LogError("[OutlineUtility] GameObject é null!");
+                UnityEngine.Debug.LogError("[OutlineUtility] GameObject é null!");
                 return null;
             }
 
@@ -83,14 +83,14 @@ namespace SlimeKing.Visual
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
-                Debug.LogError($"[OutlineUtility] GameObject '{gameObject.name}' não tem SpriteRenderer!");
+                UnityEngine.Debug.LogError($"[OutlineUtility] GameObject '{gameObject.name}' não tem SpriteRenderer!");
                 return null;
             }
 
             // Aplica o material correto
             if (!SetupOutlineMaterial(spriteRenderer))
             {
-                Debug.LogWarning($"[OutlineUtility] Não foi possível configurar material para '{gameObject.name}', mas continuando...");
+                UnityEngine.Debug.LogWarning($"[OutlineUtility] Não foi possível configurar material para '{gameObject.name}', mas continuando...");
             }
 
             // Adiciona o OutlineController se não existir
@@ -106,7 +106,7 @@ namespace SlimeKing.Visual
             outlineController.SetFadeEnabled(true);
             outlineController.UpdateOutlineSize(0.04f);
 
-            Debug.Log($"[OutlineUtility] ✅ Outline manual configurado em '{gameObject.name}' - Cor: {outlineColor}");
+            UnityEngine.Debug.Log($"[OutlineUtility] ✅ Outline manual configurado em '{gameObject.name}' - Cor: {outlineColor}");
             return outlineController;
         }
 
@@ -119,7 +119,7 @@ namespace SlimeKing.Visual
         {
             if (spriteRenderer == null)
             {
-                Debug.LogError("[OutlineUtility] SpriteRenderer é null!");
+                UnityEngine.Debug.LogError("[OutlineUtility] SpriteRenderer é null!");
                 return false;
             }
 
@@ -127,7 +127,7 @@ namespace SlimeKing.Visual
             Shader outlineShader = Shader.Find(OUTLINE_SHADER_NAME);
             if (outlineShader == null)
             {
-                Debug.LogError($"[OutlineUtility] Shader '{OUTLINE_SHADER_NAME}' não encontrado!");
+                UnityEngine.Debug.LogError($"[OutlineUtility] Shader '{OUTLINE_SHADER_NAME}' não encontrado!");
                 return false;
             }
 
@@ -135,7 +135,7 @@ namespace SlimeKing.Visual
             Material currentMaterial = spriteRenderer.material;
             if (currentMaterial != null && currentMaterial.shader == outlineShader)
             {
-                Debug.Log($"[OutlineUtility] Material já está correto em '{spriteRenderer.name}'");
+                UnityEngine.Debug.Log($"[OutlineUtility] Material já está correto em '{spriteRenderer.name}'");
                 return true;
             }
 
@@ -144,7 +144,7 @@ namespace SlimeKing.Visual
             if (outlineMaterial != null)
             {
                 spriteRenderer.material = outlineMaterial;
-                Debug.Log($"[OutlineUtility] Material padrão aplicado em '{spriteRenderer.name}'");
+                UnityEngine.Debug.Log($"[OutlineUtility] Material padrão aplicado em '{spriteRenderer.name}'");
                 return true;
             }
 
@@ -162,7 +162,7 @@ namespace SlimeKing.Visual
             SetDefaultOutlineProperties(newMaterial);
 
             spriteRenderer.material = newMaterial;
-            Debug.Log($"[OutlineUtility] Novo material criado e aplicado em '{spriteRenderer.name}'");
+            UnityEngine.Debug.Log($"[OutlineUtility] Novo material criado e aplicado em '{spriteRenderer.name}'");
             return true;
         }
 
@@ -201,7 +201,7 @@ namespace SlimeKing.Visual
                 {
                     Object.DestroyImmediate(outlineController);
                 }
-                Debug.Log($"[OutlineUtility] Outline removido de '{gameObject.name}'");
+                UnityEngine.Debug.Log($"[OutlineUtility] Outline removido de '{gameObject.name}'");
             }
         }
 

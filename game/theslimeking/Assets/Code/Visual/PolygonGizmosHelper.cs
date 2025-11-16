@@ -232,12 +232,12 @@ namespace SlimeKing.Visual
         {
 #if UNITY_EDITOR
             Vector3 infoPosition = CalculateCentroid(points) + Vector3.up * 0.6f;
-            
+
             string info = $"Path {pathIndex}\n";
             info += $"Vertices: {points.Length}\n";
             info += $"Area: {CalculatePolygonArea(points):F2}\n";
             info += $"Perimeter: {CalculatePolygonPerimeter(points):F2}";
-            
+
             UnityEditor.Handles.color = infoTextColor;
             UnityEditor.Handles.Label(infoPosition, info);
 #endif
@@ -293,26 +293,26 @@ namespace SlimeKing.Visual
         {
             var colliders = GetComponentsInChildren<PolygonCollider2D>();
 
-            Debug.Log($"=== POLYGON STATISTICS ===");
-            Debug.Log($"GameObject: {gameObject.name}");
-            Debug.Log($"Total PolygonCollider2D: {colliders.Length}");
+            UnityEngine.Debug.Log($"=== POLYGON STATISTICS ===");
+            UnityEngine.Debug.Log($"GameObject: {gameObject.name}");
+            UnityEngine.Debug.Log($"Total PolygonCollider2D: {colliders.Length}");
 
             foreach (var collider in colliders)
             {
-                Debug.Log($"\n🔺 {collider.name}:");
-                Debug.Log($"  Paths: {collider.pathCount}");
-                Debug.Log($"  Total Points: {collider.GetTotalPointCount()}");
-                Debug.Log($"  Enabled: {collider.enabled}");
-                Debug.Log($"  Is Trigger: {collider.isTrigger}");
+                UnityEngine.Debug.Log($"\n🔺 {collider.name}:");
+                UnityEngine.Debug.Log($"  Paths: {collider.pathCount}");
+                UnityEngine.Debug.Log($"  Total Points: {collider.GetTotalPointCount()}");
+                UnityEngine.Debug.Log($"  Enabled: {collider.enabled}");
+                UnityEngine.Debug.Log($"  Is Trigger: {collider.isTrigger}");
 
                 for (int i = 0; i < collider.pathCount; i++)
                 {
                     var path = collider.GetPath(i);
                     var worldPoints = ConvertToWorldPoints(collider, path);
-                    Debug.Log($"  Path {i}: {path.Length} points, Area: {CalculatePolygonArea(worldPoints):F2}");
+                    UnityEngine.Debug.Log($"  Path {i}: {path.Length} points, Area: {CalculatePolygonArea(worldPoints):F2}");
                 }
             }
-            Debug.Log($"========================");
+            UnityEngine.Debug.Log($"========================");
         }
 
         #endregion

@@ -92,7 +92,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HealthUIManager] PlayerAttributesHandler definido: {(targetPlayer != null ? "Conectado" : "Desconectado")}");
+                UnityEngine.Debug.Log($"[HealthUIManager] PlayerAttributesHandler definido: {(targetPlayer != null ? "Conectado" : "Desconectado")}");
             }
         }
 
@@ -120,7 +120,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HealthUIManager] Layout reconfigurado para {maxHearts} corações");
+                UnityEngine.Debug.Log($"[HealthUIManager] Layout reconfigurado para {maxHearts} corações");
             }
         }
 
@@ -135,26 +135,26 @@ namespace SlimeKing.Core.UI
         {
             if (heartsContainer == null)
             {
-                Debug.LogError("[HealthUIManager] Container de corações não configurado!");
+                UnityEngine.Debug.LogError("[HealthUIManager] Container de corações não configurado!");
                 return;
             }
 
             if (heartPrefab == null)
             {
-                Debug.LogError("[HealthUIManager] Prefab de coração não configurado!");
+                UnityEngine.Debug.LogError("[HealthUIManager] Prefab de coração não configurado!");
                 return;
             }
 
             if (heartFullSprite == null || heartEmptySprite == null)
             {
-                Debug.LogError("[HealthUIManager] Sprites de coração não configurados!");
+                UnityEngine.Debug.LogError("[HealthUIManager] Sprites de coração não configurados!");
                 return;
             }
 
             HeartUIElement prefabHeart = heartPrefab.GetComponent<HeartUIElement>();
             if (prefabHeart == null)
             {
-                Debug.LogError("[HealthUIManager] Prefab deve conter o componente HeartUIElement!");
+                UnityEngine.Debug.LogError("[HealthUIManager] Prefab deve conter o componente HeartUIElement!");
                 return;
             }
         }
@@ -172,12 +172,12 @@ namespace SlimeKing.Core.UI
 
                 if (enableLogs)
                 {
-                    Debug.Log($"[HealthUIManager] PlayerAttributesHandler encontrado automaticamente: {player.gameObject.name}");
+                    UnityEngine.Debug.Log($"[HealthUIManager] PlayerAttributesHandler encontrado automaticamente: {player.gameObject.name}");
                 }
             }
             else if (enableLogs)
             {
-                Debug.LogWarning("[HealthUIManager] PlayerAttributesHandler não encontrado na cena!");
+                UnityEngine.Debug.LogWarning("[HealthUIManager] PlayerAttributesHandler não encontrado na cena!");
             }
         }
 
@@ -192,7 +192,7 @@ namespace SlimeKing.Core.UI
             {
                 if (enableLogs)
                 {
-                    Debug.LogWarning("[HealthUIManager] Não é possível inicializar sem PlayerAttributesHandler!");
+                    UnityEngine.Debug.LogWarning("[HealthUIManager] Não é possível inicializar sem PlayerAttributesHandler!");
                 }
                 return;
             }
@@ -211,7 +211,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HealthUIManager] Sistema inicializado com {_currentMaxHearts} corações");
+                UnityEngine.Debug.Log($"[HealthUIManager] Sistema inicializado com {_currentMaxHearts} corações");
             }
         }
 
@@ -253,7 +253,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HealthUIManager] Vida alterada: {currentHealth}/{maxHealth}");
+                UnityEngine.Debug.Log($"[HealthUIManager] Vida alterada: {currentHealth}/{maxHealth}");
             }
         }
 
@@ -273,7 +273,7 @@ namespace SlimeKing.Core.UI
 
             if (enableLogs)
             {
-                Debug.Log($"[HealthUIManager] {_currentMaxHearts} corações criados");
+                UnityEngine.Debug.Log($"[HealthUIManager] {_currentMaxHearts} corações criados");
             }
         }
 

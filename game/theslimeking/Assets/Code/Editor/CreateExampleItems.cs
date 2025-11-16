@@ -68,7 +68,7 @@ namespace TheSlimeKing.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("✓ 5 example items created successfully in Assets/Resources/Items/");
+            UnityEngine.Debug.Log("✓ 5 example items created successfully in Assets/Resources/Items/");
             EditorUtility.DisplayDialog(
                 "Success",
                 "5 example items created successfully!\n\n" +
@@ -90,7 +90,7 @@ namespace TheSlimeKing.Editor
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
-                Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
+                UnityEngine.Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace TheSlimeKing.Editor
             item.isQuestItem = false;
 
             AssetDatabase.CreateAsset(item, assetPath);
-            Debug.Log($"Created: {assetPath}");
+            UnityEngine.Debug.Log($"Created: {assetPath}");
         }
 
         private static void CreateMaterialItem(string folderPath, string fileName, string itemName)
@@ -112,7 +112,7 @@ namespace TheSlimeKing.Editor
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
-                Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
+                UnityEngine.Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
                 return;
             }
 
@@ -123,7 +123,7 @@ namespace TheSlimeKing.Editor
             item.isQuestItem = false;
 
             AssetDatabase.CreateAsset(item, assetPath);
-            Debug.Log($"Created: {assetPath}");
+            UnityEngine.Debug.Log($"Created: {assetPath}");
         }
 
         private static void CreateQuestItem(string folderPath, string fileName, string itemName)
@@ -133,7 +133,7 @@ namespace TheSlimeKing.Editor
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
-                Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
+                UnityEngine.Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
                 return;
             }
 
@@ -144,7 +144,7 @@ namespace TheSlimeKing.Editor
             item.isQuestItem = true;
 
             AssetDatabase.CreateAsset(item, assetPath);
-            Debug.Log($"Created: {assetPath}");
+            UnityEngine.Debug.Log($"Created: {assetPath}");
         }
 
         private static void CreateEquipmentItem(string folderPath, string fileName, string itemName, EquipmentType equipmentType, int defenseBonus, int speedBonus)
@@ -154,7 +154,7 @@ namespace TheSlimeKing.Editor
             ItemData existingItem = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
             if (existingItem != null)
             {
-                Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
+                UnityEngine.Debug.LogWarning($"Item '{fileName}' already exists. Skipping.");
                 return;
             }
 
@@ -168,7 +168,7 @@ namespace TheSlimeKing.Editor
             item.isQuestItem = false;
 
             AssetDatabase.CreateAsset(item, assetPath);
-            Debug.Log($"Created: {assetPath}");
+            UnityEngine.Debug.Log($"Created: {assetPath}");
         }
     }
 }

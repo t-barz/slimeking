@@ -110,18 +110,18 @@ namespace SlimeKing.Core
         private void Log(string message)
         {
             if (enableLogs)
-                Debug.Log($"[SceneValidator] {message}");
+                UnityEngine.Debug.Log($"[SceneValidator] {message}");
         }
 
         private void LogWarning(string message)
         {
             if (enableLogs)
-                Debug.LogWarning($"[SceneValidator] {message}");
+                UnityEngine.Debug.LogWarning($"[SceneValidator] {message}");
         }
 
         private void LogError(string message)
         {
-            Debug.LogError($"[SceneValidator] {message}");
+            UnityEngine.Debug.LogError($"[SceneValidator] {message}");
         }
     }
 }

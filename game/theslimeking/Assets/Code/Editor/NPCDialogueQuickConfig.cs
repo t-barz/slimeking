@@ -21,7 +21,7 @@ namespace SlimeKing.Editor
 
             if (targetObject == null)
             {
-                Debug.LogError("⚠️ NPCDialogueQuickConfig: Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogError("⚠️ NPCDialogueQuickConfig: Nenhum GameObject selecionado!");
                 return;
             }
 
@@ -31,11 +31,11 @@ namespace SlimeKing.Editor
             try
             {
                 ConfigureDialogueComponents(targetObject);
-                Debug.Log($"✅ NPC de diálogo configurado com sucesso: {targetObject.name}");
+                UnityEngine.Debug.Log($"✅ NPC de diálogo configurado com sucesso: {targetObject.name}");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"❌ Erro ao configurar NPC de diálogo: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Erro ao configurar NPC de diálogo: {e.Message}");
             }
         }
 
@@ -58,11 +58,11 @@ namespace SlimeKing.Editor
             if (dialogueInteraction == null)
             {
                 dialogueInteraction = Undo.AddComponent<NPCDialogueInteraction>(targetObject);
-                Debug.Log("💬 NPCDialogueInteraction adicionado");
+                UnityEngine.Debug.Log("💬 NPCDialogueInteraction adicionado");
             }
             else
             {
-                Debug.Log("✅ NPCDialogueInteraction já existe, mantendo configuração");
+                UnityEngine.Debug.Log("✅ NPCDialogueInteraction já existe, mantendo configuração");
             }
 
             // 2. Configurar CircleCollider2D (se não existir ou não estiver configurado como trigger)
@@ -88,7 +88,7 @@ namespace SlimeKing.Editor
             if (circleCollider == null)
             {
                 circleCollider = Undo.AddComponent<CircleCollider2D>(targetObject);
-                Debug.Log("🔘 CircleCollider2D adicionado");
+                UnityEngine.Debug.Log("🔘 CircleCollider2D adicionado");
             }
 
             // Configura como trigger com raio padrão
@@ -96,7 +96,7 @@ namespace SlimeKing.Editor
             circleCollider.radius = 2.5f;
             circleCollider.offset = Vector2.zero;
 
-            Debug.Log($"🔘 CircleCollider2D configurado como trigger (raio: {circleCollider.radius})");
+            UnityEngine.Debug.Log($"🔘 CircleCollider2D configurado como trigger (raio: {circleCollider.radius})");
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace SlimeKing.Editor
 
             if (interactionIconPrefab == null)
             {
-                Debug.LogWarning($"⚠️ Prefab do InteractionIcon não encontrado em: {INTERACTION_ICON_PREFAB_PATH}");
+                UnityEngine.Debug.LogWarning($"⚠️ Prefab do InteractionIcon não encontrado em: {INTERACTION_ICON_PREFAB_PATH}");
                 return;
             }
 
@@ -121,11 +121,11 @@ namespace SlimeKing.Editor
             {
                 iconPrefabProperty.objectReferenceValue = interactionIconPrefab;
                 serializedObject.ApplyModifiedProperties();
-                Debug.Log($"🎯 Prefab do InteractionIcon atribuído: {interactionIconPrefab.name}");
+                UnityEngine.Debug.Log($"🎯 Prefab do InteractionIcon atribuído: {interactionIconPrefab.name}");
             }
             else
             {
-                Debug.LogWarning("⚠️ Não foi possível encontrar o campo 'interactionIconPrefab' no NPCDialogueInteraction");
+                UnityEngine.Debug.LogWarning("⚠️ Não foi possível encontrar o campo 'interactionIconPrefab' no NPCDialogueInteraction");
             }
         }
 
@@ -155,7 +155,7 @@ namespace SlimeKing.Editor
             if (dialogueIdProperty != null && string.IsNullOrEmpty(dialogueIdProperty.stringValue))
             {
                 dialogueIdProperty.stringValue = $"npc_{targetObject.name.ToLower().Replace(" ", "_")}";
-                Debug.Log($"💬 Dialogue ID padrão configurado: {dialogueIdProperty.stringValue}");
+                UnityEngine.Debug.Log($"💬 Dialogue ID padrão configurado: {dialogueIdProperty.stringValue}");
             }
 
             // Configura botão de interação padrão
@@ -166,7 +166,7 @@ namespace SlimeKing.Editor
             }
 
             serializedObject.ApplyModifiedProperties();
-            Debug.Log("⚙️ Valores padrão configurados");
+            UnityEngine.Debug.Log("⚙️ Valores padrão configurados");
         }
 
         #region Utilitários de Debug
@@ -177,18 +177,18 @@ namespace SlimeKing.Editor
             GameObject selectedObject = Selection.activeGameObject;
             if (selectedObject == null)
             {
-                Debug.LogWarning("⚠️ Nenhum GameObject selecionado!");
+                UnityEngine.Debug.LogWarning("⚠️ Nenhum GameObject selecionado!");
                 return;
             }
 
             NPCDialogueInteraction dialogueInteraction = selectedObject.GetComponent<NPCDialogueInteraction>();
             if (dialogueInteraction == null)
             {
-                Debug.LogWarning($"⚠️ {selectedObject.name} não possui componente NPCDialogueInteraction!");
+                UnityEngine.Debug.LogWarning($"⚠️ {selectedObject.name} não possui componente NPCDialogueInteraction!");
                 return;
             }
 
-            Debug.Log($"=== DIALOGUE NPC INFO: {selectedObject.name} ===");
+            UnityEngine.Debug.Log($"=== DIALOGUE NPC INFO: {selectedObject.name} ===");
             
             SerializedObject serializedObject = new SerializedObject(dialogueInteraction);
             
@@ -198,23 +198,23 @@ namespace SlimeKing.Editor
             SerializedProperty prefabProp = serializedObject.FindProperty("interactionIconPrefab");
             SerializedProperty buttonProp = serializedObject.FindProperty("interactionButton");
 
-            Debug.Log($"Dialogue ID: {dialogueIdProp?.stringValue ?? "N/A"}");
-            Debug.Log($"Interaction Radius: {radiusProp?.floatValue ?? 0f}");
-            Debug.Log($"Icon Anchor: {(anchorProp?.objectReferenceValue != null ? anchorProp.objectReferenceValue.name : "None")}");
-            Debug.Log($"Icon Prefab: {(prefabProp?.objectReferenceValue != null ? prefabProp.objectReferenceValue.name : "None")}");
-            Debug.Log($"Interaction Button: {buttonProp?.stringValue ?? "N/A"}");
+            UnityEngine.Debug.Log($"Dialogue ID: {dialogueIdProp?.stringValue ?? "N/A"}");
+            UnityEngine.Debug.Log($"Interaction Radius: {radiusProp?.floatValue ?? 0f}");
+            UnityEngine.Debug.Log($"Icon Anchor: {(anchorProp?.objectReferenceValue != null ? anchorProp.objectReferenceValue.name : "None")}");
+            UnityEngine.Debug.Log($"Icon Prefab: {(prefabProp?.objectReferenceValue != null ? prefabProp.objectReferenceValue.name : "None")}");
+            UnityEngine.Debug.Log($"Interaction Button: {buttonProp?.stringValue ?? "N/A"}");
 
             CircleCollider2D collider = selectedObject.GetComponent<CircleCollider2D>();
             if (collider != null)
             {
-                Debug.Log($"CircleCollider2D: Trigger={collider.isTrigger}, Radius={collider.radius}");
+                UnityEngine.Debug.Log($"CircleCollider2D: Trigger={collider.isTrigger}, Radius={collider.radius}");
             }
             else
             {
-                Debug.Log("CircleCollider2D: Not found");
+                UnityEngine.Debug.Log("CircleCollider2D: Not found");
             }
 
-            Debug.Log("================================");
+            UnityEngine.Debug.Log("================================");
         }
 
         [MenuItem("GameObject/SlimeKing/Show Dialogue NPC Info", true)]

@@ -99,7 +99,7 @@ namespace SlimeKing.Core
         private void Log(string message)
         {
             if (enableLogs)
-                Debug.Log($"[SimpleCameraFollow] {message}");
+                UnityEngine.Debug.Log($"[SimpleCameraFollow] {message}");
         }
 
         private void OnEnable()

@@ -3,8 +3,9 @@
 Guia rápido e específico para agentes de IA atuarem produtivamente neste projeto Unity.
 
 ## Visão Geral da Arquitetura
-- Projeto Unity 2D (URP) organizado em pastas semânticas dentro de `Assets/` usando ícones unicode ("💻 Code", "🎮 Game", etc.). Referencie pelo nome exato ao citar caminhos.
-- Código de jogo principal vive em `Assets/💻 Code/Systems` (infra, managers) e `Assets/📦 External/` (código de terceiros / importado). Evite editar código externo sem necessidade explícita.
+- Projeto Unity 2D (URP) organizado em pastas semânticas dentro de `Assets/`. NUNCA deve usar ícones unicode ("💻 Code", "🎮 Game", etc.). Referencie pelo nome exato ao citar caminhos.
+- Código de jogo principal vive em `Assets/Code/Systems` (infra, managers) e `Assets/External/` (código de terceiros / importado). Evite editar código externo sem necessidade explícita.
+- Sempre siga os princípios KISS (Keep It Simple, Stupid) e YAGNI (You Aren't Gonna Need It) ao sugerir mudanças ou adicionar funcionalidades.
 - Padrão central: Managers derivados de `ManagerSingleton<T>` (`GameManager`, `SceneTransitionManager`) para serviços globais persistentes entre cenas. NÃO use Singleton para Player (ver `PlayerController`).
 - `GameManager`: controla preload + ativação de cenas Additive e faz limpeza de artefatos (EventSystem, Light2D).
 - `SceneTransitionManager`: oferece transições visuais e ordena canvas de transição (`sortingOrder = 9999`).

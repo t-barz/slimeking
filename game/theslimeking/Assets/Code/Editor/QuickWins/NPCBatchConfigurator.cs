@@ -144,7 +144,7 @@ namespace SlimeKing.Editor
                     {
                         result.FailureCount++;
                         result.Errors.Add($"Failed to configure {target.name}: {e.Message}");
-                        Debug.LogError($"❌ Failed to configure {target.name}: {e.Message}");
+                        UnityEngine.Debug.LogError($"❌ Failed to configure {target.name}: {e.Message}");
                     }
                 }
 
@@ -154,7 +154,7 @@ namespace SlimeKing.Editor
             catch (System.Exception e)
             {
                 result.Errors.Add($"Batch operation failed: {e.Message}");
-                Debug.LogError($"❌ Batch configuration failed: {e.Message}");
+                UnityEngine.Debug.LogError($"❌ Batch configuration failed: {e.Message}");
             }
             finally
             {

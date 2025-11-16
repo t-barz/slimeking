@@ -22,7 +22,7 @@ namespace SlimeKing.Editor
         {
             if (string.IsNullOrEmpty(npcName))
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Nome do NPC não pode ser vazio!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Nome do NPC não pode ser vazio!");
                 return null;
             }
 
@@ -31,7 +31,7 @@ namespace SlimeKing.Editor
             {
                 Directory.CreateDirectory(ANIMATOR_BASE_PATH);
                 AssetDatabase.Refresh();
-                Debug.Log($"📁 Diretório criado: {ANIMATOR_BASE_PATH}");
+                UnityEngine.Debug.Log($"📁 Diretório criado: {ANIMATOR_BASE_PATH}");
             }
 
             // Caminho do controller
@@ -42,7 +42,7 @@ namespace SlimeKing.Editor
 
             if (controller != null)
             {
-                Debug.Log($"✅ Animator Controller existente carregado: {controllerPath}");
+                UnityEngine.Debug.Log($"✅ Animator Controller existente carregado: {controllerPath}");
                 return controller;
             }
 
@@ -51,11 +51,11 @@ namespace SlimeKing.Editor
             
             if (controller != null)
             {
-                Debug.Log($"🎬 Novo Animator Controller criado: {controllerPath}");
+                UnityEngine.Debug.Log($"🎬 Novo Animator Controller criado: {controllerPath}");
             }
             else
             {
-                Debug.LogError($"❌ Falha ao criar Animator Controller em: {controllerPath}");
+                UnityEngine.Debug.LogError($"❌ Falha ao criar Animator Controller em: {controllerPath}");
             }
 
             return controller;
@@ -70,7 +70,7 @@ namespace SlimeKing.Editor
         {
             if (controller == null)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
                 return;
             }
 
@@ -78,7 +78,7 @@ namespace SlimeKing.Editor
             var layers = controller.layers;
             if (layers == null || layers.Length == 0)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace SlimeKing.Editor
             if (idleState != null)
             {
                 stateMachine.defaultState = idleState;
-                Debug.Log("✅ Estado 'Idle' definido como padrão");
+                UnityEngine.Debug.Log("✅ Estado 'Idle' definido como padrão");
             }
 
             // Criar estado Talk se diálogo estiver habilitado
@@ -102,7 +102,7 @@ namespace SlimeKing.Editor
                 var talkState = FindOrCreateState(stateMachine, "Talk");
                 if (talkState != null)
                 {
-                    Debug.Log("✅ Estado 'Talk' criado");
+                    UnityEngine.Debug.Log("✅ Estado 'Talk' criado");
                 }
             }
 
@@ -119,7 +119,7 @@ namespace SlimeKing.Editor
         {
             if (stateMachine == null)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: StateMachine não pode ser nulo!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: StateMachine não pode ser nulo!");
                 return null;
             }
 
@@ -128,14 +128,14 @@ namespace SlimeKing.Editor
             {
                 if (childState.state != null && childState.state.name == stateName)
                 {
-                    Debug.Log($"✅ Estado '{stateName}' já existe");
+                    UnityEngine.Debug.Log($"✅ Estado '{stateName}' já existe");
                     return childState.state;
                 }
             }
 
             // Criar novo estado
             var newState = stateMachine.AddState(stateName);
-            Debug.Log($"🎬 Estado '{stateName}' criado");
+            UnityEngine.Debug.Log($"🎬 Estado '{stateName}' criado");
             return newState;
         }
 
@@ -148,7 +148,7 @@ namespace SlimeKing.Editor
         {
             if (controller == null)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
                 return;
             }
 
@@ -177,14 +177,14 @@ namespace SlimeKing.Editor
             {
                 if (parameter.name == parameterName && parameter.type == parameterType)
                 {
-                    Debug.Log($"✅ Parâmetro '{parameterName}' já existe");
+                    UnityEngine.Debug.Log($"✅ Parâmetro '{parameterName}' já existe");
                     return;
                 }
             }
 
             // Adicionar novo parâmetro
             controller.AddParameter(parameterName, parameterType);
-            Debug.Log($"🎯 Parâmetro '{parameterName}' ({parameterType}) adicionado");
+            UnityEngine.Debug.Log($"🎯 Parâmetro '{parameterName}' ({parameterType}) adicionado");
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace SlimeKing.Editor
         {
             if (controller == null)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
                 return;
             }
 
@@ -204,7 +204,7 @@ namespace SlimeKing.Editor
             var layers = controller.layers;
             if (layers == null || layers.Length == 0)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
                 return;
             }
 
@@ -234,7 +234,7 @@ namespace SlimeKing.Editor
                 anyStateTransition.AddCondition(AnimatorConditionMode.If, 0, "IsDead");
                 anyStateTransition.hasExitTime = false;
                 anyStateTransition.duration = 0.1f;
-                Debug.Log("✅ Transição 'Any State → Death' criada");
+                UnityEngine.Debug.Log("✅ Transição 'Any State → Death' criada");
             }
 
             EditorUtility.SetDirty(controller);
@@ -276,7 +276,7 @@ namespace SlimeKing.Editor
         {
             if (fromState == null || toState == null)
             {
-                Debug.LogWarning("⚠️ NPCAnimatorSetup: Estado de origem ou destino é nulo!");
+                UnityEngine.Debug.LogWarning("⚠️ NPCAnimatorSetup: Estado de origem ou destino é nulo!");
                 return;
             }
 
@@ -290,7 +290,7 @@ namespace SlimeKing.Editor
                     {
                         if (condition.parameter == parameterName && condition.mode == conditionMode)
                         {
-                            Debug.Log($"✅ Transição '{fromState.name} → {toState.name}' já existe");
+                            UnityEngine.Debug.Log($"✅ Transição '{fromState.name} → {toState.name}' já existe");
                             return;
                         }
                     }
@@ -304,7 +304,7 @@ namespace SlimeKing.Editor
             newTransition.exitTime = hasExitTime ? 1f : 0f;
             newTransition.duration = duration;
 
-            Debug.Log($"🔀 Transição '{fromState.name} → {toState.name}' criada");
+            UnityEngine.Debug.Log($"🔀 Transição '{fromState.name} → {toState.name}' criada");
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace SlimeKing.Editor
         {
             if (controller == null)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não pode ser nulo!");
                 return;
             }
 
@@ -326,7 +326,7 @@ namespace SlimeKing.Editor
             var layers = controller.layers;
             if (layers == null || layers.Length == 0)
             {
-                Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
+                UnityEngine.Debug.LogError("❌ NPCAnimatorSetup: Controller não possui layers!");
                 return;
             }
 
@@ -353,14 +353,14 @@ namespace SlimeKing.Editor
             var state = FindStateByName(stateMachine, stateName);
             if (state == null)
             {
-                Debug.LogWarning($"⚠️ Estado '{stateName}' não encontrado");
+                UnityEngine.Debug.LogWarning($"⚠️ Estado '{stateName}' não encontrado");
                 return;
             }
 
             // Se o estado já tem uma animação, não sobrescrever
             if (state.motion != null)
             {
-                Debug.Log($"✅ Estado '{stateName}' já possui animação: {state.motion.name}");
+                UnityEngine.Debug.Log($"✅ Estado '{stateName}' já possui animação: {state.motion.name}");
                 return;
             }
 
@@ -371,7 +371,7 @@ namespace SlimeKing.Editor
             {
                 // Usar animação placeholder encontrada
                 state.motion = placeholderClip;
-                Debug.Log($"🎬 Animação placeholder '{placeholderClip.name}' aplicada ao estado '{stateName}'");
+                UnityEngine.Debug.Log($"🎬 Animação placeholder '{placeholderClip.name}' aplicada ao estado '{stateName}'");
             }
             else
             {
@@ -380,7 +380,7 @@ namespace SlimeKing.Editor
                 if (emptyClip != null)
                 {
                     state.motion = emptyClip;
-                    Debug.Log($"📝 Clip vazio criado e aplicado ao estado '{stateName}'");
+                    UnityEngine.Debug.Log($"📝 Clip vazio criado e aplicado ao estado '{stateName}'");
                 }
             }
         }
@@ -425,7 +425,7 @@ namespace SlimeKing.Editor
             AssetDatabase.CreateAsset(clip, clipPath);
             AssetDatabase.SaveAssets();
 
-            Debug.Log($"📁 Clip vazio criado em: {clipPath}");
+            UnityEngine.Debug.Log($"📁 Clip vazio criado em: {clipPath}");
             return clip;
         }
     }

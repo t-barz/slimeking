@@ -219,7 +219,7 @@ namespace SlimeKing.Gameplay
         {
             if (enableDebugLogs)
             {
-                Debug.Log($"[InteractionHandler-{name}] {message}");
+                UnityEngine.Debug.Log($"[InteractionHandler-{name}] {message}");
             }
         }
 

@@ -315,15 +315,15 @@ namespace SlimeKing.Visual
         {
             var colliders = GetComponentsInChildren<Collider2D>(true);
             
-            Debug.Log($"=== COLLIDER INFO ===");
-            Debug.Log($"GameObject: {gameObject.name}");
-            Debug.Log($"Total Colliders: {colliders.Length}");
+            UnityEngine.Debug.Log($"=== COLLIDER INFO ===");
+            UnityEngine.Debug.Log($"GameObject: {gameObject.name}");
+            UnityEngine.Debug.Log($"Total Colliders: {colliders.Length}");
             
             foreach (var collider in colliders)
             {
-                Debug.Log($"• {collider.GetType().Name} - {collider.name} (Enabled: {collider.enabled})");
+                UnityEngine.Debug.Log($"• {collider.GetType().Name} - {collider.name} (Enabled: {collider.enabled})");
             }
-            Debug.Log($"===================");
+            UnityEngine.Debug.Log($"===================");
         }
 
         #endregion

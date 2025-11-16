@@ -1076,10 +1076,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7250040506183406600}
-  - component: {fileID: 9125356257185140759}
   - component: {fileID: 6949232957815606172}
+  - component: {fileID: 8596529800839074662}
   m_Layer: 0
-  m_Name: CrystalCounters_Container
+  m_Name: CrystalContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1110,39 +1110,6 @@ RectTransform:
   m_AnchoredPosition: {x: -20, y: -77.11}
   m_SizeDelta: {x: 300, y: 150}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &9125356257185140759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5022964274461426554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d60e92b21fee2a74c9e4dc226a60387c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.UI.CrystalCounterUI
-  crystalCountTexts:
-  - {fileID: 4064227878556776294}
-  - {fileID: 4567684513291135650}
-  - {fileID: 5478075340484873246}
-  - {fileID: 2062172841728265027}
-  - {fileID: 4066102225790209833}
-  - {fileID: 8568869285004950451}
-  crystalIcons:
-  - {fileID: 6499639142785754492}
-  - {fileID: 7463340509068919630}
-  - {fileID: 2432864481541035755}
-  - {fileID: 3899292853571405586}
-  - {fileID: 3193397494488219009}
-  - {fileID: 759645629567931512}
-  natureColor: {r: 1, g: 1, b: 1, a: 1}
-  fireColor: {r: 1, g: 1, b: 1, a: 1}
-  waterColor: {r: 1, g: 1, b: 1, a: 1}
-  shadowColor: {r: 1, g: 1, b: 1, a: 1}
-  earthColor: {r: 1, g: 1, b: 1, a: 1}
-  airColor: {r: 1, g: 1, b: 1, a: 1}
-  enableDebugLogs: 0
 --- !u!114 &6949232957815606172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1169,6 +1136,19 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8596529800839074662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5022964274461426554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5874ce5f80ab10447b7e376e5915a157, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.UI.CrystalCounterUI
+  enableDebugLogs: 1
 --- !u!1 &5245342522701054288
 GameObject:
   m_ObjectHideFlags: 0
