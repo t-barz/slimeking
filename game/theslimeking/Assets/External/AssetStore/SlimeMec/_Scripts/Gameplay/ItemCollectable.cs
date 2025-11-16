@@ -386,12 +386,17 @@ namespace SlimeMec.Gameplay
         }
 
         /// <summary>
-        /// Coleta o item e aplica seus efeitos
+        /// Coleta o item e aplica seus efeitos.
+        /// Sistema de priorização: crystalData > inventoryItemData > itemData (legado)
         /// </summary>
         public void CollectItem(GameObject collector = null)
         {
-            // Evita múltiplas coletas
-            if (_isCollected) return;
+            // PROTEÇÃO: Evita múltiplas coletas
+            if (_isCollected)
+            {
+                Debug.Log("[ItemCollectable] Item já foi coletado, ignorando chamada duplicada");
+                return;
+            }
 
             // Marca como coletado imediatamente
             _isCollected = true;
@@ -402,6 +407,114 @@ namespace SlimeMec.Gameplay
                 _collider.enabled = false;
             }
 
+            Debug.Log($"[ItemCollectable] CollectItem iniciado - crystalData={crystalData != null}, inventoryItemData={inventoryItemData != null}, itemData={itemData != null}");
+
+            // PRIORIDADE 1: Cristais Elementais (NÃO vão para inventário)
+            if (crystalData != null)
+            {
+                Debug.Log($"[ItemCollectable] Rota CRISTAL selecionada para '{crystalData.crystalName}'");
+                ProcessCrystalCollection();
+                return;
+            }
+
+            // PRIORIDADE 2: Itens de Inventário
+            if (inventoryItemData != null)
+            {
+                Debug.Log($"[ItemCollectable] Rota INVENTÁRIO selecionada para '{inventoryItemData.itemName}'");
+                ProcessInventoryItemCollection();
+                return;
+            }
+
+            // PRIORIDADE 3: Sistema Legado (CollectableItemData)
+            if (itemData != null)
+            {
+                Debug.LogWarning($"[ItemCollectable] Rota LEGADO selecionada para '{itemData.itemName}' - considere migrar para inventoryItemData");
+                ProcessLegacyItemCollection(collector);
+                return;
+            }
+
+            // Nenhum dado configurado
+            Debug.LogWarning("[ItemCollectable] Nenhum ItemData configurado! Item não pode ser coletado.");
+            RevertCollectionState();
+        }
+
+        /// <summary>
+        /// Processa coleta de cristal elemental.
+        /// Cristais NÃO são adicionados ao inventário - apenas atualizam contadores no GameManager.
+        /// </summary>
+        private void ProcessCrystalCollection()
+        {
+            // Validação: GameManager deve existir
+            if (GameManager.Instance == null)
+            {
+                Debug.LogError($"[ItemCollectable] GameManager.Instance é null! Cristal '{crystalData.crystalName}' não pode ser processado.");
+                RevertCollectionState();
+                return;
+            }
+
+            try
+            {
+                // Adiciona cristal ao contador (NÃO ao inventário)
+                Debug.Log($"[ItemCollectable] Chamando GameManager.AddCrystal({crystalData.crystalType}, {crystalData.value})");
+                GameManager.Instance.AddCrystal(crystalData.crystalType, crystalData.value);
+
+                Debug.Log($"[ItemCollectable] ✓ Cristal '{crystalData.crystalName}' coletado com sucesso (+{crystalData.value} {crystalData.crystalType})");
+
+                // Executa efeitos visuais e sonoros
+                PlayCrystalCollectionEffects();
+
+                // Remove o cristal da cena
+                DestroyItem();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[ItemCollectable] Erro ao processar cristal: {ex.Message}");
+                RevertCollectionState();
+            }
+        }
+
+        /// <summary>
+        /// Processa coleta de item de inventário.
+        /// Tenta adicionar ao InventoryManager e trata inventário cheio graciosamente.
+        /// </summary>
+        private void ProcessInventoryItemCollection()
+        {
+            // Validação: InventoryManager deve existir
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError($"[ItemCollectable] InventoryManager.Instance é null! Item '{inventoryItemData.itemName}' não pode ser processado.");
+                RevertCollectionState();
+                return;
+            }
+
+            // Tenta adicionar ao inventário
+            bool success = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
+
+            if (!success)
+            {
+                // Inventário cheio - mantém item na cena
+                Debug.Log($"[ItemCollectable] ✗ Inventário cheio! Item '{inventoryItemData.itemName}' não foi coletado.");
+                RevertCollectionState();
+                // TODO: Mostrar notificação "Inventário Cheio!" na UI
+                return;
+            }
+
+            // Sucesso - efeitos e remoção
+            Debug.Log($"[ItemCollectable] ✓ Item '{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity})");
+
+            // Executa efeitos visuais e sonoros
+            PlayCollectionEffects();
+
+            // Remove o item da cena
+            DestroyItem();
+        }
+
+        /// <summary>
+        /// Processa coleta usando sistema legado (CollectableItemData).
+        /// Mantido para compatibilidade com itens antigos.
+        /// </summary>
+        private void ProcessLegacyItemCollection(GameObject collector)
+        {
             // Encontra o coletor (player)
             if (collector == null && _playerTransform != null)
             {
@@ -410,85 +523,36 @@ namespace SlimeMec.Gameplay
 
             if (collector == null)
             {
-                Debug.LogWarning("[ItemCollectable] Coletor não encontrado!");
-                _isCollected = false; // Permite tentar novamente
-                if (_collider != null) _collider.enabled = true;
+                Debug.LogWarning("[ItemCollectable] Coletor não encontrado para sistema legado!");
+                RevertCollectionState();
                 return;
             }
 
-            // Tenta coletar como cristal se crystalData estiver configurado (prioridade máxima)
-            if (crystalData != null)
+            Debug.Log($"[ItemCollectable] Processando item legado '{itemData.itemName}'");
+
+            // Aplica efeitos do item (sistema antigo)
+            ApplyItemEffects(collector);
+
+            // Executa efeitos visuais e sonoros
+            PlayCollectionEffects();
+
+            // Remove o item da cena
+            DestroyItem();
+        }
+
+        /// <summary>
+        /// Reverte o estado de coleta quando falha.
+        /// Permite que o jogador tente coletar novamente.
+        /// </summary>
+        private void RevertCollectionState()
+        {
+            Debug.Log("[ItemCollectable] Revertendo estado de coleta - item permanece na cena");
+            _isCollected = false;
+
+            // Reabilita collider
+            if (_collider != null)
             {
-                Debug.Log($"[ItemCollectable] Processando cristal: {crystalData.crystalName}");
-
-                if (GameManager.Instance != null)
-                {
-                    Debug.Log($"[ItemCollectable] GameManager encontrado, chamando AddCrystal({crystalData.crystalType}, {crystalData.value})");
-                    GameManager.Instance.AddCrystal(crystalData.crystalType, crystalData.value);
-
-                    Debug.Log($"[ItemCollectable] Cristal '{crystalData.crystalName}' coletado (+{crystalData.value} {crystalData.crystalType})");
-
-                    // Executa efeitos visuais e sonoros
-                    PlayCrystalCollectionEffects();
-
-                    // Remove o cristal da cena
-                    DestroyItem();
-                    return;
-                }
-                else
-                {
-                    Debug.LogError($"[ItemCollectable] GameManager.Instance é null! Cristal não pode ser processado.");
-
-                    // Reverte estado de coleta para permitir tentar novamente
-                    _isCollected = false;
-                    if (_collider != null) _collider.enabled = true;
-                    return;
-                }
-            }
-
-            // Tenta adicionar ao inventário se inventoryItemData estiver configurado
-            if (inventoryItemData != null && InventoryManager.Instance != null)
-            {
-                bool addedToInventory = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
-
-                if (!addedToInventory)
-                {
-                    // Inventário cheio - não destrói o item
-                    Debug.Log($"[ItemCollectable] Inventário cheio! Item '{inventoryItemData.itemName}' não foi coletado.");
-
-                    // Reverte estado de coleta
-                    _isCollected = false;
-                    if (_collider != null) _collider.enabled = true;
-
-                    // TODO: Mostrar notificação "Inventário Cheio!" (Task 7)
-                    return;
-                }
-
-                Debug.Log($"[ItemCollectable] Item '{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity}).");
-
-                // Executa efeitos visuais e sonoros
-                PlayCollectionEffects();
-
-                // Remove o item da cena
-                DestroyItem();
-            }
-            // Fallback para sistema antigo (CollectableItemData)
-            else if (itemData != null)
-            {
-                // Aplica efeitos do item (sistema antigo)
-                ApplyItemEffects(collector);
-
-                // Executa efeitos visuais e sonoros
-                PlayCollectionEffects();
-
-                // Remove o item da cena
-                DestroyItem();
-            }
-            else
-            {
-                Debug.LogWarning("[ItemCollectable] Nenhum ItemData configurado!");
-                _isCollected = false;
-                if (_collider != null) _collider.enabled = true;
+                _collider.enabled = true;
             }
         }
 
