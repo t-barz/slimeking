@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TheSlimeKing.Inventory
 {
-    [CreateAssetMenu(fileName = "NewItem", menuName = "The Slime King/Item")]
+    [CreateAssetMenu(fileName = "NewItem", menuName = "Extra Tools/Items/Item")]
     public class ItemData : ScriptableObject
     {
         [Header("Basic Info")]

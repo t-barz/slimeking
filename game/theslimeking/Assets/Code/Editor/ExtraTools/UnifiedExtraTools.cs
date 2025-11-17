@@ -13,6 +13,20 @@ namespace ExtraTools.Editor
     /// <summary>
     /// Menu unificado de ferramentas extras para desenvolvimento Unity
     /// Consolida todas as funcionalidades em um único lugar
+    /// 
+    /// ⚠️ POLÍTICA DE MENUS - OBRIGATÓRIA:
+    /// TODOS os menus de editor DEVEM estar sob "Extra Tools/"
+    /// NUNCA criar menus separados como "SlimeKing/", "The Slime King/", etc.
+    /// 
+    /// Estrutura obrigatória:
+    /// - "Extra Tools/Tests/..." - Para todos os testes
+    /// - "Extra Tools/Setup/..." - Para ferramentas de configuração  
+    /// - "Extra Tools/NPC/..." - Para ferramentas de NPC
+    /// - "Extra Tools/Scene Tools/..." - Para ferramentas de cena
+    /// - "Extra Tools/Quest System/..." - Para sistema de quests
+    /// - "Assets/Create/Extra Tools/..." - Para criação de assets
+    /// 
+    /// Ver README.md para detalhes completos da política.
     /// </summary>
     public class UnifiedExtraTools : EditorWindow
     {

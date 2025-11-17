@@ -7,7 +7,7 @@ namespace SlimeKing.Data
     /// ScriptableObject que define as propriedades de um cristal elemental.
     /// Usado para configurar diferentes tipos de cristais coletáveis no jogo.
     /// </summary>
-    [CreateAssetMenu(fileName = "New Crystal Data", menuName = "SlimeKing/Items/Crystal Elemental Data")]
+    [CreateAssetMenu(fileName = "New Crystal Data", menuName = "Extra Tools/Items/Crystal Elemental Data")]
     public class CrystalElementalData : ScriptableObject
     {
         [Header("Crystal Identification")]

@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb7b35f36fcfff54db37be810af6feca, type: 3}
+  m_Name: SlimeFriendshipData
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.FriendshipData
+  speciesName: Slime
+  maxLevel: 5
+  levels:
+  - level: 0
+    title: Desconhecido
+    description: "Voc\xEA n\xE3o conhece esta criatura ainda."
+    unlockedBenefits:
+    - "Nenhum benef\xEDcio"
+  - level: 1
+    title: Conhecido
+    description: "A criatura reconhece sua presen\xE7a."
+    unlockedBenefits:
+    - "NPC n\xE3o foge mais de voc\xEA"
+  - level: 2
+    title: "Amig\xE1vel"
+    description: "A criatura demonstra confian\xE7a em voc\xEA."
+    unlockedBenefits:
+    - Desconto de 10% em trocas
+    - Pode receber presentes
+  - level: 3
+    title: Amigo
+    description: "Voc\xEAs desenvolveram uma amizade verdadeira."
+    unlockedBenefits:
+    - Desconto de 20% em trocas
+    - Ajuda em combate ocasionalmente
+  - level: 4
+    title: Melhor Amigo
+    description: Uma amizade profunda e duradoura.
+    unlockedBenefits:
+    - Desconto de 30% em trocas
+    - Ajuda em combate frequentemente
+    - Acesso a quests especiais
+  - level: 5
+    title: Companheiro Leal
+    description: "Um v\xEDnculo inquebrant\xE1vel de lealdade e confian\xE7a."
+    unlockedBenefits:
+    - Desconto de 50% em trocas
+    - Sempre ajuda em combate
+    - Acesso a todas as quests especiais
+    - Pode ser invocado como aliado

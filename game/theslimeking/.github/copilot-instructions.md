@@ -55,6 +55,18 @@ namespace SlimeKing.Core {
 - Usar `DestroyImmediate` em runtime (Managers usam `Destroy`).
 - Introduzir dependências ao `PlayerController` dentro de novos Managers (manter Player independente).
 - Fazer over-engineering de soluções simples; prefira clareza e manutenção futura.
+- **NUNCA criar menus fora de "Extra Tools/"** - todos os `[MenuItem]` devem seguir estrutura unificada (ver seção Editor Tools).
+
+## Editor Tools & Menus
+- **POLÍTICA OBRIGATÓRIA**: TODOS os menus de editor devem estar sob `"Extra Tools/"`.
+- **Estrutura de menus**:
+  - `"Extra Tools/Tests/"` - Para todos os testes e validações
+  - `"Extra Tools/Setup/"` - Para ferramentas de configuração e integração
+  - `"Extra Tools/NPC/"`, `"Extra Tools/Camera/"`, etc. - Para categorias específicas
+  - `"Assets/Create/Extra Tools/"` - Para criação de assets customizados
+- **NUNCA usar**: `"SlimeKing/"`, `"The Slime King/"`, `"ProjectName/"` ou qualquer outro menu raiz.
+- Namespace padrão para editor tools: `ExtraTools.Editor`.
+- Ver `Assets/Code/Editor/ExtraTools/README.md` para documentação completa.
 
 ---
 Feedback: Informe se falta alguma convenção de build, testes ou pipelines para incluirmos. Quais fluxos internos (ex: audio, inventário) você quer documentar na próxima versão?

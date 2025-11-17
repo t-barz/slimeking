@@ -25,7 +25,7 @@ public static class ItemQuickConfig
     private const string ROCK_CONTROLLER_PATH = "Assets/External/AssetStore/SlimeMec/_Animation/Item/RoundedRockA/item_RoundedRockA.controller";
     private const string FRUIT_CONTROLLER_PATH = "Assets/External/AssetStore/SlimeMec/_Animation/Item/RedFruit/item_RedFruit.controller";
 
-    [MenuItem("GameObject/Quick Config/🪨 Configure as Item", false, 0)]
+    [MenuItem("GameObject/Extra Tools/🪨 Configure as Item", false, 0)]
     public static void ConfigureAsItem(MenuCommand menuCommand)
     {
         GameObject targetObject = menuCommand.context as GameObject;
@@ -46,7 +46,7 @@ public static class ItemQuickConfig
         }
     }
 
-    [MenuItem("GameObject/Quick Config/🪨 Configure as Item", true)]
+    [MenuItem("GameObject/Extra Tools/🪨 Configure as Item", true)]
     public static bool ValidateConfigureAsItem()
     {
         return Selection.activeGameObject != null;
@@ -179,8 +179,8 @@ public static class ItemQuickConfig
     /// <summary>
     /// Exporta estrutura, componentes e configurações do GameObject selecionado para arquivo .txt
     /// </summary>
-    [MenuItem("GameObject/Export Structure", false, 20)]
-    [MenuItem("CONTEXT/GameObject/Export Structure", false, 200)]
+    [MenuItem("GameObject/Extra Tools/Export Structure", false, 20)]
+    [MenuItem("CONTEXT/GameObject/Extra Tools Export Structure", false, 200)]
     public static void ExportGameObjectStructure(MenuCommand menuCommand)
     {
         GameObject targetObject = menuCommand.context as GameObject;

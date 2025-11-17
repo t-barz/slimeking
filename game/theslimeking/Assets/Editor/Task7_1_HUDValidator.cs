@@ -13,7 +13,7 @@ namespace TheSlimeKing.Editor
     public class Task7_1_HUDValidator : EditorWindow
     {
         #region Window Setup
-        [MenuItem("The Slime King/Tests/Task 7.1 - HUD Validator")]
+        [MenuItem("Extra Tools/Tests/Task 7.1 - HUD Validator")]
         public static void ShowWindow()
         {
             var window = GetWindow<Task7_1_HUDValidator>("Task 7.1: HUD Validator");
@@ -27,7 +27,7 @@ namespace TheSlimeKing.Editor
         private bool showManualTests = true;
         private bool showQuickActions = true;
         private bool showValidationResults = true;
-        
+
         private Dictionary<CrystalType, ValidationResult> validationResults = new Dictionary<CrystalType, ValidationResult>();
         private bool hasRunValidation = false;
         #endregion
@@ -49,36 +49,36 @@ namespace TheSlimeKing.Editor
         private void OnGUI()
         {
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-            
+
             DrawHeader();
             EditorGUILayout.Space(10);
-            
+
             DrawRequirementsSection();
             EditorGUILayout.Space(10);
-            
+
             if (showQuickActions)
             {
                 DrawQuickActionsSection();
                 EditorGUILayout.Space(10);
             }
-            
+
             if (showAutomatedTests)
             {
                 DrawAutomatedTestsSection();
                 EditorGUILayout.Space(10);
             }
-            
+
             if (showManualTests)
             {
                 DrawManualTestsSection();
                 EditorGUILayout.Space(10);
             }
-            
+
             if (showValidationResults && hasRunValidation)
             {
                 DrawValidationResultsSection();
             }
-            
+
             EditorGUILayout.EndScrollView();
         }
 
@@ -95,7 +95,7 @@ namespace TheSlimeKing.Editor
         private void DrawRequirementsSection()
         {
             EditorGUILayout.LabelField("Requirements Checklist", EditorStyles.boldLabel);
-            
+
             EditorGUILayout.HelpBox(
                 "✓ 3.1: CrystalContainer contém marcador visual para cada tipo\n" +
                 "✓ 3.2: Count_Text atualiza quando cristal é coletado\n" +
@@ -110,13 +110,13 @@ namespace TheSlimeKing.Editor
         {
             showQuickActions = EditorGUILayout.Foldout(showQuickActions, "Quick Actions", true, EditorStyles.foldoutHeader);
             if (!showQuickActions) return;
-            
+
             EditorGUI.indentLevel++;
-            
+
             EditorGUILayout.HelpBox("Use estas ações rápidas para testar o HUD durante Play Mode", MessageType.Info);
-            
+
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
-            
+
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Add 1 to All Crystals", GUILayout.Height(30)))
             {
@@ -127,7 +127,7 @@ namespace TheSlimeKing.Editor
                 AddCrystalsToAll(10);
             }
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Reset All Counters", GUILayout.Height(30)))
             {
@@ -138,15 +138,15 @@ namespace TheSlimeKing.Editor
                 SetRandomCrystalValues();
             }
             EditorGUILayout.EndHorizontal();
-            
+
             EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("Individual Crystal Tests:", EditorStyles.boldLabel);
-            
+
             foreach (CrystalType type in System.Enum.GetValues(typeof(CrystalType)))
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(type.ToString(), GUILayout.Width(100));
-                
+
                 if (GUILayout.Button("+1", GUILayout.Width(40)))
                 {
                     AddCrystal(type, 1);
@@ -163,24 +163,24 @@ namespace TheSlimeKing.Editor
                 {
                     ResetCrystal(type);
                 }
-                
+
                 // Show current count
                 if (GameManager.Instance != null)
                 {
                     int count = GameManager.Instance.GetCrystalCount(type);
                     EditorGUILayout.LabelField($"Current: {count}", GUILayout.Width(80));
                 }
-                
+
                 EditorGUILayout.EndHorizontal();
             }
-            
+
             EditorGUI.EndDisabledGroup();
-            
+
             if (!Application.isPlaying)
             {
                 EditorGUILayout.HelpBox("⚠ Entre em Play Mode para usar as Quick Actions", MessageType.Warning);
             }
-            
+
             EditorGUI.indentLevel--;
         }
 
@@ -188,28 +188,28 @@ namespace TheSlimeKing.Editor
         {
             showAutomatedTests = EditorGUILayout.Foldout(showAutomatedTests, "Automated Validation", true, EditorStyles.foldoutHeader);
             if (!showAutomatedTests) return;
-            
+
             EditorGUI.indentLevel++;
-            
+
             EditorGUILayout.HelpBox(
                 "Executa validações automáticas da estrutura do HUD e referências",
                 MessageType.Info
             );
-            
+
             EditorGUI.BeginDisabledGroup(!Application.isPlaying);
-            
+
             if (GUILayout.Button("Run Automated Validation", GUILayout.Height(40)))
             {
                 RunAutomatedValidation();
             }
-            
+
             EditorGUI.EndDisabledGroup();
-            
+
             if (!Application.isPlaying)
             {
                 EditorGUILayout.HelpBox("⚠ Entre em Play Mode para executar validação automática", MessageType.Warning);
             }
-            
+
             EditorGUI.indentLevel--;
         }
 
@@ -217,14 +217,14 @@ namespace TheSlimeKing.Editor
         {
             showManualTests = EditorGUILayout.Foldout(showManualTests, "Manual Test Checklist", true, EditorStyles.foldoutHeader);
             if (!showManualTests) return;
-            
+
             EditorGUI.indentLevel++;
-            
+
             EditorGUILayout.HelpBox(
                 "Siga esta checklist para validação manual completa:",
                 MessageType.Info
             );
-            
+
             EditorGUILayout.LabelField("Test 7.1.1: Nature Crystal", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("□ Coletar cristal Nature");
             EditorGUILayout.LabelField("□ Verificar contador atualiza (x0 → x1)");
@@ -232,31 +232,31 @@ namespace TheSlimeKing.Editor
             EditorGUILayout.LabelField("□ Verificar cor verde/nature");
             EditorGUILayout.LabelField("□ Verificar ícone visível");
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.LabelField("Test 7.1.2: Fire Crystal", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("□ Coletar cristal Fire");
             EditorGUILayout.LabelField("□ Verificar contador atualiza");
             EditorGUILayout.LabelField("□ Verificar cor vermelha/laranja");
             EditorGUILayout.LabelField("□ Verificar ícone visível");
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.LabelField("Test 7.1.3-7.1.6: Water, Shadow, Earth, Air", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("□ Repetir testes para cada tipo");
             EditorGUILayout.LabelField("□ Verificar cores apropriadas");
             EditorGUILayout.LabelField("□ Verificar ícones corretos");
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.LabelField("Test 7.1.7: Multiple Collections", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("□ Coletar 5 cristais do mesmo tipo");
             EditorGUILayout.LabelField("□ Verificar incremento (x1→x2→x3→x4→x5)");
             EditorGUILayout.LabelField("□ Verificar atualização imediata");
             EditorGUILayout.Space(5);
-            
+
             EditorGUILayout.LabelField("Test 7.1.8: Mixed Collections", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("□ Coletar cristais em ordem aleatória");
             EditorGUILayout.LabelField("□ Verificar contadores independentes");
             EditorGUILayout.LabelField("□ Verificar sem cross-contamination");
-            
+
             EditorGUI.indentLevel--;
         }
 
@@ -264,46 +264,46 @@ namespace TheSlimeKing.Editor
         {
             showValidationResults = EditorGUILayout.Foldout(showValidationResults, "Validation Results", true, EditorStyles.foldoutHeader);
             if (!showValidationResults) return;
-            
+
             EditorGUI.indentLevel++;
-            
+
             bool allPassed = true;
             foreach (var kvp in validationResults)
             {
                 CrystalType type = kvp.Key;
                 ValidationResult result = kvp.Value;
-                
+
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                
+
                 string status = result.TextReferenceValid && result.FormatCorrect ? "✓" : "✗";
                 EditorGUILayout.LabelField($"{status} {type}", EditorStyles.boldLabel);
-                
+
                 EditorGUI.indentLevel++;
-                
+
                 DrawValidationItem("Text Reference", result.TextReferenceValid);
                 DrawValidationItem("Format Correct", result.FormatCorrect);
                 DrawValidationItem("Color Appropriate", result.ColorAppropriate);
                 DrawValidationItem("Icon Visible", result.IconVisible);
-                
+
                 if (!string.IsNullOrEmpty(result.CurrentText))
                 {
                     EditorGUILayout.LabelField($"Current Text: '{result.CurrentText}'");
                 }
-                
+
                 if (!string.IsNullOrEmpty(result.Issues))
                 {
                     EditorGUILayout.HelpBox(result.Issues, MessageType.Warning);
                     allPassed = false;
                 }
-                
+
                 EditorGUI.indentLevel--;
-                
+
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.Space(3);
             }
-            
+
             EditorGUILayout.Space(5);
-            
+
             if (allPassed)
             {
                 EditorGUILayout.HelpBox("✓ All automated validations passed!", MessageType.Info);
@@ -312,7 +312,7 @@ namespace TheSlimeKing.Editor
             {
                 EditorGUILayout.HelpBox("✗ Some validations failed. Check issues above.", MessageType.Warning);
             }
-            
+
             EditorGUI.indentLevel--;
         }
 
@@ -320,16 +320,16 @@ namespace TheSlimeKing.Editor
         {
             string icon = passed ? "✓" : "✗";
             Color color = passed ? Color.green : Color.red;
-            
+
             EditorGUILayout.BeginHorizontal();
-            
+
             Color oldColor = GUI.contentColor;
             GUI.contentColor = color;
             EditorGUILayout.LabelField(icon, GUILayout.Width(20));
             GUI.contentColor = oldColor;
-            
+
             EditorGUILayout.LabelField(label);
-            
+
             EditorGUILayout.EndHorizontal();
         }
         #endregion
@@ -342,12 +342,12 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] GameManager.Instance is null!");
                 return;
             }
-            
+
             foreach (CrystalType type in System.Enum.GetValues(typeof(CrystalType)))
             {
                 GameManager.Instance.AddCrystal(type, amount);
             }
-            
+
             Debug.Log($"[Task7_1_HUDValidator] Added {amount} to all crystal types");
         }
 
@@ -358,7 +358,7 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] GameManager.Instance is null!");
                 return;
             }
-            
+
             foreach (CrystalType type in System.Enum.GetValues(typeof(CrystalType)))
             {
                 int currentCount = GameManager.Instance.GetCrystalCount(type);
@@ -367,7 +367,7 @@ namespace TheSlimeKing.Editor
                     GameManager.Instance.RemoveCrystal(type, currentCount);
                 }
             }
-            
+
             Debug.Log("[Task7_1_HUDValidator] Reset all crystal counters to 0");
         }
 
@@ -378,9 +378,9 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] GameManager.Instance is null!");
                 return;
             }
-            
+
             ResetAllCrystals();
-            
+
             foreach (CrystalType type in System.Enum.GetValues(typeof(CrystalType)))
             {
                 int randomAmount = Random.Range(0, 50);
@@ -389,7 +389,7 @@ namespace TheSlimeKing.Editor
                     GameManager.Instance.AddCrystal(type, randomAmount);
                 }
             }
-            
+
             Debug.Log("[Task7_1_HUDValidator] Set random crystal values");
         }
 
@@ -400,7 +400,7 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] GameManager.Instance is null!");
                 return;
             }
-            
+
             GameManager.Instance.AddCrystal(type, amount);
             Debug.Log($"[Task7_1_HUDValidator] Added {amount} {type} crystal(s)");
         }
@@ -412,13 +412,13 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] GameManager.Instance is null!");
                 return;
             }
-            
+
             int currentCount = GameManager.Instance.GetCrystalCount(type);
             if (currentCount > 0)
             {
                 GameManager.Instance.RemoveCrystal(type, currentCount);
             }
-            
+
             Debug.Log($"[Task7_1_HUDValidator] Reset {type} crystal counter to 0");
         }
         #endregion
@@ -428,20 +428,20 @@ namespace TheSlimeKing.Editor
         {
             validationResults.Clear();
             hasRunValidation = true;
-            
+
             Debug.Log("[Task7_1_HUDValidator] Starting automated validation...");
-            
+
             // Find CrystalHUDController
             var hudController = FindObjectOfType<TheSlimeKing.UI.CrystalHUDController>();
             if (hudController == null)
             {
                 Debug.LogError("[Task7_1_HUDValidator] CrystalHUDController not found in scene!");
-                EditorUtility.DisplayDialog("Validation Failed", 
-                    "CrystalHUDController not found in scene. Make sure it's attached to CanvasHUD.", 
+                EditorUtility.DisplayDialog("Validation Failed",
+                    "CrystalHUDController not found in scene. Make sure it's attached to CanvasHUD.",
                     "OK");
                 return;
             }
-            
+
             // Find CrystalContainer
             Transform canvasHUD = GameObject.Find("CanvasHUD")?.transform;
             if (canvasHUD == null)
@@ -449,23 +449,23 @@ namespace TheSlimeKing.Editor
                 Debug.LogError("[Task7_1_HUDValidator] CanvasHUD not found in scene!");
                 return;
             }
-            
+
             Transform crystalContainer = canvasHUD.Find("CrystalContainer");
             if (crystalContainer == null)
             {
                 Debug.LogError("[Task7_1_HUDValidator] CrystalContainer not found!");
                 return;
             }
-            
+
             // Validate each crystal type
             foreach (CrystalType type in System.Enum.GetValues(typeof(CrystalType)))
             {
                 ValidationResult result = ValidateCrystalType(type, crystalContainer);
                 validationResults[type] = result;
             }
-            
+
             Debug.Log("[Task7_1_HUDValidator] Automated validation complete!");
-            
+
             Repaint();
         }
 
@@ -473,11 +473,11 @@ namespace TheSlimeKing.Editor
         {
             ValidationResult result = new ValidationResult();
             List<string> issues = new List<string>();
-            
+
             // Find crystal GameObject
             string crystalName = $"Crystal_{type}";
             Transform crystalTransform = crystalContainer.Find(crystalName);
-            
+
             if (crystalTransform == null)
             {
                 issues.Add($"GameObject '{crystalName}' not found");
@@ -488,7 +488,7 @@ namespace TheSlimeKing.Editor
                 result.Issues = string.Join("\n", issues);
                 return result;
             }
-            
+
             // Find Count_Text
             Transform countTextTransform = crystalTransform.Find("Count_Text");
             if (countTextTransform == null)
@@ -499,14 +499,14 @@ namespace TheSlimeKing.Editor
             else
             {
                 result.TextReferenceValid = true;
-                
+
                 // Get TextMeshProUGUI component
                 TextMeshProUGUI textComponent = countTextTransform.GetComponent<TextMeshProUGUI>();
                 if (textComponent != null)
                 {
                     result.CurrentText = textComponent.text;
                     result.CurrentColor = textComponent.color;
-                    
+
                     // Validate format (should be "x{number}")
                     if (result.CurrentText.StartsWith("x"))
                     {
@@ -517,7 +517,7 @@ namespace TheSlimeKing.Editor
                         result.FormatCorrect = false;
                         issues.Add($"Format incorrect: '{result.CurrentText}' (should start with 'x')");
                     }
-                    
+
                     // Validate color (basic check - not white/black)
                     if (textComponent.color != Color.white && textComponent.color != Color.black)
                     {
@@ -535,7 +535,7 @@ namespace TheSlimeKing.Editor
                     result.FormatCorrect = false;
                 }
             }
-            
+
             // Find Icon
             Transform iconTransform = crystalTransform.Find("Icon");
             if (iconTransform == null)
@@ -551,7 +551,7 @@ namespace TheSlimeKing.Editor
                     issues.Add("Icon is not active");
                 }
             }
-            
+
             result.Issues = string.Join("\n", issues);
             return result;
         }

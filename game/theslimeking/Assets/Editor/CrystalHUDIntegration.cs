@@ -11,7 +11,7 @@ namespace TheSlimeKing.Editor
     /// </summary>
     public class CrystalHUDIntegration : EditorWindow
     {
-        [MenuItem("SlimeKing/Setup/Integrate CrystalHUDController")]
+        [MenuItem("Extra Tools/Setup/Integrate CrystalHUDController")]
         public static void IntegrateCrystalHUD()
         {
             // Load the CanvasHUD prefab
@@ -133,7 +133,7 @@ namespace TheSlimeKing.Editor
             }
         }
 
-        [MenuItem("SlimeKing/Setup/Verify CrystalHUDController Integration")]
+        [MenuItem("Extra Tools/Setup/Verify CrystalHUDController Integration")]
         public static void VerifyIntegration()
         {
             // Load the CanvasHUD prefab

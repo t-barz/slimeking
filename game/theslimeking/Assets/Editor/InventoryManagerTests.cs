@@ -13,7 +13,7 @@ namespace TheSlimeKing.Editor.Tests
     public class InventoryManagerTests : EditorWindow
     {
         #region Window Setup
-        [MenuItem("The Slime King/Tests/Inventory Manager Tests")]
+        [MenuItem("Extra Tools/Tests/Inventory Manager Tests")]
         public static void ShowWindow()
         {
             var window = GetWindow<InventoryManagerTests>("Inventory Tests");
@@ -27,7 +27,7 @@ namespace TheSlimeKing.Editor.Tests
         private bool testsRunning = false;
         private int testsPassed = 0;
         private int testsFailed = 0;
-        
+
         // Test items
         private ItemData testStackableItem;
         private ItemData testNonStackableItem;
@@ -80,9 +80,9 @@ namespace TheSlimeKing.Editor.Tests
             // Test Results
             if (!string.IsNullOrEmpty(testLog))
             {
-                EditorGUILayout.LabelField($"Results: {testsPassed} passed, {testsFailed} failed", 
+                EditorGUILayout.LabelField($"Results: {testsPassed} passed, {testsFailed} failed",
                     EditorStyles.boldLabel);
-                
+
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                 EditorGUILayout.TextArea(testLog, GUILayout.ExpandHeight(true));
                 EditorGUILayout.EndScrollView();

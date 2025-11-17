@@ -17,7 +17,7 @@ namespace ExtraTools.Editor
         private const string BUSH_CONTROLLER_PATH = "Assets/External/AssetStore/SlimeMec/_Animation/BushA2/bushA2.controller";
         private const string BUSH_MATERIAL_PATH = "Assets/External/AssetStore/SlimeMec/_Art/Materials/sprite_lit_default.mat";
 
-        [MenuItem("GameObject/Quick Config/🌿 Configure as Bush", false, 0)]
+        [MenuItem("GameObject/Extra Tools/🌿 Configure as Bush", false, 0)]
         public static void ConfigureAsBush(MenuCommand menuCommand)
         {
             // Obtém o GameObject selecionado ou cria um novo
@@ -46,7 +46,7 @@ namespace ExtraTools.Editor
         /// <summary>
         /// Valida se o menu deve aparecer (só quando há GameObject selecionado)
         /// </summary>
-        [MenuItem("GameObject/Quick Config/🌿 Configure as Bush", true)]
+        [MenuItem("GameObject/Extra Tools/🌿 Configure as Bush", true)]
         public static bool ValidateConfigureAsBush()
         {
             return Selection.activeGameObject != null;
@@ -404,13 +404,13 @@ namespace ExtraTools.Editor
 
         #region Menu de Configuração Avançada
 
-        [MenuItem("GameObject/Quick Config/🌿 Bush Advanced Setup", false, 1)]
+        [MenuItem("GameObject/Extra Tools/🌿 Bush Advanced Setup", false, 1)]
         public static void ShowBushSetupWizard()
         {
             BushSetupWizard.ShowWindow();
         }
 
-        [MenuItem("GameObject/Quick Config/🌿 Bush Advanced Setup", true)]
+        [MenuItem("GameObject/Extra Tools/🌿 Bush Advanced Setup", true)]
         public static bool ValidateBushSetupWizard()
         {
             return Selection.activeGameObject != null;
@@ -420,7 +420,7 @@ namespace ExtraTools.Editor
 
         #region Utilitários de Debug
 
-        [MenuItem("GameObject/Quick Config/🔍 Show Bush Info", false, 10)]
+        [MenuItem("GameObject/Extra Tools/🔍 Show Bush Info", false, 10)]
         public static void ShowBushInfo()
         {
             GameObject selectedObject = Selection.activeGameObject;
@@ -444,7 +444,7 @@ namespace ExtraTools.Editor
             UnityEngine.Debug.Log("================================");
         }
 
-        [MenuItem("GameObject/Quick Config/🔍 Show Bush Info", true)]
+        [MenuItem("GameObject/Extra Tools/🔍 Show Bush Info", true)]
         public static bool ValidateShowBushInfo()
         {
             return Selection.activeGameObject != null;
@@ -456,7 +456,7 @@ namespace ExtraTools.Editor
         /// Configura apenas as triggers e as transições entre estados Idle, Shake, Destroy no Animator do GameObject.
         /// Não altera controller, não cria estados novos.
         /// </summary>
-        [MenuItem("GameObject/Quick Config/🌿 Configure Bush Animator States/Triggers", false, 1)]
+        [MenuItem("GameObject/Extra Tools/🌿 Configure Bush Animator States/Triggers", false, 1)]
         public static void ConfigureBushAnimatorStatesAndTriggers()
         {
             GameObject targetObject = Selection.activeGameObject;

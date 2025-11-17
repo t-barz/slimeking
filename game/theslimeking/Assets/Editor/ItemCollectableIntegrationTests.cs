@@ -18,7 +18,7 @@ namespace TheSlimeKing.Editor.Tests
     public class ItemCollectableIntegrationTests : EditorWindow
     {
         #region Window Setup
-        [MenuItem("The Slime King/Tests/ItemCollectable Integration Tests")]
+        [MenuItem("Extra Tools/Tests/ItemCollectable Integration Tests")]
         public static void ShowWindow()
         {
             var window = GetWindow<ItemCollectableIntegrationTests>("Integration Tests");
@@ -32,7 +32,7 @@ namespace TheSlimeKing.Editor.Tests
         private bool testsRunning = false;
         private int testsPassed = 0;
         private int testsFailed = 0;
-        
+
         // Test data
         private CrystalElementalData testCrystalData;
         private ItemData testItemData;
@@ -68,30 +68,30 @@ namespace TheSlimeKing.Editor.Tests
 
             // Individual Test Buttons
             EditorGUILayout.LabelField("Individual Tests", EditorStyles.boldLabel);
-            
+
             GUI.enabled = !testsRunning && Application.isPlaying;
             if (GUILayout.Button("6.1: Test Crystal Complete Flow", GUILayout.Height(30)))
             {
                 RunSingleTest(Test_CrystalCompleteFlow);
             }
-            
+
             if (GUILayout.Button("6.2: Test Item Complete Flow", GUILayout.Height(30)))
             {
                 RunSingleTest(Test_ItemCompleteFlow);
             }
-            
+
             if (GUILayout.Button("6.3: Test Inventory Full", GUILayout.Height(30)))
             {
                 RunSingleTest(Test_InventoryFull);
             }
-            
+
             if (GUILayout.Button("6.4: Test Type Prioritization", GUILayout.Height(30)))
             {
                 RunSingleTest(Test_TypePrioritization);
             }
-            
+
             EditorGUILayout.Space(10);
-            
+
             // Run All Tests Button
             if (GUILayout.Button("Run All Integration Tests", GUILayout.Height(40)))
             {
@@ -109,9 +109,9 @@ namespace TheSlimeKing.Editor.Tests
             // Test Results
             if (!string.IsNullOrEmpty(testLog))
             {
-                EditorGUILayout.LabelField($"Results: {testsPassed} passed, {testsFailed} failed", 
+                EditorGUILayout.LabelField($"Results: {testsPassed} passed, {testsFailed} failed",
                     EditorStyles.boldLabel);
-                
+
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
                 EditorGUILayout.TextArea(testLog, GUILayout.ExpandHeight(true));
                 EditorGUILayout.EndScrollView();
@@ -128,7 +128,7 @@ namespace TheSlimeKing.Editor.Tests
             testsFailed = 0;
 
             Log("=== RUNNING SINGLE TEST ===\n");
-            
+
             if (!ValidatePrerequisites())
             {
                 testsRunning = false;
@@ -150,7 +150,7 @@ namespace TheSlimeKing.Editor.Tests
             testsFailed = 0;
 
             Log("=== ITEMCOLLECTABLE INTEGRATION TESTS ===\n");
-            
+
             if (!ValidatePrerequisites())
             {
                 testsRunning = false;
@@ -260,12 +260,12 @@ namespace TheSlimeKing.Editor.Tests
             GameObject crystalObj = new GameObject("TestCrystal");
             crystalObj.tag = "Item"; // Ensure proper tag
             crystalObj.transform.position = Vector3.zero;
-            
+
             // Add required components
             SpriteRenderer sr = crystalObj.AddComponent<SpriteRenderer>();
             CircleCollider2D collider = crystalObj.AddComponent<CircleCollider2D>();
             collider.isTrigger = true;
-            
+
             ItemCollectable collectable = crystalObj.AddComponent<ItemCollectable>();
             collectable.SetCrystalData(testCrystalData);
             collectable.ForceActivateAttraction(); // Skip delay for testing
@@ -383,23 +383,23 @@ namespace TheSlimeKing.Editor.Tests
             GameObject itemObj = new GameObject("TestItem");
             itemObj.tag = "Item";
             itemObj.transform.position = Vector3.zero;
-            
+
             // Add required components
             SpriteRenderer sr = itemObj.AddComponent<SpriteRenderer>();
             CircleCollider2D collider = itemObj.AddComponent<CircleCollider2D>();
             collider.isTrigger = true;
-            
+
             ItemCollectable collectable = itemObj.AddComponent<ItemCollectable>();
-            
+
             // Use reflection to set inventoryItemData (since there's no public setter)
-            var field = typeof(ItemCollectable).GetField("inventoryItemData", 
+            var field = typeof(ItemCollectable).GetField("inventoryItemData",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (field != null)
             {
                 field.SetValue(collectable, testItemData);
             }
-            
-            var quantityField = typeof(ItemCollectable).GetField("itemQuantity", 
+
+            var quantityField = typeof(ItemCollectable).GetField("itemQuantity",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (quantityField != null)
             {
@@ -506,15 +506,15 @@ namespace TheSlimeKing.Editor.Tests
             GameObject itemObj = new GameObject("TestItemFullInventory");
             itemObj.tag = "Item";
             itemObj.transform.position = Vector3.zero;
-            
+
             SpriteRenderer sr = itemObj.AddComponent<SpriteRenderer>();
             CircleCollider2D collider = itemObj.AddComponent<CircleCollider2D>();
             collider.isTrigger = true;
-            
+
             ItemCollectable collectable = itemObj.AddComponent<ItemCollectable>();
-            
+
             // Set inventoryItemData using reflection
-            var field = typeof(ItemCollectable).GetField("inventoryItemData", 
+            var field = typeof(ItemCollectable).GetField("inventoryItemData",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (field != null)
             {
@@ -601,20 +601,20 @@ namespace TheSlimeKing.Editor.Tests
 
             // Test 1: Item with BOTH crystalData AND inventoryItemData (crystal should win)
             Log("\nTest 1: Crystal + Inventory data (crystal priority)");
-            
+
             GameObject dualItem = new GameObject("DualDataItem");
             dualItem.tag = "Item";
             dualItem.transform.position = Vector3.zero;
-            
+
             SpriteRenderer sr1 = dualItem.AddComponent<SpriteRenderer>();
             CircleCollider2D collider1 = dualItem.AddComponent<CircleCollider2D>();
             collider1.isTrigger = true;
-            
+
             ItemCollectable collectable1 = dualItem.AddComponent<ItemCollectable>();
             collectable1.SetCrystalData(testCrystalData);
-            
+
             // Also set inventoryItemData
-            var field = typeof(ItemCollectable).GetField("inventoryItemData", 
+            var field = typeof(ItemCollectable).GetField("inventoryItemData",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (field != null)
             {
@@ -668,17 +668,17 @@ namespace TheSlimeKing.Editor.Tests
 
             // Test 2: Item with ONLY inventoryItemData
             Log("\nTest 2: Only inventory data");
-            
+
             GameObject inventoryItem = new GameObject("InventoryOnlyItem");
             inventoryItem.tag = "Item";
             inventoryItem.transform.position = Vector3.zero;
-            
+
             SpriteRenderer sr2 = inventoryItem.AddComponent<SpriteRenderer>();
             CircleCollider2D collider2 = inventoryItem.AddComponent<CircleCollider2D>();
             collider2.isTrigger = true;
-            
+
             ItemCollectable collectable2 = inventoryItem.AddComponent<ItemCollectable>();
-            
+
             // Set ONLY inventoryItemData
             if (field != null)
             {

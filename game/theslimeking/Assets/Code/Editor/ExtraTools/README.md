@@ -141,6 +141,55 @@ Ferramentas avançadas localizadas em `NPCTools/QuickWins/`:
 
 ---
 
+## ⚠️ POLÍTICA DE MENUS - OBRIGATÓRIA
+
+### 🚫 REGRA FUNDAMENTAL: APENAS UM MENU PRINCIPAL
+
+**TODOS** os menus e ferramentas de editor **DEVEM** estar organizados sob `"Extra Tools/"`.
+
+**❌ NUNCA CRIAR MENUS SEPARADOS COMO:**
+
+- `"SlimeKing/..."`
+- `"The Slime King/..."`
+- `"MyTool/..."`
+- `"ProjectName/..."`
+
+**✅ SEMPRE USAR A ESTRUTURA:**
+
+- `"Extra Tools/Tests/..."` - Para todos os testes
+- `"Extra Tools/Setup/..."` - Para ferramentas de configuração
+- `"Extra Tools/NPC/..."` - Para ferramentas de NPC
+- `"Extra Tools/Scene Tools/..."` - Para ferramentas de cena
+- `"Extra Tools/Quest System/..."` - Para sistema de quests
+- `"Assets/Create/Extra Tools/..."` - Para criação de assets
+
+### 🎯 Motivação
+
+1. **Organização**: Um único ponto de entrada para todas as ferramentas
+2. **Consistência**: Interface uniforme para toda a equipe
+3. **Manutenibilidade**: Fácil localização e gestão de ferramentas
+4. **Reutilização**: Estrutura agnóstica ao projeto específico
+
+### 🔍 Como Validar
+
+Antes de criar qualquer `[MenuItem]`:
+
+```csharp
+// ❌ ERRADO
+[MenuItem("MyTool/Do Something")]
+
+// ✅ CORRETO  
+[MenuItem("Extra Tools/Category/Do Something")]
+```
+
+### 🚨 Consequências do Não Cumprimento
+
+- **Code Review**: PRs serão rejeitados
+- **Refactoring**: Menus incorretos serão movidos sem aviso
+- **Documentation**: Ferramentas fora do padrão não serão documentadas
+
+---
+
 ## 🔧 Arquitetura Técnica
 
 ### Namespaces

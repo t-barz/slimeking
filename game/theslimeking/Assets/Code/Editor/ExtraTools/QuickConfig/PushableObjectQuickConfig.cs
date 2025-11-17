@@ -22,7 +22,7 @@ namespace ExtraTools.Editor
     /// </summary>
     public static class PushableObjectQuickConfig
     {
-        [MenuItem("GameObject/Quick Config/📦 Configure as Pushable Object", false, 0)]
+        [MenuItem("GameObject/Extra Tools/📦 Configure as Pushable Object", false, 0)]
         public static void ConfigureAsPushableObject(MenuCommand menuCommand)
         {
             // Obtém o GameObject selecionado
@@ -51,7 +51,7 @@ namespace ExtraTools.Editor
         /// <summary>
         /// Valida se o menu deve aparecer (só quando há GameObject selecionado)
         /// </summary>
-        [MenuItem("GameObject/Quick Config/📦 Configure as Pushable Object", true)]
+        [MenuItem("GameObject/Extra Tools/📦 Configure as Pushable Object", true)]
         public static bool ValidateConfigureAsPushableObject()
         {
             return Selection.activeGameObject != null;
@@ -255,7 +255,7 @@ namespace ExtraTools.Editor
         /// <summary>
         /// Exibe informações detalhadas de um PushableObject no Console
         /// </summary>
-        [MenuItem("GameObject/Quick Config/📦 Debug Pushable Object Info")]
+        [MenuItem("GameObject/Extra Tools/📦 Debug Pushable Object Info")]
         public static void DebugPushableObjectInfo()
         {
             GameObject selectedObject = Selection.activeGameObject;
@@ -288,7 +288,7 @@ namespace ExtraTools.Editor
             if (validation != null) UnityEngine.Debug.LogWarning($"⚠️ Validação: {validation}");
         }
 
-        [MenuItem("GameObject/Quick Config/📦 Debug Pushable Object Info", true)]
+        [MenuItem("GameObject/Extra Tools/📦 Debug Pushable Object Info", true)]
         public static bool ValidateDebugPushableObjectInfo()
         {
             return Selection.activeGameObject != null;
