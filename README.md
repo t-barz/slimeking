@@ -1,2 +1,0 @@
-# slimeking
- Jogo e recursos
