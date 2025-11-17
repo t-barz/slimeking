@@ -249,9 +249,11 @@ namespace ExtraTools.Editor
                 UnityEngine.Debug.Log("🎮 NPCController added");
             }
 
-            // Set NPCData reference
-            npcController.npcData = npcData;
-            UnityEngine.Debug.Log($"🎮 NPCController configured with NPCData: {npcData.name}");
+            // NOTE: NPCController was refactored to use new architecture
+            // The old npcData property no longer exists
+            // NPCController now uses NPCAttributesHandler and direct Inspector configuration
+            // TODO: Update this editor tool to work with new NPCController architecture
+            UnityEngine.Debug.Log($"🎮 NPCController added (configure manually in Inspector - old npcData system deprecated)");
 
             // 2. Add and configure NPCBehavior
             NPCBehavior npcBehavior = target.GetComponent<NPCBehavior>();

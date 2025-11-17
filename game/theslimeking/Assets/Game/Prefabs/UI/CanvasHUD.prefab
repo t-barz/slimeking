@@ -712,6 +712,7 @@ GameObject:
   - component: {fileID: 6867206802063298266}
   - component: {fileID: 4791191168869915926}
   - component: {fileID: 90326438721056326}
+  - component: {fileID: 3935099497782572363}
   m_Layer: 5
   m_Name: CanvasHUD
   m_TagString: Untagged
@@ -803,6 +804,26 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &3935099497782572363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4268673405881227850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6928f9f9df94521960d1edaf976eb37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.UI.CrystalHUDController
+  natureCountText: {fileID: 4064227878556776294}
+  fireCountText: {fileID: 4567684513291135650}
+  waterCountText: {fileID: 5478075340484873246}
+  shadowCountText: {fileID: 2062172841728265027}
+  earthCountText: {fileID: 4066102225790209833}
+  airCountText: {fileID: 8568869285004950451}
+  enableDebugLogs: 1
+  countFormat: x{0}
 --- !u!1 &4532896766664797732
 GameObject:
   m_ObjectHideFlags: 0

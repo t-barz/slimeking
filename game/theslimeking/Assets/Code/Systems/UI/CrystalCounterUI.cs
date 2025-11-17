@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using SlimeKing.Core;
 using System.Collections.Generic;
+using UnityDebug = UnityEngine.Debug;
 
 namespace SlimeKing.UI
 {
@@ -22,12 +23,14 @@ namespace SlimeKing.UI
 
         private void Awake()
         {
+            UnityDebug.Log($"[CrystalCounterUI] Awake chamado em GameObject: {gameObject.name}");
             InitializeCounterReferences();
         }
 
         private void OnEnable()
         {
-            // Subscreve aos eventos do GameManager quando disponível
+            // Tenta subscrever aos eventos do GameManager quando disponível
+            // Se GameManager ainda não estiver pronto, tentará novamente no Start()
             SubscribeToEvents();
         }
 
@@ -39,6 +42,16 @@ namespace SlimeKing.UI
 
         private void Start()
         {
+            UnityDebug.Log($"[CrystalCounterUI] Start chamado. Contadores conectados: {crystalCounterTexts.Count}/6");
+            
+            // Tenta subscrever novamente caso não tenha conseguido no OnEnable
+            if (GameManager.HasInstance)
+            {
+                // Força subscrição se GameManager agora está disponível
+                UnsubscribeFromEvents(); // Remove qualquer subscrição anterior
+                SubscribeToEvents(); // Subscreve novamente
+            }
+            
             // Atualiza todos os contadores na inicialização
             UpdateAllCounters();
         }
@@ -83,25 +96,25 @@ namespace SlimeKing.UI
                         if (textComponent != null)
                         {
                             crystalCounterTexts[crystalType] = textComponent;
-                            Log($"Contador de {crystalType} conectado: {crystalGameObjectName}/Count_Text");
+                            LogMessage($"Contador de {crystalType} conectado: {crystalGameObjectName}/Count_Text");
                         }
                         else
                         {
-                            LogWarning($"TextMeshProUGUI não encontrado em {crystalGameObjectName}/Count_Text");
+                            LogWarningMessage($"TextMeshProUGUI não encontrado em {crystalGameObjectName}/Count_Text");
                         }
                     }
                     else
                     {
-                        LogWarning($"Count_Text não encontrado em {crystalGameObjectName}");
+                        LogWarningMessage($"Count_Text não encontrado em {crystalGameObjectName}");
                     }
                 }
                 else
                 {
-                    LogWarning($"GameObject {crystalGameObjectName} não encontrado na hierarquia");
+                    LogWarningMessage($"GameObject {crystalGameObjectName} não encontrado na hierarquia");
                 }
             }
 
-            Log($"Inicialização concluída: {crystalCounterTexts.Count}/6 contadores conectados");
+            LogMessage($"Inicialização concluída: {crystalCounterTexts.Count}/6 contadores conectados");
         }
 
         /// <summary>
@@ -109,11 +122,28 @@ namespace SlimeKing.UI
         /// </summary>
         private Transform FindCrystalObject(string crystalName)
         {
-            // Procura primeiro na hierarquia local
+            // Primeiro tenta encontrar CrystalContainer
+            Transform crystalContainer = transform.Find("CrystalContainer");
+            if (crystalContainer == null)
+            {
+                // Se não encontrar como filho direto, procura recursivamente
+                crystalContainer = FindDeepChild(transform, "CrystalContainer");
+            }
+
+            if (crystalContainer != null)
+            {
+                // Procura o cristal específico dentro do CrystalContainer
+                Transform crystalTransform = crystalContainer.Find(crystalName);
+                if (crystalTransform != null)
+                {
+                    return crystalTransform;
+                }
+            }
+
+            // Fallback: procura em toda a hierarquia
             Transform localResult = transform.Find(crystalName);
             if (localResult != null) return localResult;
 
-            // Procura recursivamente nos filhos
             return FindDeepChild(transform, crystalName);
         }
 
@@ -146,11 +176,11 @@ namespace SlimeKing.UI
             if (GameManager.HasInstance)
             {
                 GameManager.Instance.OnCrystalCountChanged += HandleCrystalCountChanged;
-                Log("Subscrito aos eventos do GameManager");
+                LogMessage("Subscrito aos eventos do GameManager");
             }
             else
             {
-                LogWarning("GameManager não disponível para subscrição de eventos");
+                LogWarningMessage("GameManager não disponível para subscrição de eventos");
             }
         }
 
@@ -162,7 +192,7 @@ namespace SlimeKing.UI
             if (GameManager.HasInstance)
             {
                 GameManager.Instance.OnCrystalCountChanged -= HandleCrystalCountChanged;
-                Log("Subscrições removidas dos eventos do GameManager");
+                LogMessage("Subscrições removidas dos eventos do GameManager");
             }
         }
 
@@ -192,16 +222,16 @@ namespace SlimeKing.UI
                 if (counterText != null)
                 {
                     counterText.text = count.ToString();
-                    Log($"Contador de {crystalType} atualizado: {count}");
+                    LogMessage($"Contador de {crystalType} atualizado: {count}");
                 }
                 else
                 {
-                    LogWarning($"Referência do contador de {crystalType} é null");
+                    LogWarningMessage($"Referência do contador de {crystalType} é null");
                 }
             }
             else
             {
-                LogWarning($"Contador de {crystalType} não encontrado no cache");
+                LogWarningMessage($"Contador de {crystalType} não encontrado no cache");
             }
         }
 
@@ -212,7 +242,7 @@ namespace SlimeKing.UI
         {
             if (!GameManager.HasInstance)
             {
-                LogWarning("GameManager não disponível para atualização dos contadores");
+                LogWarningMessage("GameManager não disponível para atualização dos contadores");
                 return;
             }
 
@@ -222,7 +252,7 @@ namespace SlimeKing.UI
                 UpdateCrystalCounter(kvp.Key, kvp.Value);
             }
 
-            Log("Todos os contadores atualizados");
+            LogMessage("Todos os contadores atualizados");
         }
 
         #endregion
@@ -257,19 +287,19 @@ namespace SlimeKing.UI
 
         #region Logging
 
-        private void Log(string message)
+        private void LogMessage(string message)
         {
             if (enableDebugLogs)
             {
-                SlimeKing.Debug.Debug.Log($"[CrystalCounterUI] {message}");
+                UnityDebug.Log($"[CrystalCounterUI] {message}");
             }
         }
 
-        private void LogWarning(string message)
+        private void LogWarningMessage(string message)
         {
             if (enableDebugLogs)
             {
-                SlimeKing.Debug.Debug.LogWarning($"[CrystalCounterUI] {message}");
+                UnityDebug.LogWarning($"[CrystalCounterUI] {message}");
             }
         }
 
@@ -287,7 +317,7 @@ namespace SlimeKing.UI
             }
             else
             {
-                SlimeKing.Debug.Debug.Log("[CrystalCounterUI] Refresh só funciona durante o Play Mode");
+                UnityDebug.Log("[CrystalCounterUI] Refresh só funciona durante o Play Mode");
             }
         }
 
@@ -315,7 +345,7 @@ namespace SlimeKing.UI
                 status += $"{crystalType}: {(connected ? "✓" : "✗")} (Valor: {currentValue})\n";
             }
 
-            SlimeKing.Debug.Debug.Log(status);
+            UnityDebug.Log(status);
         }
 #endif
 
