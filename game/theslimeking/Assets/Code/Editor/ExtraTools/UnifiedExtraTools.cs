@@ -67,19 +67,7 @@ namespace ExtraTools.Editor
         }
         #endregion
 
-        #region Menu Items - NPC Configuration
-        [MenuItem("Extra Tools/NPC/🎭 NPC Quick Config")]
-        public static void MenuNPCQuickConfig()
-        {
-            NPCQuickConfig.ShowWindow();
-        }
-
-        [MenuItem("Extra Tools/NPC/📊 NPC Batch Configurator")]
-        public static void MenuNPCBatchConfig()
-        {
-            EditorWindow.GetWindow(System.Type.GetType("SlimeKing.Editor.NPCBatchConfigurator, Assembly-CSharp-Editor"));
-        }
-        #endregion
+        // NPC Configuration removed - system deprecated
 
         #region Menu Items - Camera Setup
         [MenuItem("Extra Tools/Camera/📷 Add Camera Manager")]
@@ -253,7 +241,7 @@ namespace ExtraTools.Editor
         #region Window GUI
         private Vector2 scrollPosition;
         private int selectedTab = 0;
-        private readonly string[] tabNames = { "NPC", "Camera", "Scene", "Project", "Post Processing", "Quest System", "Debug" };
+        private readonly string[] tabNames = { "Camera", "Scene", "Project", "Post Processing", "Quest System", "Debug" };
 
         private void OnGUI()
         {
@@ -265,13 +253,12 @@ namespace ExtraTools.Editor
 
             switch (selectedTab)
             {
-                case 0: DrawNPCSection(); break;
-                case 1: DrawCameraSection(); break;
-                case 2: DrawSceneSection(); break;
-                case 3: DrawProjectSection(); break;
-                case 4: DrawPostProcessingSection(); break;
-                case 5: DrawQuestSystemSection(); break;
-                case 6: DrawDebugSection(); break;
+                case 0: DrawCameraSection(); break;
+                case 1: DrawSceneSection(); break;
+                case 2: DrawProjectSection(); break;
+                case 3: DrawPostProcessingSection(); break;
+                case 4: DrawQuestSystemSection(); break;
+                case 5: DrawDebugSection(); break;
             }
 
             EditorGUILayout.EndScrollView();
@@ -286,24 +273,7 @@ namespace ExtraTools.Editor
             GUILayout.Space(10);
         }
 
-        private void DrawNPCSection()
-        {
-            EditorGUILayout.LabelField("🎭 Configuração de NPCs", EditorStyles.boldLabel);
-            EditorGUILayout.Space(5);
 
-            if (GUILayout.Button("🎭 NPC Quick Config", GUILayout.Height(30)))
-            {
-                MenuNPCQuickConfig();
-            }
-
-            if (GUILayout.Button("📊 NPC Batch Configurator", GUILayout.Height(30)))
-            {
-                MenuNPCBatchConfig();
-            }
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.HelpBox("Configure NPCs individualmente ou em lote", MessageType.Info);
-        }
 
         private void DrawCameraSection()
         {
