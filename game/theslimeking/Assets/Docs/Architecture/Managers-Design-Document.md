@@ -1,8 +1,8 @@
-# 🏗️ **Managers Design Document v2.0 - The Slime King**
+# 🏗️ **Managers Design Document v2.1 - The Slime King**
 
 ## 📋 **Princípios da Arquitetura Simplificada**
 
-1. **🎯 Apenas 3 Managers Singleton** - Evitar over-engineering
+1. **🎯 Apenas 4 Managers Singleton** - Evitar over-engineering
 2. **🎮 Controller por Cena** - Cada bioma tem seu controller específico
 3. **🔗 Baixo Acoplamento** - Comunicação via eventos
 4. **⚡ Performance First** - Sem inicializações desnecessárias
@@ -235,6 +235,92 @@ namespace SlimeKing.Core
 
 ---
 
+### **NPCManager**
+
+**Sistema de relacionamento entre o Player e os diferentes tipos de NPCs.**
+
+#### **Responsabilidades Essenciais**
+
+- **Sistema de Relacionamento**: Controla níveis de relacionamento por tipo de NPC
+- **Comportamento de NPCs**: Define como NPCs reagem ao Player (agressivo/neutro/amigável)
+- **Interações**: Registra interações positivas e negativas
+- **Persistência**: Mantém histórico de relacionamentos entre sessões
+
+#### **Estrutura Base**
+
+```csharp
+namespace SlimeKing.Core
+{
+    public class NPCManager : MonoBehaviour
+    {
+        public static NPCManager Instance { get; private set; };
+        
+        [Header("Configurações de Relacionamento")]
+        [SerializeField] private int defaultRelationshipLevel = 5;
+        [SerializeField] private int minRelationshipLevel = -10;
+        [SerializeField] private int maxRelationshipLevel = 20;
+        
+        [Header("Debug")]
+        [SerializeField] private bool enableLogs = false;
+        
+        private Dictionary<NPCType, int> relationshipLevels = new();
+        private Dictionary<NPCType, int> interactionCounts = new();
+        
+        [Header("Events")]
+        public static event Action<NPCType, int, int> OnRelationshipLevelChanged;
+        public static event Action<NPCType, NPCBehaviorType> OnBehaviorChanged;
+        
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                InitializeRelationships();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+        
+        public int GetRelationshipLevel(NPCType npcType) { }
+        public void SetRelationshipLevel(NPCType npcType, int level) { }
+        public void ModifyRelationshipLevel(NPCType npcType, int change) { }
+        public NPCBehaviorType GetBehaviorType(NPCType npcType) { }
+        public void RegisterPositiveInteraction(NPCType npcType, int gain = 1) { }
+        public void RegisterNegativeInteraction(NPCType npcType, int loss = 1) { }
+        public bool IsHostile(NPCType npcType) { }
+        public bool IsFriendly(NPCType npcType) { }
+    }
+    
+    public enum NPCBehaviorType
+    {
+        Aggressive,  // < 0: NPCs atacam o player
+        Neutral,     // 0-10: NPCs são neutros  
+        Friendly     // > 10: NPCs são amigáveis
+    }
+}
+```
+
+#### **Sistema de Relacionamento**
+
+**Níveis de Relacionamento:**
+
+| Nível | Comportamento | Descrição |
+|-------|---------------|-----------|
+| < 0 | **Aggressive** | NPCs atacam o Player automaticamente |
+| 0-10 | **Neutral** | NPCs ignoram o Player, não atacam nem ajudam |
+| > 10 | **Friendly** | NPCs podem ajudar o Player, oferecer itens ou informações |
+
+**Como Ganhar/Perder Relacionamento:**
+
+- **Interações Positivas**: Ajudar NPCs, completar quests, dar presentes
+- **Interações Negativas**: Atacar NPCs, roubar itens, quebrar propriedades
+- **Relacionamento por Tipo**: Afetar um Slime Verde afeta todos os Slimes Verdes
+
+---
+
 ## 🎯 **Scene Controllers**
 
 ### **Estrutura Base do Controller**
@@ -392,6 +478,10 @@ namespace SlimeKing.Events
         // Save Events
         public static event Action OnGameSaved;
         public static event Action OnGameLoaded;
+        
+        // NPC Relationship Events
+        public static event Action<NPCType, int, int> OnRelationshipLevelChanged;
+        public static event Action<NPCType, NPCBehaviorType> OnBehaviorChanged;
     }
 }
 ```
@@ -406,6 +496,7 @@ sequenceDiagram
     participant GM as GameManager
     participant AM as AudioManager
     participant SM as SaveManager
+    participant NRM as NPCManager
     participant SC as SceneController
     
     Unity->>GM: Awake()
@@ -416,6 +507,9 @@ sequenceDiagram
     
     Unity->>SM: Awake()
     SM->>SM: LoadGame()
+    
+    Unity->>NRM: Awake()
+    NRM->>NRM: InitializeRelationships()
     
     Unity->>SC: Start()
     SC->>SC: InitializeScene()
@@ -429,10 +523,11 @@ sequenceDiagram
 ## 📊 **Resumo da Arquitetura Simplificada**
 
 | **Componente** | **Tipo** | **Responsabilidade** | **Localização** |
-|----------------|----------|----------------------|-----------------|
+|----------------|----------|----------------------|------------------|
 | **GameManager** | Singleton | Estado global, tempo, evolução | DontDestroyOnLoad |
 | **AudioManager** | Singleton | Música e SFX | DontDestroyOnLoad |
 | **SaveManager** | Singleton | Persistência | DontDestroyOnLoad |
+| **NPCManager** | Singleton | Relacionamento com NPCs | DontDestroyOnLoad |
 | **NestController** | Scene | Lar do slime, tutorial | Cena do Ninho |
 | **ForestController** | Scene | Floresta, criaturas | Cena da Floresta |
 | **LakeController** | Scene | Lago, aquáticos | Cena do Lago |
@@ -445,9 +540,10 @@ sequenceDiagram
 
 ## 🎯 **Benefícios da Simplificação**
 
-1. **Menos Arquivos**: 3 Managers + 7 Controllers vs 8+ Managers
+1. **Menos Arquivos**: 4 Managers + 7 Controllers vs 8+ Managers
 2. **Menos Dependências**: Comunicação via eventos, não referências diretas
 3. **Melhor Performance**: Sem managers desnecessários rodando
 4. **Manutenção Simples**: Responsabilidades claras e específicas
 5. **Escalabilidade**: Fácil adicionar novos biomas com Controllers
 6. **Debug Eficiente**: Logs opcionais por componente
+7. **Sistema de Relacionamento**: NPCs reagem dinamicamente ao comportamento do Player

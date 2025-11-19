@@ -29,6 +29,132 @@
 - Utilize números inteiros para contagem e iteração, evitando o uso de floats ou doubles quando não necessário.
 - Mantenha a documentação atualizada e clara, facilitando a compreensão do código por outros desenvolvedores.
 
+## 🔍 Sistema de Logs e Debug
+
+### **📝 Boas Práticas de Logging**
+
+**SEMPRE use logs qualificados para evitar conflitos de namespace:**
+
+```csharp
+// ✅ CORRETO - Namespace explícito
+UnityEngine.Debug.Log("[ClassName] Mensagem de log");
+UnityEngine.Debug.LogWarning("[ClassName] Mensagem de aviso");
+UnityEngine.Debug.LogError("[ClassName] Mensagem de erro");
+
+// ❌ INCORRETO - Pode causar conflitos
+Debug.Log("Mensagem"); // Erro CS1955: Non-invocable member 'Log'
+```
+
+**Padrão de Formatação de Logs:**
+
+```csharp
+// Formato padrão: [NomeClasse] Descrição detalhada
+UnityEngine.Debug.Log("[PlayerController] Player iniciado na posição (0, 0, 0)");
+UnityEngine.Debug.LogWarning("[AudioManager] AudioClip 'explosion' não encontrado");
+UnityEngine.Debug.LogError("[SaveManager] Falha ao salvar arquivo: permissão negada");
+```
+
+**Sistema de Logs Condicionais:**
+
+```csharp
+public class ExampleManager : MonoBehaviour
+{
+    [Header("Debug")]
+    [SerializeField] private bool enableLogs = false;
+    
+    private void Log(string message)
+    {
+        if (enableLogs)
+            UnityEngine.Debug.Log($"[{GetType().Name}] {message}");
+    }
+    
+    private void LogWarning(string message)
+    {
+        if (enableLogs)
+            UnityEngine.Debug.LogWarning($"[{GetType().Name}] {message}");
+    }
+    
+    private void LogError(string message)
+    {
+        // Erros sempre são exibidos, independente da flag
+        UnityEngine.Debug.LogError($"[{GetType().Name}] {message}");
+    }
+}
+```
+
+### **🔧 Resolução de Problemas Comuns**
+
+**Erro CS1955: "Non-invocable member 'Log' cannot be used like a method"**
+
+**Causa:** Conflito de namespace ou cache corrompido do Unity.
+
+**Soluções:**
+
+1. **Use namespace completo:**
+
+   ```csharp
+   UnityEngine.Debug.Log("mensagem"); // Sempre funciona
+   ```
+
+2. **Limpe o cache do Unity:**
+
+   ```bash
+   # No terminal PowerShell
+   Remove-Item "Library\ScriptAssemblies\*" -Force
+   ```
+
+3. **Verifique using statements:**
+
+   ```csharp
+   using UnityEngine; // Deve estar presente
+   ```
+
+**Outros Problemas de Log:**
+
+| Problema | Causa | Solução |
+|----------|-------|---------|
+| Logs não aparecem | `enableLogs = false` | Verificar flag no Inspector |
+| Spam de logs | Logs em Update/FixedUpdate | Usar throttling ou eventos |
+| Logs em build | `Debug.Log` não removido | Usar Conditional Compilation |
+
+### **⚡ Performance de Logs**
+
+**Evite logs caros:**
+
+```csharp
+// ❌ INCORRETO - String concatenation cara
+UnityEngine.Debug.Log("Player HP: " + currentHP + "/" + maxHP);
+
+// ✅ CORRETO - String interpolation eficiente
+UnityEngine.Debug.Log($"Player HP: {currentHP}/{maxHP}");
+
+// ✅ MELHOR - Log condicional para performance
+private void LogPlayerStats()
+{
+    if (!enableLogs) return;
+    UnityEngine.Debug.Log($"[PlayerController] HP: {currentHP}/{maxHP}");
+}
+```
+
+**Compilation Conditionals para Release:**
+
+```csharp
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    UnityEngine.Debug.Log("[Manager] Debug info apenas em desenvolvimento");
+#endif
+```
+
+### **📋 Checklist de Logs**
+
+**Antes de fazer commit:**
+
+- [ ] ✅ Todos os logs usam `UnityEngine.Debug.Log`
+- [ ] ✅ Logs têm formato `[ClassName] Mensagem`
+- [ ] ✅ Logs de debug são condicionais (`enableLogs`)
+- [ ] ✅ Logs de erro sempre visíveis
+- [ ] ✅ Nenhum log em loops de Update
+- [ ] ✅ Interpolação de strings com `$"{}"`
+
 ## 🏗️ Padrões Arquiteturais e Nomenclatura
 
 ### 📝 **Manager** - Gerenciadores de Sistema
