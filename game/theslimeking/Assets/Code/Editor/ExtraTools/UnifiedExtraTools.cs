@@ -4,6 +4,7 @@ using UnityEditor.Animations;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -74,7 +75,7 @@ namespace ExtraTools.Editor
         [MenuItem("Extra Tools/Camera/📷 Add Camera Manager")]
         public static void MenuAddCameraManager()
         {
-            var existing = Object.FindFirstObjectByType<CameraManager>();
+            var existing = UnityEngine.Object.FindFirstObjectByType<CameraManager>();
             if (existing != null)
             {
                 EditorUtility.DisplayDialog("Camera Manager",
@@ -95,7 +96,7 @@ namespace ExtraTools.Editor
         [MenuItem("Extra Tools/Camera/✅ Add Scene Validator")]
         public static void MenuAddSceneValidator()
         {
-            var existing = Object.FindFirstObjectByType<SceneSetupValidator>();
+            var existing = UnityEngine.Object.FindFirstObjectByType<SceneSetupValidator>();
             if (existing != null)
             {
                 EditorUtility.DisplayDialog("Scene Validator",
@@ -119,7 +120,7 @@ namespace ExtraTools.Editor
             bool addedCameraManager = false;
             bool addedValidator = false;
 
-            var existingCameraManager = Object.FindFirstObjectByType<CameraManager>();
+            var existingCameraManager = UnityEngine.Object.FindFirstObjectByType<CameraManager>();
             if (existingCameraManager == null)
             {
                 var cameraManagerObj = new GameObject("Camera Manager");
@@ -128,7 +129,7 @@ namespace ExtraTools.Editor
                 addedCameraManager = true;
             }
 
-            var existingValidator = Object.FindFirstObjectByType<SceneSetupValidator>();
+            var existingValidator = UnityEngine.Object.FindFirstObjectByType<SceneSetupValidator>();
             if (existingValidator == null)
             {
                 var validatorObj = new GameObject("Scene Validator");
@@ -948,27 +949,69 @@ namespace ExtraTools.Editor
                 // Informações do estado atual
                 if (animator.layerCount > 0)
                 {
-                    var currentState = animator.GetCurrentAnimatorStateInfo(0);
-                    writer.WriteLine($"    ├─ Current State: {GetStateName(animator, 0, currentState)}");
-                    writer.WriteLine($"    ├─ Current Time: {currentState.normalizedTime:F2}");
-                    writer.WriteLine($"    ├─ State Length: {currentState.length:F2}s");
-                    writer.WriteLine($"    ├─ In Transition: {animator.IsInTransition(0)}");
-
-                    if (animator.IsInTransition(0))
+                    try
                     {
-                        var transitionInfo = animator.GetAnimatorTransitionInfo(0);
-                        writer.WriteLine($"    ├─ Transition Progress: {transitionInfo.normalizedTime:F2}");
+                        var currentState = animator.GetCurrentAnimatorStateInfo(0);
+                        writer.WriteLine($"    ├─ Current State: {GetStateName(animator, 0, currentState)}");
+                        writer.WriteLine($"    ├─ Current Time: {currentState.normalizedTime:F2}");
+                        writer.WriteLine($"    ├─ State Length: {currentState.length:F2}s");
+                        writer.WriteLine($"    ├─ In Transition: {animator.IsInTransition(0)}");
+
+                        if (animator.IsInTransition(0))
+                        {
+                            try
+                            {
+                                var transitionInfo = animator.GetAnimatorTransitionInfo(0);
+                                writer.WriteLine($"    ├─ Transition Progress: {transitionInfo.normalizedTime:F2}");
+                            }
+                            catch (System.Exception ex)
+                            {
+                                writer.WriteLine($"    ├─ Transition Progress: (Error - {ex.Message})");
+                            }
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        writer.WriteLine($"    ├─ Current State: (Error - {ex.Message})");
                     }
                 }
 
                 // Lista parâmetros
                 writer.WriteLine($"    ├─ Parameters:");
-                for (int i = 0; i < animator.parameterCount; i++)
+                try
                 {
-                    var param = animator.GetParameter(i);
-                    string value = GetParameterValue(animator, param);
-                    string paramType = param.type.ToString();
-                    writer.WriteLine($"    │   ├─ {param.name} ({paramType}): {value}");
+                    if (animator.parameterCount > 0)
+                    {
+                        for (int i = 0; i < animator.parameterCount; i++)
+                        {
+                            try
+                            {
+                                var param = animator.GetParameter(i);
+                                if (param != null)
+                                {
+                                    string value = GetParameterValue(animator, param);
+                                    string paramType = param.type.ToString();
+                                    writer.WriteLine($"    │   ├─ {param.name} ({paramType}): {value}");
+                                }
+                                else
+                                {
+                                    writer.WriteLine($"    │   ├─ Parameter [{i}]: (Null)");
+                                }
+                            }
+                            catch (System.Exception ex)
+                            {
+                                writer.WriteLine($"    │   ├─ Parameter [{i}]: (Error - {ex.Message})");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        writer.WriteLine($"    │   ├─ No parameters found");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    writer.WriteLine($"    │   ├─ Error reading parameters: {ex.Message}");
                 }
 
                 // Lista todos os estados da máquina de estados
@@ -979,28 +1022,49 @@ namespace ExtraTools.Editor
                 if (animator.layerCount > 1)
                 {
                     writer.WriteLine($"    ├─ Layers:");
-                    for (int i = 0; i < animator.layerCount; i++)
+                    try
                     {
-                        string layerName = animator.GetLayerName(i);
-                        float layerWeight = animator.GetLayerWeight(i);
-                        var layerState = animator.GetCurrentAnimatorStateInfo(i);
-                        string layerStateName = GetStateName(animator, i, layerState);
-                        writer.WriteLine($"    │   ├─ [{i}] {layerName} (Weight: {layerWeight:F2}) - State: {layerStateName}");
-
-                        // Lista estados específicos desta camada
-                        if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+                        for (int i = 0; i < animator.layerCount; i++)
                         {
                             try
                             {
-                                var layer = animController.layers[i];
-                                writer.WriteLine($"    │   │   ├─ States in Layer:");
-                                WriteLayerStates(layer.stateMachine, writer, "    │   │   │   ");
+                                string layerName = animator.GetLayerName(i);
+                                float layerWeight = animator.GetLayerWeight(i);
+                                var layerState = animator.GetCurrentAnimatorStateInfo(i);
+                                string layerStateName = GetStateName(animator, i, layerState);
+                                writer.WriteLine($"    │   ├─ [{i}] {layerName} (Weight: {layerWeight:F2}) - State: {layerStateName}");
+
+                                // Lista estados específicos desta camada
+                                if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+                                {
+                                    try
+                                    {
+                                        if (i < animController.layers.Length)
+                                        {
+                                            var layer = animController.layers[i];
+                                            writer.WriteLine($"    │   │   ├─ States in Layer:");
+                                            WriteLayerStates(layer.stateMachine, writer, "    │   │   │   ");
+                                        }
+                                        else
+                                        {
+                                            writer.WriteLine($"    │   │   ├─ Layer index out of range");
+                                        }
+                                    }
+                                    catch (System.Exception ex)
+                                    {
+                                        writer.WriteLine($"    │   │   ├─ Error reading layer states: {ex.Message}");
+                                    }
+                                }
                             }
-                            catch
+                            catch (System.Exception ex)
                             {
-                                writer.WriteLine($"    │   │   ├─ (Error reading layer states)");
+                                writer.WriteLine($"    │   ├─ Layer [{i}]: (Error - {ex.Message})");
                             }
                         }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        writer.WriteLine($"    │   ├─ Error reading layers: {ex.Message}");
                     }
                 }
             }
@@ -1008,24 +1072,37 @@ namespace ExtraTools.Editor
 
         private static string GetStateName(Animator animator, int layerIndex, AnimatorStateInfo stateInfo)
         {
+            // Verifica se os índices são válidos
+            if (animator == null || layerIndex < 0 || layerIndex >= animator.layerCount)
+            {
+                return $"Invalid_Layer_{layerIndex}";
+            }
+
             // Tenta obter o nome do estado através do hash
             var controller = animator.runtimeAnimatorController;
             if (controller != null && controller is UnityEditor.Animations.AnimatorController animController)
             {
                 try
                 {
-                    var layer = animController.layers[layerIndex];
-                    foreach (var state in layer.stateMachine.states)
+                    // Verifica se o índice da camada é válido
+                    if (layerIndex >= 0 && layerIndex < animController.layers.Length)
                     {
-                        if (state.state.nameHash == stateInfo.shortNameHash)
+                        var layer = animController.layers[layerIndex];
+                        if (layer.stateMachine != null && layer.stateMachine.states != null)
                         {
-                            return state.state.name;
+                            foreach (var state in layer.stateMachine.states)
+                            {
+                                if (state.state != null && state.state.nameHash == stateInfo.shortNameHash)
+                                {
+                                    return state.state.name;
+                                }
+                            }
                         }
                     }
                 }
-                catch
+                catch (System.Exception ex)
                 {
-                    // Em caso de erro, retorna hash
+                    return $"Error_Reading_State_{stateInfo.shortNameHash}_{ex.Message.Substring(0, Math.Min(20, ex.Message.Length))}";
                 }
             }
             return $"State_{stateInfo.shortNameHash}";
@@ -1158,7 +1235,7 @@ namespace ExtraTools.Editor
         {
             Log("🎨 Configurando Post Processing...");
 
-            var existing = Object.FindFirstObjectByType<Volume>();
+            var existing = UnityEngine.Object.FindFirstObjectByType<Volume>();
             if (existing != null && existing.gameObject.name == "Global Volume")
             {
                 EditorUtility.DisplayDialog("Global Volume", "Global Volume já existe!", "OK");
