@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -214,6 +215,18 @@ namespace ExtraTools.Editor
         public static void MenuExportProjectSettings()
         {
             ExtraTools.Core.ProjectSettingsExporterWindow.Open();
+        }
+
+        [MenuItem("GameObject/Extra Tools/📊 Export GameObject Structure", false, 10)]
+        public static void MenuExportGameObjectStructure()
+        {
+            ExportGameObjectStructure();
+        }
+
+        [MenuItem("GameObject/Extra Tools/📊 Export GameObject Structure", true)]
+        public static bool ValidateExportGameObjectStructure()
+        {
+            return Selection.activeGameObject != null;
         }
         #endregion
 
@@ -591,6 +604,552 @@ namespace ExtraTools.Editor
                     WriteGameObjectHierarchy(child, writer, level + 1);
             }
         }
+
+        private static void ExportGameObjectStructure()
+        {
+            GameObject selectedObject = Selection.activeGameObject;
+            if (selectedObject == null)
+            {
+                LogError("Nenhum GameObject selecionado.");
+                EditorUtility.DisplayDialog("Erro", "Selecione um GameObject para exportar sua estrutura.", "OK");
+                return;
+            }
+
+            Log($"📊 Exportando estrutura detalhada de '{selectedObject.name}'...");
+
+            string fileName = $"GameObject_{selectedObject.name}_{System.DateTime.Now:yyyyMMdd_HHmmss}.txt";
+            string auxTempDir = Path.Combine(Application.dataPath, "AuxTemp");
+            if (!Directory.Exists(auxTempDir))
+                Directory.CreateDirectory(auxTempDir);
+
+            string filePath = Path.Combine(auxTempDir, fileName);
+
+            using (var writer = new StreamWriter(filePath))
+            {
+                // Cabeçalho
+                writer.WriteLine("════════════════════════════════════════════════════════");
+                writer.WriteLine($"  ESTRUTURA DETALHADA DO GAMEOBJECT: {selectedObject.name}");
+                writer.WriteLine("════════════════════════════════════════════════════════");
+                writer.WriteLine($"Caminho completo: {GetGameObjectPath(selectedObject)}");
+                writer.WriteLine($"Exportado em: {System.DateTime.Now}");
+                writer.WriteLine($"Unity Version: {Application.unityVersion}");
+                writer.WriteLine();
+
+                // Informações básicas do GameObject
+                WriteBasicObjectInfo(selectedObject, writer);
+                writer.WriteLine();
+
+                // Transform detalhado
+                WriteTransformDetails(selectedObject.transform, writer);
+                writer.WriteLine();
+
+                // Componentes detalhados
+                WriteDetailedComponents(selectedObject, writer);
+                writer.WriteLine();
+
+                // Layer e Tag
+                WriteLayerAndTagInfo(selectedObject, writer);
+                writer.WriteLine();
+
+                // Hierarquia de filhos
+                WriteChildrenHierarchy(selectedObject, writer);
+            }
+
+            Log($"✅ Estrutura detalhada do GameObject '{selectedObject.name}' exportada: {filePath}");
+            EditorUtility.DisplayDialog("Exportação",
+                $"📊 Estrutura detalhada exportada!\n{fileName}", "OK");
+            EditorUtility.RevealInFinder(filePath);
+        }
+
+        private static string GetGameObjectPath(GameObject obj)
+        {
+            string path = obj.name;
+            Transform parent = obj.transform.parent;
+
+            while (parent != null)
+            {
+                path = parent.name + "/" + path;
+                parent = parent.parent;
+            }
+
+            return path;
+        }
+
+        private static int GetChildCount(Transform transform)
+        {
+            int count = transform.childCount;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                count += GetChildCount(transform.GetChild(i));
+            }
+            return count;
+        }
+
+        #region Detailed Export Functions
+
+        private static void WriteBasicObjectInfo(GameObject obj, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ INFORMAÇÕES BÁSICAS");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+            writer.WriteLine($"Nome: {obj.name}");
+            writer.WriteLine($"Ativo na Hierarquia: {(obj.activeInHierarchy ? "Sim" : "Não")}");
+            writer.WriteLine($"Ativo Localmente: {(obj.activeSelf ? "Sim" : "Não")}");
+            writer.WriteLine($"Static: {(obj.isStatic ? "Sim" : "Não")}");
+            writer.WriteLine($"Total de Componentes: {obj.GetComponents<Component>().Length}");
+            writer.WriteLine($"Total de Filhos: {GetChildCount(obj.transform)}");
+            writer.WriteLine($"Total de Filhos Diretos: {obj.transform.childCount}");
+
+            // Informações da cena
+            if (obj.scene.IsValid())
+            {
+                writer.WriteLine($"Cena: {obj.scene.name}");
+                writer.WriteLine($"Índice da Cena: {obj.scene.buildIndex}");
+            }
+        }
+
+        private static void WriteTransformDetails(Transform transform, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ TRANSFORM");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+            writer.WriteLine($"Posição Local: {transform.localPosition}");
+            writer.WriteLine($"Posição Mundial: {transform.position}");
+            writer.WriteLine($"Rotação Local: {transform.localRotation.eulerAngles}");
+            writer.WriteLine($"Rotação Mundial: {transform.rotation.eulerAngles}");
+            writer.WriteLine($"Escala Local: {transform.localScale}");
+            writer.WriteLine($"Escala com Lossy: {transform.lossyScale}");
+
+            if (transform.parent != null)
+            {
+                writer.WriteLine($"Parent: {transform.parent.name}");
+                writer.WriteLine($"Sibling Index: {transform.GetSiblingIndex()}");
+            }
+            else
+            {
+                writer.WriteLine("Parent: (Root Object)");
+            }
+        }
+
+        private static void WriteDetailedComponents(GameObject obj, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ COMPONENTES DETALHADOS");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            Component[] components = obj.GetComponents<Component>();
+
+            for (int i = 0; i < components.Length; i++)
+            {
+                Component component = components[i];
+                if (component == null)
+                {
+                    writer.WriteLine($"{i + 1}. [MISSING SCRIPT]");
+                    continue;
+                }
+
+                writer.WriteLine($"{i + 1}. {component.GetType().Name}");
+                writer.WriteLine($"    ├─ Namespace: {component.GetType().Namespace ?? "Global"}");
+                writer.WriteLine($"    ├─ Assembly: {component.GetType().Assembly.GetName().Name}");
+                writer.WriteLine($"    ├─ Habilitado: {GetComponentEnabledState(component)}");
+
+                // Detalhes específicos por tipo de componente
+                WriteComponentSpecificDetails(component, writer);
+
+                if (i < components.Length - 1)
+                    writer.WriteLine("    │");
+            }
+        }
+
+        private static void WriteLayerAndTagInfo(GameObject obj, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ LAYER & TAG");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+            writer.WriteLine($"Tag: {obj.tag}");
+            writer.WriteLine($"Layer: {obj.layer} ({LayerMask.LayerToName(obj.layer)})");
+
+            // Informações sobre colisões
+            int layerMask = 1 << obj.layer;
+            writer.WriteLine($"Layer Mask (bit): {layerMask}");
+
+            // Lista outras camadas que podem colidir com esta
+            List<string> collidingLayers = new List<string>();
+            for (int i = 0; i < 32; i++)
+            {
+                if (!Physics2D.GetIgnoreLayerCollision(obj.layer, i))
+                {
+                    string layerName = LayerMask.LayerToName(i);
+                    if (!string.IsNullOrEmpty(layerName))
+                    {
+                        collidingLayers.Add($"{i} ({layerName})");
+                    }
+                }
+            }
+
+            if (collidingLayers.Count > 0)
+            {
+                writer.WriteLine($"Pode colidir com: {string.Join(", ", collidingLayers)}");
+            }
+        }
+
+        private static void WriteChildrenHierarchy(GameObject obj, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ HIERARQUIA DE FILHOS");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            if (obj.transform.childCount > 0)
+            {
+                WriteDetailedGameObjectHierarchy(obj.transform, writer, 0);
+            }
+            else
+            {
+                writer.WriteLine("(Nenhum filho)");
+            }
+        }
+
+        private static void WriteDetailedGameObjectHierarchy(Transform transform, StreamWriter writer, int level)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform child = transform.GetChild(i);
+                string indent = new string(' ', level * 2);
+                string prefix = i == transform.childCount - 1 ? "└─" : "├─";
+
+                // Informações básicas do filho
+                writer.WriteLine($"{indent}{prefix} {child.name} " +
+                    $"[{(child.gameObject.activeInHierarchy ? "Ativo" : "Inativo")}] " +
+                    $"({child.GetComponents<Component>().Length - 1} componentes)");
+
+                // Detalhes do Transform do filho
+                string childIndent = indent + (i == transform.childCount - 1 ? "   " : "│  ");
+                writer.WriteLine($"{childIndent}├─ Posição: {child.localPosition}");
+                writer.WriteLine($"{childIndent}├─ Rotação: {child.localRotation.eulerAngles}");
+                writer.WriteLine($"{childIndent}├─ Escala: {child.localScale}");
+                writer.WriteLine($"{childIndent}├─ Tag: {child.tag}");
+                writer.WriteLine($"{childIndent}├─ Layer: {child.gameObject.layer} ({LayerMask.LayerToName(child.gameObject.layer)})");
+
+                // Lista componentes principais do filho
+                Component[] childComponents = child.GetComponents<Component>();
+                List<string> componentNames = new List<string>();
+                foreach (var comp in childComponents)
+                {
+                    if (comp != null && !(comp is Transform))
+                    {
+                        componentNames.Add(comp.GetType().Name);
+                    }
+                }
+
+                if (componentNames.Count > 0)
+                {
+                    writer.WriteLine($"{childIndent}└─ Componentes: {string.Join(", ", componentNames)}");
+                }
+                else
+                {
+                    writer.WriteLine($"{childIndent}└─ Componentes: (Apenas Transform)");
+                }
+
+                // Recursivamente processa filhos dos filhos
+                if (child.childCount > 0)
+                {
+                    writer.WriteLine($"{childIndent}");
+                    WriteDetailedGameObjectHierarchy(child, writer, level + 1);
+                }
+
+                // Adiciona espaço entre irmãos para legibilidade
+                if (i < transform.childCount - 1)
+                {
+                    writer.WriteLine($"{childIndent}");
+                }
+            }
+        }
+        private static string GetComponentEnabledState(Component component)
+        {
+            // Verifica se o componente tem propriedade "enabled"
+            var enabledProperty = component.GetType().GetProperty("enabled");
+            if (enabledProperty != null && enabledProperty.PropertyType == typeof(bool))
+            {
+                bool isEnabled = (bool)enabledProperty.GetValue(component);
+                return isEnabled ? "Sim" : "Não";
+            }
+            return "N/A";
+        }
+
+        private static void WriteComponentSpecificDetails(Component component, StreamWriter writer)
+        {
+            switch (component)
+            {
+                case Renderer renderer:
+                    writer.WriteLine($"    ├─ Material: {(renderer.sharedMaterial ? renderer.sharedMaterial.name : "None")}");
+                    writer.WriteLine($"    ├─ Sorting Layer: {renderer.sortingLayerName}");
+                    writer.WriteLine($"    ├─ Sorting Order: {renderer.sortingOrder}");
+                    break;
+
+                case Collider2D collider2D:
+                    writer.WriteLine($"    ├─ Is Trigger: {collider2D.isTrigger}");
+                    writer.WriteLine($"    ├─ Material: {(collider2D.sharedMaterial ? collider2D.sharedMaterial.name : "None")}");
+                    writer.WriteLine($"    ├─ Bounds: {collider2D.bounds}");
+                    break;
+
+                case Rigidbody2D rb2D:
+                    writer.WriteLine($"    ├─ Body Type: {rb2D.bodyType}");
+                    writer.WriteLine($"    ├─ Mass: {rb2D.mass}");
+                    writer.WriteLine($"    ├─ Gravity Scale: {rb2D.gravityScale}");
+                    writer.WriteLine($"    ├─ Freeze Position: {rb2D.constraints}");
+                    break;
+
+                case Animator animator:
+                    WriteAnimatorDetails(animator, writer);
+                    break;
+
+                case Canvas canvas:
+                    writer.WriteLine($"    ├─ Render Mode: {canvas.renderMode}");
+                    writer.WriteLine($"    ├─ Sort Order: {canvas.sortingOrder}");
+                    writer.WriteLine($"    ├─ World Camera: {(canvas.worldCamera ? canvas.worldCamera.name : "None")}");
+                    break;
+
+                case Camera camera:
+                    writer.WriteLine($"    ├─ Projection: {camera.orthographic}");
+                    writer.WriteLine($"    ├─ Size/FOV: {(camera.orthographic ? camera.orthographicSize.ToString() : camera.fieldOfView.ToString())}");
+                    writer.WriteLine($"    ├─ Depth: {camera.depth}");
+                    writer.WriteLine($"    ├─ Culling Mask: {camera.cullingMask}");
+                    break;
+
+                case Light light:
+                    writer.WriteLine($"    ├─ Type: {light.type}");
+                    writer.WriteLine($"    ├─ Color: {light.color}");
+                    writer.WriteLine($"    ├─ Intensity: {light.intensity}");
+                    writer.WriteLine($"    ├─ Range: {light.range}");
+                    break;
+
+                case AudioSource audioSource:
+                    writer.WriteLine($"    ├─ Clip: {(audioSource.clip ? audioSource.clip.name : "None")}");
+                    writer.WriteLine($"    ├─ Volume: {audioSource.volume}");
+                    writer.WriteLine($"    ├─ Pitch: {audioSource.pitch}");
+                    writer.WriteLine($"    ├─ Loop: {audioSource.loop}");
+                    break;
+            }
+        }
+
+        private static void WriteAnimatorDetails(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine($"    ├─ Controller: {(animator.runtimeAnimatorController ? animator.runtimeAnimatorController.name : "None")}");
+            writer.WriteLine($"    ├─ Culling Mode: {animator.cullingMode}");
+            writer.WriteLine($"    ├─ Update Mode: {animator.updateMode}");
+            writer.WriteLine($"    ├─ Apply Root Motion: {animator.applyRootMotion}");
+            writer.WriteLine($"    ├─ Animate Physics: {animator.animatePhysics}");
+
+            if (animator.runtimeAnimatorController != null)
+            {
+                writer.WriteLine($"    ├─ Layer Count: {animator.layerCount}");
+                writer.WriteLine($"    ├─ Parameter Count: {animator.parameterCount}");
+
+                // Informações do estado atual
+                if (animator.layerCount > 0)
+                {
+                    var currentState = animator.GetCurrentAnimatorStateInfo(0);
+                    writer.WriteLine($"    ├─ Current State: {GetStateName(animator, 0, currentState)}");
+                    writer.WriteLine($"    ├─ Current Time: {currentState.normalizedTime:F2}");
+                    writer.WriteLine($"    ├─ State Length: {currentState.length:F2}s");
+                    writer.WriteLine($"    ├─ In Transition: {animator.IsInTransition(0)}");
+
+                    if (animator.IsInTransition(0))
+                    {
+                        var transitionInfo = animator.GetAnimatorTransitionInfo(0);
+                        writer.WriteLine($"    ├─ Transition Progress: {transitionInfo.normalizedTime:F2}");
+                    }
+                }
+
+                // Lista parâmetros
+                writer.WriteLine($"    ├─ Parameters:");
+                for (int i = 0; i < animator.parameterCount; i++)
+                {
+                    var param = animator.GetParameter(i);
+                    string value = GetParameterValue(animator, param);
+                    string paramType = param.type.ToString();
+                    writer.WriteLine($"    │   ├─ {param.name} ({paramType}): {value}");
+                }
+
+                // Lista todos os estados da máquina de estados
+                writer.WriteLine($"    ├─ All States:");
+                WriteAllAnimatorStates(animator, writer);
+
+                // Lista layers se houver mais de 1
+                if (animator.layerCount > 1)
+                {
+                    writer.WriteLine($"    ├─ Layers:");
+                    for (int i = 0; i < animator.layerCount; i++)
+                    {
+                        string layerName = animator.GetLayerName(i);
+                        float layerWeight = animator.GetLayerWeight(i);
+                        var layerState = animator.GetCurrentAnimatorStateInfo(i);
+                        string layerStateName = GetStateName(animator, i, layerState);
+                        writer.WriteLine($"    │   ├─ [{i}] {layerName} (Weight: {layerWeight:F2}) - State: {layerStateName}");
+
+                        // Lista estados específicos desta camada
+                        if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+                        {
+                            try
+                            {
+                                var layer = animController.layers[i];
+                                writer.WriteLine($"    │   │   ├─ States in Layer:");
+                                WriteLayerStates(layer.stateMachine, writer, "    │   │   │   ");
+                            }
+                            catch
+                            {
+                                writer.WriteLine($"    │   │   ├─ (Error reading layer states)");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string GetStateName(Animator animator, int layerIndex, AnimatorStateInfo stateInfo)
+        {
+            // Tenta obter o nome do estado através do hash
+            var controller = animator.runtimeAnimatorController;
+            if (controller != null && controller is UnityEditor.Animations.AnimatorController animController)
+            {
+                try
+                {
+                    var layer = animController.layers[layerIndex];
+                    foreach (var state in layer.stateMachine.states)
+                    {
+                        if (state.state.nameHash == stateInfo.shortNameHash)
+                        {
+                            return state.state.name;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Em caso de erro, retorna hash
+                }
+            }
+            return $"State_{stateInfo.shortNameHash}";
+        }
+
+        private static string GetParameterValue(Animator animator, AnimatorControllerParameter param)
+        {
+            try
+            {
+                switch (param.type)
+                {
+                    case AnimatorControllerParameterType.Bool:
+                        return animator.GetBool(param.name).ToString();
+                    case AnimatorControllerParameterType.Float:
+                        return animator.GetFloat(param.name).ToString("F2");
+                    case AnimatorControllerParameterType.Int:
+                        return animator.GetInteger(param.name).ToString();
+                    case AnimatorControllerParameterType.Trigger:
+                        return animator.GetBool(param.name) ? "Triggered" : "Not Triggered";
+                    default:
+                        return "Unknown";
+                }
+            }
+            catch
+            {
+                return "Error";
+            }
+        }
+
+        private static void WriteAllAnimatorStates(Animator animator, StreamWriter writer)
+        {
+            if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+            {
+                try
+                {
+                    for (int layerIndex = 0; layerIndex < animController.layers.Length; layerIndex++)
+                    {
+                        var layer = animController.layers[layerIndex];
+                        writer.WriteLine($"    │   ├─ Layer [{layerIndex}] {layer.name}:");
+                        WriteLayerStates(layer.stateMachine, writer, "    │   │   ");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    writer.WriteLine($"    │   ├─ Error reading states: {ex.Message}");
+                }
+            }
+            else
+            {
+                writer.WriteLine($"    │   ├─ No AnimatorController found or invalid type");
+            }
+        }
+
+        private static void WriteLayerStates(UnityEditor.Animations.AnimatorStateMachine stateMachine, StreamWriter writer, string indent)
+        {
+            if (stateMachine == null)
+            {
+                writer.WriteLine($"{indent}├─ (Null StateMachine)");
+                return;
+            }
+
+            // Lista todos os estados
+            foreach (var stateInfo in stateMachine.states)
+            {
+                var state = stateInfo.state;
+                if (state == null) continue;
+
+                string stateDetails = GetStateDetails(state);
+                writer.WriteLine($"{indent}├─ {state.name}{stateDetails}");
+
+                // Lista transições do estado
+                if (state.transitions.Length > 0)
+                {
+                    writer.WriteLine($"{indent}│   ├─ Transitions ({state.transitions.Length}):");
+                    foreach (var transition in state.transitions)
+                    {
+                        if (transition.destinationState != null)
+                        {
+                            writer.WriteLine($"{indent}│   │   ├─ → {transition.destinationState.name}");
+                        }
+                        else if (transition.isExit)
+                        {
+                            writer.WriteLine($"{indent}│   │   ├─ → (Exit)");
+                        }
+                    }
+                }
+            }
+
+            // Lista sub-máquinas de estado recursivamente
+            foreach (var subStateMachine in stateMachine.stateMachines)
+            {
+                writer.WriteLine($"{indent}├─ SubStateMachine: {subStateMachine.stateMachine.name}");
+                WriteLayerStates(subStateMachine.stateMachine, writer, indent + "│   ");
+            }
+        }
+
+        private static string GetStateDetails(UnityEditor.Animations.AnimatorState state)
+        {
+            var details = new System.Collections.Generic.List<string>();
+
+            if (state.motion != null)
+            {
+                details.Add($"Motion: {state.motion.name}");
+            }
+
+            if (state.speed != 1.0f)
+            {
+                details.Add($"Speed: {state.speed:F2}");
+            }
+
+            if (state.cycleOffset != 0.0f)
+            {
+                details.Add($"Offset: {state.cycleOffset:F2}");
+            }
+
+            if (state.tag != "")
+            {
+                details.Add($"Tag: {state.tag}");
+            }
+
+            return details.Count > 0 ? $" ({string.Join(", ", details)})" : "";
+        }
+
+        #endregion
         #endregion
 
 

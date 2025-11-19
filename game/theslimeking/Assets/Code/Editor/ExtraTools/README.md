@@ -81,6 +81,19 @@ O sistema Quest foi integrado ao ExtraTools e oferece ferramentas para criação
 - **Função:** Configura objetos empurráveis pelo player
 - **Componentes:** Physics, constraints, feedback
 
+#### 📊 Export GameObject Structure
+
+- **Menu:** `GameObject/Extra Tools/📊 Export GameObject Structure`
+- **Função:** Exporta a estrutura hierárquica completa e detalhada de um GameObject selecionado
+- **Saída:** Arquivo texto em `Assets/AuxTemp/` com análise completa do objeto
+- **Features:**
+  - Informações básicas (ativo, static, cena, etc.)
+  - Transform detalhado (posições, rotações, escalas locais e mundiais)
+  - Componentes com configurações específicas (Renderer, Collider2D, Rigidbody2D, etc.)
+  - Layer e Tag com informações de colisão
+  - Hierarquia visual completa com status dos filhos
+  - Detalhes específicos por tipo de componente (Material, Sorting Layer, Physics, etc.)
+
 ### 🎬 Scene Tools
 
 #### 🔧 Scene Setup Tool
@@ -277,7 +290,7 @@ namespace ExtraTools.Editor
 
 ---
 
-## 🔍 Troubleshooting
+### 🔍 Troubleshooting
 
 ### Problemas Comuns
 
@@ -285,12 +298,14 @@ namespace ExtraTools.Editor
 2. **Ferramenta não funciona**: Confirme dependências estão presentes
 3. **Context menu vazio**: Valide seleção de GameObject
 4. **Performance lenta**: Use ferramentas em pequenos lotes
+5. **Export falha**: Verifique permissões de escrita na pasta Assets/AuxTemp
 
 ### Logs e Debug
 
 - Logs controlados por flags `enableLogs` nos scripts
 - Use `UnityEngine.Debug.Log` para feedback
 - Prefixos padronizados: `[Extra Tools]`, `[NPC Tools]`, etc.
+- **Export GameObject Structure**: Exporta estrutura detalhada via clique direito
 
 ---
 
