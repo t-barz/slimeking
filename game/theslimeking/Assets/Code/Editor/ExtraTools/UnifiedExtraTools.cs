@@ -212,6 +212,18 @@ namespace ExtraTools.Editor
             ExportSceneStructure();
         }
 
+        [MenuItem("Extra Tools/Debug/🎭 Export Animator Configuration")]
+        public static void MenuExportAnimatorConfigurationDebug()
+        {
+            ExportAnimatorConfiguration();
+        }
+
+        [MenuItem("Extra Tools/Debug/🎭 Export Animator Configuration", true)]
+        public static bool ValidateExportAnimatorConfigurationDebug()
+        {
+            return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent<Animator>() != null;
+        }
+
         [MenuItem("Extra Tools/Debug/⚙️ Export Project Settings")]
         public static void MenuExportProjectSettings()
         {
@@ -228,6 +240,18 @@ namespace ExtraTools.Editor
         public static bool ValidateExportGameObjectStructure()
         {
             return Selection.activeGameObject != null;
+        }
+
+        [MenuItem("GameObject/Extra Tools/🎭 Export Animator Configuration", false, 11)]
+        public static void MenuExportAnimatorConfiguration()
+        {
+            ExportAnimatorConfiguration();
+        }
+
+        [MenuItem("GameObject/Extra Tools/🎭 Export Animator Configuration", true)]
+        public static bool ValidateExportAnimatorConfiguration()
+        {
+            return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent<Animator>() != null;
         }
         #endregion
 
@@ -604,6 +628,44 @@ namespace ExtraTools.Editor
                 if (child.childCount > 0)
                     WriteGameObjectHierarchy(child, writer, level + 1);
             }
+        }
+
+        private static void ExportAnimatorConfiguration()
+        {
+            GameObject selectedObject = Selection.activeGameObject;
+            if (selectedObject == null)
+            {
+                LogError("Nenhum GameObject selecionado.");
+                EditorUtility.DisplayDialog("Erro", "Selecione um GameObject para exportar a configuração do Animator.", "OK");
+                return;
+            }
+
+            Animator animator = selectedObject.GetComponent<Animator>();
+            if (animator == null)
+            {
+                LogError("O GameObject selecionado não possui um componente Animator.");
+                EditorUtility.DisplayDialog("Erro", "O GameObject selecionado não possui um componente Animator.", "OK");
+                return;
+            }
+
+            Log($"🎭 Exportando configuração completa do Animator de '{selectedObject.name}'...");
+
+            string fileName = $"AnimatorConfig_{selectedObject.name}_{System.DateTime.Now:yyyyMMdd_HHmmss}.txt";
+            string auxTempDir = Path.Combine(Application.dataPath, "AuxTemp");
+            if (!Directory.Exists(auxTempDir))
+                Directory.CreateDirectory(auxTempDir);
+
+            string filePath = Path.Combine(auxTempDir, fileName);
+
+            using (var writer = new StreamWriter(filePath))
+            {
+                WriteAnimatorConfigurationReport(animator, selectedObject, writer);
+            }
+
+            Log($"✅ Configuração do Animator exportada: {filePath}");
+            EditorUtility.DisplayDialog("Exportação Completa",
+                $"🎭 Configuração do Animator exportada!\n{fileName}", "OK");
+            EditorUtility.RevealInFinder(filePath);
         }
 
         private static void ExportGameObjectStructure()
@@ -1346,6 +1408,389 @@ namespace ExtraTools.Editor
 
             EditorGUILayout.Space(10);
             EditorGUILayout.HelpBox("Ferramentas para criação e configuração de quests", MessageType.Info);
+        }
+
+        private static void WriteAnimatorConfigurationReport(Animator animator, GameObject gameObject, StreamWriter writer)
+        {
+            // Cabeçalho
+            writer.WriteLine("════════════════════════════════════════════════════════");
+            writer.WriteLine($"  CONFIGURAÇÃO COMPLETA DO ANIMATOR");
+            writer.WriteLine("════════════════════════════════════════════════════════");
+            writer.WriteLine($"GameObject: {gameObject.name}");
+            writer.WriteLine($"Caminho: {GetGameObjectPath(gameObject)}");
+            writer.WriteLine($"Exportado em: {System.DateTime.Now}");
+            writer.WriteLine($"Unity Version: {Application.unityVersion}");
+            writer.WriteLine();
+
+            // Informações básicas do Animator
+            WriteAnimatorBasicInfo(animator, writer);
+            writer.WriteLine();
+
+            // Controller Information
+            WriteAnimatorControllerInfo(animator, writer);
+            writer.WriteLine();
+
+            // Parâmetros detalhados
+            WriteAnimatorParametersDetail(animator, writer);
+            writer.WriteLine();
+
+            // Estados e Layers
+            WriteAnimatorStatesAndLayers(animator, writer);
+            writer.WriteLine();
+
+            // Transições
+            WriteAnimatorTransitions(animator, writer);
+            writer.WriteLine();
+
+            // Estado atual
+            WriteCurrentAnimatorState(animator, writer);
+        }
+
+        private static void WriteAnimatorBasicInfo(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ INFORMAÇÕES BÁSICAS DO ANIMATOR");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+            writer.WriteLine($"Controller: {(animator.runtimeAnimatorController ? animator.runtimeAnimatorController.name : "None")}");
+            writer.WriteLine($"Avatar: {(animator.avatar ? animator.avatar.name : "None")}");
+            writer.WriteLine($"Culling Mode: {animator.cullingMode}");
+            writer.WriteLine($"Update Mode: {animator.updateMode}");
+            writer.WriteLine($"Apply Root Motion: {animator.applyRootMotion}");
+            writer.WriteLine($"Animate Physics: {animator.animatePhysics}");
+            writer.WriteLine($"Is Human: {animator.isHuman}");
+            writer.WriteLine($"Has Root Motion: {animator.hasRootMotion}");
+            writer.WriteLine($"Is Optimizable: {animator.isOptimizable}");
+            writer.WriteLine($"Layer Count: {animator.layerCount}");
+            writer.WriteLine($"Parameter Count: {animator.parameterCount}");
+        }
+
+        private static void WriteAnimatorControllerInfo(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ CONTROLLER INFORMATION");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            if (animator.runtimeAnimatorController == null)
+            {
+                writer.WriteLine("❌ Nenhum Animator Controller configurado");
+                return;
+            }
+
+            var controller = animator.runtimeAnimatorController;
+            writer.WriteLine($"Nome: {controller.name}");
+            writer.WriteLine($"Tipo: {controller.GetType().Name}");
+
+            if (controller is UnityEditor.Animations.AnimatorController animController)
+            {
+                writer.WriteLine($"Layers: {animController.layers.Length}");
+                writer.WriteLine($"Parameters: {animController.parameters.Length}");
+                writer.WriteLine($"Asset Path: {AssetDatabase.GetAssetPath(animController)}");
+
+                // Informações adicionais do controller
+                writer.WriteLine($"Animation Clips Count: {animController.animationClips.Length}");
+                if (animController.animationClips.Length > 0)
+                {
+                    writer.WriteLine("Animation Clips:");
+                    for (int i = 0; i < animController.animationClips.Length; i++)
+                    {
+                        var clip = animController.animationClips[i];
+                        writer.WriteLine($"  {i + 1}. {clip.name} ({clip.length:F2}s, FPS: {clip.frameRate})");
+                    }
+                }
+            }
+        }
+
+        private static void WriteAnimatorParametersDetail(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ PARÂMETROS DETALHADOS");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            if (animator.parameterCount == 0)
+            {
+                writer.WriteLine("❌ Nenhum parâmetro configurado");
+                return;
+            }
+
+            try
+            {
+                for (int i = 0; i < animator.parameterCount; i++)
+                {
+                    var param = animator.GetParameter(i);
+                    if (param != null)
+                    {
+                        writer.WriteLine($"{i + 1}. {param.name}");
+                        writer.WriteLine($"   ├─ Tipo: {param.type}");
+                        writer.WriteLine($"   ├─ Valor Padrão: {GetParameterDefaultValue(param)}");
+                        writer.WriteLine($"   ├─ Valor Atual: {GetParameterValue(animator, param)}");
+                        writer.WriteLine($"   ├─ Hash: {param.nameHash}");
+
+                        if (i < animator.parameterCount - 1)
+                            writer.WriteLine("   │");
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                writer.WriteLine($"❌ Erro ao ler parâmetros: {ex.Message}");
+            }
+        }
+
+        private static void WriteAnimatorStatesAndLayers(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ ESTADOS E LAYERS");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+            {
+                try
+                {
+                    for (int layerIndex = 0; layerIndex < animController.layers.Length; layerIndex++)
+                    {
+                        var layer = animController.layers[layerIndex];
+                        writer.WriteLine($"Layer [{layerIndex}]: {layer.name}");
+                        writer.WriteLine($"├─ Peso Padrão: {layer.defaultWeight}");
+                        writer.WriteLine($"├─ Peso Atual: {animator.GetLayerWeight(layerIndex)}");
+                        writer.WriteLine($"├─ Sync Parâmetros: {(layer.syncedLayerIndex >= 0 ? "Sim (Layer " + layer.syncedLayerIndex + ")" : "Não")}");
+                        writer.WriteLine($"├─ IK Pass: {layer.iKPass}");
+                        writer.WriteLine($"├─ Avatar Mask: {(layer.avatarMask ? layer.avatarMask.name : "None")}");
+                        writer.WriteLine($"├─ Blending Mode: {layer.blendingMode}");
+
+                        if (layer.stateMachine != null)
+                        {
+                            writer.WriteLine($"├─ State Machine: {layer.stateMachine.name}");
+                            writer.WriteLine($"├─ Estados:");
+                            WriteLayerStatesDetailed(layer.stateMachine, writer, "│  ");
+
+                            writer.WriteLine($"├─ Sub-State Machines:");
+                            WriteSubStateMachines(layer.stateMachine, writer, "│  ");
+                        }
+
+                        if (layerIndex < animController.layers.Length - 1)
+                            writer.WriteLine("│");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    writer.WriteLine($"❌ Erro ao ler layers: {ex.Message}");
+                }
+            }
+        }
+
+        private static void WriteAnimatorTransitions(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ TRANSIÇÕES");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            if (animator.runtimeAnimatorController is UnityEditor.Animations.AnimatorController animController)
+            {
+                try
+                {
+                    for (int layerIndex = 0; layerIndex < animController.layers.Length; layerIndex++)
+                    {
+                        var layer = animController.layers[layerIndex];
+                        writer.WriteLine($"Layer [{layerIndex}]: {layer.name}");
+
+                        WriteStateTransitions(layer.stateMachine, writer, "├─ ");
+
+                        if (layerIndex < animController.layers.Length - 1)
+                            writer.WriteLine("│");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    writer.WriteLine($"❌ Erro ao ler transições: {ex.Message}");
+                }
+            }
+        }
+
+        private static void WriteCurrentAnimatorState(Animator animator, StreamWriter writer)
+        {
+            writer.WriteLine("┌─────────────────────────────────────────────────────────");
+            writer.WriteLine("│ ESTADO ATUAL (RUNTIME)");
+            writer.WriteLine("└─────────────────────────────────────────────────────────");
+
+            try
+            {
+                for (int i = 0; i < animator.layerCount; i++)
+                {
+                    writer.WriteLine($"Layer [{i}]:");
+                    var currentState = animator.GetCurrentAnimatorStateInfo(i);
+                    writer.WriteLine($"├─ Estado Atual: {GetStateName(animator, i, currentState)}");
+                    writer.WriteLine($"├─ Tempo Normalizado: {currentState.normalizedTime:F3}");
+                    writer.WriteLine($"├─ Duração: {currentState.length:F3}s");
+                    writer.WriteLine($"├─ Velocidade: {currentState.speed:F3}");
+                    writer.WriteLine($"├─ Tag: {currentState.tagHash}");
+                    writer.WriteLine($"├─ Em Transição: {animator.IsInTransition(i)}");
+
+                    if (animator.IsInTransition(i))
+                    {
+                        var transitionInfo = animator.GetAnimatorTransitionInfo(i);
+                        writer.WriteLine($"├─ Transição:");
+                        writer.WriteLine($"│  ├─ Progresso: {transitionInfo.normalizedTime:F3}");
+                        writer.WriteLine($"│  ├─ Duração: {transitionInfo.duration:F3}s");
+                        writer.WriteLine($"│  └─ Para: Hash {transitionInfo.nameHash}");
+                    }
+
+                    if (i < animator.layerCount - 1)
+                        writer.WriteLine("│");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                writer.WriteLine($"❌ Erro ao ler estado atual: {ex.Message}");
+            }
+        }
+
+        private static string GetParameterDefaultValue(AnimatorControllerParameter param)
+        {
+            switch (param.type)
+            {
+                case AnimatorControllerParameterType.Bool:
+                    return param.defaultBool.ToString();
+                case AnimatorControllerParameterType.Float:
+                    return param.defaultFloat.ToString("F2");
+                case AnimatorControllerParameterType.Int:
+                    return param.defaultInt.ToString();
+                case AnimatorControllerParameterType.Trigger:
+                    return "False (Trigger)";
+                default:
+                    return "Unknown";
+            }
+        }
+
+        private static void WriteLayerStatesDetailed(UnityEditor.Animations.AnimatorStateMachine stateMachine, StreamWriter writer, string prefix)
+        {
+            if (stateMachine.states == null) return;
+
+            foreach (var stateInfo in stateMachine.states)
+            {
+                if (stateInfo.state == null) continue;
+
+                var state = stateInfo.state;
+                writer.WriteLine($"{prefix}├─ {state.name}");
+                writer.WriteLine($"{prefix}│  ├─ Tag: {state.tag}");
+                writer.WriteLine($"{prefix}│  ├─ Velocidade: {state.speed}");
+                writer.WriteLine($"{prefix}│  ├─ Motion: {(state.motion ? state.motion.name : "None")}");
+                writer.WriteLine($"{prefix}│  ├─ Posição: {stateInfo.position}");
+                writer.WriteLine($"{prefix}│  ├─ Transições: {state.transitions.Length}");
+
+                if (state.motion is AnimationClip clip)
+                {
+                    writer.WriteLine($"{prefix}│  ├─ Clip Info:");
+                    writer.WriteLine($"{prefix}│  │  ├─ Duração: {clip.length:F2}s");
+                    writer.WriteLine($"{prefix}│  │  ├─ FPS: {clip.frameRate}");
+                    writer.WriteLine($"{prefix}│  │  ├─ Loop: {clip.isLooping}");
+                    writer.WriteLine($"{prefix}│  │  └─ Legacy: {clip.legacy}");
+                }
+
+                writer.WriteLine($"{prefix}│  │");
+            }
+        }
+
+        private static void WriteSubStateMachines(UnityEditor.Animations.AnimatorStateMachine stateMachine, StreamWriter writer, string prefix)
+        {
+            if (stateMachine.stateMachines == null) return;
+
+            foreach (var subStateMachineInfo in stateMachine.stateMachines)
+            {
+                if (subStateMachineInfo.stateMachine == null) continue;
+
+                var subSM = subStateMachineInfo.stateMachine;
+                writer.WriteLine($"{prefix}├─ {subSM.name}");
+                writer.WriteLine($"{prefix}│  ├─ Estados: {subSM.states.Length}");
+                writer.WriteLine($"{prefix}│  ├─ Sub-Máquinas: {subSM.stateMachines.Length}");
+                writer.WriteLine($"{prefix}│  └─ Posição: {subStateMachineInfo.position}");
+            }
+        }
+
+        private static void WriteStateTransitions(UnityEditor.Animations.AnimatorStateMachine stateMachine, StreamWriter writer, string prefix)
+        {
+            if (stateMachine.states == null) return;
+
+            foreach (var stateInfo in stateMachine.states)
+            {
+                if (stateInfo.state == null || stateInfo.state.transitions == null) continue;
+
+                var state = stateInfo.state;
+                if (state.transitions.Length > 0)
+                {
+                    writer.WriteLine($"{prefix}Estado: {state.name}");
+                    foreach (var transition in state.transitions)
+                    {
+                        string destinationName = transition.destinationState ? transition.destinationState.name :
+                                                transition.destinationStateMachine ? transition.destinationStateMachine.name :
+                                                "Exit";
+
+                        writer.WriteLine($"{prefix}├─ → {destinationName}");
+                        writer.WriteLine($"{prefix}│  ├─ Duração: {transition.duration:F3}");
+                        writer.WriteLine($"{prefix}│  ├─ Offset: {transition.offset:F3}");
+                        writer.WriteLine($"{prefix}│  ├─ Exit Time: {transition.exitTime:F3}");
+                        writer.WriteLine($"{prefix}│  ├─ Has Exit Time: {transition.hasExitTime}");
+                        writer.WriteLine($"{prefix}│  ├─ Fixed Duration: {transition.hasFixedDuration}");
+                        writer.WriteLine($"{prefix}│  ├─ Interrupt Source: {transition.interruptionSource}");
+                        writer.WriteLine($"{prefix}│  ├─ Ordered Interruption: {transition.orderedInterruption}");
+                        writer.WriteLine($"{prefix}│  ├─ Can Transition To Self: {transition.canTransitionToSelf}");
+
+                        if (transition.conditions != null && transition.conditions.Length > 0)
+                        {
+                            writer.WriteLine($"{prefix}│  ├─ Condições:");
+                            foreach (var condition in transition.conditions)
+                            {
+                                writer.WriteLine($"{prefix}│  │  └─ {condition.parameter} {condition.mode} {condition.threshold}");
+                            }
+                        }
+                        else
+                        {
+                            writer.WriteLine($"{prefix}│  ├─ Condições: Nenhuma");
+                        }
+                        writer.WriteLine($"{prefix}│  │");
+                    }
+                }
+            }
+
+            // Any State Transitions
+            if (stateMachine.anyStateTransitions != null && stateMachine.anyStateTransitions.Length > 0)
+            {
+                writer.WriteLine($"{prefix}Any State Transitions:");
+                foreach (var transition in stateMachine.anyStateTransitions)
+                {
+                    string destinationName = transition.destinationState ? transition.destinationState.name : "Exit";
+                    writer.WriteLine($"{prefix}├─ → {destinationName}");
+                    writer.WriteLine($"{prefix}│  ├─ Duração: {transition.duration:F3}");
+
+                    if (transition.conditions != null && transition.conditions.Length > 0)
+                    {
+                        writer.WriteLine($"{prefix}│  ├─ Condições:");
+                        foreach (var condition in transition.conditions)
+                        {
+                            writer.WriteLine($"{prefix}│  │  └─ {condition.parameter} {condition.mode} {condition.threshold}");
+                        }
+                    }
+                }
+            }
+
+            // Entry Transitions
+            if (stateMachine.entryTransitions != null && stateMachine.entryTransitions.Length > 0)
+            {
+                writer.WriteLine($"{prefix}Entry Transitions:");
+                foreach (var transition in stateMachine.entryTransitions)
+                {
+                    string destinationName = transition.destinationState ? transition.destinationState.name : "Exit";
+                    writer.WriteLine($"{prefix}├─ → {destinationName}");
+
+                    if (transition.conditions != null && transition.conditions.Length > 0)
+                    {
+                        writer.WriteLine($"{prefix}│  ├─ Condições:");
+                        foreach (var condition in transition.conditions)
+                        {
+                            writer.WriteLine($"{prefix}│  │  └─ {condition.parameter} {condition.mode} {condition.threshold}");
+                        }
+                    }
+                }
+            }
         }
         #endregion
         #endregion

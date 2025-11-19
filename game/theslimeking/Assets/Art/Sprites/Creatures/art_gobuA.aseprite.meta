@@ -2,7 +2,37 @@ fileFormatVersion: 2
 guid: ae4af105e3050ca439faca6dbc8f9c3a
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Attack
+    second: {fileID: 7400000, guid: 16db93be9cd47a0498387eb4094e1f51, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Awaking
+    second: {fileID: 7400000, guid: 088cba13cdb05b541867a8e240d68f04, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Idle
+    second: {fileID: 7400000, guid: e4551e2ad15dce342af0e4252a2b320c, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Run
+    second: {fileID: 7400000, guid: 2018f368ea40c0f4dae9ff3380defdc6, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Sleep
+    second: {fileID: 7400000, guid: 4990d226b7c8562419062da00c30ba11, type: 2}
+  - first:
+      type: UnityEngine:AnimationClip
+      assembly: UnityEngine.AnimationModule
+      name: Walk
+    second: {fileID: 7400000, guid: 90d44ecd1d3fc9f4a89a37aa78e29d7f, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -102,7 +132,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638990962002571086
+  platformSettingsDirtyTick: 638991390516772565
   textureAssetName: 
   singleSpriteImportData:
   - name: 

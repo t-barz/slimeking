@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine.Rendering;
 using System.Linq;
+using System.Collections.Generic;
 using SlimeKing.Core;
 
 /// <summary>
@@ -44,16 +45,8 @@ namespace ExtraTools.Editor
             NPCController npcController = selected.AddComponent<NPCController>();
             ConfigureNPCController(npcController, selected);
 
-            // === CRIAÇÃO DO ANIMATOR CONTROLLER ===
-            AnimatorController controller = CreateAnimatorControllerForNPC(selected.name);
-            if (controller != null)
-            {
-                Animator animator = selected.GetComponent<Animator>();
-                if (animator != null)
-                {
-                    animator.runtimeAnimatorController = controller;
-                }
-            }
+            // === CONFIGURAÇÃO DO ANIMATOR EXISTENTE ===
+            ConfigureExistingAnimator(selected);
 
             // === CONFIGURAÇÕES FINAIS ===
             FinalizeNPCSetup(selected);
@@ -115,16 +108,8 @@ namespace ExtraTools.Editor
             // Configura automaticamente baseado nos filhos
             ConfigureNPCController(npcController, selected);
 
-            // Cria e configura Animator Controller automaticamente
-            AnimatorController controller = CreateAnimatorControllerForNPC(selected.name);
-            if (controller != null)
-            {
-                Animator animator = selected.GetComponent<Animator>();
-                if (animator != null)
-                {
-                    animator.runtimeAnimatorController = controller;
-                }
-            }
+            // Configura Animator existente ou adiciona um básico se não houver
+            ConfigureExistingAnimator(selected);
 
             Debug.Log($"[NPCCreationTool] NPCController adicionado com sucesso ao GameObject '{selected.name}'!");
         }
@@ -357,6 +342,561 @@ namespace ExtraTools.Editor
         }
 
         /// <summary>
+        /// Configura o Animator existente do GameObject para trabalhar com NPCController
+        /// Adiciona parâmetros necessários se não existirem e configura adequadamente
+        /// </summary>
+        /// <param name="gameObject">GameObject com o Animator a ser configurado</param>
+        private static void ConfigureExistingAnimator(GameObject gameObject)
+        {
+            Animator animator = gameObject.GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' não possui componente Animator!");
+                return;
+            }
+
+            AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
+            if (controller == null)
+            {
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' não possui um AnimatorController configurado! Use o controller existente.");
+                return;
+            }
+
+            Debug.Log($"[NPCCreationTool] Configurando Animator existente '{controller.name}' para NPC...");
+
+            try
+            {
+                bool hasChanges = false;
+
+                // === VERIFICA PARÂMETROS EXISTENTES ===
+                var existingParams = new List<string>();
+                foreach (var param in controller.parameters)
+                {
+                    existingParams.Add($"{param.name} ({param.type})");
+                }
+                Debug.Log($"[NPCCreationTool] 📋 Parâmetros existentes: {string.Join(", ", existingParams)}");
+
+                // === VERIFICA E ADICIONA APENAS PARÂMETROS NECESSÁRIOS ===
+                // O NPCController precisa de isWalking para controlar animação de movimento
+                // Combat system precisa de triggers Hit e Attack
+                bool hasIsWalking = false;
+                bool hasFacingRight = false;
+                bool hasHitTrigger = false;
+                bool hasAttackTrigger = false;
+
+                foreach (var existingParam in controller.parameters)
+                {
+                    if (existingParam.name == "isWalking" && existingParam.type == AnimatorControllerParameterType.Bool)
+                    {
+                        hasIsWalking = true;
+                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'isWalking' já existe");
+                    }
+                    if (existingParam.name == "FacingRight" && existingParam.type == AnimatorControllerParameterType.Bool)
+                    {
+                        hasFacingRight = true;
+                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'FacingRight' já existe");
+                    }
+                    if (existingParam.name == "Hit" && existingParam.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hasHitTrigger = true;
+                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'Hit' (Trigger) já existe");
+                    }
+                    if (existingParam.name == "Attack" && existingParam.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hasAttackTrigger = true;
+                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'Attack' (Trigger) já existe");
+                    }
+                }
+
+                // Adiciona isWalking se não existir (necessário para movimento)
+                if (!hasIsWalking)
+                {
+                    controller.AddParameter("isWalking", AnimatorControllerParameterType.Bool);
+                    // Configura valor padrão
+                    foreach (var param in controller.parameters)
+                    {
+                        if (param.name == "isWalking")
+                        {
+                            param.defaultBool = false;
+                            break;
+                        }
+                    }
+                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'isWalking' (Bool) adicionado - necessário para movimento");
+                    hasChanges = true;
+                }
+
+                // Adiciona FacingRight se não existir (necessário para direção)
+                if (!hasFacingRight)
+                {
+                    controller.AddParameter("FacingRight", AnimatorControllerParameterType.Bool);
+                    // Configura valor padrão
+                    foreach (var param in controller.parameters)
+                    {
+                        if (param.name == "FacingRight")
+                        {
+                            param.defaultBool = true;
+                            break;
+                        }
+                    }
+                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'FacingRight' (Bool) adicionado - necessário para direção");
+                    hasChanges = true;
+                }
+
+                // Adiciona Hit se não existir (necessário para combat system)
+                if (!hasHitTrigger)
+                {
+                    controller.AddParameter("Hit", AnimatorControllerParameterType.Trigger);
+                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'Hit' (Trigger) adicionado - necessário para combat system");
+                    hasChanges = true;
+                }
+
+                // Adiciona Attack se não existir (necessário para combat system)
+                if (!hasAttackTrigger)
+                {
+                    controller.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
+                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'Attack' (Trigger) adicionado - necessário para combat system");
+                    hasChanges = true;
+                }
+
+                // === CONFIGURAÇÕES GERAIS DO ANIMATOR ===
+                // Configura para não aplicar root motion (importante para NPCs)
+                if (animator.applyRootMotion)
+                {
+                    animator.applyRootMotion = false;
+                    Debug.Log($"[NPCCreationTool] ⚙️ Root Motion desabilitado para NPC");
+                }
+
+                // Configura Culling Mode para AlwaysAnimate se for diferente
+                if (animator.cullingMode != AnimatorCullingMode.AlwaysAnimate)
+                {
+                    animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                    Debug.Log($"[NPCCreationTool] ⚙️ Culling Mode configurado para AlwaysAnimate");
+                }
+
+                // === CONFIGURAÇÃO DE TODAS AS TRANSIÇÕES ===
+                ConfigureAllTransitions(controller, ref hasChanges);
+
+                // === SALVA AS MUDANÇAS ===
+                if (hasChanges)
+                {
+                    EditorUtility.SetDirty(controller);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
+                    Debug.Log($"[NPCCreationTool] ✅ Animator Controller '{controller.name}' configurado com sucesso!");
+                }
+                else
+                {
+                    Debug.Log($"[NPCCreationTool] ✅ Animator Controller '{controller.name}' já possui parâmetros necessários");
+                }
+
+                // === LOGGING DE INFORMAÇÕES DO CONTROLLER ===
+                Debug.Log($"[NPCCreationTool] 📊 Controller: {controller.name}");
+                Debug.Log($"[NPCCreationTool] 📊 Parâmetros: {controller.parameters.Length}");
+                Debug.Log($"[NPCCreationTool] 📊 Layers: {controller.layers.Length}");
+
+                if (controller.layers.Length > 0 && controller.layers[0].stateMachine.states != null)
+                {
+                    Debug.Log($"[NPCCreationTool] 📊 Estados: {controller.layers[0].stateMachine.states.Length}");
+                    var stateNames = controller.layers[0].stateMachine.states.Select(s => s.state.name).ToArray();
+                    Debug.Log($"[NPCCreationTool] 📊 Lista de Estados: {string.Join(", ", stateNames)}");
+                }
+
+                Debug.Log($"[NPCCreationTool] 💡 O NPC manterá os estados existentes ({string.Join(", ", controller.layers[0].stateMachine.states.Select(s => s.state.name))})");
+                Debug.Log($"[NPCCreationTool] 💡 Apenas parâmetros básicos de movimento (isWalking, FacingRight) foram adicionados se necessário");
+
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[NPCCreationTool] Erro ao configurar Animator existente: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Configura TODAS as transições do Animator Controller baseadas nos parâmetros existentes
+        /// </summary>
+        /// <param name="controller">Animator Controller a ser configurado</param>
+        /// <param name="hasChanges">Referência para indicar se houve mudanças</param>
+        private static void ConfigureAllTransitions(AnimatorController controller, ref bool hasChanges)
+        {
+            if (controller.layers.Length == 0) return;
+
+            var baseLayer = controller.layers[0];
+            var stateMachine = baseLayer.stateMachine;
+
+            if (stateMachine.states == null) return;
+
+            Debug.Log($"[NPCCreationTool] 🔄 Configurando TODAS as transições do Animator Controller...");
+
+            // === MAPEAMENTO DE ESTADOS ===
+            var stateMap = new Dictionary<string, AnimatorState>();
+            foreach (var stateInfo in stateMachine.states)
+            {
+                if (stateInfo.state != null)
+                {
+                    string stateName = stateInfo.state.name.ToLower();
+                    stateMap[stateName] = stateInfo.state;
+                }
+            }
+
+            // === VERIFICAÇÃO DE PARÂMETROS DISPONÍVEIS ===
+            var parameterMap = new Dictionary<string, AnimatorControllerParameter>();
+            foreach (var param in controller.parameters)
+            {
+                parameterMap[param.name.ToLower()] = param;
+            }
+
+            // === CONFIGURAÇÃO DE TRANSIÇÕES ESPECÍFICAS ===
+
+            // 1. MOVIMENTO: Idle ↔ Walk
+            ConfigureMovementTransitions(stateMap, parameterMap, ref hasChanges);
+
+            // 2. COMBAT: Any → Attack (via trigger)
+            ConfigureAttackTransitions(stateMap, parameterMap, stateMachine, ref hasChanges);
+
+            // 3. DAMAGE: Any State → Hit (via trigger)  
+            ConfigureDamageTransitions(stateMap, parameterMap, stateMachine, ref hasChanges);
+
+            // 4. COMPLETION: Attack/Hit/Unique → Idle (via exit time)
+            ConfigureCompletionTransitions(stateMap, ref hasChanges);
+
+            // 5. DEATH: Hit → Die (sem condições específicas, baseado em lógica de jogo)
+            ConfigureDeathTransitions(stateMap, ref hasChanges);
+
+            // 6. SPECIAL: Idle/Walk → Unique (sem condições para ações especiais)
+            ConfigureSpecialTransitions(stateMap, ref hasChanges);
+
+            // === CONFIGURA ESTADO PADRÃO ===
+            if (stateMap.ContainsKey("idle") && stateMachine.defaultState != stateMap["idle"])
+            {
+                stateMachine.defaultState = stateMap["idle"];
+                Debug.Log($"[NPCCreationTool] ⚙️ Estado padrão configurado: Idle");
+                hasChanges = true;
+            }
+
+            Debug.Log($"[NPCCreationTool] ✅ Configuração completa de todas as transições concluída");
+        }
+
+        private static void ConfigureMovementTransitions(Dictionary<string, AnimatorState> stateMap, Dictionary<string, AnimatorControllerParameter> parameterMap, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("idle") || !stateMap.ContainsKey("walk"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estados Idle ou Walk não encontrados - transições de movimento ignoradas");
+                return;
+            }
+
+            var idleState = stateMap["idle"];
+            var walkState = stateMap["walk"];
+
+            Debug.Log($"[NPCCreationTool] 🚶 Configurando transições de movimento...");
+
+            // Idle → Walk (quando isWalking = true)
+            ConfigureOrCreateTransition(idleState, walkState, "isWalking", AnimatorConditionMode.If, parameterMap, ref hasChanges);
+
+            // Walk → Idle (quando isWalking = false)
+            ConfigureOrCreateTransition(walkState, idleState, "isWalking", AnimatorConditionMode.IfNot, parameterMap, ref hasChanges);
+        }
+
+        private static void ConfigureAttackTransitions(Dictionary<string, AnimatorState> stateMap, Dictionary<string, AnimatorControllerParameter> parameterMap, AnimatorStateMachine stateMachine, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("attack"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estado Attack não encontrado - transições de ataque ignoradas");
+                return;
+            }
+
+            var attackState = stateMap["attack"];
+            Debug.Log($"[NPCCreationTool] ⚔️ Configurando transições de ataque...");
+
+            // Configura transições dos estados básicos para Attack
+            foreach (var kvp in stateMap)
+            {
+                string stateName = kvp.Key;
+                var state = kvp.Value;
+
+                // Apenas estados que devem poder atacar
+                if (stateName == "idle" || stateName == "walk")
+                {
+                    ConfigureOrCreateTransition(state, attackState, "Attack", AnimatorConditionMode.If, parameterMap, ref hasChanges);
+                }
+            }
+
+            // Any State → Attack também (para triggers universais)
+            ConfigureAnyStateTransition(stateMachine, attackState, "Attack", AnimatorConditionMode.If, parameterMap, ref hasChanges);
+        }
+
+        private static void ConfigureDamageTransitions(Dictionary<string, AnimatorState> stateMap, Dictionary<string, AnimatorControllerParameter> parameterMap, AnimatorStateMachine stateMachine, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("hit"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estado Hit não encontrado - transições de dano ignoradas");
+                return;
+            }
+
+            var hitState = stateMap["hit"];
+            Debug.Log($"[NPCCreationTool] 💥 Configurando transições de dano...");
+
+            // Any State → Hit (via trigger Hit)
+            ConfigureAnyStateTransition(stateMachine, hitState, "Hit", AnimatorConditionMode.If, parameterMap, ref hasChanges);
+        }
+
+        private static void ConfigureCompletionTransitions(Dictionary<string, AnimatorState> stateMap, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("idle"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estado Idle não encontrado - transições de conclusão ignoradas");
+                return;
+            }
+
+            var idleState = stateMap["idle"];
+            Debug.Log($"[NPCCreationTool] 🔄 Configurando transições de conclusão...");
+
+            // Estados que devem retornar ao Idle após conclusão
+            string[] completionStates = { "attack", "hit", "unique" };
+
+            foreach (string stateName in completionStates)
+            {
+                if (stateMap.ContainsKey(stateName))
+                {
+                    var state = stateMap[stateName];
+                    ConfigureExitTimeTransition(state, idleState, ref hasChanges);
+                }
+            }
+        }
+
+        private static void ConfigureDeathTransitions(Dictionary<string, AnimatorState> stateMap, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("hit") || !stateMap.ContainsKey("die"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estados Hit ou Die não encontrados - transições de morte ignoradas");
+                return;
+            }
+
+            var hitState = stateMap["hit"];
+            var dieState = stateMap["die"];
+
+            Debug.Log($"[NPCCreationTool] 💀 Configurando transições de morte...");
+
+            // Hit → Die (via exit time, para lógica de jogo determinar quando morrer)
+            ConfigureExitTimeTransition(hitState, dieState, ref hasChanges);
+        }
+
+        private static void ConfigureSpecialTransitions(Dictionary<string, AnimatorState> stateMap, ref bool hasChanges)
+        {
+            if (!stateMap.ContainsKey("unique"))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Estado Unique não encontrado - transições especiais ignoradas");
+                return;
+            }
+
+            var uniqueState = stateMap["unique"];
+            Debug.Log($"[NPCCreationTool] ⭐ Configurando transições especiais...");
+
+            // Estados básicos podem ir para Unique (sem condições específicas)
+            string[] basicStates = { "idle", "walk" };
+
+            foreach (string stateName in basicStates)
+            {
+                if (stateMap.ContainsKey(stateName))
+                {
+                    var state = stateMap[stateName];
+
+                    // Verifica se já existe transição para Unique
+                    bool hasTransitionToUnique = false;
+                    foreach (var transition in state.transitions)
+                    {
+                        if (transition.destinationState == uniqueState)
+                        {
+                            hasTransitionToUnique = true;
+                            break;
+                        }
+                    }
+
+                    // Preserva transição existente (pode ser controlada via script)
+                    if (!hasTransitionToUnique)
+                    {
+                        var newTransition = state.AddTransition(uniqueState);
+                        newTransition.hasExitTime = true;
+                        newTransition.exitTime = 0.8f; // Permite interrupção tardia
+                        newTransition.duration = 0.1f;
+
+                        Debug.Log($"[NPCCreationTool] ➕ Transição {state.name} → {uniqueState.name} criada (exit time)");
+                        hasChanges = true;
+                    }
+                }
+            }
+        }
+
+        private static void ConfigureOrCreateTransition(AnimatorState fromState, AnimatorState toState, string parameterName, AnimatorConditionMode mode, Dictionary<string, AnimatorControllerParameter> parameterMap, ref bool hasChanges)
+        {
+            if (!parameterMap.ContainsKey(parameterName.ToLower()))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Parâmetro '{parameterName}' não encontrado - transição {fromState.name} → {toState.name} ignorada");
+                return;
+            }
+
+            // Verifica se já existe transição com condição correta
+            bool foundCorrectTransition = false;
+
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == toState)
+                {
+                    // Verifica condições existentes
+                    bool hasCorrectCondition = false;
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter.ToLower() == parameterName.ToLower() && condition.mode == mode)
+                        {
+                            hasCorrectCondition = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasCorrectCondition)
+                    {
+                        // Remove condições antigas se existirem
+                        for (int i = transition.conditions.Length - 1; i >= 0; i--)
+                        {
+                            transition.RemoveCondition(transition.conditions[i]);
+                        }
+
+                        // Adiciona condição correta
+                        transition.AddCondition(mode, 0, parameterName);
+
+                        // Otimiza para responsividade
+                        transition.hasExitTime = false;
+                        transition.hasFixedDuration = true;
+                        transition.duration = 0.1f;
+                        transition.offset = 0f;
+
+                        Debug.Log($"[NPCCreationTool] 🔧 Transição {fromState.name} → {toState.name} atualizada com condição {parameterName} {mode}");
+                        hasChanges = true;
+                    }
+                    else
+                    {
+                        Debug.Log($"[NPCCreationTool] ✅ Transição {fromState.name} → {toState.name} já configurada corretamente");
+                    }
+
+                    foundCorrectTransition = true;
+                    break;
+                }
+            }
+
+            // Cria nova transição se necessário
+            if (!foundCorrectTransition)
+            {
+                var newTransition = fromState.AddTransition(toState);
+                newTransition.AddCondition(mode, 0, parameterName);
+                newTransition.hasExitTime = false;
+                newTransition.hasFixedDuration = true;
+                newTransition.duration = 0.1f;
+                newTransition.offset = 0f;
+
+                Debug.Log($"[NPCCreationTool] ➕ Transição criada: {fromState.name} → {toState.name} (quando {parameterName} {mode})");
+                hasChanges = true;
+            }
+        }
+
+        private static void ConfigureAnyStateTransition(AnimatorStateMachine stateMachine, AnimatorState toState, string parameterName, AnimatorConditionMode mode, Dictionary<string, AnimatorControllerParameter> parameterMap, ref bool hasChanges)
+        {
+            if (!parameterMap.ContainsKey(parameterName.ToLower()))
+            {
+                Debug.LogWarning($"[NPCCreationTool] Parâmetro '{parameterName}' não encontrado - Any State → {toState.name} ignorada");
+                return;
+            }
+
+            // Verifica se já existe Any State transition
+            bool foundCorrectTransition = false;
+
+            foreach (var transition in stateMachine.anyStateTransitions)
+            {
+                if (transition.destinationState == toState)
+                {
+                    // Verifica condições
+                    bool hasCorrectCondition = false;
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter.ToLower() == parameterName.ToLower() && condition.mode == mode)
+                        {
+                            hasCorrectCondition = true;
+                            break;
+                        }
+                    }
+
+                    if (!hasCorrectCondition)
+                    {
+                        // Remove condições antigas
+                        for (int i = transition.conditions.Length - 1; i >= 0; i--)
+                        {
+                            transition.RemoveCondition(transition.conditions[i]);
+                        }
+
+                        // Adiciona condição correta
+                        transition.AddCondition(mode, 0, parameterName);
+                        transition.hasExitTime = false;
+                        transition.hasFixedDuration = true;
+                        transition.duration = 0.0f; // Imediata para triggers
+                        transition.offset = 0f;
+
+                        Debug.Log($"[NPCCreationTool] 🔧 Any State → {toState.name} atualizada com condição {parameterName} {mode}");
+                        hasChanges = true;
+                    }
+                    else
+                    {
+                        Debug.Log($"[NPCCreationTool] ✅ Any State → {toState.name} já configurada corretamente");
+                    }
+
+                    foundCorrectTransition = true;
+                    break;
+                }
+            }
+
+            // Cria nova Any State transition se necessário
+            if (!foundCorrectTransition)
+            {
+                var newTransition = stateMachine.AddAnyStateTransition(toState);
+                newTransition.AddCondition(mode, 0, parameterName);
+                newTransition.hasExitTime = false;
+                newTransition.hasFixedDuration = true;
+                newTransition.duration = 0.0f;
+                newTransition.offset = 0f;
+
+                Debug.Log($"[NPCCreationTool] ➕ Any State → {toState.name} criada (quando {parameterName} {mode})");
+                hasChanges = true;
+            }
+        }
+
+        private static void ConfigureExitTimeTransition(AnimatorState fromState, AnimatorState toState, ref bool hasChanges)
+        {
+            // Verifica se já existe transição baseada em exit time
+            bool foundExitTimeTransition = false;
+
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == toState && transition.hasExitTime && transition.conditions.Length == 0)
+                {
+                    foundExitTimeTransition = true;
+                    Debug.Log($"[NPCCreationTool] ✅ Transição exit time {fromState.name} → {toState.name} já existe");
+                    break;
+                }
+            }
+
+            // Cria transição baseada em exit time se necessário
+            if (!foundExitTimeTransition)
+            {
+                var newTransition = fromState.AddTransition(toState);
+                newTransition.hasExitTime = true;
+                newTransition.exitTime = 1.0f; // Após completar animação
+                newTransition.hasFixedDuration = true;
+                newTransition.duration = 0.0f; // Transição imediata após exit time
+                newTransition.offset = 0f;
+
+                Debug.Log($"[NPCCreationTool] ➕ Transição exit time criada: {fromState.name} → {toState.name}");
+                hasChanges = true;
+            }
+        }
+
+        /// <summary>
         /// Cria um Animator Controller completo para NPCs com todos os parâmetros e transições necessários
         /// </summary>
         /// <param name="npcName">Nome do NPC para nomear o controller</param>
@@ -483,7 +1023,7 @@ namespace ExtraTools.Editor
             }
         }
 
-        [UnityEditor.MenuItem("Extra Tools/NPC/Create Animator Controller")]
+        [UnityEditor.MenuItem("Extra Tools/NPC/Create NEW Animator Controller")]
         public static void CreateNPCAnimatorController()
         {
             GameObject selected = UnityEditor.Selection.activeGameObject;
@@ -510,6 +1050,19 @@ namespace ExtraTools.Editor
 
                 Debug.Log($"[NPCCreationTool] Animator Controller criado e configurado para '{selected.name}': {AssetDatabase.GetAssetPath(controller)}");
             }
+        }
+
+        [UnityEditor.MenuItem("Extra Tools/NPC/Configure Existing Animator")]
+        public static void ConfigureExistingAnimatorMenuItem()
+        {
+            GameObject selected = UnityEditor.Selection.activeGameObject;
+            if (selected == null)
+            {
+                Debug.LogWarning("[NPCCreationTool] Nenhum GameObject selecionado!");
+                return;
+            }
+
+            ConfigureExistingAnimator(selected);
         }
 
         [UnityEditor.MenuItem("Extra Tools/NPC/Validate Animator Setup")]
