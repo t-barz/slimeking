@@ -10,6 +10,7 @@
 - **SEMPRE consulte o Roadmap.md para verificar prioridades e tarefas pendentes antes de iniciar qualquer desenvolvimento.**
 - **Todas as atividades de desenvolvimento devem estar registradas no Roadmap.md - nunca implemente algo que não esteja documentado lá.**
 - Sempre verifique se existe alguma documentação relacionada na pasta Assets/Docs antes de implementar algo novo.
+- Evite usar soluções baseadas em reflexão, a menos que seja absolutamente necessário.
 - Utilize o idioma inglês para nomes de arquivos, pastas, classes e variáveis.
 - Nunca crie códigos de exemplo ou testes a não ser que seja solicitado.
 - Use camelCase para nomes de variáveis e métodos, e PascalCase para nomes de classes.

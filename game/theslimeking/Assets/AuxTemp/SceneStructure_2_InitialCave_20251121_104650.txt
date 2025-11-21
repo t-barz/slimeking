@@ -1,0 +1,242 @@
+ESTRUTURA DA CENA: 2_InitialCave
+Exportado em: 21/11/2025 10:46:50
+Total de GameObjects: 19
+
+[1] Camera Manager
+[2] Main Camera
+[3] EventSystem
+[4] Global Volume
+[5] chr_whiteslime
+  └─ back
+  └─ vfx_back
+  └─ vfx_front
+  └─ front
+  └─ side
+  └─ vfx_side
+  └─ shadow
+[6] Grid
+  └─ ground16
+  └─ ground
+  └─ groundProps
+  └─ walls
+  └─ wallsProps
+  └─ Tilemap
+[7] Scenario
+  └─ prop_puddle
+    └─ puddle
+    └─ gota
+  └─ env_brown_rockA2
+  └─ env_brown_rockA2 (2)
+  └─ env_brown_rockA2 (3)
+  └─ env_brown_rockA2 (4)
+  └─ env_brown_rockD2
+  └─ env_brown_rockD2 (1)
+  └─ env_brown_rockD2 (2)
+  └─ env_brown_rockB2
+  └─ env_brown_rockB2 (1)
+  └─ caveEntrance
+  └─ caveEntrance (3)
+  └─ caveEntrance (2)
+  └─ caveEntrance (4)
+  └─ caveEntrance (1)
+  └─ env_brown_rockB
+  └─ env_brown_rockB2
+  └─ env_brown_rockA2
+  └─ env_brown_rockD2
+  └─ env_brown_rockF2
+  └─ env_brown_rockF2 (1)
+  └─ env_brown_rockF2 (2)
+  └─ env_brown_rockB2 (1)
+  └─ env_brown_rockA2 (1)
+  └─ grassB
+    └─ interactivePointAct1
+      └─ gamepad
+      └─ playstation
+      └─ switch
+      └─ xbox
+      └─ keyboard
+  └─ grassB (1)
+    └─ interactivePointAct1 (1)
+      └─ gamepad
+      └─ playstation
+      └─ switch
+      └─ xbox
+      └─ keyboard
+  └─ grassB
+  └─ grassB (1)
+  └─ grassB (2)
+  └─ grassB (3)
+  └─ grassB (4)
+  └─ grassA
+  └─ grassA (1)
+  └─ grassA (2)
+  └─ Escadaria
+  └─ mushroomA
+    └─ shadowA
+  └─ mushroomA
+    └─ shadowA
+  └─ mushroomA (1)
+    └─ shadowA
+  └─ prop_puddle
+    └─ puddle
+    └─ gota
+  └─ grassB
+  └─ grassB (1)
+  └─ grassB (2)
+  └─ grassB (3)
+  └─ grassB (4)
+  └─ grassB (5)
+  └─ grassB (6)
+  └─ grassB
+  └─ grassB (1)
+  └─ grassB (2)
+  └─ grassB (3)
+  └─ mushroomA
+    └─ shadowA
+  └─ mushroomA (1)
+    └─ shadowA
+  └─ mushroomA
+    └─ shadowA
+  └─ mushroomA (2)
+    └─ shadowA
+  └─ env_brown_rockA2
+  └─ env_brown_rockA2 (1)
+  └─ env_brown_rockA2 (2)
+  └─ env_brown_rockD2
+  └─ env_brown_rockD2 (1)
+  └─ env_brown_rockB2
+  └─ env_brown_rockF2
+  └─ grassB
+  └─ grassB (1)
+  └─ env_brown_rockA2
+  └─ env_brown_rockD2
+  └─ env_brown_rockD2 (1)
+  └─ env_brown_rockD2 (2)
+  └─ env_brown_rockD2 (3)
+  └─ env_brown_rockD2 (4)
+  └─ env_brown_rockF2
+  └─ env_grassA
+  └─ env_grassA (1)
+  └─ env_grassA (2)
+  └─ grassA
+  └─ grassA (1)
+  └─ grassA (2)
+  └─ grassA (3)
+  └─ grassA (4)
+  └─ grassA (5)
+  └─ env_grassA (3)
+[8] Mechanics
+  └─ shrinkPointA
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ shrinkPointC
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ shrinkPointD
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ shrinkPointE
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ shrinkPointF
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ shrinkPointB
+    └─ gamepad
+    └─ playstation
+    └─ switch
+    └─ xbox
+    └─ keyboard
+  └─ prop_nest
+    └─ env_brown_rockF2
+    └─ env_brown_rockF2 (1)
+    └─ env_brown_rockF2 (2)
+    └─ env_brown_rockF2 (3)
+    └─ env_brown_rockF2 (4)
+    └─ env_brown_rockF2 (5)
+    └─ env_brown_rockF2 (6)
+    └─ env_brown_rockF2 (7)
+    └─ env_brown_rockF2 (8)
+    └─ env_brown_rockF2 (9)
+  └─ caveExit
+  └─ teleportPointExit
+  └─ teleportPointSecret
+  └─ teleportPointPuzzleRoom
+  └─ teleportPointPuzzleRoomExit
+  └─ rollingRock
+    └─ sphericalRockA
+    └─ shadowA
+      └─ interactivePointAct2
+        └─ gamepad
+        └─ playstation
+        └─ switch
+        └─ xbox
+        └─ keyboard
+  └─ teleportPoint
+  └─ teleportPoint
+[9] Particle System
+[10] GameManager
+[11] SceneTransitioner
+[12] TeleportManager
+[13] chr_yellowslime
+  └─ back
+  └─ vfx_back
+  └─ side
+  └─ vfx_side
+  └─ shadow
+  └─ vfx_front
+  └─ front
+[14] art_rickA
+  └─ front
+  └─ shadow
+[15] SprayedObjects
+[16] Background
+  └─ Sky_back_mountain
+  └─ sky_front_mountain
+  └─ Sky_sky
+  └─ sky_cloud_floor
+[17] CanvasHUD
+  └─ HeartsContainer
+  └─ CrystalContainer
+    └─ Crystal_Nature
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Fire
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Water
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Shadow
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Earth
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Air
+      └─ Icon
+      └─ Count_Text
+[18] NPCManager
+[19] NPC_art_beeA
+  └─ side
+  └─ back
+  └─ vfx_side
+  └─ vfx_back
+  └─ front
+  └─ vfx_front
+  └─ shadow

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine.Rendering;
@@ -6,16 +6,20 @@ using System.Linq;
 using System.Collections.Generic;
 using SlimeKing.Core;
 
-/// <summary>
-/// Ferramenta de editor para facilitar a criação e configuração de NPCs no jogo.
-/// Configura completamente GameObjects existentes para funcionar como NPCs completos.
-/// Também cria automaticamente os atributos e transições necessários no Animator Controller.
-/// </summary>
+
 namespace ExtraTools.Editor
 {
     public static class NPCCreationTool
     {
         [UnityEditor.MenuItem("Extra Tools/NPC/Setup GameObject as NPC")]
+        public static void SetupGameObjectAsNPC_MenuItem()
+        {
+            SetupGameObjectAsNPC();
+        }
+
+        /// <summary>
+        /// Configura um GameObject como NPC completo com todos os componentes necessÃ¡rios
+        /// </summary>
         public static void SetupGameObjectAsNPC()
         {
             GameObject selected = UnityEditor.Selection.activeGameObject;
@@ -25,36 +29,39 @@ namespace ExtraTools.Editor
                 return;
             }
 
-            // Verifica se já tem NPCController para evitar duplicação
+            // Verifica se jÃ¡ tem NPCController para evitar duplicaÃ§Ã£o
             NPCController existingController = selected.GetComponent<NPCController>();
             if (existingController != null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' já é um NPC! Use outras ferramentas para reconfigurar.");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' jÃ¡ Ã© um NPC! Use outras ferramentas para reconfigurar.");
                 return;
             }
 
-            Debug.Log($"[NPCCreationTool] Iniciando configuração completa de '{selected.name}' como NPC...");
+            Debug.Log($"[NPCCreationTool] Iniciando configuraÃ§Ã£o completa de '{selected.name}' como NPC...");
 
-            // === CONFIGURAÇÃO DE COMPONENTES OBRIGATÓRIOS ===
+            // === CONFIGURAÃ‡ÃƒO DE COMPONENTES OBRIGATÃ“RIOS ===
             SetupRequiredComponents(selected);
 
-            // === CRIAÇÃO DE ESTRUTURA VISUAL ===
+            // === CRIAÃ‡ÃƒO DE ESTRUTURA VISUAL ===
             CreateVisualStructure(selected);
 
-            // === CONFIGURAÇÃO DO NPCCONTROLLER ===
+            // === CONFIGURAÃ‡ÃƒO DO NPCCONTROLLER ===
             NPCController npcController = selected.AddComponent<NPCController>();
             ConfigureNPCController(npcController, selected);
 
-            // === CONFIGURAÇÃO DO ANIMATOR EXISTENTE ===
+            // === CONFIGURAÇÃO DO NPCATTRIBUTESHANDLER ===
+            NPCAttributesHandler attributesHandler = selected.AddComponent<NPCAttributesHandler>();
+            ConfigureNPCAttributesHandler(attributesHandler, selected);
+
+            // === CONFIGURAÃ‡ÃƒO DO ANIMATOR EXISTENTE ===
             ConfigureExistingAnimator(selected);
 
-            // === CONFIGURAÇÕES FINAIS ===
             FinalizeNPCSetup(selected);
 
             // Seleciona o objeto configurado
             UnityEditor.Selection.activeGameObject = selected;
 
-            Debug.Log($"[NPCCreationTool] ✅ GameObject '{selected.name}' configurado com sucesso como NPC completo!");
+            Debug.Log($"[NPCCreationTool] âœ… GameObject '{selected.name}' configurado com sucesso como NPC completo!");
         }
 
         // Menu de contexto (clique direito) para configurar GameObject como NPC
@@ -64,7 +71,7 @@ namespace ExtraTools.Editor
             SetupGameObjectAsNPC();
         }
 
-        // Validação do menu de contexto - só aparece quando há um GameObject selecionado
+        // ValidaÃ§Ã£o do menu de contexto - sÃ³ aparece quando hÃ¡ um GameObject selecionado
         [UnityEditor.MenuItem("GameObject/Extra Tools/Setup as NPC", true)]
         public static bool SetupGameObjectAsNPC_ContextMenuValidate()
         {
@@ -81,20 +88,20 @@ namespace ExtraTools.Editor
                 return;
             }
 
-            // Verifica se já tem NPCController
+            // Verifica se jÃ¡ tem NPCController
             NPCController existingController = selected.GetComponent<NPCController>();
             if (existingController != null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' já possui NPCController!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' jÃ¡ possui NPCController!");
                 return;
             }
 
-            // Adiciona componentes obrigatórios se não existirem
+            // Adiciona componentes obrigatÃ³rios se nÃ£o existirem
             if (selected.GetComponent<Rigidbody2D>() == null)
             {
                 Rigidbody2D rb = selected.AddComponent<Rigidbody2D>();
-                rb.gravityScale = 0f; // NPCs 2D geralmente não usam gravidade
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation; // Impede rotação
+                rb.gravityScale = 0f; // NPCs 2D geralmente nÃ£o usam gravidade
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation; // Impede rotaÃ§Ã£o
             }
 
             if (selected.GetComponent<Animator>() == null)
@@ -108,7 +115,11 @@ namespace ExtraTools.Editor
             // Configura automaticamente baseado nos filhos
             ConfigureNPCController(npcController, selected);
 
-            // Configura Animator existente ou adiciona um básico se não houver
+            // Adiciona NPCAttributesHandler
+            NPCAttributesHandler attributesHandler = selected.AddComponent<NPCAttributesHandler>();
+            ConfigureNPCAttributesHandler(attributesHandler, selected);
+
+            // Configura Animator existente ou adiciona um bÃ¡sico se nÃ£o houver
             ConfigureExistingAnimator(selected);
 
             Debug.Log($"[NPCCreationTool] NPCController adicionado com sucesso ao GameObject '{selected.name}'!");
@@ -127,29 +138,33 @@ namespace ExtraTools.Editor
             NPCController npcController = selected.GetComponent<NPCController>();
             if (npcController == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' não possui NPCController!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' nÃ£o possui NPCController!");
                 return;
             }
 
             ConfigureNPCController(npcController, selected);
 
+            // Adiciona NPCAttributesHandler
+            NPCAttributesHandler attributesHandler = selected.AddComponent<NPCAttributesHandler>();
+            ConfigureNPCAttributesHandler(attributesHandler, selected);
+
             Debug.Log($"[NPCCreationTool] Objetos visuais configurados para '{selected.name}'!");
         }
 
         /// <summary>
-        /// Configura todos os componentes obrigatórios para o funcionamento do NPC
+        /// Configura todos os componentes obrigatÃ³rios para o funcionamento do NPC
         /// </summary>
         /// <param name="gameObject">GameObject alvo</param>
         private static void SetupRequiredComponents(GameObject gameObject)
         {
-            Debug.Log($"[NPCCreationTool] Configurando componentes obrigatórios para '{gameObject.name}'...");
+            Debug.Log($"[NPCCreationTool] Configurando componentes obrigatÃ³rios para '{gameObject.name}'...");
 
             // === RIGIDBODY2D ===
             Rigidbody2D rigidbody = gameObject.GetComponent<Rigidbody2D>();
             if (rigidbody == null)
             {
                 rigidbody = gameObject.AddComponent<Rigidbody2D>();
-                Debug.Log("[NPCCreationTool] • Rigidbody2D adicionado");
+                Debug.Log("[NPCCreationTool] â€¢ Rigidbody2D adicionado");
             }
 
             // Configura Rigidbody2D para NPCs 2D
@@ -162,12 +177,12 @@ namespace ExtraTools.Editor
             if (animator == null)
             {
                 animator = gameObject.AddComponent<Animator>();
-                Debug.Log("[NPCCreationTool] • Animator adicionado");
+                Debug.Log("[NPCCreationTool] â€¢ Animator adicionado");
             }
 
             // === SORTING GROUP (para controle de camadas) - OPCIONAL ===
-            // Nota: SortingGroup pode não estar disponível em todas as versões
-            // Se necessário, adicione manualmente depois
+            // Nota: SortingGroup pode nÃ£o estar disponÃ­vel em todas as versÃµes
+            // Se necessÃ¡rio, adicione manualmente depois
             /*
             SortingGroup sortingGroup = gameObject.GetComponent<SortingGroup>();
             if (sortingGroup == null)
@@ -175,7 +190,7 @@ namespace ExtraTools.Editor
                 sortingGroup = gameObject.AddComponent<SortingGroup>();
                 sortingGroup.sortingLayerName = "Default";
                 sortingGroup.sortingOrder = 0;
-                Debug.Log("[NPCCreationTool] • SortingGroup adicionado");
+                Debug.Log("[NPCCreationTool] â€¢ SortingGroup adicionado");
             }
             */
 
@@ -186,14 +201,14 @@ namespace ExtraTools.Editor
                 CircleCollider2D circleCollider = gameObject.AddComponent<CircleCollider2D>();
                 circleCollider.radius = 0.5f;
                 circleCollider.isTrigger = false;
-                Debug.Log("[NPCCreationTool] • CircleCollider2D adicionado");
+                Debug.Log("[NPCCreationTool] â€¢ CircleCollider2D adicionado");
             }
 
-            Debug.Log("[NPCCreationTool] ✅ Componentes obrigatórios configurados");
+            Debug.Log("[NPCCreationTool] âœ… Componentes obrigatÃ³rios configurados");
         }
 
         /// <summary>
-        /// Cria a estrutura visual necessária para NPCs direcionais
+        /// Cria a estrutura visual necessÃ¡ria para NPCs direcionais
         /// </summary>
         /// <param name="gameObject">GameObject pai</param>
         private static void CreateVisualStructure(GameObject gameObject)
@@ -201,7 +216,7 @@ namespace ExtraTools.Editor
             Debug.Log($"[NPCCreationTool] Criando estrutura visual para '{gameObject.name}'...");
 
             // Objetos visuais principais
-            CreateChildObjectIfNotExists(gameObject, "front", "Sprite visual frontal (padrão)");
+            CreateChildObjectIfNotExists(gameObject, "front", "Sprite visual frontal (padrÃ£o)");
             CreateChildObjectIfNotExists(gameObject, "back", "Sprite visual traseiro");
             CreateChildObjectIfNotExists(gameObject, "side", "Sprite visual lateral");
 
@@ -213,14 +228,14 @@ namespace ExtraTools.Editor
             // Sombra opcional
             CreateChildObjectIfNotExists(gameObject, "shadow", "Sombra do NPC (opcional)");
 
-            // Configura objeto front como ativo por padrão
+            // Configura objeto front como ativo por padrÃ£o
             Transform frontTransform = gameObject.transform.Find("front");
             if (frontTransform != null)
             {
                 frontTransform.gameObject.SetActive(true);
             }
 
-            // Desativa outros objetos por padrão
+            // Desativa outros objetos por padrÃ£o
             string[] objectsToDeactivate = { "back", "side", "vfx_front", "vfx_back", "vfx_side" };
             foreach (string objName in objectsToDeactivate)
             {
@@ -231,15 +246,15 @@ namespace ExtraTools.Editor
                 }
             }
 
-            Debug.Log("[NPCCreationTool] ✅ Estrutura visual criada");
+            Debug.Log("[NPCCreationTool] âœ… Estrutura visual criada");
         }
 
         /// <summary>
-        /// Cria um objeto filho se ele não existir
+        /// Cria um objeto filho se ele nÃ£o existir
         /// </summary>
         /// <param name="parent">GameObject pai</param>
         /// <param name="childName">Nome do objeto filho</param>
-        /// <param name="description">Descrição para log</param>
+        /// <param name="description">DescriÃ§Ã£o para log</param>
         private static void CreateChildObjectIfNotExists(GameObject parent, string childName, string description)
         {
             Transform existingChild = parent.transform.Find(childName);
@@ -259,50 +274,50 @@ namespace ExtraTools.Editor
                     spriteRenderer.sortingOrder = 1;
                 }
 
-                Debug.Log($"[NPCCreationTool] • {childName} criado: {description}");
+                Debug.Log($"[NPCCreationTool] â€¢ {childName} criado: {description}");
             }
         }
 
         /// <summary>
-        /// Configurações finais do NPC
+        /// ConfiguraÃ§Ãµes finais do NPC
         /// </summary>
         /// <param name="gameObject">GameObject do NPC</param>
         private static void FinalizeNPCSetup(GameObject gameObject)
         {
-            Debug.Log($"[NPCCreationTool] Aplicando configurações finais para '{gameObject.name}'...");
+            Debug.Log($"[NPCCreationTool] Aplicando configuraÃ§Ãµes finais para '{gameObject.name}'...");
 
             // Define uma tag NPC se ela existir
             string[] allTags = UnityEditorInternal.InternalEditorUtility.tags;
             if (allTags.Contains("NPC"))
             {
                 gameObject.tag = "NPC";
-                Debug.Log("[NPCCreationTool] • Tag 'NPC' aplicada");
+                Debug.Log("[NPCCreationTool] â€¢ Tag 'NPC' aplicada");
             }
 
             // Define layer NPC se existir
             if (LayerMask.NameToLayer("NPC") != -1)
             {
                 gameObject.layer = LayerMask.NameToLayer("NPC");
-                Debug.Log("[NPCCreationTool] • Layer 'NPC' aplicado");
+                Debug.Log("[NPCCreationTool] â€¢ Layer 'NPC' aplicado");
             }
 
-            // Renomeia para seguir convenção se necessário
+            // Renomeia para seguir convenÃ§Ã£o se necessÃ¡rio
             if (!gameObject.name.StartsWith("NPC_") && !gameObject.name.Contains("NPC"))
             {
                 string oldName = gameObject.name;
                 gameObject.name = $"NPC_{gameObject.name}";
-                Debug.Log($"[NPCCreationTool] • Nome alterado: '{oldName}' → '{gameObject.name}'");
+                Debug.Log($"[NPCCreationTool] â€¢ Nome alterado: '{oldName}' â†’ '{gameObject.name}'");
             }
 
-            Debug.Log("[NPCCreationTool] ✅ Configurações finais aplicadas");
+            Debug.Log("[NPCCreationTool] âœ… ConfiguraÃ§Ãµes finais aplicadas");
 
-            // Força atualização da interface
+            // ForÃ§a atualizaÃ§Ã£o da interface
             EditorUtility.SetDirty(gameObject);
         }
 
         private static void ConfigureNPCController(NPCController controller, GameObject npcObject)
         {
-            // Configura os campos através de SerializedObject (mais seguro para o editor)
+            // Configura os campos atravÃ©s de SerializedObject (mais seguro para o editor)
 
             // Busca objetos filhos baseado na estrutura do NPCTemplate
             Transform front = npcObject.transform.Find("front");
@@ -312,7 +327,7 @@ namespace ExtraTools.Editor
             Transform vfxBack = npcObject.transform.Find("vfx_back");
             Transform vfxSide = npcObject.transform.Find("vfx_side");
 
-            // Configura os campos através de SerializedObject (mais seguro para o editor)
+            // Configura os campos atravÃ©s de SerializedObject (mais seguro para o editor)
             var serializedObject = new UnityEditor.SerializedObject(controller);
 
             SetSerializedProperty(serializedObject, "frontObject", front?.gameObject);
@@ -322,7 +337,7 @@ namespace ExtraTools.Editor
             SetSerializedProperty(serializedObject, "vfxBackObject", vfxBack?.gameObject);
             SetSerializedProperty(serializedObject, "vfxSideObject", vfxSide?.gameObject);
 
-            // Configurações padrão para NPC
+            // ConfiguraÃ§Ãµes padrÃ£o para NPC
             SetSerializedProperty(serializedObject, "moveSpeed", 2f);
             SetSerializedProperty(serializedObject, "movementType", NPCController.MovementType.Wander);
             SetSerializedProperty(serializedObject, "wanderRadius", 3f);
@@ -338,12 +353,12 @@ namespace ExtraTools.Editor
             if (back != null) objectsFound++;
             if (side != null) objectsFound++;
 
-            Debug.Log($"[NPCCreationTool] Configuração concluída! {objectsFound} objetos visuais direcionais encontrados.");
+            Debug.Log($"[NPCCreationTool] ConfiguraÃ§Ã£o concluÃ­da! {objectsFound} objetos visuais direcionais encontrados.");
         }
 
         /// <summary>
         /// Configura o Animator existente do GameObject para trabalhar com NPCController
-        /// Adiciona parâmetros necessários se não existirem e configura adequadamente
+        /// Adiciona parÃ¢metros necessÃ¡rios se nÃ£o existirem e configura adequadamente
         /// </summary>
         /// <param name="gameObject">GameObject com o Animator a ser configurado</param>
         private static void ConfigureExistingAnimator(GameObject gameObject)
@@ -351,14 +366,14 @@ namespace ExtraTools.Editor
             Animator animator = gameObject.GetComponent<Animator>();
             if (animator == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' não possui componente Animator!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' nÃ£o possui componente Animator!");
                 return;
             }
 
             AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
             if (controller == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' não possui um AnimatorController configurado! Use o controller existente.");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{gameObject.name}' nÃ£o possui um AnimatorController configurado! Use o controller existente.");
                 return;
             }
 
@@ -368,16 +383,16 @@ namespace ExtraTools.Editor
             {
                 bool hasChanges = false;
 
-                // === VERIFICA PARÂMETROS EXISTENTES ===
+                // === VERIFICA PARÃ‚METROS EXISTENTES ===
                 var existingParams = new List<string>();
                 foreach (var param in controller.parameters)
                 {
                     existingParams.Add($"{param.name} ({param.type})");
                 }
-                Debug.Log($"[NPCCreationTool] 📋 Parâmetros existentes: {string.Join(", ", existingParams)}");
+                Debug.Log($"[NPCCreationTool] ðŸ“‹ ParÃ¢metros existentes: {string.Join(", ", existingParams)}");
 
-                // === VERIFICA E ADICIONA APENAS PARÂMETROS NECESSÁRIOS ===
-                // O NPCController precisa de isWalking para controlar animação de movimento
+                // === VERIFICA E ADICIONA APENAS PARÃ‚METROS NECESSÃRIOS ===
+                // O NPCController precisa de isWalking para controlar animaÃ§Ã£o de movimento
                 // Combat system precisa de triggers Hit e Attack
                 bool hasIsWalking = false;
                 bool hasFacingRight = false;
@@ -389,30 +404,30 @@ namespace ExtraTools.Editor
                     if (existingParam.name == "isWalking" && existingParam.type == AnimatorControllerParameterType.Bool)
                     {
                         hasIsWalking = true;
-                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'isWalking' já existe");
+                        Debug.Log($"[NPCCreationTool] âœ… ParÃ¢metro 'isWalking' jÃ¡ existe");
                     }
                     if (existingParam.name == "FacingRight" && existingParam.type == AnimatorControllerParameterType.Bool)
                     {
                         hasFacingRight = true;
-                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'FacingRight' já existe");
+                        Debug.Log($"[NPCCreationTool] âœ… ParÃ¢metro 'FacingRight' jÃ¡ existe");
                     }
                     if (existingParam.name == "Hit" && existingParam.type == AnimatorControllerParameterType.Trigger)
                     {
                         hasHitTrigger = true;
-                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'Hit' (Trigger) já existe");
+                        Debug.Log($"[NPCCreationTool] âœ… ParÃ¢metro 'Hit' (Trigger) jÃ¡ existe");
                     }
                     if (existingParam.name == "Attack" && existingParam.type == AnimatorControllerParameterType.Trigger)
                     {
                         hasAttackTrigger = true;
-                        Debug.Log($"[NPCCreationTool] ✅ Parâmetro 'Attack' (Trigger) já existe");
+                        Debug.Log($"[NPCCreationTool] âœ… ParÃ¢metro 'Attack' (Trigger) jÃ¡ existe");
                     }
                 }
 
-                // Adiciona isWalking se não existir (necessário para movimento)
+                // Adiciona isWalking se nÃ£o existir (necessÃ¡rio para movimento)
                 if (!hasIsWalking)
                 {
                     controller.AddParameter("isWalking", AnimatorControllerParameterType.Bool);
-                    // Configura valor padrão
+                    // Configura valor padrÃ£o
                     foreach (var param in controller.parameters)
                     {
                         if (param.name == "isWalking")
@@ -421,15 +436,15 @@ namespace ExtraTools.Editor
                             break;
                         }
                     }
-                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'isWalking' (Bool) adicionado - necessário para movimento");
+                    Debug.Log($"[NPCCreationTool] âž• ParÃ¢metro 'isWalking' (Bool) adicionado - necessÃ¡rio para movimento");
                     hasChanges = true;
                 }
 
-                // Adiciona FacingRight se não existir (necessário para direção)
+                // Adiciona FacingRight se nÃ£o existir (necessÃ¡rio para direÃ§Ã£o)
                 if (!hasFacingRight)
                 {
                     controller.AddParameter("FacingRight", AnimatorControllerParameterType.Bool);
-                    // Configura valor padrão
+                    // Configura valor padrÃ£o
                     foreach (var param in controller.parameters)
                     {
                         if (param.name == "FacingRight")
@@ -438,71 +453,71 @@ namespace ExtraTools.Editor
                             break;
                         }
                     }
-                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'FacingRight' (Bool) adicionado - necessário para direção");
+                    Debug.Log($"[NPCCreationTool] âž• ParÃ¢metro 'FacingRight' (Bool) adicionado - necessÃ¡rio para direÃ§Ã£o");
                     hasChanges = true;
                 }
 
-                // Adiciona Hit se não existir (necessário para combat system)
+                // Adiciona Hit se nÃ£o existir (necessÃ¡rio para combat system)
                 if (!hasHitTrigger)
                 {
                     controller.AddParameter("Hit", AnimatorControllerParameterType.Trigger);
-                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'Hit' (Trigger) adicionado - necessário para combat system");
+                    Debug.Log($"[NPCCreationTool] âž• ParÃ¢metro 'Hit' (Trigger) adicionado - necessÃ¡rio para combat system");
                     hasChanges = true;
                 }
 
-                // Adiciona Attack se não existir (necessário para combat system)
+                // Adiciona Attack se nÃ£o existir (necessÃ¡rio para combat system)
                 if (!hasAttackTrigger)
                 {
                     controller.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
-                    Debug.Log($"[NPCCreationTool] ➕ Parâmetro 'Attack' (Trigger) adicionado - necessário para combat system");
+                    Debug.Log($"[NPCCreationTool] âž• ParÃ¢metro 'Attack' (Trigger) adicionado - necessÃ¡rio para combat system");
                     hasChanges = true;
                 }
 
-                // === CONFIGURAÇÕES GERAIS DO ANIMATOR ===
-                // Configura para não aplicar root motion (importante para NPCs)
+                // === CONFIGURAÃ‡Ã•ES GERAIS DO ANIMATOR ===
+                // Configura para nÃ£o aplicar root motion (importante para NPCs)
                 if (animator.applyRootMotion)
                 {
                     animator.applyRootMotion = false;
-                    Debug.Log($"[NPCCreationTool] ⚙️ Root Motion desabilitado para NPC");
+                    Debug.Log($"[NPCCreationTool] âš™ï¸ Root Motion desabilitado para NPC");
                 }
 
                 // Configura Culling Mode para AlwaysAnimate se for diferente
                 if (animator.cullingMode != AnimatorCullingMode.AlwaysAnimate)
                 {
                     animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                    Debug.Log($"[NPCCreationTool] ⚙️ Culling Mode configurado para AlwaysAnimate");
+                    Debug.Log($"[NPCCreationTool] âš™ï¸ Culling Mode configurado para AlwaysAnimate");
                 }
 
-                // === CONFIGURAÇÃO DE TODAS AS TRANSIÇÕES ===
+                // === CONFIGURAÃ‡ÃƒO DE TODAS AS TRANSIÃ‡Ã•ES ===
                 ConfigureAllTransitions(controller, ref hasChanges);
 
-                // === SALVA AS MUDANÇAS ===
+                // === SALVA AS MUDANÃ‡AS ===
                 if (hasChanges)
                 {
                     EditorUtility.SetDirty(controller);
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
-                    Debug.Log($"[NPCCreationTool] ✅ Animator Controller '{controller.name}' configurado com sucesso!");
+                    Debug.Log($"[NPCCreationTool] âœ… Animator Controller '{controller.name}' configurado com sucesso!");
                 }
                 else
                 {
-                    Debug.Log($"[NPCCreationTool] ✅ Animator Controller '{controller.name}' já possui parâmetros necessários");
+                    Debug.Log($"[NPCCreationTool] âœ… Animator Controller '{controller.name}' jÃ¡ possui parÃ¢metros necessÃ¡rios");
                 }
 
-                // === LOGGING DE INFORMAÇÕES DO CONTROLLER ===
-                Debug.Log($"[NPCCreationTool] 📊 Controller: {controller.name}");
-                Debug.Log($"[NPCCreationTool] 📊 Parâmetros: {controller.parameters.Length}");
-                Debug.Log($"[NPCCreationTool] 📊 Layers: {controller.layers.Length}");
+                // === LOGGING DE INFORMAÃ‡Ã•ES DO CONTROLLER ===
+                Debug.Log($"[NPCCreationTool] ðŸ“Š Controller: {controller.name}");
+                Debug.Log($"[NPCCreationTool] ðŸ“Š ParÃ¢metros: {controller.parameters.Length}");
+                Debug.Log($"[NPCCreationTool] ðŸ“Š Layers: {controller.layers.Length}");
 
                 if (controller.layers.Length > 0 && controller.layers[0].stateMachine.states != null)
                 {
-                    Debug.Log($"[NPCCreationTool] 📊 Estados: {controller.layers[0].stateMachine.states.Length}");
+                    Debug.Log($"[NPCCreationTool] ðŸ“Š Estados: {controller.layers[0].stateMachine.states.Length}");
                     var stateNames = controller.layers[0].stateMachine.states.Select(s => s.state.name).ToArray();
-                    Debug.Log($"[NPCCreationTool] 📊 Lista de Estados: {string.Join(", ", stateNames)}");
+                    Debug.Log($"[NPCCreationTool] ðŸ“Š Lista de Estados: {string.Join(", ", stateNames)}");
                 }
 
-                Debug.Log($"[NPCCreationTool] 💡 O NPC manterá os estados existentes ({string.Join(", ", controller.layers[0].stateMachine.states.Select(s => s.state.name))})");
-                Debug.Log($"[NPCCreationTool] 💡 Apenas parâmetros básicos de movimento (isWalking, FacingRight) foram adicionados se necessário");
+                Debug.Log($"[NPCCreationTool] ðŸ’¡ O NPC manterÃ¡ os estados existentes ({string.Join(", ", controller.layers[0].stateMachine.states.Select(s => s.state.name))})");
+                Debug.Log($"[NPCCreationTool] ðŸ’¡ Apenas parÃ¢metros bÃ¡sicos de movimento (isWalking, FacingRight) foram adicionados se necessÃ¡rio");
 
             }
             catch (System.Exception ex)
@@ -512,10 +527,10 @@ namespace ExtraTools.Editor
         }
 
         /// <summary>
-        /// Configura TODAS as transições do Animator Controller baseadas nos parâmetros existentes
+        /// Configura TODAS as transiÃ§Ãµes do Animator Controller baseadas nos parÃ¢metros existentes
         /// </summary>
         /// <param name="controller">Animator Controller a ser configurado</param>
-        /// <param name="hasChanges">Referência para indicar se houve mudanças</param>
+        /// <param name="hasChanges">ReferÃªncia para indicar se houve mudanÃ§as</param>
         private static void ConfigureAllTransitions(AnimatorController controller, ref bool hasChanges)
         {
             if (controller.layers.Length == 0) return;
@@ -525,7 +540,7 @@ namespace ExtraTools.Editor
 
             if (stateMachine.states == null) return;
 
-            Debug.Log($"[NPCCreationTool] 🔄 Configurando TODAS as transições do Animator Controller...");
+            Debug.Log($"[NPCCreationTool] ðŸ”„ Configurando TODAS as transiÃ§Ãµes do Animator Controller...");
 
             // === MAPEAMENTO DE ESTADOS ===
             var stateMap = new Dictionary<string, AnimatorState>();
@@ -538,61 +553,61 @@ namespace ExtraTools.Editor
                 }
             }
 
-            // === VERIFICAÇÃO DE PARÂMETROS DISPONÍVEIS ===
+            // === VERIFICAÃ‡ÃƒO DE PARÃ‚METROS DISPONÃVEIS ===
             var parameterMap = new Dictionary<string, AnimatorControllerParameter>();
             foreach (var param in controller.parameters)
             {
                 parameterMap[param.name.ToLower()] = param;
             }
 
-            // === CONFIGURAÇÃO DE TRANSIÇÕES ESPECÍFICAS ===
+            // === CONFIGURAÃ‡ÃƒO DE TRANSIÃ‡Ã•ES ESPECÃFICAS ===
 
-            // 1. MOVIMENTO: Idle ↔ Walk
+            // 1. MOVIMENTO: Idle â†” Walk
             ConfigureMovementTransitions(stateMap, parameterMap, ref hasChanges);
 
-            // 2. COMBAT: Any → Attack (via trigger)
+            // 2. COMBAT: Any â†’ Attack (via trigger)
             ConfigureAttackTransitions(stateMap, parameterMap, stateMachine, ref hasChanges);
 
-            // 3. DAMAGE: Any State → Hit (via trigger)  
+            // 3. DAMAGE: Any State â†’ Hit (via trigger)  
             ConfigureDamageTransitions(stateMap, parameterMap, stateMachine, ref hasChanges);
 
-            // 4. COMPLETION: Attack/Hit/Unique → Idle (via exit time)
+            // 4. COMPLETION: Attack/Hit/Unique â†’ Idle (via exit time)
             ConfigureCompletionTransitions(stateMap, ref hasChanges);
 
-            // 5. DEATH: Hit → Die (sem condições específicas, baseado em lógica de jogo)
+            // 5. DEATH: Hit â†’ Die (sem condiÃ§Ãµes especÃ­ficas, baseado em lÃ³gica de jogo)
             ConfigureDeathTransitions(stateMap, ref hasChanges);
 
-            // 6. SPECIAL: Idle/Walk → Unique (sem condições para ações especiais)
+            // 6. SPECIAL: Idle/Walk â†’ Unique (sem condiÃ§Ãµes para aÃ§Ãµes especiais)
             ConfigureSpecialTransitions(stateMap, ref hasChanges);
 
-            // === CONFIGURA ESTADO PADRÃO ===
+            // === CONFIGURA ESTADO PADRÃƒO ===
             if (stateMap.ContainsKey("idle") && stateMachine.defaultState != stateMap["idle"])
             {
                 stateMachine.defaultState = stateMap["idle"];
-                Debug.Log($"[NPCCreationTool] ⚙️ Estado padrão configurado: Idle");
+                Debug.Log($"[NPCCreationTool] âš™ï¸ Estado padrÃ£o configurado: Idle");
                 hasChanges = true;
             }
 
-            Debug.Log($"[NPCCreationTool] ✅ Configuração completa de todas as transições concluída");
+            Debug.Log($"[NPCCreationTool] âœ… ConfiguraÃ§Ã£o completa de todas as transiÃ§Ãµes concluÃ­da");
         }
 
         private static void ConfigureMovementTransitions(Dictionary<string, AnimatorState> stateMap, Dictionary<string, AnimatorControllerParameter> parameterMap, ref bool hasChanges)
         {
             if (!stateMap.ContainsKey("idle") || !stateMap.ContainsKey("walk"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estados Idle ou Walk não encontrados - transições de movimento ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estados Idle ou Walk nÃ£o encontrados - transiÃ§Ãµes de movimento ignoradas");
                 return;
             }
 
             var idleState = stateMap["idle"];
             var walkState = stateMap["walk"];
 
-            Debug.Log($"[NPCCreationTool] 🚶 Configurando transições de movimento...");
+            Debug.Log($"[NPCCreationTool] ðŸš¶ Configurando transiÃ§Ãµes de movimento...");
 
-            // Idle → Walk (quando isWalking = true)
+            // Idle â†’ Walk (quando isWalking = true)
             ConfigureOrCreateTransition(idleState, walkState, "isWalking", AnimatorConditionMode.If, parameterMap, ref hasChanges);
 
-            // Walk → Idle (quando isWalking = false)
+            // Walk â†’ Idle (quando isWalking = false)
             ConfigureOrCreateTransition(walkState, idleState, "isWalking", AnimatorConditionMode.IfNot, parameterMap, ref hasChanges);
         }
 
@@ -600,14 +615,14 @@ namespace ExtraTools.Editor
         {
             if (!stateMap.ContainsKey("attack"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estado Attack não encontrado - transições de ataque ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estado Attack nÃ£o encontrado - transiÃ§Ãµes de ataque ignoradas");
                 return;
             }
 
             var attackState = stateMap["attack"];
-            Debug.Log($"[NPCCreationTool] ⚔️ Configurando transições de ataque...");
+            Debug.Log($"[NPCCreationTool] âš”ï¸ Configurando transiÃ§Ãµes de ataque...");
 
-            // Configura transições dos estados básicos para Attack
+            // Configura transiÃ§Ãµes dos estados bÃ¡sicos para Attack
             foreach (var kvp in stateMap)
             {
                 string stateName = kvp.Key;
@@ -620,7 +635,7 @@ namespace ExtraTools.Editor
                 }
             }
 
-            // Any State → Attack também (para triggers universais)
+            // Any State â†’ Attack tambÃ©m (para triggers universais)
             ConfigureAnyStateTransition(stateMachine, attackState, "Attack", AnimatorConditionMode.If, parameterMap, ref hasChanges);
         }
 
@@ -628,14 +643,14 @@ namespace ExtraTools.Editor
         {
             if (!stateMap.ContainsKey("hit"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estado Hit não encontrado - transições de dano ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estado Hit nÃ£o encontrado - transiÃ§Ãµes de dano ignoradas");
                 return;
             }
 
             var hitState = stateMap["hit"];
-            Debug.Log($"[NPCCreationTool] 💥 Configurando transições de dano...");
+            Debug.Log($"[NPCCreationTool] ðŸ’¥ Configurando transiÃ§Ãµes de dano...");
 
-            // Any State → Hit (via trigger Hit)
+            // Any State â†’ Hit (via trigger Hit)
             ConfigureAnyStateTransition(stateMachine, hitState, "Hit", AnimatorConditionMode.If, parameterMap, ref hasChanges);
         }
 
@@ -643,14 +658,14 @@ namespace ExtraTools.Editor
         {
             if (!stateMap.ContainsKey("idle"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estado Idle não encontrado - transições de conclusão ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estado Idle nÃ£o encontrado - transiÃ§Ãµes de conclusÃ£o ignoradas");
                 return;
             }
 
             var idleState = stateMap["idle"];
-            Debug.Log($"[NPCCreationTool] 🔄 Configurando transições de conclusão...");
+            Debug.Log($"[NPCCreationTool] ðŸ”„ Configurando transiÃ§Ãµes de conclusÃ£o...");
 
-            // Estados que devem retornar ao Idle após conclusão
+            // Estados que devem retornar ao Idle apÃ³s conclusÃ£o
             string[] completionStates = { "attack", "hit", "unique" };
 
             foreach (string stateName in completionStates)
@@ -667,16 +682,16 @@ namespace ExtraTools.Editor
         {
             if (!stateMap.ContainsKey("hit") || !stateMap.ContainsKey("die"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estados Hit ou Die não encontrados - transições de morte ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estados Hit ou Die nÃ£o encontrados - transiÃ§Ãµes de morte ignoradas");
                 return;
             }
 
             var hitState = stateMap["hit"];
             var dieState = stateMap["die"];
 
-            Debug.Log($"[NPCCreationTool] 💀 Configurando transições de morte...");
+            Debug.Log($"[NPCCreationTool] ðŸ’€ Configurando transiÃ§Ãµes de morte...");
 
-            // Hit → Die (via exit time, para lógica de jogo determinar quando morrer)
+            // Hit â†’ Die (via exit time, para lÃ³gica de jogo determinar quando morrer)
             ConfigureExitTimeTransition(hitState, dieState, ref hasChanges);
         }
 
@@ -684,14 +699,14 @@ namespace ExtraTools.Editor
         {
             if (!stateMap.ContainsKey("unique"))
             {
-                Debug.LogWarning($"[NPCCreationTool] Estado Unique não encontrado - transições especiais ignoradas");
+                Debug.LogWarning($"[NPCCreationTool] Estado Unique nÃ£o encontrado - transiÃ§Ãµes especiais ignoradas");
                 return;
             }
 
             var uniqueState = stateMap["unique"];
-            Debug.Log($"[NPCCreationTool] ⭐ Configurando transições especiais...");
+            Debug.Log($"[NPCCreationTool] â­ Configurando transiÃ§Ãµes especiais...");
 
-            // Estados básicos podem ir para Unique (sem condições específicas)
+            // Estados bÃ¡sicos podem ir para Unique (sem condiÃ§Ãµes especÃ­ficas)
             string[] basicStates = { "idle", "walk" };
 
             foreach (string stateName in basicStates)
@@ -700,7 +715,7 @@ namespace ExtraTools.Editor
                 {
                     var state = stateMap[stateName];
 
-                    // Verifica se já existe transição para Unique
+                    // Verifica se jÃ¡ existe transiÃ§Ã£o para Unique
                     bool hasTransitionToUnique = false;
                     foreach (var transition in state.transitions)
                     {
@@ -711,15 +726,15 @@ namespace ExtraTools.Editor
                         }
                     }
 
-                    // Preserva transição existente (pode ser controlada via script)
+                    // Preserva transiÃ§Ã£o existente (pode ser controlada via script)
                     if (!hasTransitionToUnique)
                     {
                         var newTransition = state.AddTransition(uniqueState);
                         newTransition.hasExitTime = true;
-                        newTransition.exitTime = 0.8f; // Permite interrupção tardia
+                        newTransition.exitTime = 0.8f; // Permite interrupÃ§Ã£o tardia
                         newTransition.duration = 0.1f;
 
-                        Debug.Log($"[NPCCreationTool] ➕ Transição {state.name} → {uniqueState.name} criada (exit time)");
+                        Debug.Log($"[NPCCreationTool] âž• TransiÃ§Ã£o {state.name} â†’ {uniqueState.name} criada (exit time)");
                         hasChanges = true;
                     }
                 }
@@ -730,18 +745,18 @@ namespace ExtraTools.Editor
         {
             if (!parameterMap.ContainsKey(parameterName.ToLower()))
             {
-                Debug.LogWarning($"[NPCCreationTool] Parâmetro '{parameterName}' não encontrado - transição {fromState.name} → {toState.name} ignorada");
+                Debug.LogWarning($"[NPCCreationTool] ParÃ¢metro '{parameterName}' nÃ£o encontrado - transiÃ§Ã£o {fromState.name} â†’ {toState.name} ignorada");
                 return;
             }
 
-            // Verifica se já existe transição com condição correta
+            // Verifica se jÃ¡ existe transiÃ§Ã£o com condiÃ§Ã£o correta
             bool foundCorrectTransition = false;
 
             foreach (var transition in fromState.transitions)
             {
                 if (transition.destinationState == toState)
                 {
-                    // Verifica condições existentes
+                    // Verifica condiÃ§Ãµes existentes
                     bool hasCorrectCondition = false;
                     foreach (var condition in transition.conditions)
                     {
@@ -754,13 +769,13 @@ namespace ExtraTools.Editor
 
                     if (!hasCorrectCondition)
                     {
-                        // Remove condições antigas se existirem
+                        // Remove condiÃ§Ãµes antigas se existirem
                         for (int i = transition.conditions.Length - 1; i >= 0; i--)
                         {
                             transition.RemoveCondition(transition.conditions[i]);
                         }
 
-                        // Adiciona condição correta
+                        // Adiciona condiÃ§Ã£o correta
                         transition.AddCondition(mode, 0, parameterName);
 
                         // Otimiza para responsividade
@@ -769,12 +784,12 @@ namespace ExtraTools.Editor
                         transition.duration = 0.1f;
                         transition.offset = 0f;
 
-                        Debug.Log($"[NPCCreationTool] 🔧 Transição {fromState.name} → {toState.name} atualizada com condição {parameterName} {mode}");
+                        Debug.Log($"[NPCCreationTool] ðŸ”§ TransiÃ§Ã£o {fromState.name} â†’ {toState.name} atualizada com condiÃ§Ã£o {parameterName} {mode}");
                         hasChanges = true;
                     }
                     else
                     {
-                        Debug.Log($"[NPCCreationTool] ✅ Transição {fromState.name} → {toState.name} já configurada corretamente");
+                        Debug.Log($"[NPCCreationTool] âœ… TransiÃ§Ã£o {fromState.name} â†’ {toState.name} jÃ¡ configurada corretamente");
                     }
 
                     foundCorrectTransition = true;
@@ -782,7 +797,7 @@ namespace ExtraTools.Editor
                 }
             }
 
-            // Cria nova transição se necessário
+            // Cria nova transiÃ§Ã£o se necessÃ¡rio
             if (!foundCorrectTransition)
             {
                 var newTransition = fromState.AddTransition(toState);
@@ -792,7 +807,7 @@ namespace ExtraTools.Editor
                 newTransition.duration = 0.1f;
                 newTransition.offset = 0f;
 
-                Debug.Log($"[NPCCreationTool] ➕ Transição criada: {fromState.name} → {toState.name} (quando {parameterName} {mode})");
+                Debug.Log($"[NPCCreationTool] âž• TransiÃ§Ã£o criada: {fromState.name} â†’ {toState.name} (quando {parameterName} {mode})");
                 hasChanges = true;
             }
         }
@@ -801,18 +816,18 @@ namespace ExtraTools.Editor
         {
             if (!parameterMap.ContainsKey(parameterName.ToLower()))
             {
-                Debug.LogWarning($"[NPCCreationTool] Parâmetro '{parameterName}' não encontrado - Any State → {toState.name} ignorada");
+                Debug.LogWarning($"[NPCCreationTool] ParÃ¢metro '{parameterName}' nÃ£o encontrado - Any State â†’ {toState.name} ignorada");
                 return;
             }
 
-            // Verifica se já existe Any State transition
+            // Verifica se jÃ¡ existe Any State transition
             bool foundCorrectTransition = false;
 
             foreach (var transition in stateMachine.anyStateTransitions)
             {
                 if (transition.destinationState == toState)
                 {
-                    // Verifica condições
+                    // Verifica condiÃ§Ãµes
                     bool hasCorrectCondition = false;
                     foreach (var condition in transition.conditions)
                     {
@@ -825,25 +840,25 @@ namespace ExtraTools.Editor
 
                     if (!hasCorrectCondition)
                     {
-                        // Remove condições antigas
+                        // Remove condiÃ§Ãµes antigas
                         for (int i = transition.conditions.Length - 1; i >= 0; i--)
                         {
                             transition.RemoveCondition(transition.conditions[i]);
                         }
 
-                        // Adiciona condição correta
+                        // Adiciona condiÃ§Ã£o correta
                         transition.AddCondition(mode, 0, parameterName);
                         transition.hasExitTime = false;
                         transition.hasFixedDuration = true;
                         transition.duration = 0.0f; // Imediata para triggers
                         transition.offset = 0f;
 
-                        Debug.Log($"[NPCCreationTool] 🔧 Any State → {toState.name} atualizada com condição {parameterName} {mode}");
+                        Debug.Log($"[NPCCreationTool] ðŸ”§ Any State â†’ {toState.name} atualizada com condiÃ§Ã£o {parameterName} {mode}");
                         hasChanges = true;
                     }
                     else
                     {
-                        Debug.Log($"[NPCCreationTool] ✅ Any State → {toState.name} já configurada corretamente");
+                        Debug.Log($"[NPCCreationTool] âœ… Any State â†’ {toState.name} jÃ¡ configurada corretamente");
                     }
 
                     foundCorrectTransition = true;
@@ -851,7 +866,7 @@ namespace ExtraTools.Editor
                 }
             }
 
-            // Cria nova Any State transition se necessário
+            // Cria nova Any State transition se necessÃ¡rio
             if (!foundCorrectTransition)
             {
                 var newTransition = stateMachine.AddAnyStateTransition(toState);
@@ -861,14 +876,14 @@ namespace ExtraTools.Editor
                 newTransition.duration = 0.0f;
                 newTransition.offset = 0f;
 
-                Debug.Log($"[NPCCreationTool] ➕ Any State → {toState.name} criada (quando {parameterName} {mode})");
+                Debug.Log($"[NPCCreationTool] âž• Any State â†’ {toState.name} criada (quando {parameterName} {mode})");
                 hasChanges = true;
             }
         }
 
         private static void ConfigureExitTimeTransition(AnimatorState fromState, AnimatorState toState, ref bool hasChanges)
         {
-            // Verifica se já existe transição baseada em exit time
+            // Verifica se jÃ¡ existe transiÃ§Ã£o baseada em exit time
             bool foundExitTimeTransition = false;
 
             foreach (var transition in fromState.transitions)
@@ -876,28 +891,28 @@ namespace ExtraTools.Editor
                 if (transition.destinationState == toState && transition.hasExitTime && transition.conditions.Length == 0)
                 {
                     foundExitTimeTransition = true;
-                    Debug.Log($"[NPCCreationTool] ✅ Transição exit time {fromState.name} → {toState.name} já existe");
+                    Debug.Log($"[NPCCreationTool] âœ… TransiÃ§Ã£o exit time {fromState.name} â†’ {toState.name} jÃ¡ existe");
                     break;
                 }
             }
 
-            // Cria transição baseada em exit time se necessário
+            // Cria transiÃ§Ã£o baseada em exit time se necessÃ¡rio
             if (!foundExitTimeTransition)
             {
                 var newTransition = fromState.AddTransition(toState);
                 newTransition.hasExitTime = true;
-                newTransition.exitTime = 1.0f; // Após completar animação
+                newTransition.exitTime = 1.0f; // ApÃ³s completar animaÃ§Ã£o
                 newTransition.hasFixedDuration = true;
-                newTransition.duration = 0.0f; // Transição imediata após exit time
+                newTransition.duration = 0.0f; // TransiÃ§Ã£o imediata apÃ³s exit time
                 newTransition.offset = 0f;
 
-                Debug.Log($"[NPCCreationTool] ➕ Transição exit time criada: {fromState.name} → {toState.name}");
+                Debug.Log($"[NPCCreationTool] âž• TransiÃ§Ã£o exit time criada: {fromState.name} â†’ {toState.name}");
                 hasChanges = true;
             }
         }
 
         /// <summary>
-        /// Cria um Animator Controller completo para NPCs com todos os parâmetros e transições necessários
+        /// Cria um Animator Controller completo para NPCs com todos os parÃ¢metros e transiÃ§Ãµes necessÃ¡rios
         /// </summary>
         /// <param name="npcName">Nome do NPC para nomear o controller</param>
         /// <returns>AnimatorController criado ou null se houve erro</returns>
@@ -910,7 +925,7 @@ namespace ExtraTools.Editor
                 string fileName = $"{npcName}_Controller.controller";
                 string fullPath = $"{folderPath}/{fileName}";
 
-                // Cria a pasta se não existir
+                // Cria a pasta se nÃ£o existir
                 if (!AssetDatabase.IsValidFolder(folderPath))
                 {
                     string[] pathParts = folderPath.Split('/');
@@ -930,26 +945,26 @@ namespace ExtraTools.Editor
                 // Cria o Animator Controller
                 AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(fullPath);
 
-                // === CONFIGURAÇÃO DOS PARÂMETROS ===
-                // Adiciona parâmetros Bool
+                // === CONFIGURAÃ‡ÃƒO DOS PARÃ‚METROS ===
+                // Adiciona parÃ¢metros Bool
                 controller.AddParameter("isWalking", AnimatorControllerParameterType.Bool);
                 controller.AddParameter("FacingRight", AnimatorControllerParameterType.Bool);
 
-                // Configura valor padrão para FacingRight
+                // Configura valor padrÃ£o para FacingRight
                 foreach (var param in controller.parameters)
                 {
                     if (param.name == "FacingRight")
                     {
-                        param.defaultBool = true; // NPCs começam virados para direita
+                        param.defaultBool = true; // NPCs comeÃ§am virados para direita
                     }
                 }
 
-                // === CONFIGURAÇÃO DOS ESTADOS ===
-                // Obtém a layer base (sempre existe)
+                // === CONFIGURAÃ‡ÃƒO DOS ESTADOS ===
+                // ObtÃ©m a layer base (sempre existe)
                 AnimatorControllerLayer baseLayer = controller.layers[0];
                 AnimatorStateMachine rootStateMachine = baseLayer.stateMachine;
 
-                // Estado Idle (padrão)
+                // Estado Idle (padrÃ£o)
                 AnimatorState idleState = rootStateMachine.AddState("Idle", new Vector3(300, 0, 0));
                 idleState.writeDefaultValues = true;
 
@@ -957,11 +972,11 @@ namespace ExtraTools.Editor
                 AnimatorState walkingState = rootStateMachine.AddState("Walking", new Vector3(300, 100, 0));
                 walkingState.writeDefaultValues = true;
 
-                // Define Idle como estado padrão
+                // Define Idle como estado padrÃ£o
                 rootStateMachine.defaultState = idleState;
 
-                // === CONFIGURAÇÃO DAS TRANSIÇÕES ===
-                // Idle → Walking (quando isWalking = true)
+                // === CONFIGURAÃ‡ÃƒO DAS TRANSIÃ‡Ã•ES ===
+                // Idle â†’ Walking (quando isWalking = true)
                 AnimatorStateTransition idleToWalking = idleState.AddTransition(walkingState);
                 idleToWalking.AddCondition(AnimatorConditionMode.If, 0, "isWalking");
                 idleToWalking.hasExitTime = false;
@@ -969,7 +984,7 @@ namespace ExtraTools.Editor
                 idleToWalking.duration = 0.1f;
                 idleToWalking.offset = 0f;
 
-                // Walking → Idle (quando isWalking = false)
+                // Walking â†’ Idle (quando isWalking = false)
                 AnimatorStateTransition walkingToIdle = walkingState.AddTransition(idleState);
                 walkingToIdle.AddCondition(AnimatorConditionMode.IfNot, 0, "isWalking");
                 walkingToIdle.hasExitTime = false;
@@ -977,20 +992,20 @@ namespace ExtraTools.Editor
                 walkingToIdle.duration = 0.1f;
                 walkingToIdle.offset = 0f;
 
-                // === CONFIGURAÇÕES ADICIONAIS ===
+                // === CONFIGURAÃ‡Ã•ES ADICIONAIS ===
                 // Configura layer settings
                 baseLayer.name = "Base Layer";
                 baseLayer.defaultWeight = 1f;
 
-                // Salva as mudanças
+                // Salva as mudanÃ§as
                 EditorUtility.SetDirty(controller);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
                 Debug.Log($"[NPCCreationTool] Animator Controller criado com sucesso: {fullPath}");
-                Debug.Log($"[NPCCreationTool] Parâmetros criados: isWalking (Bool), FacingRight (Bool)");
-                Debug.Log($"[NPCCreationTool] Estados criados: Idle (padrão), Walking");
-                Debug.Log($"[NPCCreationTool] Transições criadas: Idle ↔ Walking baseadas em isWalking");
+                Debug.Log($"[NPCCreationTool] ParÃ¢metros criados: isWalking (Bool), FacingRight (Bool)");
+                Debug.Log($"[NPCCreationTool] Estados criados: Idle (padrÃ£o), Walking");
+                Debug.Log($"[NPCCreationTool] TransiÃ§Ãµes criadas: Idle â†” Walking baseadas em isWalking");
 
                 return controller;
             }
@@ -999,6 +1014,30 @@ namespace ExtraTools.Editor
                 Debug.LogError($"[NPCCreationTool] Erro ao criar Animator Controller: {ex.Message}");
                 return null;
             }
+        }
+
+
+        /// <summary>
+        /// Configura o NPCAttributesHandler com valores padrão
+        /// </summary>
+        /// <param name="attributesHandler">Componente NPCAttributesHandler</param>
+        /// <param name="npcObject">GameObject do NPC</param>
+        private static void ConfigureNPCAttributesHandler(NPCAttributesHandler attributesHandler, GameObject npcObject)
+        {
+            var serializedObject = new UnityEditor.SerializedObject(attributesHandler);
+
+            // Configurações padrão de atributos
+            SetSerializedProperty(serializedObject, "npcType", NPCType.Abelha);
+            SetSerializedProperty(serializedObject, "baseHealthPoints", 3);
+            SetSerializedProperty(serializedObject, "baseAttack", 1);
+            SetSerializedProperty(serializedObject, "baseDefense", 0);
+            SetSerializedProperty(serializedObject, "baseSpeed", 2);
+            SetSerializedProperty(serializedObject, "enableLogs", false);
+            SetSerializedProperty(serializedObject, "enableDebugGizmos", true);
+
+            serializedObject.ApplyModifiedProperties();
+
+            Debug.Log($"[NPCCreationTool] NPCAttributesHandler configurado para '{npcObject.name}' com atributos base");
         }
 
         private static void SetSerializedProperty(UnityEditor.SerializedObject serializedObject, string propertyName, object value)
@@ -1013,6 +1052,12 @@ namespace ExtraTools.Editor
                     break;
                 case UnityEditor.SerializedPropertyType.Float:
                     property.floatValue = (float)value;
+                    break;
+                case UnityEditor.SerializedPropertyType.Integer:
+                    property.intValue = (int)value;
+                    break;
+                case UnityEditor.SerializedPropertyType.Boolean:
+                    property.boolValue = (bool)value;
                     break;
                 case UnityEditor.SerializedPropertyType.Enum:
                     if (value is System.Enum enumValue)
@@ -1036,7 +1081,7 @@ namespace ExtraTools.Editor
             Animator animator = selected.GetComponent<Animator>();
             if (animator == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' não possui componente Animator!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' nÃ£o possui componente Animator!");
                 return;
             }
 
@@ -1078,18 +1123,18 @@ namespace ExtraTools.Editor
             Animator animator = selected.GetComponent<Animator>();
             if (animator == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' não possui componente Animator!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' nÃ£o possui componente Animator!");
                 return;
             }
 
             AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
             if (controller == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' não possui AnimatorController configurado!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' nÃ£o possui AnimatorController configurado!");
                 return;
             }
 
-            // Valida parâmetros necessários
+            // Valida parÃ¢metros necessÃ¡rios
             string[] requiredBoolParams = { "isWalking", "FacingRight" };
             bool allParametersFound = true;
 
@@ -1107,12 +1152,12 @@ namespace ExtraTools.Editor
 
                 if (!found)
                 {
-                    Debug.LogError($"[NPCCreationTool] Parâmetro obrigatório não encontrado: {paramName} (Bool)");
+                    Debug.LogError($"[NPCCreationTool] ParÃ¢metro obrigatÃ³rio nÃ£o encontrado: {paramName} (Bool)");
                     allParametersFound = false;
                 }
             }
 
-            // Valida estados necessários
+            // Valida estados necessÃ¡rios
             AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
             string[] requiredStates = { "Idle", "Walking" };
             bool allStatesFound = true;
@@ -1131,19 +1176,19 @@ namespace ExtraTools.Editor
 
                 if (!found)
                 {
-                    Debug.LogError($"[NPCCreationTool] Estado obrigatório não encontrado: {stateName}");
+                    Debug.LogError($"[NPCCreationTool] Estado obrigatÃ³rio nÃ£o encontrado: {stateName}");
                     allStatesFound = false;
                 }
             }
 
-            // Resultado da validação
+            // Resultado da validaÃ§Ã£o
             if (allParametersFound && allStatesFound)
             {
-                Debug.Log($"[NPCCreationTool] ✅ Animator Controller de '{selected.name}' está configurado corretamente!");
+                Debug.Log($"[NPCCreationTool] âœ… Animator Controller de '{selected.name}' estÃ¡ configurado corretamente!");
             }
             else
             {
-                Debug.LogWarning($"[NPCCreationTool] ⚠️ Animator Controller de '{selected.name}' possui problemas de configuração.");
+                Debug.LogWarning($"[NPCCreationTool] âš ï¸ Animator Controller de '{selected.name}' possui problemas de configuraÃ§Ã£o.");
             }
         }
 
@@ -1152,7 +1197,7 @@ namespace ExtraTools.Editor
         {
             if (!Application.isPlaying)
             {
-                Debug.LogWarning("[NPCCreationTool] Esta função só funciona durante o Play Mode!");
+                Debug.LogWarning("[NPCCreationTool] Esta funÃ§Ã£o sÃ³ funciona durante o Play Mode!");
                 return;
             }
 
@@ -1166,25 +1211,10 @@ namespace ExtraTools.Editor
             NPCController npcController = selected.GetComponent<NPCController>();
             if (npcController == null)
             {
-                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' não possui NPCController!");
+                Debug.LogWarning($"[NPCCreationTool] GameObject '{selected.name}' nÃ£o possui NPCController!");
                 return;
             }
 
-            // Alterna o tipo de movimento para testar
-            var currentType = npcController.GetType()
-                .GetField("movementType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                .GetValue(npcController);
-
-            if (currentType.ToString() == "Idle")
-            {
-                npcController.SetMovementType(NPCController.MovementType.Wander);
-                Debug.Log($"[NPCCreationTool] '{selected.name}' agora está em modo Wander!");
-            }
-            else
-            {
-                npcController.SetMovementType(NPCController.MovementType.Idle);
-                Debug.Log($"[NPCCreationTool] '{selected.name}' agora está em modo Idle!");
-            }
         }
     }
 }

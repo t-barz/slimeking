@@ -2,11 +2,11 @@
   Active: True
   Tag: NPC
   Layer: Default (0)
-  Transform: Pos (-0.10, 1.16, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-  Components (6):
+  Transform: Pos (-0.07, 0.67, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+  Components (8):
     • Transform
-      - position: (-0.10, 1.16, 0.00)
-      - localPosition: (-0.10, 1.16, 0.00)
+      - position: (-0.07, 0.67, 0.00)
+      - localPosition: (-0.07, 0.67, 0.00)
       - eulerAngles: (0.00, 0.00, 0.00)
       - localEulerAngles: (0.00, 0.00, 0.00)
       - right: (1.00, 0.00, 0.00)
@@ -16,13 +16,13 @@
       - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - localScale: (1.00, 1.00, 1.00)
       - parent: 
-      - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.16469
+      - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.16469
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -59,7 +59,7 @@
       - deltaRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - velocity: (0.00, 0.00, 0.00)
       - angularVelocity: (0.00, 0.00, 0.00)
-      - rootPosition: (-0.10, 1.16, 0.00)
+      - rootPosition: (-0.07, 0.67, 0.00)
       - rootRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - applyRootMotion: False
       - linearVelocityBlending: False
@@ -68,11 +68,11 @@
       - hasTransformHierarchy: True
       - gravityWeight: 0
       - bodyPosition: (0.00, 0.00, 0.00)
-      - bodyRotation: (0.00000, 0.00000, 0.00000, 0.00000)
+      - bodyRotation: (58827910000000000.00000, 0.00000, 0.00000, 0.00000)
       - stabilizeFeet: False
       - layerCount: 1
       - parameters: UnityEngine.AnimatorControllerParameter[]
-      - parameterCount: 2
+      - parameterCount: 4
       - feetPivotActive: 1
       - pivotWeight: 0,5
       - pivotPosition: (0.00, 0.00, 0.00)
@@ -106,7 +106,7 @@
       - name: NPC_art_beeA
       - hideFlags: None
     • Rigidbody2D
-      - position: (-0.10, 1.16)
+      - position: (-0.07, 0.67)
       - rotation: 0
       - linearVelocity: (0.00, 0.00)
       - linearVelocityX: 0
@@ -115,8 +115,8 @@
       - useAutoMass: False
       - mass: 1
       - sharedMaterial: 
-      - centerOfMass: (0.00, 0.20)
-      - worldCenterOfMass: (-0.10, 1.36)
+      - centerOfMass: (0.00, 0.18)
+      - worldCenterOfMass: (-0.07, 0.85)
       - inertia: 0
       - linearDamping: 0
       - angularDamping: 0,05
@@ -134,8 +134,8 @@
       - totalTorque: 0
       - excludeLayers: UnityEngine.LayerMask
       - includeLayers: UnityEngine.LayerMask
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.16469
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -158,15 +158,15 @@
       - compositeOperation: None
       - compositeOrder: 0
       - composite: 
-      - offset: (0.00, 0.20)
+      - offset: (0.00, 0.18)
       - attachedRigidbody: NPC_art_beeA (UnityEngine.Rigidbody2D)
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.16469
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
       - shapeCount: 1
-      - bounds: Center: (-0.10, 1.36, 0.00), Extents: (0.10, 0.10, 0.00)
+      - bounds: Center: (-0.07, 0.85, 0.00), Extents: (0.10, 0.10, 0.00)
       - errorState: None
       - compositeCapable: True
       - sharedMaterial: 
@@ -203,6 +203,35 @@
       - tag: NPC
       - name: NPC_art_beeA
       - hideFlags: None
+    • NPCBehaviorGraphController
+      - WaypointReachDistance: 0,5
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: NPC_art_beeA (UnityEngine.Transform)
+      - gameObject: NPC_art_beeA (UnityEngine.GameObject)
+      - tag: NPC
+      - name: NPC_art_beeA
+      - hideFlags: None
+    • BehaviorGraphAgent
+      - Graph: 
+      - BlackboardReference: 
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: NPC_art_beeA (UnityEngine.Transform)
+      - gameObject: NPC_art_beeA (UnityEngine.GameObject)
+      - tag: NPC
+      - name: NPC_art_beeA
+      - hideFlags: None
   Children (7):
   - GameObject: side
     Active: False
@@ -211,7 +240,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (-0.10, 1.26, 0.00)
+        - position: (-0.07, 0.76, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -222,13 +251,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -259,7 +288,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.10, 1.38, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (-0.07, 0.89, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: False
@@ -283,13 +312,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -316,7 +345,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (-0.10, 1.26, 0.00)
+        - position: (-0.07, 0.76, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -327,13 +356,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -364,7 +393,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.10, 1.38, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (-0.07, 0.89, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: False
@@ -388,13 +417,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -421,7 +450,7 @@
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (-0.13, 1.16, 0.00)
+        - position: (-0.10, 0.67, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -432,13 +461,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.13139
-0.00000	1.00000	0.00000	-1.16469
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.09911
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.13139
-0.00000	1.00000	0.00000	1.16469
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.09911
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -469,7 +498,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.13, 1.37, 0.00), Extents: (0.22, 0.20, 0.10)
+        - bounds: Center: (-0.10, 0.87, 0.00), Extents: (0.22, 0.20, 0.10)
         - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: False
@@ -493,13 +522,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.13139
-0.00000	1.00000	0.00000	-1.16469
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.09911
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.13139
-0.00000	1.00000	0.00000	1.16469
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.09911
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -526,7 +555,7 @@
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (-0.13, 1.16, 0.00)
+        - position: (-0.10, 0.67, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -537,13 +566,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.13139
-0.00000	1.00000	0.00000	-1.16469
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.09911
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.13139
-0.00000	1.00000	0.00000	1.16469
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.09911
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -574,7 +603,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.13, 1.37, 0.00), Extents: (0.22, 0.20, 0.10)
+        - bounds: Center: (-0.10, 0.87, 0.00), Extents: (0.22, 0.20, 0.10)
         - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: False
@@ -598,13 +627,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.13139
-0.00000	1.00000	0.00000	-1.16469
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.09911
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.13139
-0.00000	1.00000	0.00000	1.16469
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.09911
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -631,7 +660,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (3):
       • Transform
-        - position: (-0.10, 1.26, 0.00)
+        - position: (-0.07, 0.76, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -642,13 +671,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -679,7 +708,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.10, 1.38, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (-0.07, 0.89, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
@@ -703,13 +732,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -753,7 +782,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (-0.10, 1.26, 0.00)
+        - position: (-0.07, 0.76, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -764,13 +793,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -801,7 +830,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (-0.10, 1.35, 0.00), Extents: (0.16, 0.09, 0.10)
+        - bounds: Center: (-0.07, 0.86, 0.00), Extents: (0.16, 0.09, 0.10)
         - localBounds: Center: (0.00, 0.09, 0.00), Extents: (0.16, 0.09, 0.10)
         - enabled: True
         - isVisible: False
@@ -825,13 +854,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.25844
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.25844
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.76354
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -858,7 +887,7 @@
     Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (1):
       • Transform
-        - position: (-0.10, 1.16, 0.00)
+        - position: (-0.07, 0.67, 0.00)
         - localPosition: (0.00, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -869,13 +898,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_art_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.10014
-0.00000	1.00000	0.00000	-1.16469
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.06786
+0.00000	1.00000	0.00000	-0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.10014
-0.00000	1.00000	0.00000	1.16469
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.06786
+0.00000	1.00000	0.00000	0.66979
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
