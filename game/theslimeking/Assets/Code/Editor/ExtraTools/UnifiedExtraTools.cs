@@ -199,6 +199,20 @@ namespace ExtraTools.Editor
         }
         #endregion
 
+        #region Menu Items - Scene Tools
+        [MenuItem("Extra Tools/Scene Tools/🎬 Setup Scene for Transitions")]
+        public static void MenuSetupSceneForTransitions()
+        {
+            ExtraTools.Editor.SceneSetupTool.SetupSceneForTransitions();
+        }
+
+        [MenuItem("Extra Tools/Scene Tools/🖌️ GameObject Brush")]
+        public static void MenuOpenGameObjectBrush()
+        {
+            GameObjectBrushTool.ShowWindow();
+        }
+        #endregion
+
         #region Menu Items - Debug
         [MenuItem("Extra Tools/Debug/🔊 Toggle Logs")]
         public static void MenuToggleLogs()
@@ -347,8 +361,13 @@ namespace ExtraTools.Editor
                 ExtraTools.Editor.SceneSetupTool.SetupSceneForTransitions();
             }
 
+            if (GUILayout.Button("🖌️ GameObject Brush", GUILayout.Height(30)))
+            {
+                MenuOpenGameObjectBrush();
+            }
+
             EditorGUILayout.Space(10);
-            EditorGUILayout.HelpBox("Configure cena com componentes essenciais para transições", MessageType.Info);
+            EditorGUILayout.HelpBox("Configure cena com componentes essenciais para transições e use o brush para posicionar objetos", MessageType.Info);
         }
 
         private void DrawProjectSection()
