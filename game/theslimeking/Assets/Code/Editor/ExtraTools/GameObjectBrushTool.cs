@@ -70,10 +70,15 @@ namespace ExtraTools.Editor
         // Debug
         private bool enableDebugLogs = false;
 
+        // Parent organization
+        private string parentObjectName = "PaintedObjects";
+        private bool groupByType = true;
+
         // Private
         private Vector2 scrollPosition;
         private GameObject sprayedObjectsParent;
         private Vector3 lastPaintPosition = Vector3.zero;
+        private Dictionary<GameObject, GameObject> prefabParents = new Dictionary<GameObject, GameObject>();
         #endregion
 
         #region Unity Lifecycle
@@ -137,7 +142,7 @@ namespace ExtraTools.Editor
                 {
                     isEraserActive = false;
                     isSelectiveEraserActive = false;
-                    SetupSprayedObjectsParent();
+                    GetMainParent(); // Initialize main parent
                 }
                 SceneView.RepaintAll();
             }
@@ -303,6 +308,21 @@ namespace ExtraTools.Editor
             brushRadius = EditorGUILayout.Slider("Brush Radius", brushRadius, 0.5f, 20f);
             brushDensity = EditorGUILayout.Slider("Density", brushDensity, 0.1f, 3f);
             minSpacing = EditorGUILayout.Slider("Min Spacing", minSpacing, 0.1f, 5f);
+
+            EditorGUILayout.Space(5);
+            GUILayout.Label("📁 Organization", EditorStyles.boldLabel);
+
+            parentObjectName = EditorGUILayout.TextField("Parent Name", parentObjectName);
+            groupByType = EditorGUILayout.Toggle("Group by Object Type", groupByType);
+
+            if (groupByType)
+            {
+                EditorGUILayout.HelpBox("Objects will be grouped under: [Parent]/[ObjectName]", MessageType.Info);
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("All objects will be placed directly under: [Parent]", MessageType.Info);
+            }
         }
 
         private void DrawRandomizationSettings()
@@ -568,9 +588,6 @@ namespace ExtraTools.Editor
 
             lastPaintPosition = center;
 
-            // Setup parent if needed
-            SetupSprayedObjectsParent();
-
             // Calculate number of objects based on density
             int objectCount = Mathf.RoundToInt(brushDensity * brushRadius * 0.5f);
             objectCount = Mathf.Max(1, objectCount);
@@ -580,6 +597,9 @@ namespace ExtraTools.Editor
                 // Choose random prefab from valid ones
                 GameObject prefab = validPrefabs[Random.Range(0, validPrefabs.Count)];
 
+                // Get appropriate parent (main or type-specific)
+                GameObject parentForPrefab = GetOrCreateParentForPrefab(prefab);
+
                 // Random position within brush radius (2D XY plane)
                 Vector2 randomCircle = Random.insideUnitCircle * brushRadius;
                 Vector3 spawnPosition = center + new Vector3(randomCircle.x, randomCircle.y, 0);
@@ -587,7 +607,7 @@ namespace ExtraTools.Editor
                 // Create object
                 GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
                 instance.transform.position = spawnPosition;
-                instance.transform.SetParent(sprayedObjectsParent.transform);
+                instance.transform.SetParent(parentForPrefab.transform);
 
                 // Apply randomization
                 ApplyRandomization(instance, prefab);
@@ -595,7 +615,6 @@ namespace ExtraTools.Editor
                 // Register for undo
                 Undo.RegisterCreatedObjectUndo(instance, "Paint GameObject");
             }
-
             if (paintAllSlots)
             {
                 DebugLog($"Pintados {objectCount} objetos aleatórios entre {validPrefabs.Count} prefabs");
@@ -695,17 +714,57 @@ namespace ExtraTools.Editor
             return false;
         }
 
-        private void SetupSprayedObjectsParent()
+        private GameObject GetOrCreateParentForPrefab(GameObject prefab)
         {
-            if (sprayedObjectsParent == null)
+            if (!groupByType)
             {
-                sprayedObjectsParent = GameObject.Find("SprayedObjects");
-                if (sprayedObjectsParent == null)
+                // Use main parent only
+                return GetMainParent();
+            }
+
+            // Check if we already have a parent for this prefab type
+            if (prefabParents.ContainsKey(prefab) && prefabParents[prefab] != null)
+            {
+                return prefabParents[prefab];
+            }
+
+            // Create or find type-specific parent
+            GameObject mainParent = GetMainParent();
+            string typeName = prefab.name.Replace("(Clone)", "").Trim();
+
+            GameObject typeParent = null;
+            foreach (Transform child in mainParent.transform)
+            {
+                if (child.name == typeName)
                 {
-                    sprayedObjectsParent = new GameObject("SprayedObjects");
-                    DebugLog("Criado parent SprayedObjects");
+                    typeParent = child.gameObject;
+                    break;
                 }
             }
+
+            if (typeParent == null)
+            {
+                typeParent = new GameObject(typeName);
+                typeParent.transform.SetParent(mainParent.transform);
+                DebugLog($"Criado parent para tipo: {typeName}");
+            }
+
+            prefabParents[prefab] = typeParent;
+            return typeParent;
+        }
+
+        private GameObject GetMainParent()
+        {
+            if (sprayedObjectsParent == null || sprayedObjectsParent.name != parentObjectName)
+            {
+                sprayedObjectsParent = GameObject.Find(parentObjectName);
+                if (sprayedObjectsParent == null)
+                {
+                    sprayedObjectsParent = new GameObject(parentObjectName);
+                    DebugLog($"Criado parent principal: {parentObjectName}");
+                }
+            }
+            return sprayedObjectsParent;
         }
         #endregion
 
