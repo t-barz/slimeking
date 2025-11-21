@@ -113,6 +113,16 @@ namespace SlimeKing.Core
             _rigidbody = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
 
+            // VERIFICAÇÃO CRÍTICA: Rigidbody2D é obrigatório para movimento
+            if (_rigidbody == null)
+            {
+                UnityEngine.Debug.LogError($"[NPCController] {gameObject.name} - RIGIDBODY2D NÃO ENCONTRADO! Adicione um componente Rigidbody2D para que o movimento funcione.");
+            }
+            else if (enableDebugLogs)
+            {
+                UnityEngine.Debug.Log($"[NPCController] {gameObject.name} - Rigidbody2D encontrado com sucesso");
+            }
+
             // Obtém componente opcional
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _attributesHandler = GetComponent<NPCAttributesHandler>();
@@ -235,6 +245,11 @@ namespace SlimeKing.Core
                 return;
             }
 
+            if (enableDebugLogs && _moveDirection.magnitude > 0.1f)
+            {
+                UnityEngine.Debug.Log($"[NPCController] {gameObject.name} - HandleMovement executando. Direção: {_moveDirection:F3}, isMoving: {_isMoving}");
+            }
+
             // Sincroniza velocidade com sistema de atributos
             SynchronizeSpeedWithAttributes();
 
@@ -262,6 +277,12 @@ namespace SlimeKing.Core
 
         private void ApplySmoothMovement()
         {
+            if (_rigidbody == null)
+            {
+                UnityEngine.Debug.LogError($"[NPCController] {gameObject.name} - RIGIDBODY É NULL! Movimento impossível!");
+                return;
+            }
+
             Vector2 targetVelocity = _moveDirection * moveSpeed;
             float currentRate = _isMoving ? acceleration : deceleration;
 
@@ -274,7 +295,7 @@ namespace SlimeKing.Core
 
             if (enableDebugLogs && _moveDirection.magnitude > 0.1f)
             {
-                UnityEngine.Debug.Log($"[NPCController] {gameObject.name} - ApplySmoothMovement: target={targetVelocity:F3}, old={oldVelocity:F3}, new={_rigidbody.linearVelocity:F3}");
+                UnityEngine.Debug.Log($"[NPCController] {gameObject.name} - ApplySmoothMovement: target={targetVelocity:F3}, old={oldVelocity:F3}, new={_rigidbody.linearVelocity:F3}, moveSpeed={moveSpeed:F2}");
             }
         }
 
@@ -481,7 +502,7 @@ namespace SlimeKing.Core
             {
                 if (!wasMoving && _isMoving)
                 {
-                    UnityEngine.Debug.Log($"[NPCController] {gameObject.name} COMEÇOU A SE MOVER - Direção: {direction:F3}, Magnitude: {direction.magnitude:F3}, Velocidade: {moveSpeed}");
+                    UnityEngine.Debug.Log($"[NPCController] {gameObject.name} COMEÇOU A SE MOVER - Direção: {direction:F3}, Magnitude: {direction.magnitude:F3}, Velocidade: {moveSpeed}, canMove: {_canMove}");
                 }
                 else if (wasMoving && !_isMoving)
                 {
@@ -489,7 +510,7 @@ namespace SlimeKing.Core
                 }
                 else if (_isMoving)
                 {
-                    UnityEngine.Debug.Log($"[NPCController] {gameObject.name} MOVENDO - Direção: {direction:F3}, Velocidade atual: {_rigidbody.linearVelocity.magnitude:F2}");
+                    UnityEngine.Debug.Log($"[NPCController] {gameObject.name} MOVENDO - Direção: {direction:F3}, Velocidade atual: {_rigidbody.linearVelocity.magnitude:F2}, canMove: {_canMove}");
                 }
             }
         }        /// <summary>

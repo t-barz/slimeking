@@ -81,6 +81,16 @@ public class NPCBehaviorController : MonoBehaviour
     [Tooltip("Mostra debug apenas quando selecionado")]
     [SerializeField] private bool debugOnlyWhenSelected = true;
 
+    [Header("🔍 Configurações de Detecção")]
+    [Tooltip("Sobrescreve o raio de detecção padrão do NPC (0 = usar padrão)")]
+    [SerializeField, Range(0f, 20f)] private float customVisionRange = 1f;
+
+    [Tooltip("Sobrescreve o ângulo de visão padrão do NPC (0 = usar padrão, 360 = círculo completo)")]
+    [SerializeField, Range(0f, 360f)] private float customVisionAngle = 0f;
+
+    [Tooltip("Multiplica a velocidade de rotação do cone de visão")]
+    [SerializeField, Range(0.1f, 20f)] private float visionSpeedMultiplier = 1f;
+
     #endregion
 
     #region Enums
@@ -161,7 +171,7 @@ public class NPCBehaviorController : MonoBehaviour
                     visionRange = 8f,
                     visionAngle = 60f,
                     hearingRange = 5f,
-                    attackRange = 0.8f,
+                    attackRange = 0.5f,
                     attackCooldown = 2f,
                     chaseSpeed = 3.5f,
                     alertDuration = 3f,
@@ -280,6 +290,14 @@ public class NPCBehaviorController : MonoBehaviour
     private static readonly Color DEBUG_VISION_ATTACK = new Color(1f, 0f, 0f, 0.5f);
     private static readonly Color DEBUG_ATTACK_RANGE = new Color(1f, 0f, 0f, 0.2f);
 
+    // === SISTEMA DE RASTREAMENTO VISUAL ===
+    private Vector2 _visionDirection = Vector2.down;           // Direção atual do cone de visão
+    private Vector2 _defaultLookDirection = Vector2.down;      // Direção padrão quando não rastreando
+    private bool _shouldTrackPlayer = false;                  // Se deve rastrear o player ativamente
+    private float _visionRotationSpeed = 24f;                 // Velocidade de rotação do cone (duplicada para máxima responsividade)
+    private Vector2 _targetVisionDirection = Vector2.down;    // Direção alvo para interpolação
+    private bool _instantRotation = false;                    // Para rotação instantânea em certas situações
+
     #endregion
 
     #region Unity Lifecycle
@@ -333,12 +351,24 @@ public class NPCBehaviorController : MonoBehaviour
         StealthEvents.OnPlayerEnteredStealth += OnPlayerEnteredStealth;
         StealthEvents.OnPlayerExitedStealth += OnPlayerExitedStealth;
 
+        // Inicializa direção do cone de visão
+        _defaultLookDirection = Vector2.down; // Direção padrão para frente (sul)
+        _visionDirection = _defaultLookDirection;
+        _targetVisionDirection = _defaultLookDirection;
+
         // Inicializa em estado Idle
         ChangeState(NPCBehaviorState.Idle);
 
         if (enableDetailedLogs)
         {
-            UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} configurado para {_config.visionRange}m de visão, {_config.visionAngle}° ângulo");
+            float effectiveRange = GetEffectiveVisionRange();
+            float effectiveAngle = GetEffectiveVisionAngle();
+            float effectiveSpeed = GetEffectiveVisionSpeed();
+
+            string rangeInfo = customVisionRange > 0f ? $"{effectiveRange}m (CUSTOM)" : $"{effectiveRange}m (padrão)";
+            string angleInfo = customVisionAngle > 0f ? $"{effectiveAngle}° (CUSTOM)" : $"{effectiveAngle}° (padrão)";
+
+            UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} configurado - Visão: {rangeInfo}, Ângulo: {angleInfo}, Velocidade: {effectiveSpeed:F1}x");
         }
     }
 
@@ -351,6 +381,9 @@ public class NPCBehaviorController : MonoBehaviour
 
         // Atualiza sistema de detecção
         UpdateDetection();
+
+        // Atualiza direção do cone de visão
+        UpdateVisionDirection();
 
         // Executa estado atual via jump table
         _stateMethods[(int)_currentState]?.Invoke();
@@ -513,6 +546,32 @@ public class NPCBehaviorController : MonoBehaviour
 
     #region Detection System
 
+    // === CONFIGURAÇÕES CUSTOMIZÁVEIS ===
+
+    /// <summary>
+    /// Obtém o raio de visão efetivo (customizado ou padrão).
+    /// </summary>
+    private float GetEffectiveVisionRange()
+    {
+        return customVisionRange > 0f ? customVisionRange : _config.visionRange;
+    }
+
+    /// <summary>
+    /// Obtém o ângulo de visão efetivo (customizado ou padrão).
+    /// </summary>
+    private float GetEffectiveVisionAngle()
+    {
+        return customVisionAngle > 0f ? customVisionAngle : _config.visionAngle;
+    }
+
+    /// <summary>
+    /// Obtém a velocidade de rotação efetiva com multiplicador aplicado.
+    /// </summary>
+    private float GetEffectiveVisionSpeed()
+    {
+        return _visionRotationSpeed * visionSpeedMultiplier;
+    }
+
     /// <summary>
     /// Sistema de detecção otimizado com cone de visão e verificação de obstáculos.
     /// </summary>
@@ -553,12 +612,13 @@ public class NPCBehaviorController : MonoBehaviour
         Vector2 npcPosition = transform.position;
         Vector2 directionToPlayer = playerPosition - npcPosition;
 
-        float visionRangeSqr = _config.visionRange * _config.visionRange;
+        float effectiveVisionRange = GetEffectiveVisionRange();
+        float visionRangeSqr = effectiveVisionRange * effectiveVisionRange;
         if (directionToPlayer.sqrMagnitude > visionRangeSqr)
         {
             if (enableDetailedLogs)
             {
-                UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} - Player fora do alcance. Distância: {directionToPlayer.magnitude:F2}m, Alcance: {_config.visionRange}m");
+                UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} - Player fora do alcance. Distância: {directionToPlayer.magnitude:F2}m, Alcance: {effectiveVisionRange}m");
             }
             return;
         }
@@ -604,9 +664,16 @@ public class NPCBehaviorController : MonoBehaviour
         }
 
         // Player detectado!
+        bool wasPlayerDetected = _playerDetected;
         _playerDetected = true;
         _hasLineOfSight = true;
         _lastKnownPlayerPosition = playerPosition;
+
+        // Rotação instantânea na primeira detecção para resposta imediata
+        if (!wasPlayerDetected && _shouldTrackPlayer)
+        {
+            _instantRotation = true;
+        }
 
         if (enableDetailedLogs)
         {
@@ -629,16 +696,118 @@ public class NPCBehaviorController : MonoBehaviour
     /// </summary>
     private bool IsPlayerInVisionCone(Vector2 directionToPlayer)
     {
-        // Atualiza direção de visão baseada na direção do NPC
-        _lookDirection = GetNPCLookDirection();
+        // Usa direção dinâmica do cone de visão (atualizada em UpdateVisionDirection)
+        _lookDirection = _visionDirection;
 
         // Calcula produto escalar normalizado
         float dot = Vector2.Dot(directionToPlayer.normalized, _lookDirection);
 
-        // Compara com threshold pré-calculado baseado no ângulo
-        float angleThreshold = Mathf.Cos(_config.visionAngle * 0.5f * Mathf.Deg2Rad);
+        // Compara com threshold baseado no ângulo efetivo
+        float effectiveVisionAngle = GetEffectiveVisionAngle();
+        float angleThreshold = Mathf.Cos(effectiveVisionAngle * 0.5f * Mathf.Deg2Rad);
 
-        return dot >= angleThreshold;
+        bool inCone = dot >= angleThreshold;
+
+        if (enableDetailedLogs && inCone)
+        {
+            UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} - Player no cone de visão! Direção cone: {_lookDirection:F2}, Direção player: {directionToPlayer.normalized:F2}");
+        }
+
+        return inCone;
+    }
+
+    // === SISTEMA DE RASTREAMENTO VISUAL ===
+
+    /// <summary>
+    /// Obtém a direção do cone de visão (dinâmica baseada no estado).
+    /// </summary>
+    private Vector2 GetVisionDirection()
+    {
+        if (_shouldTrackPlayer && _playerDetected)
+        {
+            // Cone aponta para o player
+            Vector2 directionToPlayer = (_lastKnownPlayerPosition - (Vector2)transform.position).normalized;
+            return directionToPlayer;
+        }
+        else if (_shouldTrackPlayer && !_playerDetected && (_currentState == NPCBehaviorState.Alert || _currentState == NPCBehaviorState.Chase))
+        {
+            // Cone aponta para última posição conhecida
+            Vector2 directionToLastKnown = (_lastKnownPlayerPosition - (Vector2)transform.position).normalized;
+            return directionToLastKnown;
+        }
+
+        // Cone em direção padrão baseada na direção visual do NPC
+        return GetNPCVisualDirection();
+    }
+
+    /// <summary>
+    /// Obtém a direção visual do NPC baseada no movimento (apenas para referência).
+    /// </summary>
+    private Vector2 GetNPCVisualDirection()
+    {
+        var visualDirection = _npcController.GetCurrentVisualDirection();
+        return visualDirection switch
+        {
+            NPCController.VisualDirection.North => Vector2.up,
+            NPCController.VisualDirection.South => Vector2.down,
+            NPCController.VisualDirection.Side => _npcController.IsMoving() ?
+                (transform.position.x > _lastKnownPlayerPosition.x ? Vector2.left : Vector2.right) : Vector2.down,
+            _ => Vector2.down
+        };
+    }
+
+    /// <summary>
+    /// Atualiza a direção do cone de visão com rotação suave ou instantânea.
+    /// </summary>
+    private void UpdateVisionDirection()
+    {
+        _targetVisionDirection = GetVisionDirection();
+
+        if (_instantRotation || !_shouldTrackPlayer)
+        {
+            // Rotação instantânea para mudanças críticas
+            _visionDirection = _targetVisionDirection;
+            _instantRotation = false; // Reset flag
+        }
+        else
+        {
+            // Rotação suave com velocidade customizável
+            float baseSpeed = GetEffectiveVisionSpeed();
+            float rotationSpeed = _shouldTrackPlayer ? baseSpeed * 1.5f : baseSpeed;
+            _visionDirection = Vector2.Lerp(_visionDirection, _targetVisionDirection,
+                rotationSpeed * Time.deltaTime);
+        }
+
+        // Normaliza para evitar drift
+        _visionDirection = _visionDirection.normalized;
+
+        if (enableDetailedLogs && Vector2.Angle(_visionDirection, _targetVisionDirection) > 3f)
+        {
+            UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} - Rotacionando cone: {_visionDirection:F2} → {_targetVisionDirection:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Configura o modo de rastreamento baseado no estado.
+    /// </summary>
+    private void SetVisionTrackingMode(bool shouldTrack)
+    {
+        if (_shouldTrackPlayer != shouldTrack)
+        {
+            _shouldTrackPlayer = shouldTrack;
+
+            // Rotação instantânea quando ativar rastreamento para resposta imediata
+            if (shouldTrack)
+            {
+                _instantRotation = true;
+            }
+
+            if (enableDetailedLogs)
+            {
+                string mode = shouldTrack ? "ATIVO" : "DESATIVO";
+                UnityEngine.Debug.Log($"[NPCBehaviorController] {gameObject.name} - Rastreamento visual: {mode}");
+            }
+        }
     }
 
     /// <summary>
@@ -731,6 +900,7 @@ public class NPCBehaviorController : MonoBehaviour
                 _alertStartTime = Time.time;
                 PlaySound(_config.alertSound);
                 SetAnimatorTrigger(Alert);
+                SetVisionTrackingMode(true); // Ativa rastreamento visual
 
                 // TODO: Implementar sistema de grupo
                 if (enableGroupBehavior)
@@ -742,9 +912,11 @@ public class NPCBehaviorController : MonoBehaviour
             case NPCBehaviorState.Chase:
                 PlaySound(_config.chaseSound);
                 SetAnimatorBool(IsChasing, true);
+                SetVisionTrackingMode(true); // Mantém rastreamento ativo
                 break;
 
             case NPCBehaviorState.Attack:
+                SetVisionTrackingMode(true); // Rastreamento ativo durante ataque
                 // Preparar para atacar
                 break;
 
@@ -752,10 +924,12 @@ public class NPCBehaviorController : MonoBehaviour
                 _returnStartTime = Time.time;
                 PlaySound(_config.returnSound);
                 SetAnimatorBool(IsChasing, false);
+                SetVisionTrackingMode(false); // Desativa rastreamento
                 break;
 
             case NPCBehaviorState.Idle:
                 SetAnimatorBool(IsChasing, false);
+                SetVisionTrackingMode(false); // Desativa rastreamento
                 break;
         }
     }
@@ -1156,7 +1330,11 @@ public class NPCBehaviorController : MonoBehaviour
     private void DrawVisionCone(NPCBehaviorConfig config)
     {
         Vector3 position = transform.position;
-        Vector3 lookDir = _lookDirection;
+        Vector3 lookDir = _visionDirection; // Usa direção dinâmica do cone
+
+        // Usa valores efetivos (customizados ou padrão)
+        float effectiveRange = GetEffectiveVisionRange();
+        float effectiveAngle = GetEffectiveVisionAngle();
 
         // Cor baseada no estado atual
         Color visionColor = _currentState switch
@@ -1170,17 +1348,25 @@ public class NPCBehaviorController : MonoBehaviour
 
         Gizmos.color = visionColor;
 
-        // Desenha cone de visão
-        float halfAngle = config.visionAngle * 0.5f;
+        // Desenha cone de visão com valores efetivos
+        float halfAngle = effectiveAngle * 0.5f;
         Vector3 leftBound = Quaternion.AngleAxis(-halfAngle, Vector3.forward) * lookDir;
         Vector3 rightBound = Quaternion.AngleAxis(halfAngle, Vector3.forward) * lookDir;
 
-        Gizmos.DrawLine(position, position + leftBound * config.visionRange);
-        Gizmos.DrawLine(position, position + rightBound * config.visionRange);
+        Gizmos.DrawLine(position, position + leftBound * effectiveRange);
+        Gizmos.DrawLine(position, position + rightBound * effectiveRange);
 
         // Desenha arco do cone
         UnityEditor.Handles.color = visionColor;
-        UnityEditor.Handles.DrawWireArc(position, Vector3.forward, leftBound, config.visionAngle, config.visionRange);
+        UnityEditor.Handles.DrawWireArc(position, Vector3.forward, leftBound, effectiveAngle, effectiveRange);
+
+        // Mostra direção de rastreamento
+        if (_shouldTrackPlayer)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(position, position + (Vector3)_visionDirection * effectiveRange * 0.3f);
+            Gizmos.DrawWireSphere(position + (Vector3)_visionDirection * effectiveRange * 0.3f, 0.1f);
+        }
 
         // Linha para player se detectado
         if (_playerDetected && _hasLineOfSight)
