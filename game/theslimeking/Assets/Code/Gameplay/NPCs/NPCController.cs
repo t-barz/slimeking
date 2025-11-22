@@ -331,6 +331,7 @@ namespace SlimeKing.Core
             if (_currentVisualDirection == VisualDirection.Side)
             {
                 ApplyFlipToSideObject(sideObject);
+                ApplyFlipToSideObject(vfxSideObject);
             }
 
             if (enableDebugLogs)
@@ -373,7 +374,7 @@ namespace SlimeKing.Core
             if (backObject != null) backObject.SetActive(false);
             if (sideObject != null) sideObject.SetActive(false);
 
-            // VFX sempre desativados (NPCs básicos não usam VFX por padrão)
+            // Desativa todos os objetos VFX primeiro
             if (vfxFrontObject != null) vfxFrontObject.SetActive(false);
             if (vfxBackObject != null) vfxBackObject.SetActive(false);
             if (vfxSideObject != null) vfxSideObject.SetActive(false);
@@ -383,10 +384,12 @@ namespace SlimeKing.Core
             {
                 case VisualDirection.South:
                     if (frontObject != null) frontObject.SetActive(true);
+                    if (vfxFrontObject != null) vfxFrontObject.SetActive(true);
                     break;
 
                 case VisualDirection.North:
                     if (backObject != null) backObject.SetActive(true);
+                    if (vfxBackObject != null) vfxBackObject.SetActive(true);
                     break;
 
                 case VisualDirection.Side:
@@ -394,6 +397,11 @@ namespace SlimeKing.Core
                     {
                         sideObject.SetActive(true);
                         ApplyFlipToSideObject(sideObject);
+                    }
+                    if (vfxSideObject != null)
+                    {
+                        vfxSideObject.SetActive(true);
+                        ApplyFlipToSideObject(vfxSideObject);
                     }
                     break;
             }

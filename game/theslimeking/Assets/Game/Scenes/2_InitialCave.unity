@@ -22399,27 +22399,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1b3d647f7f72b874caafa109865df5b2, type: 3}
---- !u!1 &1791778823 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5895015999092524648, guid: 467ef8addf8855d4bad30d13070700f5, type: 3}
-  m_PrefabInstance: {fileID: 2376481732964677814}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1791778826
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1791778823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff1af16c7b951f04d9dfeb4ff18ebe1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.NPCManager
-  defaultRelationshipLevel: 5
-  minRelationshipLevel: -10
-  maxRelationshipLevel: 20
-  enableLogs: 1
 --- !u!1001 &1796056859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24837,14 +24816,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NPCManager
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3521403323626118431, guid: 467ef8addf8855d4bad30d13070700f5, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5895015999092524648, guid: 467ef8addf8855d4bad30d13070700f5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1791778826}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 467ef8addf8855d4bad30d13070700f5, type: 3}
 --- !u!1001 &2886896993431379066
 PrefabInstance:

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2055453608246574788}
-  - component: {fileID: 3521403323626118431}
+  - component: {fileID: 2872948050689622872}
   m_Layer: 0
   m_Name: NPCManager
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3521403323626118431
+--- !u!114 &2872948050689622872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5895015999092524648}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9651f90a463f4cb47a9a24ef03a93e34, type: 3}
+  m_Script: {fileID: 11500000, guid: ff1af16c7b951f04d9dfeb4ff18ebe1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.NPCManager
-  defaultRelationshipLevel: 0
-  minRelationshipLevel: -100
-  maxRelationshipLevel: 100
-  enableLogs: 0
+  defaultRelationshipLevel: 5
+  minRelationshipLevel: -10
+  maxRelationshipLevel: 20
+  enableLogs: 1
