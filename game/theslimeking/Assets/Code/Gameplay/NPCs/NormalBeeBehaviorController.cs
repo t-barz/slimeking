@@ -52,6 +52,19 @@ public class NormalBeeBehaviorController : MonoBehaviour
     [Tooltip("Tempo entre ataques em segundos")]
     [SerializeField, Range(0.5f, 3f)] private float attackCooldown = 1f;
 
+    [Header("🎬 Efeitos de Detecção")]
+    [Tooltip("Prefab do efeito visual a ser instanciado quando detecta o player")]
+    [SerializeField] private GameObject vfxDetectionPrefab;
+
+    [Tooltip("Som reproduzido quando detecta o player")]
+    [SerializeField] private AudioClip sfxDetection;
+
+    [Tooltip("Volume do som de detecção")]
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+
+    [Tooltip("Offset da posição do VFX de detecção em relação à abelha (Y positivo = acima)")]
+    [SerializeField] private Vector3 vfxDetectionOffset = new Vector3(0f, 1f, 0f);
+
     [Header("🔧 Debug")]
     [Tooltip("Habilita logs detalhados no Console")]
     [SerializeField] private bool enableDebugLogs = false;
@@ -81,6 +94,10 @@ public class NormalBeeBehaviorController : MonoBehaviour
     private bool _isAttacking = false;
     private float _lastAttackTime = 0f;
     private float _playerDistance = float.MaxValue;
+
+    // === SISTEMA DE EFEITOS ===
+    private GameObject _currentVfxDetection;  // Instância atual do VFX
+    private AudioSource _audioSource;        // Componente de áudio
 
     // === ESTADOS CUSTOMIZADOS ===
     public enum BeeState
@@ -113,6 +130,16 @@ public class NormalBeeBehaviorController : MonoBehaviour
         if (playerObject != null)
         {
             _playerTransform = playerObject.transform;
+        }
+
+        // Configura ou cria AudioSource
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+        {
+            _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.playOnAwake = false;
+            _audioSource.spatialBlend = 1f; // 3D sound
+            _audioSource.volume = sfxVolume;
         }
 
         if (_npcController == null)
@@ -216,6 +243,7 @@ public class NormalBeeBehaviorController : MonoBehaviour
         {
             // Player entrou no raio de detecção
             ChangeToChaseState();
+            TriggerDetectionEffects(); // Adiciona efeitos de detecção
         }
         else if (!_playerDetected && wasDetected)
         {
@@ -247,6 +275,9 @@ public class NormalBeeBehaviorController : MonoBehaviour
         _currentBeeState = BeeState.Idle;
         _isChasing = false;
         _isAttacking = false;
+
+        // Remove efeito visual de detecção
+        RemoveDetectionEffects();
 
         if (enableDebugLogs)
         {
@@ -427,6 +458,62 @@ public class NormalBeeBehaviorController : MonoBehaviour
             Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Bouncing: time={_bounceTime:F2}, " +
                      $"horizontal={horizontalOffset:F2}, vertical={verticalOffset:F2}, " +
                      $"direction={_currentDirection}");
+        }
+    }
+
+    #endregion
+
+    #region Detection Effects
+
+    /// <summary>
+    /// Ativa efeitos visuais e sonoros quando o player é detectado
+    /// </summary>
+    private void TriggerDetectionEffects()
+    {
+        if (_currentVfxDetection != null) return; // Já tem VFX ativo
+
+        // Instancia VFX de detecção se definido
+        if (vfxDetectionPrefab != null)
+        {
+            // Calcula posição com offset
+            Vector3 vfxPosition = _transform.position + vfxDetectionOffset;
+            _currentVfxDetection = Instantiate(vfxDetectionPrefab, vfxPosition, Quaternion.identity, _transform);
+            _currentVfxDetection.name = "vfxDetection";
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[NormalBeeBehavior] {gameObject.name} - VFX de detecção instanciado na posição {vfxPosition}");
+            }
+        }
+
+        // Reproduz som de detecção
+        if (sfxDetection != null && _audioSource != null)
+        {
+            _audioSource.clip = sfxDetection;
+            _audioSource.volume = sfxVolume;
+            _audioSource.Play();
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[NormalBeeBehavior] {gameObject.name} - SFX de detecção reproduzido");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Remove efeitos visuais de detecção
+    /// </summary>
+    private void RemoveDetectionEffects()
+    {
+        if (_currentVfxDetection != null)
+        {
+            Destroy(_currentVfxDetection);
+            _currentVfxDetection = null;
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[NormalBeeBehavior] {gameObject.name} - VFX de detecção removido");
+            }
         }
     }
 
