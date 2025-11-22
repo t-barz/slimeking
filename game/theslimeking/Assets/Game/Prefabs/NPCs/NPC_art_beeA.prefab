@@ -20,6 +20,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4757400586843728671, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+      propertyPath: m_SortingOrder
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: -4673567303181985027, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_SortingOrder
       value: 10
@@ -47,6 +51,10 @@ PrefabInstance:
     - target: {fileID: 3930086621309378627, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5995086052100991988, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+      propertyPath: m_SortingOrder
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_LocalPosition.x
@@ -87,6 +95,10 @@ PrefabInstance:
     - target: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7948022875021607971, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+      propertyPath: m_SortingOrder
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -219,8 +231,17 @@ MonoBehaviour:
   verticalOscillation: 0.3
   verticalSpeed: 0.5
   maxDistanceFromCenter: 3
+  detectionRange: 2
+  attackRange: 0.5
+  chaseSpeed: 1
+  attackSpeed: 2
+  attackCooldown: 1
+  vfxDetectionPrefab: {fileID: 6429605549283721597, guid: 08e6e7b8123ae53498a4e78da2f02e07, type: 3}
+  sfxDetection: {fileID: 0}
+  sfxVolume: 1
+  vfxDetectionOffset: {x: 0, y: 0.5, z: 0}
   enableDebugLogs: 0
-  enableDebugGizmos: 0
+  enableDebugGizmos: 1
 --- !u!114 &7718221219190829307
 MonoBehaviour:
   m_ObjectHideFlags: 0

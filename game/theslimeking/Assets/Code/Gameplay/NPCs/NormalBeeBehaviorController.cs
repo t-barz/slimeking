@@ -34,20 +34,20 @@ public class NormalBeeBehaviorController : MonoBehaviour
 
     [Header("🎯 Configurações de Posicionamento")]
     [Tooltip("Distância máxima da posição inicial antes de retornar")]
-    [SerializeField, Range(2f, 10f)] private float maxDistanceFromCenter = 3f;
+    [SerializeField, Range(0f, 10f)] private float maxDistanceFromCenter = 3f;
 
     [Header("🔍 Sistema de Detecção e Combate")]
     [Tooltip("Raio de detecção do player")]
     [SerializeField, Range(1f, 10f)] private float detectionRange = 4f;
 
     [Tooltip("Raio de ataque quando próximo ao player")]
-    [SerializeField, Range(0.5f, 3f)] private float attackRange = 1.5f;
+    [SerializeField, Range(0.5f, 3f)] private float attackRange = 0.8f;
 
     [Tooltip("Velocidade de perseguição quando detecta o player")]
-    [SerializeField, Range(1f, 8f)] private float chaseSpeed = 3f;
+    [SerializeField, Range(1f, 8f)] private float chaseSpeed = 5f;
 
     [Tooltip("Velocidade de ataque quando próximo")]
-    [SerializeField, Range(0.5f, 5f)] private float attackSpeed = 2f;
+    [SerializeField, Range(0.5f, 5f)] private float attackSpeed = 4f;
 
     [Tooltip("Tempo entre ataques em segundos")]
     [SerializeField, Range(0.5f, 3f)] private float attackCooldown = 1f;
@@ -81,6 +81,7 @@ public class NormalBeeBehaviorController : MonoBehaviour
     private NPCBehaviorController _behaviorController;
     private Transform _transform;
     private Transform _playerTransform;
+    private Animator _animator;
 
     // === ESTADO DO MOVIMENTO ===
     private Vector3 _centerPosition;      // Posição central de referência
@@ -111,8 +112,14 @@ public class NormalBeeBehaviorController : MonoBehaviour
     private BeeState _currentBeeState = BeeState.Idle;
 
     // === CONFIGURAÇÕES DE MOVIMENTO ===
-    private const float MOVEMENT_SMOOTHNESS = 2f;  // Suavidade do movimento
+    private const float MOVEMENT_SMOOTHNESS = 4f;  // Suavidade do movimento (aumentada para combate)
     private const float DIRECTION_CHANGE_THRESHOLD = 0.1f;  // Limiar para mudança de direção
+    private const float COMBAT_BOUNCE_REDUCTION = 0.1f;  // Redução do bouncing durante combate (10%)
+
+    // === PARÂMETROS DO ANIMATOR ===
+    private static readonly int AttackTrigger = Animator.StringToHash("Attack");
+    private static readonly int IsChasing = Animator.StringToHash("IsChasing");
+    private static readonly int IsAttacking = Animator.StringToHash("IsAttacking");
 
     #endregion
 
@@ -124,6 +131,7 @@ public class NormalBeeBehaviorController : MonoBehaviour
         _npcController = GetComponent<NPCController>();
         _behaviorController = GetComponent<NPCBehaviorController>();
         _transform = transform;
+        _animator = GetComponent<Animator>();
 
         // Encontra o player
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
@@ -150,6 +158,11 @@ public class NormalBeeBehaviorController : MonoBehaviour
         if (_playerTransform == null)
         {
             Debug.LogWarning($"[NormalBeeBehavior] {gameObject.name} - Player não encontrado!");
+        }
+
+        if (_animator == null)
+        {
+            Debug.LogWarning($"[NormalBeeBehavior] {gameObject.name} - Animator não encontrado! Animações não funcionarão.");
         }
 
         if (enableDebugLogs)
@@ -276,6 +289,13 @@ public class NormalBeeBehaviorController : MonoBehaviour
         _isChasing = false;
         _isAttacking = false;
 
+        // Atualiza parâmetros do Animator
+        if (_animator != null)
+        {
+            _animator.SetBool(IsChasing, false);
+            _animator.SetBool(IsAttacking, false);
+        }
+
         // Remove efeito visual de detecção
         RemoveDetectionEffects();
 
@@ -291,6 +311,13 @@ public class NormalBeeBehaviorController : MonoBehaviour
         _isChasing = true;
         _isAttacking = false;
 
+        // Atualiza parâmetros do Animator
+        if (_animator != null)
+        {
+            _animator.SetBool(IsChasing, true);
+            _animator.SetBool(IsAttacking, false);
+        }
+
         if (enableDebugLogs)
         {
             Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Mudou para estado CHASE");
@@ -303,9 +330,17 @@ public class NormalBeeBehaviorController : MonoBehaviour
         _isChasing = false;
         _isAttacking = true;
 
+        // Atualiza parâmetros do Animator e ativa trigger de ataque
+        if (_animator != null)
+        {
+            _animator.SetBool(IsChasing, false);
+            _animator.SetBool(IsAttacking, true);
+            _animator.SetTrigger(AttackTrigger);
+        }
+
         if (enableDebugLogs)
         {
-            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Mudou para estado ATTACK");
+            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Mudou para estado ATTACK - Trigger ativado!");
         }
     }
 
@@ -320,16 +355,20 @@ public class NormalBeeBehaviorController : MonoBehaviour
         // Calcula direção para o player
         Vector3 directionToPlayer = (_playerTransform.position - _transform.position).normalized;
 
-        // Aplica velocidade de perseguição
-        _currentDirection = Vector2.Lerp(_currentDirection, directionToPlayer,
-            Time.deltaTime * MOVEMENT_SMOOTHNESS);
+        // Adiciona bouncing reduzido durante perseguição
+        Vector3 bounceOffset = CalculateReducedBounceOffset();
+        Vector3 combinedDirection = directionToPlayer + bounceOffset;
+
+        // Aplica velocidade de perseguição com movimento mais responsivo
+        _currentDirection = Vector2.Lerp(_currentDirection, combinedDirection.normalized,
+            Time.deltaTime * MOVEMENT_SMOOTHNESS * 1.2f);
 
         // Define velocidade de perseguição no NPC Controller
         _npcController?.SetMoveDirection(_currentDirection * chaseSpeed);
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Perseguindo player: direction={directionToPlayer}");
+            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Perseguindo player: direction={directionToPlayer}, bounce={bounceOffset}");
         }
     }
 
@@ -345,15 +384,21 @@ public class NormalBeeBehaviorController : MonoBehaviour
 
         // Movimento de ataque mais agressivo e próximo
         Vector3 directionToPlayer = (_playerTransform.position - _transform.position).normalized;
-        _currentDirection = Vector2.Lerp(_currentDirection, directionToPlayer,
-            Time.deltaTime * MOVEMENT_SMOOTHNESS * 1.5f);
+
+        // Adiciona bouncing reduzido durante ataque
+        Vector3 bounceOffset = CalculateReducedBounceOffset();
+        Vector3 combinedDirection = directionToPlayer + bounceOffset;
+
+        // Movimento extra agressivo durante ataque
+        _currentDirection = Vector2.Lerp(_currentDirection, combinedDirection.normalized,
+            Time.deltaTime * MOVEMENT_SMOOTHNESS * 2f);
 
         // Velocidade de ataque (pode ser diferente da perseguição)
         _npcController?.SetMoveDirection(_currentDirection * attackSpeed);
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Atacando player: direction={directionToPlayer}");
+            Debug.Log($"[NormalBeeBehavior] {gameObject.name} - Atacando player: direction={directionToPlayer}, bounce={bounceOffset}");
         }
     }
 
@@ -373,6 +418,23 @@ public class NormalBeeBehaviorController : MonoBehaviour
         // - Aplicar dano ao player
         // - Sons de ataque
         // - Animações especiais
+    }
+
+    /// <summary>
+    /// Calcula offset de bouncing reduzido para estados de combate
+    /// </summary>
+    /// <returns>Offset de movimento com bouncing reduzido</returns>
+    private Vector3 CalculateReducedBounceOffset()
+    {
+        // Calcula movimento com amplitudes reduzidas
+        float reducedAmplitude = bounceAmplitude * COMBAT_BOUNCE_REDUCTION;
+        float reducedVertical = verticalOscillation * COMBAT_BOUNCE_REDUCTION;
+
+        // Calcula movimento horizontal e vertical reduzidos
+        float horizontalOffset = Mathf.Sin(_bounceTime) * reducedAmplitude;
+        float verticalOffset = Mathf.Sin(_bounceTime * verticalSpeed) * reducedVertical;
+
+        return new Vector3(horizontalOffset, verticalOffset, 0f);
     }
 
     #endregion

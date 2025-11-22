@@ -647,36 +647,41 @@ namespace ExtraTools.Editor
 
         private void EraseObjectsInRadius(Vector3 center, float radius, bool selectiveMode)
         {
-            // Find the SprayedObjects parent
-            GameObject parentObject = GameObject.Find("SprayedObjects");
+            // Find the parent object using the configured name
+            GameObject parentObject = GameObject.Find(parentObjectName);
             if (parentObject == null)
             {
-                return;
+                // If specific parent doesn't exist, try to find any painted objects in the scene
+                parentObject = FindAnyPaintedObjectsParent();
+                if (parentObject == null)
+                {
+                    DebugLog($"Nenhum objeto pai '{parentObjectName}' encontrado para apagar");
+                    return;
+                }
             }
 
             List<GameObject> objectsToDelete = new List<GameObject>();
             float radiusSquared = radius * radius;
 
-            // Check all children of SprayedObjects
-            foreach (Transform child in parentObject.transform)
+            // If groupByType is enabled, check all child group containers
+            if (groupByType)
             {
-                Vector3 childPosition = child.position;
-                float sqrDistance = (childPosition - center).sqrMagnitude;
-
-                if (sqrDistance <= radiusSquared)
+                // Check all children of the main parent (these are group containers)
+                foreach (Transform groupContainer in parentObject.transform)
                 {
-                    // In selective mode, check if object matches any prefab slot
-                    if (selectiveMode)
+                    // Check all children of each group container
+                    foreach (Transform child in groupContainer.transform)
                     {
-                        if (IsObjectMatchingPrefabSlots(child.gameObject))
-                        {
-                            objectsToDelete.Add(child.gameObject);
-                        }
+                        CheckAndAddForDeletion(child, center, radiusSquared, selectiveMode, objectsToDelete);
                     }
-                    else
-                    {
-                        objectsToDelete.Add(child.gameObject);
-                    }
+                }
+            }
+            else
+            {
+                // Check all children of the main parent directly
+                foreach (Transform child in parentObject.transform)
+                {
+                    CheckAndAddForDeletion(child, center, radiusSquared, selectiveMode, objectsToDelete);
                 }
             }
 
@@ -689,6 +694,49 @@ namespace ExtraTools.Editor
                     Undo.DestroyObjectImmediate(obj);
                 }
                 DebugLog($"Apagados {objectsToDelete.Count} objetos");
+            }
+            else
+            {
+                DebugLog("Nenhum objeto encontrado no raio para apagar");
+            }
+        }
+
+        private GameObject FindAnyPaintedObjectsParent()
+        {
+            // Try common parent names
+            string[] commonNames = { "PaintedObjects", "SprayedObjects", "BrushedObjects", "PlacedObjects" };
+
+            foreach (string name in commonNames)
+            {
+                GameObject found = GameObject.Find(name);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        private void CheckAndAddForDeletion(Transform child, Vector3 center, float radiusSquared, bool selectiveMode, List<GameObject> objectsToDelete)
+        {
+            Vector3 childPosition = child.position;
+            float sqrDistance = (childPosition - center).sqrMagnitude;
+
+            if (sqrDistance <= radiusSquared)
+            {
+                // In selective mode, check if object matches any prefab slot
+                if (selectiveMode)
+                {
+                    if (IsObjectMatchingPrefabSlots(child.gameObject))
+                    {
+                        objectsToDelete.Add(child.gameObject);
+                    }
+                }
+                else
+                {
+                    objectsToDelete.Add(child.gameObject);
+                }
             }
         }
 
