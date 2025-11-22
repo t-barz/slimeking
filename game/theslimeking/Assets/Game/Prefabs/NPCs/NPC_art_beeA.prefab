@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5916792188371992093
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2866749293945242508}
-  m_Layer: 0
-  m_Name: shadow
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2866749293945242508
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5916792188371992093}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1698430196053618114}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8847194595988787919
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8137813610356888312, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+      propertyPath: m_SortAtRoot
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -7978252334861413448, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -46,6 +19,10 @@ PrefabInstance:
     - target: {fileID: -7170302673964078167, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4673567303181985027, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+      propertyPath: m_SortingOrder
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: -2253911629886400664, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_Name
@@ -73,11 +50,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.3749484
+      value: 3.5059648
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.0089028
+      value: 0.3721875
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       propertyPath: m_LocalPosition.z
@@ -113,10 +90,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2866749293945242508}
+    m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       insertIndex: -1
@@ -129,19 +103,14 @@ PrefabInstance:
       addedObject: {fileID: 8150426101476347677}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 102703316291062707}
+      addedObject: {fileID: 5448302824430539601}
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3192598623236634683}
+      addedObject: {fileID: 7718221219190829307}
     - targetCorrespondingSourceObject: {fileID: -7111898828100931324, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7339476508097642169}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
---- !u!4 &1698430196053618114 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
-  m_PrefabInstance: {fileID: 8847194595988787919}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1909512825229084071 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2253911629886400664, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
@@ -232,8 +201,27 @@ MonoBehaviour:
   vfxBackObject: {fileID: 8530301554119588408}
   vfxSideObject: {fileID: 7402364355355654502}
   enableDebugLogs: 0
-  enableDebugGizmos: 1
---- !u!114 &102703316291062707
+  enableDebugGizmos: 0
+--- !u!114 &5448302824430539601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909512825229084071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3013fe266f8dc474b9cf570f80905e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NormalBeeBehaviorController
+  bounceAmplitude: 0.75
+  bounceSpeed: 0.25
+  verticalOscillation: 0.3
+  verticalSpeed: 0.5
+  maxDistanceFromCenter: 3
+  enableDebugLogs: 0
+  enableDebugGizmos: 0
+--- !u!114 &7718221219190829307
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -249,43 +237,10 @@ MonoBehaviour:
   baseHealthPoints: 3
   baseAttack: 1
   baseDefense: 0
-  baseSpeed: 1
+  baseSpeed: 2
   dropItems: []
   enableLogs: 0
-  enableDebugGizmos: 0
---- !u!114 &3192598623236634683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1909512825229084071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6752e0d9a71b02642b9602f8e908253d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCBehaviorController
-  enableBehaviorSystem: 1
-  forceAggressiveBehavior: 1
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 129
-  obstacleLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  disableLineOfSightCheck: 0
-  enableGroupBehavior: 0
-  groupAlertRange: 10
-  audioVolume: 1
-  maxBehaviorDistance: 3
-  reducedUpdateDistance: 5
-  disableDistance: 7
-  enableDetailedLogs: 1
   enableDebugGizmos: 1
-  debugOnlyWhenSelected: 0
-  customVisionRange: 2
-  customVisionAngle: 190
-  visionSpeedMultiplier: 20
 --- !u!1 &5498319456042218124 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3930086621309378627, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}

@@ -80,6 +80,27 @@ AnimationClip:
     classID: 212
     script: {fileID: 0}
     flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Enabled
+    path: shadow
+    classID: 212
+    script: {fileID: 0}
+    flags: 16
   m_PPtrCurves:
   - serializedVersion: 2
     curve: []
@@ -156,6 +177,25 @@ AnimationClip:
       value: {fileID: -2788185215890446582, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
     attribute: m_Sprite
     path: side
+    classID: 212
+    script: {fileID: 0}
+    flags: 2
+  - serializedVersion: 2
+    curve:
+    - time: 0
+      value: {fileID: -6465204187976597920, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.100000024
+      value: {fileID: 101071765815433131, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.19999999
+      value: {fileID: 2107115228591001497, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.3
+      value: {fileID: -8234733770653407929, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.40000004
+      value: {fileID: -191081522632950695, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.49000007
+      value: {fileID: -191081522632950695, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    attribute: m_Sprite
+    path: shadow
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -248,6 +288,27 @@ AnimationClip:
       m_RotationOrder: 4
     attribute: m_Enabled
     path: vfx_side
+    classID: 212
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Enabled
+    path: shadow
     classID: 212
     script: {fileID: 0}
     flags: 16

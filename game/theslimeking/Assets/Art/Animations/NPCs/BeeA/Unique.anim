@@ -80,6 +80,27 @@ AnimationClip:
     classID: 212
     script: {fileID: 0}
     flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Enabled
+    path: shadow
+    classID: 212
+    script: {fileID: 0}
+    flags: 16
   m_PPtrCurves:
   - serializedVersion: 2
     curve: []
@@ -132,6 +153,17 @@ AnimationClip:
       value: {fileID: -207879034344147937, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
     attribute: m_Sprite
     path: side
+    classID: 212
+    script: {fileID: 0}
+    flags: 2
+  - serializedVersion: 2
+    curve:
+    - time: 0
+      value: {fileID: 7460340428660483376, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - time: 0.09
+      value: {fileID: 7460340428660483376, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    attribute: m_Sprite
+    path: shadow
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -224,6 +256,27 @@ AnimationClip:
       m_RotationOrder: 4
     attribute: m_Enabled
     path: vfx_side
+    classID: 212
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Enabled
+    path: shadow
     classID: 212
     script: {fileID: 0}
     flags: 16
