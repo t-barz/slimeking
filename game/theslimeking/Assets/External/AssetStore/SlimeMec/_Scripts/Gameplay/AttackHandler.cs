@@ -61,7 +61,7 @@ namespace SlimeMec.Gameplay
         [SerializeField] private LayerMask destructableLayerMask = -1; // Layers dos objetos destrutíveis
 
         [Header("Debug")]
-        [SerializeField] private bool enableDebugLogs = false;
+        [SerializeField] private bool enableDebugLogs = true;
         [SerializeField] private bool showDebugGizmos = true;
         #endregion
 
@@ -194,11 +194,11 @@ namespace SlimeMec.Gameplay
                 Collider2D col = colliderCache[i];
                 if (col.gameObject == gameObject) continue; // Ignora o próprio atacante
 
-                // Verifica se tem a tag "Destructable" - usa CompareTag para performance
+                bool damageDealt = false;
+
+                // Verifica se tem a tag "Destructable"
                 if (col.CompareTag("Destructable"))
                 {
-                    bool damageDealt = false;
-
                     // Tenta causar dano em BushDestruct
                     if (!bushCache.TryGetValue(col, out BushDestruct bushDestructable))
                     {
@@ -360,7 +360,7 @@ namespace SlimeMec.Gameplay
                     bool hasBushDestruct = col.GetComponent<BushDestruct>() != null;
                     bool hasRockDestruct = col.GetComponent<RockDestruct>() != null;
                     string destructType = hasBushDestruct ? "Bush" : (hasRockDestruct ? "Rock" : "None");
-                    Debug.Log($"  - {col.name} (Tag: {col.tag}, IsDestructable: {hasDestructableTag}, DestructType: {destructType})");
+                    Debug.Log($"  - {col.name} (Tag: {col.tag}, IsDestructable: {hasDestructableTag}, Type: {destructType})");
                 }
             }
         }

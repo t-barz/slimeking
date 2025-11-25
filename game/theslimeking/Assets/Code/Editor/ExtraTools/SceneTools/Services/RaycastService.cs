@@ -40,7 +40,7 @@ namespace GameObjectSprayTool.Services
             // Log warning only once to avoid console spam
             if (!hasLoggedNoSurfaceWarning)
             {
-                Debug.LogWarning(WARNING_NO_SURFACE);
+                UnityEngine.Debug.LogWarning(WARNING_NO_SURFACE);
                 hasLoggedNoSurfaceWarning = true;
             }
 

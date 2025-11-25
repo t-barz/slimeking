@@ -21,7 +21,7 @@ namespace ExtraTools.Editor
         public static void ExecuteYourTool()
         {
             // Implementação aqui
-            Debug.Log("[Extra Tools] Your Tool executed!");
+            UnityEngine.Debug.Log("[Extra Tools] Your Tool executed!");
         }
 
         // ✅ EXEMPLO CORRETO: Menu Item com validação
@@ -38,12 +38,12 @@ namespace ExtraTools.Editor
             GameObject selected = Selection.activeGameObject;
             if (selected == null)
             {
-                Debug.LogWarning("[Extra Tools] No GameObject selected!");
+                UnityEngine.Debug.LogWarning("[Extra Tools] No GameObject selected!");
                 return;
             }
 
             // Configuração aqui
-            Debug.Log($"[Extra Tools] Configured {selected.name}");
+            UnityEngine.Debug.Log($"[Extra Tools] Configured {selected.name}");
         }
 
         // ✅ EXEMPLO CORRETO: Asset Creation Menu
@@ -70,7 +70,7 @@ namespace ExtraTools.Editor
 
             if (GUILayout.Button("Execute Action"))
             {
-                Debug.Log("[Extra Tools] Action executed from window!");
+                UnityEngine.Debug.Log("[Extra Tools] Action executed from window!");
             }
         }
     }

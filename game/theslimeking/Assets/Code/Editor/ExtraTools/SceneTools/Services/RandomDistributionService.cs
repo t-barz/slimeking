@@ -35,13 +35,13 @@ namespace GameObjectSprayTool.Services
             // Validate parameters
             if (radius <= 0)
             {
-                Debug.LogWarning("Invalid radius for position generation. Radius must be greater than 0.");
+                UnityEngine.Debug.LogWarning("Invalid radius for position generation. Radius must be greater than 0.");
                 return new List<Vector3>();
             }
 
             if (count <= 0)
             {
-                Debug.LogWarning("Invalid count for position generation. Count must be greater than 0.");
+                UnityEngine.Debug.LogWarning("Invalid count for position generation. Count must be greater than 0.");
                 return new List<Vector3>();
             }
 

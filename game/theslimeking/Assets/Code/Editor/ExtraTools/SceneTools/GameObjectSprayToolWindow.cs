@@ -95,7 +95,7 @@ namespace ExtraTools.SceneTools
             }
             else
             {
-                Debug.LogWarning(ERROR_INVALID_SCENE);
+                UnityEngine.Debug.LogWarning(ERROR_INVALID_SCENE);
             }
         }
 
@@ -332,7 +332,7 @@ namespace ExtraTools.SceneTools
             {
                 // Ensure position is at Vector2.zero (which is Vector3.zero in 3D space)
                 parent.position = Vector3.zero;
-                Debug.Log($"Parent object '{parent.name}' is ready at position {parent.position}");
+                UnityEngine.Debug.Log($"Parent object '{parent.name}' is ready at position {parent.position}");
             }
         }
 

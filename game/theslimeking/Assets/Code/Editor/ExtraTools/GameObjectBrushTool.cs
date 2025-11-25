@@ -821,7 +821,7 @@ namespace ExtraTools.Editor
         {
             if (enableDebugLogs)
             {
-                Debug.Log($"[GameObjectBrush] {message}");
+                UnityEngine.Debug.Log($"[GameObjectBrush] {message}");
             }
         }
         #endregion

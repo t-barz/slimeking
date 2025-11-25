@@ -43,19 +43,19 @@ namespace GameObjectSprayTool.Services
             // Validate parameters
             if (brushRadius <= 0)
             {
-                Debug.LogWarning("Invalid brush radius in configuration. Using minimum value.");
+                UnityEngine.Debug.LogWarning("Invalid brush radius in configuration. Using minimum value.");
                 brushRadius = 0.1f;
             }
 
             if (density <= 0)
             {
-                Debug.LogWarning("Invalid density in configuration. Using minimum value.");
+                UnityEngine.Debug.LogWarning("Invalid density in configuration. Using minimum value.");
                 density = 1;
             }
 
             if (minSpacing < 0)
             {
-                Debug.LogWarning("Invalid min spacing in configuration. Using minimum value.");
+                UnityEngine.Debug.LogWarning("Invalid min spacing in configuration. Using minimum value.");
                 minSpacing = 0.01f;
             }
 

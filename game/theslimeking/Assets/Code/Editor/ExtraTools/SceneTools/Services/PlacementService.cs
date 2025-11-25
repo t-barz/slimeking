@@ -38,20 +38,20 @@ namespace GameObjectSprayTool.Services
             // Validate parameters
             if (radius <= 0)
             {
-                Debug.LogWarning("Invalid brush radius. Radius must be greater than 0.");
+                UnityEngine.Debug.LogWarning("Invalid brush radius. Radius must be greater than 0.");
                 return;
             }
 
             if (density <= 0)
             {
-                Debug.LogWarning("Invalid density. Density must be greater than 0.");
+                UnityEngine.Debug.LogWarning("Invalid density. Density must be greater than 0.");
                 return;
             }
 
             // Validate that we have at least one valid prefab
             if (!HasValidPrefabs(prefabSlots))
             {
-                Debug.LogWarning("No valid prefabs available for spraying.");
+                UnityEngine.Debug.LogWarning("No valid prefabs available for spraying.");
                 return;
             }
 
@@ -61,7 +61,7 @@ namespace GameObjectSprayTool.Services
             // Validate parent was successfully created/retrieved
             if (parent == null)
             {
-                Debug.LogWarning("Failed to create or retrieve parent GameObject for organization.");
+                UnityEngine.Debug.LogWarning("Failed to create or retrieve parent GameObject for organization.");
                 return;
             }
 

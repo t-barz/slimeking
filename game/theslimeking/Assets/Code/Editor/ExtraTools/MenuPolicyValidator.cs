@@ -14,34 +14,34 @@ namespace ExtraTools.Editor
         [MenuItem("Extra Tools/Tests/🔍 Validate Menu Policy")]
         public static void ValidateMenuPolicy()
         {
-            Debug.Log("=== Validating Menu Policy ===");
+            UnityEngine.Debug.Log("=== Validating Menu Policy ===");
 
             var violations = FindMenuPolicyViolations();
 
             if (violations.Count == 0)
             {
-                Debug.Log("<color=green>✅ ALL MENUS FOLLOW POLICY!</color>");
-                Debug.Log("All MenuItem attributes use 'Extra Tools/' prefix correctly.");
+                UnityEngine.Debug.Log("<color=green>✅ ALL MENUS FOLLOW POLICY!</color>");
+                UnityEngine.Debug.Log("All MenuItem attributes use 'Extra Tools/' prefix correctly.");
             }
             else
             {
-                Debug.LogError($"<color=red>❌ FOUND {violations.Count} MENU POLICY VIOLATIONS!</color>");
-                Debug.LogError("The following files contain MenuItem attributes that violate the 'Extra Tools/' policy:");
+                UnityEngine.Debug.LogError($"<color=red>❌ FOUND {violations.Count} MENU POLICY VIOLATIONS!</color>");
+                UnityEngine.Debug.LogError("The following files contain MenuItem attributes that violate the 'Extra Tools/' policy:");
 
                 foreach (var violation in violations)
                 {
-                    Debug.LogError($"<color=yellow>File:</color> {violation.FilePath}");
-                    Debug.LogError($"<color=yellow>Line {violation.LineNumber}:</color> {violation.MenuPath}");
-                    Debug.LogError($"<color=yellow>Suggestion:</color> Change to 'Extra Tools/{violation.SuggestedCategory}/'");
+                    UnityEngine.Debug.LogError($"<color=yellow>File:</color> {violation.FilePath}");
+                    UnityEngine.Debug.LogError($"<color=yellow>Line {violation.LineNumber}:</color> {violation.MenuPath}");
+                    UnityEngine.Debug.LogError($"<color=yellow>Suggestion:</color> Change to 'Extra Tools/{violation.SuggestedCategory}/'");
                 }
 
-                Debug.LogError("\nPLEASE FIX THESE VIOLATIONS:");
-                Debug.LogError("- All MenuItem paths must start with 'Extra Tools/'");
-                Debug.LogError("- Assets creation menus should use 'Assets/Create/Extra Tools/'");
-                Debug.LogError("- See README.md for complete policy details");
+                UnityEngine.Debug.LogError("\nPLEASE FIX THESE VIOLATIONS:");
+                UnityEngine.Debug.LogError("- All MenuItem paths must start with 'Extra Tools/'");
+                UnityEngine.Debug.LogError("- Assets creation menus should use 'Assets/Create/Extra Tools/'");
+                UnityEngine.Debug.LogError("- See README.md for complete policy details");
             }
 
-            Debug.Log("=== Menu Policy Validation Complete ===");
+            UnityEngine.Debug.Log("=== Menu Policy Validation Complete ===");
         }
 
         private static List<MenuPolicyViolation> FindMenuPolicyViolations()

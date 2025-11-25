@@ -28,7 +28,7 @@ namespace ExtraTools.QuestSystem
 
             AssetDatabase.Refresh();
 
-            Debug.Log("[QuestSpriteGenerator] Sprites de indicadores criados com sucesso!");
+            UnityEngine.Debug.Log("[QuestSpriteGenerator] Sprites de indicadores criados com sucesso!");
             EditorUtility.DisplayDialog("Quest Sprites", "Sprites de indicadores criados com sucesso em:\n" + spritePath, "OK");
         }
 

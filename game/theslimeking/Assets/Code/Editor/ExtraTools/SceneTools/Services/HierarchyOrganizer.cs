@@ -27,7 +27,7 @@ namespace GameObjectSprayTool.Services
             // Clear invalid cache
             if (cachedParent != null && cachedParent.gameObject == null)
             {
-                Debug.LogWarning("Cached parent GameObject was destroyed. Creating new parent.");
+                UnityEngine.Debug.LogWarning("Cached parent GameObject was destroyed. Creating new parent.");
                 cachedParent = null;
             }
 

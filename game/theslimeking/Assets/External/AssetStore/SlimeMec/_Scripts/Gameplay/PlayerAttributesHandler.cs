@@ -17,7 +17,7 @@ public class PlayerAttributesHandler : MonoBehaviour
     [SerializeField] private int baseSpeed = 2;
 
     [Header("Configurações de Debug")]
-    [SerializeField] private bool enableLogs = false;
+    [SerializeField] private bool enableLogs = true;
     [SerializeField] private bool enableDebugGizmos = true;
 
     #endregion
@@ -30,6 +30,7 @@ public class PlayerAttributesHandler : MonoBehaviour
     private int _currentSpeed;
     private int _totalSkillPoints;
     private int _currentSkillPoints;
+    private bool _isInitialized = false;
 
     #endregion
 
@@ -73,7 +74,20 @@ public class PlayerAttributesHandler : MonoBehaviour
     /// </summary>
     public int CurrentAttack
     {
-        get => baseAttack;
+        get
+        {
+            if (!_isInitialized)
+            {
+                Debug.LogWarning("[PlayerAttributes] CurrentAttack acessado antes da inicialização! Forçando InitializeAttributes()");
+                InitializeAttributes();
+            }
+
+            if (enableLogs)
+            {
+                Debug.Log($"[PlayerAttributes] CurrentAttack acessado: retornando {_currentAttack}");
+            }
+            return _currentAttack;
+        }
         set
         {
             int oldValue = _currentAttack;
@@ -91,7 +105,7 @@ public class PlayerAttributesHandler : MonoBehaviour
     /// </summary>
     public int CurrentDefense
     {
-        get => baseDefense;
+        get => _currentDefense;
         set
         {
             int oldValue = _currentDefense;
@@ -109,7 +123,7 @@ public class PlayerAttributesHandler : MonoBehaviour
     /// </summary>
     public int CurrentSpeed
     {
-        get => baseSpeed;
+        get => _currentSpeed;
         set
         {
             int oldValue = _currentSpeed;
@@ -353,10 +367,11 @@ public class PlayerAttributesHandler : MonoBehaviour
         _currentSpeed = baseSpeed;
         _totalSkillPoints = 0;
         _currentSkillPoints = 0;
+        _isInitialized = true;
 
         if (enableLogs)
         {
-            Debug.Log("[PlayerAttributes] Atributos inicializados com valores base.");
+            Debug.Log($"[PlayerAttributes] Atributos inicializados - Attack: {_currentAttack} (base: {baseAttack}), Defense: {_currentDefense}, Speed: {_currentSpeed}");
         }
     }
 

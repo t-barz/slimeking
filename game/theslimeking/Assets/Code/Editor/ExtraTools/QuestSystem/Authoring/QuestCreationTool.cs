@@ -28,7 +28,7 @@ namespace ExtraTools.QuestSystem
             // Se usuário cancelou, retorna
             if (string.IsNullOrEmpty(path))
             {
-                Debug.Log("[QuestCreationTool] Criação de quest cancelada.");
+                UnityEngine.Debug.Log("[QuestCreationTool] Criação de quest cancelada.");
                 return;
             }
 
@@ -52,7 +52,7 @@ namespace ExtraTools.QuestSystem
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = newQuest;
 
-            Debug.Log($"[QuestCreationTool] Quest criada com sucesso: {path}");
+            UnityEngine.Debug.Log($"[QuestCreationTool] Quest criada com sucesso: {path}");
         }
 
         /// <summary>
@@ -75,11 +75,11 @@ namespace ExtraTools.QuestSystem
                 // Cria Assets/Data/Quests
                 AssetDatabase.CreateFolder("Assets/Data", "Quests");
 
-                Debug.Log($"[QuestCreationTool] Estrutura de pastas criada: {basePath}");
+                UnityEngine.Debug.Log($"[QuestCreationTool] Estrutura de pastas criada: {basePath}");
             }
             else
             {
-                Debug.Log($"[QuestCreationTool] Estrutura de pastas já existe: {basePath}");
+                UnityEngine.Debug.Log($"[QuestCreationTool] Estrutura de pastas já existe: {basePath}");
             }
 
             AssetDatabase.Refresh();
