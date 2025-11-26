@@ -1,12 +1,12 @@
-- GameObject: chr_whiteslime
+- GameObject: NPC_beeA (1)
   Active: True
-  Tag: Player
-  Layer: Player (7)
-  Transform: Pos (0.69, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-  Components (10):
+  Tag: Enemy
+  Layer: Default (0)
+  Transform: Pos (-0.41, -0.47, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+  Components (9):
     • Transform
-      - position: (0.69, 0.00, 0.00)
-      - localPosition: (0.69, 0.00, 0.00)
+      - position: (-0.41, -0.47, 0.00)
+      - localPosition: (-0.41, -0.47, 0.00)
       - eulerAngles: (0.00, 0.00, 0.00)
       - localEulerAngles: (0.00, 0.00, 0.00)
       - right: (1.00, 0.00, 0.00)
@@ -16,26 +16,26 @@
       - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - localScale: (1.00, 1.00, 1.00)
       - parent: 
-      - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+      - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-      - root: chr_whiteslime (UnityEngine.Transform)
+      - root: NPC_beeA (1) (UnityEngine.Transform)
       - childCount: 7
       - lossyScale: (1.00, 1.00, 1.00)
       - hasChanged: True
       - hierarchyCapacity: 8
       - hierarchyCount: 8
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
     • SortingGroup
       - sortingLayerName: Default
@@ -44,76 +44,10 @@
       - sortAtRoot: False
       - enabled: True
       - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
-      - hideFlags: None
-    • SpriteRenderer
-      - sprite: 
-      - drawMode: Simple
-      - size: (1.00, 1.00)
-      - adaptiveModeThreshold: 0,5
-      - tileMode: Continuous
-      - color: RGBA(1.000, 1.000, 1.000, 1.000)
-      - maskInteraction: None
-      - flipX: False
-      - flipY: False
-      - spriteSortPoint: Pivot
-      - lightmapTilingOffset: (0.00, 0.00, 0.00, 0.00)
-      - lightProbeAnchor: 
-      - castShadows: False
-      - motionVectors: True
-      - useLightProbes: True
-      - bounds: Center: (0.69, 0.00, 0.00), Extents: (0.00, 0.00, 0.00)
-      - localBounds: Center: (0.00, 0.00, 0.00), Extents: (0.00, 0.00, 0.00)
-      - enabled: True
-      - isVisible: True
-      - shadowCastingMode: Off
-      - receiveShadows: False
-      - forceRenderingOff: False
-      - staticShadowCaster: False
-      - motionVectorGenerationMode: Object
-      - lightProbeUsage: BlendProbes
-      - reflectionProbeUsage: BlendProbes
-      - renderingLayerMask: 1
-      - rendererPriority: 0
-      - rayTracingMode: Off
-      - rayTracingAccelerationStructureBuildFlags: PreferFastTrace
-      - rayTracingAccelerationStructureBuildFlagsOverride: False
-      - sortingLayerName: Default
-      - sortingLayerID: 0
-      - sortingOrder: 0
-      - isLOD0: True
-      - allowOcclusionWhenDynamic: True
-      - forceMeshLod: -1
-      - meshLodSelectionBias: 0
-      - isPartOfStaticBatch: False
-      - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
-0.00000	0.00000	1.00000	0.00000
-0.00000	0.00000	0.00000	1.00000
-
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
-0.00000	0.00000	1.00000	0.00000
-0.00000	0.00000	0.00000	1.00000
-
-      - lightProbeProxyVolumeOverride: 
-      - probeAnchor: 
-      - lightmapIndex: -1
-      - realtimeLightmapIndex: -1
-      - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
-      - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
-      - materials: UnityEngine.Material[]
-      - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-      - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-      - sharedMaterials: UnityEngine.Material[]
-      - LODGroup: 
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
     • Animator
       - isOptimizable: False
@@ -125,7 +59,7 @@
       - deltaRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - velocity: (0.00, 0.00, 0.00)
       - angularVelocity: (0.00, 0.00, 0.00)
-      - rootPosition: (0.69, 0.00, 0.00)
+      - rootPosition: (-0.41, -0.47, 0.00)
       - rootRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - applyRootMotion: False
       - linearVelocityBlending: False
@@ -134,11 +68,11 @@
       - hasTransformHierarchy: True
       - gravityWeight: 0
       - bodyPosition: (0.00, 0.00, 0.00)
-      - bodyRotation: (765089.70000, 0.00000, 0.00000, 0.00000)
+      - bodyRotation: (0.00000, 0.00000, 0.00000, 0.00000)
       - stabilizeFeet: False
       - layerCount: 1
       - parameters: UnityEngine.AnimatorControllerParameter[]
-      - parameterCount: 12
+      - parameterCount: 2
       - feetPivotActive: 1
       - pivotWeight: 0,5
       - pivotPosition: (0.00, 0.00, 0.00)
@@ -146,13 +80,13 @@
       - speed: 1
       - targetPosition: (0.00, 0.00, 0.00)
       - targetRotation: (0.00000, 0.00000, 0.00000, 1.00000)
-      - avatarRoot: chr_whiteslime (UnityEngine.Transform)
+      - avatarRoot: NPC_beeA (1) (UnityEngine.Transform)
       - cullingMode: AlwaysAnimate
       - playbackTime: -1
       - recorderStartTime: -1
       - recorderStopTime: -1
       - recorderMode: Offline
-      - runtimeAnimatorController: chr_whiteslime (UnityEngine.AnimatorController)
+      - runtimeAnimatorController: art_beeA (UnityEngine.AnimatorController)
       - hasBoundPlayables: True
       - avatar: 
       - playableGraph: UnityEngine.Playables.PlayableGraph
@@ -166,75 +100,17 @@
       - writeDefaultValuesOnDisable: False
       - enabled: True
       - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
-    • AudioSource
-      - panLevel: 0
-      - pan: 0
-      - volume: 1
-      - pitch: 1
-      - time: 0
-      - timeSamples: 0
-      - clip: slimeMoving (UnityEngine.AudioClip)
-      - resource: slimeMoving (UnityEngine.AudioClip)
-      - outputAudioMixerGroup: 
-      - gamepadSpeakerOutputType: Speaker
-      - isPlaying: False
-      - isVirtual: True
-      - loop: False
-      - ignoreListenerVolume: False
-      - playOnAwake: False
-      - ignoreListenerPause: False
-      - velocityUpdateMode: Auto
-      - panStereo: 0
-      - spatialBlend: 0
-      - spatialize: False
-      - spatializePostEffects: False
-      - reverbZoneMix: 1
-      - bypassEffects: False
-      - bypassListenerEffects: False
-      - bypassReverbZones: False
-      - dopplerLevel: 1
-      - spread: 0
-      - priority: 128
-      - mute: False
-      - minDistance: 0,5286238
-      - maxDistance: 500
-      - rolloffMode: Logarithmic
-      - minVolume: 0
-      - maxVolume: 0
-      - rolloffFactor: 0
-      - enabled: True
-      - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
-      - hideFlags: None
-    • PlayerInput
-      - inputIsActive: False
-      - active: False
-      - playerIndex: -1
-      - splitScreenIndex: -1
-      - actions: InputSystem_Actions (UnityEngine.InputSystem.InputActionAsset)
-      - currentControlScheme: 
-      - defaultControlScheme: 
-      - neverAutoSwitchControlSchemes: False
-      - currentActionMap: 
-      - defaultActionMap: Gameplay
-      - notificationBehavior: SendMessages
-      - actionEvents: UnityEngine.InputSystem.Utilities.ReadOnlyArray`1[[UnityEngine.InputSystem.PlayerInput+ActionEvent, Unity.InputSystem, Version=1.14.2.0, Culture=neutral, PublicKeyToken=null]]
-      - deviceLostEvent: UnityEngine.InputSystem.PlayerInput+DeviceLostEvent UnityEngine.InputSystem.PlayerInput+DeviceLostEvent
-      - deviceRegainedEvent: UnityEngine.InputSystem.PlayerInput+DeviceRegainedEvent UnityEngine.InputSystem.PlayerInput+DeviceRegainedEvent
-      - controlsChangedEvent: UnityEngine.InputSystem.PlayerInput+ControlsChangedEvent UnityEngine.InputSystem.PlayerInput+ControlsChangedEvent
-      - camera: null
-      - uiInputModule: 
-      - user: <Invalid> (id: 0)
-      - devices: UnityEngine.InputSystem.Utilities.ReadOnlyArray`1[[UnityEngine.InputSystem.InputDevice, Unity.InputSystem, Version=1.14.2.0, Culture=neutral, PublicKeyToken=null]]
-      - hasMissingRequiredDevices: False
+    • NPCAttributesHandler
+      - CurrentHealthPoints: 3
+      - CurrentAttack: 1
+      - CurrentDefense: 1
+      - CurrentSpeed: 2
+      - IsDead: False
       - destroyCancellationToken: System.Threading.CancellationToken
       - useGUILayout: True
       - didStart: False
@@ -242,55 +118,23 @@
       - runInEditMode: False
       - enabled: True
       - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
-    • Rigidbody2D
-      - position: (0.69, 0.00)
-      - rotation: 0
-      - linearVelocity: (0.00, 0.00)
-      - linearVelocityX: 0
-      - linearVelocityY: 0
-      - angularVelocity: 0
-      - useAutoMass: False
-      - mass: 1
-      - sharedMaterial: 
-      - centerOfMass: (0.00, 0.10)
-      - worldCenterOfMass: (0.69, 0.10)
-      - inertia: 0
-      - linearDamping: 0
-      - angularDamping: 0
-      - gravityScale: 0
-      - bodyType: Dynamic
-      - useFullKinematicContacts: False
-      - freezeRotation: True
-      - constraints: FreezeRotation
-      - simulated: True
-      - interpolation: None
-      - sleepMode: StartAwake
-      - collisionDetectionMode: Discrete
-      - attachedColliderCount: 1
-      - totalForce: (0.00, 0.00)
-      - totalTorque: 0
-      - excludeLayers: UnityEngine.LayerMask
-      - includeLayers: UnityEngine.LayerMask
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
-0.00000	0.00000	1.00000	0.00000
-0.00000	0.00000	0.00000	1.00000
-
-      - isKinematic: False
-      - drag: 0
-      - angularDrag: 0
-      - velocity: (0.00, 0.00)
-      - velocityX: 0
-      - velocityY: 0
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+    • NPCBaseController
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
     • CircleCollider2D
       - radius: 0,12
@@ -300,15 +144,15 @@
       - compositeOperation: None
       - compositeOrder: 0
       - composite: 
-      - offset: (0.00, 0.10)
-      - attachedRigidbody: chr_whiteslime (UnityEngine.Rigidbody2D)
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+      - offset: (0.00, 0.12)
+      - attachedRigidbody: NPC_beeA (1) (UnityEngine.Rigidbody2D)
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
       - shapeCount: 1
-      - bounds: Center: (0.69, 0.10, 0.00), Extents: (0.12, 0.12, 0.00)
+      - bounds: Center: (-0.41, -0.35, 0.00), Extents: (0.12, 0.12, 0.00)
       - errorState: None
       - compositeCapable: True
       - sharedMaterial: 
@@ -327,19 +171,101 @@
       - usedByComposite: False
       - enabled: True
       - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
-    • PlayerAttributesHandler
-      - CurrentHealthPoints: 0
-      - MaxHealthPoints: 3
-      - CurrentAttack: 5
-      - CurrentDefense: 0
-      - CurrentSpeed: 2
-      - TotalSkillPoints: 0
-      - CurrentSkillPoints: 0
+    • CircleCollider2D
+      - radius: 0,15
+      - density: 1
+      - isTrigger: True
+      - usedByEffector: False
+      - compositeOperation: None
+      - compositeOrder: 0
+      - composite: 
+      - offset: (0.00, 0.12)
+      - attachedRigidbody: NPC_beeA (1) (UnityEngine.Rigidbody2D)
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - shapeCount: 1
+      - bounds: Center: (-0.41, -0.35, 0.00), Extents: (0.15, 0.15, 0.00)
+      - errorState: None
+      - compositeCapable: True
+      - sharedMaterial: 
+      - layerOverridePriority: 0
+      - excludeLayers: UnityEngine.LayerMask
+      - includeLayers: UnityEngine.LayerMask
+      - forceSendLayers: UnityEngine.LayerMask
+      - forceReceiveLayers: UnityEngine.LayerMask
+      - contactCaptureLayers: UnityEngine.LayerMask
+      - callbackLayers: UnityEngine.LayerMask
+      - friction: 0,4
+      - bounciness: 0
+      - frictionCombine: Mean
+      - bounceCombine: Maximum
+      - contactMask: UnityEngine.LayerMask
+      - usedByComposite: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
+      - hideFlags: None
+    • Rigidbody2D
+      - position: (-0.41, -0.47)
+      - rotation: 0
+      - linearVelocity: (0.00, 0.00)
+      - linearVelocityX: 0
+      - linearVelocityY: 0
+      - angularVelocity: 0
+      - useAutoMass: False
+      - mass: 1
+      - sharedMaterial: 
+      - centerOfMass: (0.00, 0.00)
+      - worldCenterOfMass: (-0.41, -0.47)
+      - inertia: 0
+      - linearDamping: 0
+      - angularDamping: 0,05
+      - gravityScale: 0
+      - bodyType: Kinematic
+      - useFullKinematicContacts: False
+      - freezeRotation: True
+      - constraints: FreezeRotation
+      - simulated: True
+      - interpolation: None
+      - sleepMode: StartAwake
+      - collisionDetectionMode: Discrete
+      - attachedColliderCount: 2
+      - totalForce: (0.00, 0.00)
+      - totalTorque: 0
+      - excludeLayers: UnityEngine.LayerMask
+      - includeLayers: UnityEngine.LayerMask
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - isKinematic: True
+      - drag: 0
+      - angularDrag: 0,05
+      - velocity: (0.00, 0.00)
+      - velocityX: 0
+      - velocityY: 0
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
+      - hideFlags: None
+    • DropController
+      - PrefabCount: 1
+      - MinDropCount: 1
+      - MaxDropCount: 1
+      - HasValidPrefabs: True
       - destroyCancellationToken: System.Threading.CancellationToken
       - useGUILayout: True
       - didStart: False
@@ -347,39 +273,21 @@
       - runInEditMode: False
       - enabled: True
       - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
-      - hideFlags: None
-    • PlayerController
-      - MovementSound: slimeMoving (UnityEngine.AudioClip)
-      - AttackSound: attackBasic (UnityEngine.AudioClip)
-      - JumpSound: jump2 (UnityEngine.AudioClip)
-      - SlideSound: slimeSlide (UnityEngine.AudioClip)
-      - SquatSound: jump (UnityEngine.AudioClip)
-      - destroyCancellationToken: System.Threading.CancellationToken
-      - useGUILayout: True
-      - didStart: False
-      - didAwake: False
-      - runInEditMode: False
-      - enabled: True
-      - isActiveAndEnabled: True
-      - transform: chr_whiteslime (UnityEngine.Transform)
-      - gameObject: chr_whiteslime (UnityEngine.GameObject)
-      - tag: Player
-      - name: chr_whiteslime
+      - transform: NPC_beeA (1) (UnityEngine.Transform)
+      - gameObject: NPC_beeA (1) (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA (1)
       - hideFlags: None
   Children (7):
-  - GameObject: back
+  - GameObject: side
     Active: True
-    Tag: Player
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.41, -0.38, 0.00)
+        - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -388,32 +296,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: back (UnityEngine.Transform)
-        - gameObject: back (UnityEngine.GameObject)
-        - tag: Player
-        - name: back
+        - transform: side (UnityEngine.Transform)
+        - gameObject: side (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: side
         - hideFlags: None
       • SpriteRenderer
-        - sprite: back_Frame_0 (UnityEngine.Sprite)
+        - sprite: side_Frame_0 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.31, 0.19)
+        - size: (0.25, 0.25)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -426,8 +334,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.69, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
-        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
+        - bounds: Center: (-0.41, -0.25, 0.00), Extents: (0.13, 0.13, 0.10)
+        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -450,13 +358,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -467,24 +375,24 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: back (UnityEngine.Transform)
-        - gameObject: back (UnityEngine.GameObject)
-        - tag: Player
-        - name: back
+        - transform: side (UnityEngine.Transform)
+        - gameObject: side (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: side
         - hideFlags: None
-  - GameObject: vfx_back
+  - GameObject: back
     Active: True
-    Tag: Attack
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.41, -0.38, 0.00)
+        - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -493,32 +401,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: vfx_back (UnityEngine.Transform)
-        - gameObject: vfx_back (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_back
+        - transform: back (UnityEngine.Transform)
+        - gameObject: back (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: back
         - hideFlags: None
       • SpriteRenderer
-        - sprite: vfx_back_Frame_35 (UnityEngine.Sprite)
+        - sprite: back_Frame_0 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.16, 0.19)
+        - size: (0.25, 0.25)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -531,8 +439,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.52, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
-        - localBounds: Center: (-0.17, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
+        - bounds: Center: (-0.41, -0.25, 0.00), Extents: (0.13, 0.13, 0.10)
+        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -555,13 +463,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -572,24 +480,24 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: vfx_back (UnityEngine.Transform)
-        - gameObject: vfx_back (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_back
+        - transform: back (UnityEngine.Transform)
+        - gameObject: back (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: back
         - hideFlags: None
-  - GameObject: vfx_front
+  - GameObject: front
     Active: True
-    Tag: Attack
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.41, -0.38, 0.00)
+        - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -598,32 +506,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: vfx_front (UnityEngine.Transform)
-        - gameObject: vfx_front (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_front
+        - transform: front (UnityEngine.Transform)
+        - gameObject: front (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: front
         - hideFlags: None
       • SpriteRenderer
-        - sprite: vfx_front_Frame_35 (UnityEngine.Sprite)
+        - sprite: front_Frame_0 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.16, 0.19)
+        - size: (0.25, 0.25)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -636,8 +544,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.52, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
-        - localBounds: Center: (-0.17, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
+        - bounds: Center: (-0.41, -0.25, 0.00), Extents: (0.13, 0.13, 0.10)
+        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -660,13 +568,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -677,24 +585,24 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: vfx_front (UnityEngine.Transform)
-        - gameObject: vfx_front (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_front
+        - transform: front (UnityEngine.Transform)
+        - gameObject: front (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: front
         - hideFlags: None
-  - GameObject: front
+  - GameObject: vfx_side
     Active: True
-    Tag: Player
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.44, -0.47, 0.00)
+        - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -703,32 +611,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.44216
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.44216
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: front (UnityEngine.Transform)
-        - gameObject: front (UnityEngine.GameObject)
-        - tag: Player
-        - name: front
+        - transform: vfx_side (UnityEngine.Transform)
+        - gameObject: vfx_side (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_side
         - hideFlags: None
       • SpriteRenderer
-        - sprite: front_Frame_0 (UnityEngine.Sprite)
+        - sprite: vfx_side_Frame_22 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.31, 0.19)
+        - size: (0.44, 0.41)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -741,8 +649,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.69, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
-        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
+        - bounds: Center: (-0.44, -0.27, 0.00), Extents: (0.22, 0.20, 0.10)
+        - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -765,13 +673,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.44216
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.44216
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -782,24 +690,24 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: front (UnityEngine.Transform)
-        - gameObject: front (UnityEngine.GameObject)
-        - tag: Player
-        - name: front
+        - transform: vfx_side (UnityEngine.Transform)
+        - gameObject: vfx_side (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_side
         - hideFlags: None
-  - GameObject: side
+  - GameObject: vfx_back
     Active: True
-    Tag: Player
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.44, -0.47, 0.00)
+        - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -808,32 +716,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.44216
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.44216
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: side (UnityEngine.Transform)
-        - gameObject: side (UnityEngine.GameObject)
-        - tag: Player
-        - name: side
+        - transform: vfx_back (UnityEngine.Transform)
+        - gameObject: vfx_back (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_back
         - hideFlags: None
       • SpriteRenderer
-        - sprite: side_Frame_0 (UnityEngine.Sprite)
+        - sprite: vfx_back_Frame_22 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.31, 0.19)
+        - size: (0.44, 0.41)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -846,8 +754,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.69, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
-        - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.16, 0.09, 0.10)
+        - bounds: Center: (-0.44, -0.27, 0.00), Extents: (0.22, 0.20, 0.10)
+        - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -870,13 +778,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.44216
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.44216
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -887,24 +795,24 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: side (UnityEngine.Transform)
-        - gameObject: side (UnityEngine.GameObject)
-        - tag: Player
-        - name: side
+        - transform: vfx_back (UnityEngine.Transform)
+        - gameObject: vfx_back (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_back
         - hideFlags: None
-  - GameObject: vfx_side
+  - GameObject: vfx_front
     Active: True
-    Tag: Attack
-    Layer: Player (7)
-    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
-        - localPosition: (0.00, 0.00, 0.00)
+        - position: (-0.41, -0.38, 0.00)
+        - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
         - right: (1.00, 0.00, 0.00)
@@ -913,32 +821,32 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
         - hierarchyCapacity: 8
         - hierarchyCount: 8
-        - transform: vfx_side (UnityEngine.Transform)
-        - gameObject: vfx_side (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_side
+        - transform: vfx_front (UnityEngine.Transform)
+        - gameObject: vfx_front (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_front
         - hideFlags: None
       • SpriteRenderer
-        - sprite: vfx_side_Frame_35 (UnityEngine.Sprite)
+        - sprite: vfx_front_Frame_12 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.16, 0.19)
+        - size: (0.31, 0.19)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -951,8 +859,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.52, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
-        - localBounds: Center: (-0.17, 0.16, 0.00), Extents: (0.08, 0.09, 0.10)
+        - bounds: Center: (-0.41, -0.29, 0.00), Extents: (0.16, 0.09, 0.10)
+        - localBounds: Center: (0.00, 0.09, 0.00), Extents: (0.16, 0.09, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -975,13 +883,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.37978
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -992,23 +900,23 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
-        - transform: vfx_side (UnityEngine.Transform)
-        - gameObject: vfx_side (UnityEngine.GameObject)
-        - tag: Attack
-        - name: vfx_side
+        - transform: vfx_front (UnityEngine.Transform)
+        - gameObject: vfx_front (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: vfx_front
         - hideFlags: None
   - GameObject: shadow
     Active: True
-    Tag: Player
-    Layer: Player (7)
+    Tag: Untagged
+    Layer: Default (0)
     Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (0.69, 0.00, 0.00)
+        - position: (-0.41, -0.47, 0.00)
         - localPosition: (0.00, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -1018,18 +926,18 @@
         - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
-        - parent: chr_whiteslime (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - parent: NPC_beeA (1) (UnityEngine.Transform)
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - root: chr_whiteslime (UnityEngine.Transform)
+        - root: NPC_beeA (1) (UnityEngine.Transform)
         - childCount: 0
         - lossyScale: (1.00, 1.00, 1.00)
         - hasChanged: True
@@ -1037,13 +945,13 @@
         - hierarchyCount: 8
         - transform: shadow (UnityEngine.Transform)
         - gameObject: shadow (UnityEngine.GameObject)
-        - tag: Player
+        - tag: Untagged
         - name: shadow
         - hideFlags: None
       • SpriteRenderer
         - sprite: shadow_Frame_0 (UnityEngine.Sprite)
         - drawMode: Simple
-        - size: (0.22, 0.06)
+        - size: (0.25, 0.09)
         - adaptiveModeThreshold: 0,5
         - tileMode: Continuous
         - color: RGBA(1.000, 1.000, 1.000, 1.000)
@@ -1056,8 +964,8 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (0.67, 0.03, 0.00), Extents: (0.11, 0.03, 0.10)
-        - localBounds: Center: (-0.02, 0.03, 0.00), Extents: (0.11, 0.03, 0.10)
+        - bounds: Center: (-0.41, -0.43, 0.00), Extents: (0.13, 0.05, 0.10)
+        - localBounds: Center: (0.00, 0.05, 0.00), Extents: (0.13, 0.05, 0.10)
         - enabled: True
         - isVisible: True
         - shadowCastingMode: Off
@@ -1080,13 +988,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-0.69000
-0.00000	1.00000	0.00000	0.00000
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	0.41091
+0.00000	1.00000	0.00000	0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	0.69000
-0.00000	1.00000	0.00000	0.00000
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	-0.41091
+0.00000	1.00000	0.00000	-0.47353
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -1097,12 +1005,12 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - material: Lit (Instance) (UnityEngine.Material)
+        - sharedMaterial: Lit (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: shadow (UnityEngine.Transform)
         - gameObject: shadow (UnityEngine.GameObject)
-        - tag: Player
+        - tag: Untagged
         - name: shadow
         - hideFlags: None
