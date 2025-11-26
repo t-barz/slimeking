@@ -25,6 +25,9 @@ namespace TheSlimeKing.NPCs
         protected int _currentDefense;
         protected float _currentSpeed;
         protected bool _isInitialized = false;
+
+        // Animator parameters cache
+        private static readonly int IsDying = Animator.StringToHash("isDying");
         #endregion
 
         #region Public Properties
@@ -33,7 +36,7 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         public int CurrentHealthPoints
         {
-            get 
+            get
             {
                 if (!_isInitialized)
                 {
@@ -59,7 +62,7 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         public int CurrentAttack
         {
-            get 
+            get
             {
                 if (!_isInitialized)
                 {
@@ -85,7 +88,7 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         public int CurrentDefense
         {
-            get 
+            get
             {
                 if (!_isInitialized)
                 {
@@ -111,7 +114,7 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         public float CurrentSpeed
         {
-            get 
+            get
             {
                 if (!_isInitialized)
                 {
@@ -209,7 +212,7 @@ namespace TheSlimeKing.NPCs
         public virtual void ResetAttributes()
         {
             InitializeAttributes();
-            
+
             if (enableLogs)
             {
                 UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - Atributos resetados");
@@ -244,7 +247,22 @@ namespace TheSlimeKing.NPCs
             {
                 UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - NPC morreu!");
             }
-            
+
+            // Marca isDying como true no Animator
+            var animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                animator.SetBool(IsDying, true);
+                if (enableLogs)
+                {
+                    UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - isDying marcado como true no Animator");
+                }
+            }
+            else if (enableLogs)
+            {
+                UnityEngine.Debug.LogWarning($"[NPCAttributes] {gameObject.name} - Animator não encontrado para marcar isDying!");
+            }
+
             // Verifica se existe componente DropController e executa o drop
             var dropController = GetComponent<DropController>();
             if (dropController != null)
@@ -255,9 +273,6 @@ namespace TheSlimeKing.NPCs
                     UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - Drops executados!");
                 }
             }
-            
-            // Implementação base: desativar GameObject
-            gameObject.SetActive(false);
         }
         #endregion
 

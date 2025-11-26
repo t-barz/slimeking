@@ -15,6 +15,13 @@ namespace TheSlimeKing.NPCs
         [Header("Knockback")]
         [SerializeField] protected float knockbackDuration = 0.3f;
 
+        [Header("Player Detection")]
+        [SerializeField] protected float detectionRange = 3.0f;
+        [SerializeField] protected bool enablePlayerDetection = true;
+        [SerializeField] protected GameObject vfxDetectionAlert;
+        [SerializeField] protected Vector3 vfxOffset = Vector3.up;
+        [SerializeField] protected float responseTime = 1f;
+
         [Header("Debug")]
         [SerializeField] protected bool enableDebugLogs = false;
         [SerializeField] protected bool enableDebugGizmos = true;
@@ -30,9 +37,21 @@ namespace TheSlimeKing.NPCs
         protected bool isInKnockback = false;
         protected float knockbackEndTime;
 
+        // Player detection system
+        protected bool playerInRange = false;
+        protected float lastDetectionTime = 0f;
+        protected float detectionCooldown = 1f; // Log apenas a cada segundo para evitar spam
+        protected GameObject currentVfxInstance;
+
+        // Movement and chase system
+        protected bool isChasing = false;
+        protected Vector2 targetPosition;
+        protected Vector2 moveDirection;
+
         // Animator parameters cache
         private static readonly int HitTrigger = Animator.StringToHash("Hit");
         private static readonly int IsDying = Animator.StringToHash("isDying");
+        private static readonly int IsWalking = Animator.StringToHash("isWalking");
         #endregion
 
         #region Unity Lifecycle
@@ -65,6 +84,7 @@ namespace TheSlimeKing.NPCs
             }
 
             UpdateKnockback();
+            UpdatePlayerDetection();
             UpdateState();
             UpdateMovement();
             UpdateAnimations();
@@ -101,11 +121,6 @@ namespace TheSlimeKing.NPCs
                 }
 
                 OnTakeDamage(damage, died);
-
-                if (died)
-                {
-                    OnDeath();
-                }
             }
             else
             {
@@ -120,9 +135,25 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual void UpdateState()
         {
-            // TODO: Implementar sistema de estados (Idle, Patrolling, Chasing, Attacking, Dead)
-            // TODO: Adicionar detecção de distância do player
-            // TODO: Implementar transições entre estados baseadas em ranges
+            if (playerInRange && playerTransform != null)
+            {
+                // Inicia perseguição se player está no range
+                if (!isChasing)
+                {
+                    StartChasing();
+                }
+
+                // Atualiza posição alvo para a posição atual do player
+                targetPosition = playerTransform.position;
+            }
+            else
+            {
+                // Para perseguição se player saiu do range
+                if (isChasing)
+                {
+                    StopChasing();
+                }
+            }
         }
 
         /// <summary>
@@ -130,9 +161,23 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual void UpdateMovement()
         {
-            // TODO: Implementar lógica de movimento baseada no estado atual
-            // TODO: Adicionar patrulha, perseguição e posicionamento para ataque
-            // TODO: Calcular targetPosition baseado no estado
+            if (isChasing && playerTransform != null)
+            {
+                // Calcula direção para o player
+                Vector2 currentPosition = transform.position;
+                moveDirection = (targetPosition - currentPosition).normalized;
+
+                // Verifica se chegou próximo o suficiente do player (para evitar vibração)
+                float distanceToTarget = Vector2.Distance(currentPosition, targetPosition);
+                if (distanceToTarget < 0.1f)
+                {
+                    moveDirection = Vector2.zero;
+                }
+            }
+            else
+            {
+                moveDirection = Vector2.zero;
+            }
         }
 
         /// <summary>
@@ -140,9 +185,25 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual void PerformMovement()
         {
-            // TODO: Implementar aplicação de movimento via Rigidbody2D
-            // TODO: Usar attributesHandler.CurrentSpeed para velocidade
-            // TODO: Calcular direção baseada em targetPosition
+            if (rb == null || isInKnockback) return;
+
+            // Aplica movimento se estiver perseguindo
+            if (isChasing && moveDirection != Vector2.zero)
+            {
+                float currentSpeed = attributesHandler.CurrentSpeed;
+                Vector2 velocity = moveDirection * currentSpeed;
+                rb.linearVelocity = velocity;
+
+                if (enableDebugLogs)
+                {
+                    Log($"Movimento aplicado - Direção: {moveDirection}, Velocidade: {currentSpeed}");
+                }
+            }
+            else
+            {
+                // Para o movimento se não está perseguindo
+                rb.linearVelocity = Vector2.zero;
+            }
         }
 
         /// <summary>
@@ -150,9 +211,16 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual void UpdateAnimations()
         {
-            // TODO: Implementar controle de animações baseado no estado
-            // TODO: Configurar parâmetros do Animator (IsMoving, Attack, Death)
-            // TODO: Usar Animator.StringToHash para performance
+            if (animator == null) return;
+
+            // Controla parâmetro isWalking baseado no estado de perseguição
+            bool shouldWalk = isChasing && moveDirection != Vector2.zero;
+            animator.SetBool(IsWalking, shouldWalk);
+
+            if (enableDebugLogs && shouldWalk)
+            {
+                Log($"Animação isWalking = {shouldWalk}");
+            }
         }
 
         /// <summary>
@@ -199,18 +267,6 @@ namespace TheSlimeKing.NPCs
 
             // Aplica knockback reverso no player
             ApplyPlayerKnockback();
-        }
-
-        /// <summary>
-        /// Chamado quando o NPC morre.
-        /// </summary>
-        protected virtual void OnDeath()
-        {
-            // TODO: Implementar comportamento de morte
-            // TODO: Parar movimento (rb.velocity = Vector2.zero)
-            // TODO: Trigger animação de morte
-            // TODO: Desativar colliders não-trigger
-            // TODO: Mudar estado para Dead
         }
         #endregion
 
@@ -336,6 +392,91 @@ namespace TheSlimeKing.NPCs
             }
         }
 
+        /// <summary>
+        /// Atualiza sistema de detecção do player.
+        /// </summary>
+        protected virtual void UpdatePlayerDetection()
+        {
+            if (!enablePlayerDetection || playerTransform == null) return;
+
+            // Calcula distância para o player
+            float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+            bool playerCurrentlyInRange = distanceToPlayer <= detectionRange;
+
+            // Detecta mudança de estado (entrou no range)
+            if (playerCurrentlyInRange && !playerInRange)
+            {
+                OnPlayerEnterRange();
+            }
+            // Detecta mudança de estado (saiu do range)
+            else if (!playerCurrentlyInRange && playerInRange)
+            {
+                OnPlayerExitRange();
+            }
+
+            // Atualiza estado
+            playerInRange = playerCurrentlyInRange;
+
+            // Log periódico quando player está no range (evita spam)
+            if (playerInRange && enableDebugLogs && (Time.time - lastDetectionTime) >= detectionCooldown)
+            {
+                Log($"Player detectado no range - Distância: {distanceToPlayer:F2}m");
+                lastDetectionTime = Time.time;
+            }
+        }
+
+        /// <summary>
+        /// Chamado quando o player entra no range de detecção.
+        /// </summary>
+        protected virtual void OnPlayerEnterRange()
+        {
+            if (enableDebugLogs)
+            {
+                Log("Player ENTROU no range de detecção!");
+            }
+
+            // Instancia VFX de alerta se configurado
+            if (vfxDetectionAlert != null && currentVfxInstance == null)
+            {
+                Vector3 vfxPosition = transform.position + vfxOffset;
+                currentVfxInstance = Instantiate(vfxDetectionAlert, vfxPosition, Quaternion.identity, transform);
+
+                if (enableDebugLogs)
+                {
+                    Log($"VFX de detecção instanciado na posição: {vfxPosition}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Chamado quando o player sai do range de detecção.
+        /// </summary>
+        protected virtual void OnPlayerExitRange()
+        {
+            if (enableDebugLogs)
+            {
+                Log("Player SAIU do range de detecção!");
+            }
+
+            // Destrói VFX de alerta se existir
+            if (currentVfxInstance != null)
+            {
+                Destroy(currentVfxInstance);
+                currentVfxInstance = null;
+
+                if (enableDebugLogs)
+                {
+                    Log("VFX de detecção destruído");
+                }
+            }
+
+            // Para perseguição quando perde o player de vista
+            if (isChasing)
+            {
+                StopChasing();
+            }
+        }
+
         protected void Log(string message)
         {
             if (enableDebugLogs)
@@ -348,6 +489,52 @@ namespace TheSlimeKing.NPCs
         {
             UnityEngine.Debug.LogWarning($"[{GetType().Name}] {gameObject.name} - {message}");
         }
+
+        /// <summary>
+        /// Destrói o objeto do NPC.
+        /// </summary>
+        public virtual void DestroyNPC()
+        {
+            if (enableDebugLogs)
+            {
+                Log("Destruindo NPC");
+            }
+
+            Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// Inicia perseguição do player.
+        /// </summary>
+        protected virtual void StartChasing()
+        {
+            isChasing = true;
+
+            if (enableDebugLogs)
+            {
+                Log("Iniciou perseguição do player");
+            }
+        }
+
+        /// <summary>
+        /// Para perseguição do player.
+        /// </summary>
+        protected virtual void StopChasing()
+        {
+            isChasing = false;
+            moveDirection = Vector2.zero;
+
+            // Para movimento imediatamente
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+
+            if (enableDebugLogs)
+            {
+                Log("Parou perseguição do player");
+            }
+        }
         #endregion
 
         #region Gizmos
@@ -355,8 +542,21 @@ namespace TheSlimeKing.NPCs
         {
             if (!enableDebugGizmos) return;
 
-            // TODO: Implementar gizmos de debug
-            // TODO: Desenhar range de detecção (círculo amarelo)
+            // Desenha range de detecção do player
+            if (enablePlayerDetection)
+            {
+                Gizmos.color = playerInRange ? Color.red : Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+                // Desenha linha para o player se estiver no range
+                if (playerInRange && playerTransform != null)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(transform.position, playerTransform.position);
+                }
+            }
+
+            // TODO: Implementar outros gizmos de debug
             // TODO: Desenhar range de ataque (círculo vermelho)  
             // TODO: Desenhar range de patrulha (círculo verde)
             // TODO: Mostrar posição alvo atual (cubo azul)
@@ -364,6 +564,13 @@ namespace TheSlimeKing.NPCs
 
         protected virtual void OnDestroy()
         {
+            // Limpa VFX de detecção se existir
+            if (currentVfxInstance != null)
+            {
+                Destroy(currentVfxInstance);
+                currentVfxInstance = null;
+            }
+
             UnityEngine.Debug.LogError($"[DESTRUIÇÃO DETECTADA] {gameObject.name} está sendo destruído!");
             UnityEngine.Debug.LogError($"StackTrace: {System.Environment.StackTrace}");
         }

@@ -641,8 +641,12 @@ GameObject:
   - component: {fileID: 8479325745170846203}
   - component: {fileID: 1723108075182048254}
   - component: {fileID: 640480736858514238}
-  - component: {fileID: 7143029206511613585}
   - component: {fileID: 5240131495681340589}
+  - component: {fileID: 267535892317605966}
+  - component: {fileID: 4287131638364473528}
+  - component: {fileID: 4241078229766783160}
+  - component: {fileID: 5733098080763784986}
+  - component: {fileID: 7278840875529294786}
   m_Layer: 0
   m_Name: NPC_beeA
   m_TagString: Enemy
@@ -706,23 +710,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7143029206511613585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8665320791765432734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc06ba2ac0b67e042b6d11a807057a69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.NPCs.NPCAttributesHandler
-  baseHealthPoints: 3
-  baseAttack: 1
-  baseDefense: 1
-  baseSpeed: 2
-  enableLogs: 0
 --- !u!114 &5240131495681340589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,8 +723,144 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DropController
   prefabList:
-  - {fileID: 2578814136964045558, guid: a2832ee17cf15d84f89ace82b32461e4, type: 3}
+  - {fileID: 2578814136964045558, guid: 433c9f0aa79f4fc48bcbe6025021c54b, type: 3}
   minDropCount: 1
   maxDropCount: 1
   useCurrentPosition: 1
   enableDebugLogs: 0
+--- !u!114 &267535892317605966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8665320791765432734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc06ba2ac0b67e042b6d11a807057a69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.NPCs.NPCAttributesHandler
+  baseHealthPoints: 5
+  baseAttack: 1
+  baseDefense: 1
+  baseSpeed: 0.5
+  enableLogs: 0
+--- !u!114 &4287131638364473528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8665320791765432734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc5b0fad91a467b4db57094e6513cbcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.NPCs.NPCBaseController
+  knockbackDuration: 0.3
+  detectionRange: 1
+  enablePlayerDetection: 1
+  vfxDetectionAlert: {fileID: 6429605549283721597, guid: 08e6e7b8123ae53498a4e78da2f02e07, type: 3}
+  vfxOffset: {x: 0, y: 0.4, z: 0}
+  responseTime: 1.5
+  enableDebugLogs: 0
+  enableDebugGizmos: 0
+--- !u!50 &4241078229766783160
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8665320791765432734}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!58 &5733098080763784986
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8665320791765432734}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0.12}
+  m_Radius: 0.12
+--- !u!58 &7278840875529294786
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8665320791765432734}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0.12}
+  m_Radius: 0.15

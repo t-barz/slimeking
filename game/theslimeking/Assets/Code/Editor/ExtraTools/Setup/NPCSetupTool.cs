@@ -72,11 +72,12 @@ namespace ExtraTools.Editor
 
         private static void SetupAttributesHandler(GameObject target)
         {
-            // Remove handler existente para evitar duplicatas
+            // Verifica se já existe NPCAttributesHandler
             var existingHandler = target.GetComponent<TheSlimeKing.NPCs.NPCAttributesHandler>();
             if (existingHandler != null)
             {
-                Undo.DestroyObjectImmediate(existingHandler);
+                UnityEngine.Debug.Log($"[NPCSetupTool] NPCAttributesHandler já existe - mantendo configuração atual");
+                return;
             }
 
             // Adiciona novo NPCAttributesHandler
@@ -87,11 +88,12 @@ namespace ExtraTools.Editor
 
         private static void SetupController(GameObject target)
         {
-            // Remove controller existente para evitar duplicatas
+            // Verifica se já existe NPCBaseController
             var existingController = target.GetComponent<TheSlimeKing.NPCs.NPCBaseController>();
             if (existingController != null)
             {
-                Undo.DestroyObjectImmediate(existingController);
+                UnityEngine.Debug.Log($"[NPCSetupTool] NPCBaseController já existe - mantendo configuração atual");
+                return;
             }
 
             // Adiciona NPCBaseController
@@ -102,35 +104,85 @@ namespace ExtraTools.Editor
 
         private static void SetupColliders(GameObject target)
         {
-            // Remove colliders existentes para evitar conflitos
-            var existingColliders = target.GetComponents<Collider2D>();
-            for (int i = existingColliders.Length - 1; i >= 0; i--)
+            var existingColliders = target.GetComponents<CircleCollider2D>();
+
+            // Verifica se já existem os colliders necessários com configurações corretas
+            CircleCollider2D physicsCollider = null;
+            CircleCollider2D attackDetector = null;
+
+            foreach (var collider in existingColliders)
             {
-                Undo.DestroyObjectImmediate(existingColliders[i]);
+                // Verifica se é um collider físico (não-trigger com radius ~0.12)
+                if (!collider.isTrigger &&
+                    Mathf.Approximately(collider.radius, 0.12f) &&
+                    Vector2.Distance(collider.offset, new Vector2(0f, 0.12f)) < 0.01f)
+                {
+                    physicsCollider = collider;
+                }
+                // Verifica se é um detector de ataque (trigger com radius ~0.15)
+                else if (collider.isTrigger &&
+                         Mathf.Approximately(collider.radius, 0.15f) &&
+                         Vector2.Distance(collider.offset, new Vector2(0f, 0.12f)) < 0.01f)
+                {
+                    attackDetector = collider;
+                }
             }
 
-            // Collider principal (bloqueio físico)
-            CircleCollider2D physicsCollider = Undo.AddComponent<CircleCollider2D>(target);
-            physicsCollider.radius = 0.12f;
-            physicsCollider.offset = new Vector2(0f, 0.12f);
-            physicsCollider.isTrigger = false; // Bloqueia movimento do Player
+            // Cria collider físico se não existir
+            if (physicsCollider == null)
+            {
+                physicsCollider = Undo.AddComponent<CircleCollider2D>(target);
+                physicsCollider.radius = 0.12f;
+                physicsCollider.offset = new Vector2(0f, 0.12f);
+                physicsCollider.isTrigger = false;
+                UnityEngine.Debug.Log($"[NPCSetupTool] Physics Collider criado (radius: {physicsCollider.radius})");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Physics Collider já existe e está configurado corretamente");
+            }
 
-            // Collider de detecção de ataque
-            CircleCollider2D attackDetector = Undo.AddComponent<CircleCollider2D>(target);
-            attackDetector.radius = 0.15f;
-            attackDetector.offset = new Vector2(0f, 0.12f);
-            attackDetector.isTrigger = true; // Detecta vfx_* do Player
+            // Cria collider de detecção se não existir
+            if (attackDetector == null)
+            {
+                attackDetector = Undo.AddComponent<CircleCollider2D>(target);
+                attackDetector.radius = 0.15f;
+                attackDetector.offset = new Vector2(0f, 0.12f);
+                attackDetector.isTrigger = true;
+                UnityEngine.Debug.Log($"[NPCSetupTool] Attack Detector criado (radius: {attackDetector.radius})");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Attack Detector já existe e está configurado corretamente");
+            }
 
             UnityEngine.Debug.Log($"[NPCSetupTool] Colliders configurados: Physics (radius: {physicsCollider.radius}) + Attack Detector (radius: {attackDetector.radius})");
         }
 
         private static void SetupRigidbody(GameObject target)
         {
-            // Remove rigidbody existente
+            // Verifica se já existe Rigidbody2D
             var existingRb = target.GetComponent<Rigidbody2D>();
             if (existingRb != null)
             {
-                Undo.DestroyObjectImmediate(existingRb);
+                // Verifica se já está configurado corretamente
+                if (existingRb.bodyType == RigidbodyType2D.Kinematic &&
+                    existingRb.freezeRotation == true &&
+                    existingRb.gravityScale == 0f)
+                {
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Rigidbody2D já existe e está configurado corretamente");
+                    return;
+                }
+                else
+                {
+                    // Configura o existente
+                    Undo.RecordObject(existingRb, "Setup NPC Rigidbody");
+                    existingRb.bodyType = RigidbodyType2D.Kinematic;
+                    existingRb.freezeRotation = true;
+                    existingRb.gravityScale = 0f;
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Rigidbody2D existente reconfigurado como Kinematic");
+                    return;
+                }
             }
 
             // Adiciona novo Rigidbody2D
@@ -230,13 +282,34 @@ namespace ExtraTools.Editor
                     UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isDying' já existe no Animator");
                 }
 
+                // Adiciona parâmetro isWalking se não existir
+                bool isWalkingExists = false;
+                foreach (var param in animatorController.parameters)
+                {
+                    if (param.name == "isWalking" && param.type == AnimatorControllerParameterType.Bool)
+                    {
+                        isWalkingExists = true;
+                        break;
+                    }
+                }
+
+                if (!isWalkingExists)
+                {
+                    animatorController.AddParameter("isWalking", AnimatorControllerParameterType.Bool);
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isWalking' (Bool) adicionado ao Animator");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isWalking' já existe no Animator");
+                }
+
                 // Configura transições de estado
                 SetupAnimatorTransitions(animatorController);
 
                 // Marca como modificado
                 EditorUtility.SetDirty(animatorController);
 
-                UnityEngine.Debug.Log($"[NPCSetupTool] Animator configurado com parâmetros 'Hit' e 'isDying', e transições completas");
+                UnityEngine.Debug.Log($"[NPCSetupTool] Animator configurado com parâmetros 'Hit', 'isDying', 'isWalking' e transições completas");
             }
             catch (System.Exception ex)
             {
@@ -287,6 +360,9 @@ namespace ExtraTools.Editor
 
             // Configura transições de saída do estado Hit
             SetupHitExitTransitions(hitState, idleState, dieState);
+
+            // Configura transições Idle ↔ Walk baseadas em isWalking
+            SetupWalkingTransitions(idleState, walkState);
         }
 
         private static void CreateHitTransition(AnimatorState fromState, AnimatorState hitState, string fromStateName)
@@ -346,6 +422,66 @@ namespace ExtraTools.Editor
             else
             {
                 UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Idle' não encontrado. Transição Hit → Idle não será criada.");
+            }
+        }
+
+        private static void SetupWalkingTransitions(AnimatorState idleState, AnimatorState walkState)
+        {
+            if (idleState == null || walkState == null)
+            {
+                if (idleState == null)
+                    UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Idle' não encontrado. Transições de movimento não serão criadas.");
+                if (walkState == null)
+                    UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Walk' não encontrado. Transições de movimento não serão criadas.");
+                return;
+            }
+
+            // Transição Idle → Walk (isWalking = true)
+            CreateWalkingTransition(idleState, walkState, "Idle", "Walk", true);
+
+            // Transição Walk → Idle (isWalking = false)  
+            CreateWalkingTransition(walkState, idleState, "Walk", "Idle", false);
+        }
+
+        private static void CreateWalkingTransition(AnimatorState fromState, AnimatorState toState, string fromStateName, string toStateName, bool isWalkingValue)
+        {
+            // Verifica se já existe transição com a condição isWalking
+            bool transitionExists = false;
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == toState)
+                {
+                    // Verifica se tem a condição isWalking
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter == "isWalking")
+                        {
+                            transitionExists = true;
+                            break;
+                        }
+                    }
+                    if (transitionExists) break;
+                }
+            }
+
+            if (!transitionExists)
+            {
+                var transition = fromState.AddTransition(toState);
+
+                // Configura condição isWalking
+                AnimatorConditionMode conditionMode = isWalkingValue ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot;
+                transition.AddCondition(conditionMode, 0, "isWalking");
+
+                // Transição instantânea
+                transition.duration = 0f;
+                transition.hasExitTime = false;
+                transition.hasFixedDuration = true;
+
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → {toStateName} criada (instantânea, isWalking={isWalkingValue})");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → {toStateName} já existe");
             }
         }
 

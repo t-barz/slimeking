@@ -224,11 +224,7 @@ namespace ExtraTools.Editor
             ExtraTools.Editor.SceneSetupTool.SetupSceneForTransitions();
         }
 
-        [MenuItem("Extra Tools/Scene Tools/🖌️ GameObject Brush")]
-        public static void MenuOpenGameObjectBrush()
-        {
-            GameObjectBrushTool.ShowWindow();
-        }
+        // Menu GameObject Brush movido para GameObjectBrushTool.cs
         #endregion
 
         #region Menu Items - Debug
@@ -288,23 +284,11 @@ namespace ExtraTools.Editor
         #endregion
 
         #region Menu Items - Quest System
-        [MenuItem("Extra Tools/Quest System/Authoring/🎯 Create Collect Quest")]
-        public static void MenuCreateCollectQuest()
-        {
-            ExtraTools.QuestSystem.QuestCreationTool.CreateCollectQuest();
-        }
+        // Menu Create Collect Quest movido para QuestCreationTool.cs
 
-        [MenuItem("Extra Tools/Quest System/Authoring/📁 Create Folder Structure")]
-        public static void MenuCreateQuestFolderStructure()
-        {
-            ExtraTools.QuestSystem.QuestCreationTool.CreateQuestFolderStructure();
-        }
+        // Menu Create Folder Structure (Quest) movido para QuestCreationTool.cs
 
-        [MenuItem("Extra Tools/Quest System/Authoring/🎨 Generate UI Sprites")]
-        public static void MenuGenerateQuestSprites()
-        {
-            ExtraTools.QuestSystem.QuestSpriteGenerator.GenerateQuestSprites();
-        }
+        // Menu Generate UI Sprites movido para QuestSpriteGenerator.cs
         #endregion
 
 
@@ -381,7 +365,7 @@ namespace ExtraTools.Editor
 
             if (GUILayout.Button("🖌️ GameObject Brush", GUILayout.Height(30)))
             {
-                MenuOpenGameObjectBrush();
+                GameObjectBrushTool.ShowWindow();
             }
 
             EditorGUILayout.Space(10);
