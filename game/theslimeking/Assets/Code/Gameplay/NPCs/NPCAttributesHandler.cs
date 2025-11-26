@@ -245,6 +245,17 @@ namespace TheSlimeKing.NPCs
                 UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - NPC morreu!");
             }
             
+            // Verifica se existe componente DropController e executa o drop
+            var dropController = GetComponent<DropController>();
+            if (dropController != null)
+            {
+                dropController.DropItems();
+                if (enableLogs)
+                {
+                    UnityEngine.Debug.Log($"[NPCAttributes] {gameObject.name} - Drops executados!");
+                }
+            }
+            
             // Implementação base: desativar GameObject
             gameObject.SetActive(false);
         }

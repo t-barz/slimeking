@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Animations;
 
 namespace ExtraTools.Editor
 {
@@ -56,6 +57,7 @@ namespace ExtraTools.Editor
                 SetupColliders(target);
                 SetupRigidbody(target);
                 SetupTag(target);
+                SetupAnimator(target);
 
                 UnityEngine.Debug.Log($"[NPCSetupTool] ✅ '{target.name}' configurado como NPC com sucesso!");
 
@@ -163,6 +165,241 @@ namespace ExtraTools.Editor
             // Verifica se a tag existe na lista de tags do projeto
             string[] tags = UnityEditorInternal.InternalEditorUtility.tags;
             return System.Array.Exists(tags, tag => tag == tagName);
+        }
+
+        private static void SetupAnimator(GameObject target)
+        {
+            var animator = target.GetComponent<Animator>();
+            if (animator == null)
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ '{target.name}' não possui Animator. Adicione um Animator e execute novamente.");
+                return;
+            }
+
+            var animatorController = animator.runtimeAnimatorController as AnimatorController;
+            if (animatorController == null)
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ '{target.name}' não possui AnimatorController configurado.");
+                return;
+            }
+
+            // Registra para Undo
+            Undo.RecordObject(animatorController, "Setup NPC Animator");
+
+            try
+            {
+                // Adiciona parâmetro Hit se não existir
+                bool hitExists = false;
+                foreach (var param in animatorController.parameters)
+                {
+                    if (param.name == "Hit" && param.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        hitExists = true;
+                        break;
+                    }
+                }
+
+                if (!hitExists)
+                {
+                    animatorController.AddParameter("Hit", AnimatorControllerParameterType.Trigger);
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'Hit' (Trigger) adicionado ao Animator");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'Hit' já existe no Animator");
+                }
+
+                // Adiciona parâmetro isDying se não existir
+                bool isDyingExists = false;
+                foreach (var param in animatorController.parameters)
+                {
+                    if (param.name == "isDying" && param.type == AnimatorControllerParameterType.Bool)
+                    {
+                        isDyingExists = true;
+                        break;
+                    }
+                }
+
+                if (!isDyingExists)
+                {
+                    animatorController.AddParameter("isDying", AnimatorControllerParameterType.Bool);
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isDying' (Bool) adicionado ao Animator");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isDying' já existe no Animator");
+                }
+
+                // Configura transições de estado
+                SetupAnimatorTransitions(animatorController);
+
+                // Marca como modificado
+                EditorUtility.SetDirty(animatorController);
+
+                UnityEngine.Debug.Log($"[NPCSetupTool] Animator configurado com parâmetros 'Hit' e 'isDying', e transições completas");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogError($"[NPCSetupTool] Erro ao configurar Animator: {ex.Message}");
+            }
+        }
+
+        private static void SetupAnimatorTransitions(AnimatorController controller)
+        {
+            var rootStateMachine = controller.layers[0].stateMachine;
+
+            // Busca estados Idle, Walk, Hit e Die
+            AnimatorState idleState = null;
+            AnimatorState walkState = null;
+            AnimatorState hitState = null;
+            AnimatorState dieState = null;
+
+            foreach (var state in rootStateMachine.states)
+            {
+                string stateName = state.state.name.ToLower();
+                if (stateName.Contains("idle"))
+                    idleState = state.state;
+                else if (stateName.Contains("walk") || stateName.Contains("move"))
+                    walkState = state.state;
+                else if (stateName.Contains("hit") || stateName.Contains("hurt") || stateName.Contains("damage"))
+                    hitState = state.state;
+                else if (stateName.Contains("die") || stateName.Contains("death") || stateName.Contains("dead"))
+                    dieState = state.state;
+            }
+
+            // Se não encontrou estado Hit, avisa mas não cria (deve existir no Animator)
+            if (hitState == null)
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Hit' não encontrado. Verifique se existe um estado de Hit/Hurt/Damage no Animator.");
+                return;
+            }
+
+            // Cria transições instantâneas para o estado Hit
+            if (idleState != null)
+            {
+                CreateHitTransition(idleState, hitState, "Idle");
+            }
+
+            if (walkState != null)
+            {
+                CreateHitTransition(walkState, hitState, "Walk");
+            }
+
+            // Configura transições de saída do estado Hit
+            SetupHitExitTransitions(hitState, idleState, dieState);
+        }
+
+        private static void CreateHitTransition(AnimatorState fromState, AnimatorState hitState, string fromStateName)
+        {
+            // Verifica se já existe transição
+            bool transitionExists = false;
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == hitState)
+                {
+                    // Verifica se tem a condição Hit
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter == "Hit")
+                        {
+                            transitionExists = true;
+                            break;
+                        }
+                    }
+                    if (transitionExists) break;
+                }
+            }
+
+            if (!transitionExists)
+            {
+                var transition = fromState.AddTransition(hitState);
+                transition.AddCondition(AnimatorConditionMode.If, 0, "Hit");
+                transition.duration = 0f; // Transição instantânea
+                transition.hasExitTime = false; // Sem tempo de saída
+                transition.hasFixedDuration = true;
+
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → Hit criada");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → Hit já existe");
+            }
+        }
+
+        private static void SetupHitExitTransitions(AnimatorState hitState, AnimatorState idleState, AnimatorState dieState)
+        {
+            // Configura transição Hit → Die (quando isDying = true)
+            if (dieState != null)
+            {
+                CreateConditionalTransition(hitState, dieState, "Hit", "Die", "isDying", true, true); // Instantânea
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Die' não encontrado. Transição Hit → Die não será criada.");
+            }
+
+            // Configura transição Hit → Idle (quando isDying = false, com exit time)
+            if (idleState != null)
+            {
+                CreateConditionalTransition(hitState, idleState, "Hit", "Idle", "isDying", false, false); // Com exit time
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Idle' não encontrado. Transição Hit → Idle não será criada.");
+            }
+        }
+
+        private static void CreateConditionalTransition(AnimatorState fromState, AnimatorState toState, string fromStateName, string toStateName, string conditionParam, bool conditionValue, bool isInstant)
+        {
+            // Verifica se já existe transição
+            bool transitionExists = false;
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == toState)
+                {
+                    // Verifica se tem a condição especificada
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter == conditionParam)
+                        {
+                            transitionExists = true;
+                            break;
+                        }
+                    }
+                    if (transitionExists) break;
+                }
+            }
+
+            if (!transitionExists)
+            {
+                var transition = fromState.AddTransition(toState);
+
+                // Configura condição
+                AnimatorConditionMode conditionMode = conditionValue ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot;
+                transition.AddCondition(conditionMode, 0, conditionParam);
+
+                // Configura timing
+                if (isInstant)
+                {
+                    transition.duration = 0f; // Instantânea
+                    transition.hasExitTime = false;
+                }
+                else
+                {
+                    transition.duration = 0.1f; // Pequena duração para suavidade
+                    transition.hasExitTime = true;
+                    transition.exitTime = 0.9f; // Sai quase no final da animação
+                }
+
+                transition.hasFixedDuration = true;
+
+                string transitionType = isInstant ? "instantânea" : "com exit time";
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → {toStateName} criada ({transitionType}, {conditionParam}={conditionValue})");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → {toStateName} já existe");
+            }
         }
     }
 }

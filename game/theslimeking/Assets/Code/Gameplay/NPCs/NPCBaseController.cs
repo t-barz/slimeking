@@ -1,4 +1,5 @@
 using UnityEngine;
+using SlimeMec.Gameplay;
 
 namespace TheSlimeKing.NPCs
 {
@@ -11,6 +12,9 @@ namespace TheSlimeKing.NPCs
     {
 
         #region Inspector Variables
+        [Header("Knockback")]
+        [SerializeField] protected float knockbackDuration = 0.3f;
+
         [Header("Debug")]
         [SerializeField] protected bool enableDebugLogs = false;
         [SerializeField] protected bool enableDebugGizmos = true;
@@ -21,6 +25,14 @@ namespace TheSlimeKing.NPCs
         protected Rigidbody2D rb;
         protected Animator animator;
         protected Transform playerTransform;
+
+        // Knockback system
+        protected bool isInKnockback = false;
+        protected float knockbackEndTime;
+
+        // Animator parameters cache
+        private static readonly int HitTrigger = Animator.StringToHash("Hit");
+        private static readonly int IsDying = Animator.StringToHash("isDying");
         #endregion
 
         #region Unity Lifecycle
@@ -52,6 +64,7 @@ namespace TheSlimeKing.NPCs
                 return;
             }
 
+            UpdateKnockback();
             UpdateState();
             UpdateMovement();
             UpdateAnimations();
@@ -151,6 +164,27 @@ namespace TheSlimeKing.NPCs
             {
                 Log($"Recebeu {damage} de dano. Vida restante: {attributesHandler.CurrentHealthPoints}");
             }
+
+            // Aciona animação de Hit
+            if (animator != null)
+            {
+                // Configura isDying baseado no status de morte
+                animator.SetBool(IsDying, died);
+
+                // Aciona trigger Hit
+                animator.SetTrigger(HitTrigger);
+
+                if (enableDebugLogs)
+                {
+                    Log($"Animator configurado - Hit: acionado, isDying: {died}");
+                }
+            }
+
+            // Aplica knockback se não morreu
+            if (!died)
+            {
+                ApplyKnockback(damage);
+            }
         }
 
         /// <summary>
@@ -160,8 +194,11 @@ namespace TheSlimeKing.NPCs
         {
             if (enableDebugLogs)
             {
-                Log("Ataque bloqueado pela defesa");
+                Log("Ataque bloqueado pela defesa - aplicando knockback reverso no player");
             }
+
+            // Aplica knockback reverso no player
+            ApplyPlayerKnockback();
         }
 
         /// <summary>
@@ -212,6 +249,93 @@ namespace TheSlimeKing.NPCs
             return Mathf.Max(0, attackPower - defense);
         }
 
+        /// <summary>
+        /// Aplica knockback reverso no player quando ataque é bloqueado.
+        /// </summary>
+        protected virtual void ApplyPlayerKnockback()
+        {
+            if (playerTransform == null) return;
+
+            // Busca o PlayerController
+            var playerController = playerTransform.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                // Aplica knockback usando a posição deste NPC como origem
+                playerController.ApplyKnockback(transform.position);
+
+                if (enableDebugLogs)
+                {
+                    Log($"Knockback reverso aplicado no player - Origem: {transform.position}");
+                }
+            }
+            else
+            {
+                LogWarning("PlayerController não encontrado para aplicar knockback reverso!");
+            }
+        }
+
+        /// <summary>
+        /// Aplica efeito de knockback no NPC baseado no dano recebido.
+        /// </summary>
+        protected virtual void ApplyKnockback(int damageValue)
+        {
+            if (rb == null || playerTransform == null) return;
+
+            // Calcula força do knockback baseada no dano (ataque do slime - defesa do NPC)
+            float knockbackForce = Mathf.Max(0f, damageValue);
+
+            // Se a força é zero, não aplica knockback
+            if (knockbackForce <= 0f) return;
+
+            // Calcula direção do knockback (oposta ao player)
+            Vector2 knockbackDirection = (transform.position - playerTransform.position).normalized;
+
+            // Aplica força de knockback
+            rb.linearVelocity = knockbackDirection * knockbackForce;
+
+            // Define estado de knockback
+            isInKnockback = true;
+            knockbackEndTime = Time.time + knockbackDuration;
+
+            if (enableDebugLogs)
+            {
+                Log($"Knockback aplicado - Direção: {knockbackDirection}, Força: {knockbackForce} (baseada no dano)");
+            }
+        }
+
+        /// <summary>
+        /// Atualiza sistema de knockback.
+        /// </summary>
+        protected virtual void UpdateKnockback()
+        {
+            if (!isInKnockback) return;
+
+            // Verifica se o knockback terminou
+            if (Time.time >= knockbackEndTime)
+            {
+                isInKnockback = false;
+
+                // Para o movimento imediatamente quando o knockback termina
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector2.zero;
+                }
+
+                if (enableDebugLogs)
+                {
+                    Log("Knockback finalizado");
+                }
+            }
+            else
+            {
+                // Durante o knockback, reduz gradualmente a velocidade
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, Time.deltaTime * 2f);
+                }
+            }
+        }
+
         protected void Log(string message)
         {
             if (enableDebugLogs)
@@ -236,6 +360,18 @@ namespace TheSlimeKing.NPCs
             // TODO: Desenhar range de ataque (círculo vermelho)  
             // TODO: Desenhar range de patrulha (círculo verde)
             // TODO: Mostrar posição alvo atual (cubo azul)
+        }
+
+        protected virtual void OnDestroy()
+        {
+            UnityEngine.Debug.LogError($"[DESTRUIÇÃO DETECTADA] {gameObject.name} está sendo destruído!");
+            UnityEngine.Debug.LogError($"StackTrace: {System.Environment.StackTrace}");
+        }
+
+        protected virtual void OnDisable()
+        {
+            UnityEngine.Debug.LogError($"[DESATIVAÇÃO DETECTADA] {gameObject.name} está sendo desativado!");
+            UnityEngine.Debug.LogError($"StackTrace: {System.Environment.StackTrace}");
         }
         #endregion
     }

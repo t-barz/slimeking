@@ -640,7 +640,7 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 - **Elemento:** Nature
 - **Reis Monstros:** Rainha Melífera, Imperatriz Nictófila
 - **Atmosfera:** Primavera eterna, flores cristalinas, colmeias suspensas
-- **Criaturas:** Cervos-Broto, Esquilos Coletores, Abelhas Cristalinas
+- **Criaturas:** Cervos-Broto, Esquilos Coletores, Abelhas Cristalinas, Abelhas Carrega-Fruta
 - **Puzzles:** Geometria, padrões naturais, crescimento de plantas
 
 #### 4.2.3 Lago Espelhado (Water/Air)
@@ -1567,6 +1567,88 @@ bool CanSeePlayer()
     return false;
 }
 ```
+
+### 11.4 Estados de IA - NPCs Pacíficos
+
+Nem todas as criaturas em Aethros são agressivas. Muitas espécies desenvolveram comportamentos pacíficos focados em suas próprias atividades diárias, oferecendo oportunidades únicas de interação e observação para o jogador.
+
+#### 11.4.1 Abelhas Carrega-Fruta
+
+**Localização:** Floresta Calma  
+**Comportamento:** Pacífico, nunca atacam  
+**Característica Especial:** Transportam frutas entre localizações
+
+**Estados Comportamentais:**
+
+- **Foraging (Coleta):** Procura por frutas nas árvores e arbustos
+- **Carrying (Transporte):** Voa carregando uma fruta, mais lenta
+- **Resting (Descanso):** Para em flores para recuperar energia
+- **Startled (Assustada):** Reação ao ser surpreendida ou atingida
+
+**Mecânicas de Gameplay:**
+
+- **Drop de Frutas:** Têm 15% de chance de derrubar frutas aleatoriamente durante o transporte
+- **Drop por Impacto:** Se atingidas pelo jogador (ataque ou colisão), sempre deixam cair a fruta que carregavam
+- **Frutas Transportadas:** Maçãs Cristalinas (+10 HP), Peras Douradas (+15 HP), Cerejas da Sorte (+5 HP, +10% velocidade por 30s)
+- **Comportamento Defensivo:** Quando assustadas, voam em padrão errático por 3-5 segundos antes de retomar atividades normais
+- **Respawn de Frutas:** Frutas reaparecem em árvores a cada 2-3 minutos do jogo
+
+**Interações com o Jogador:**
+
+- **Observação Pacífica:** Jogador pode observar sem causar reação (stealth passivo)
+- **Aproximação Lenta:** Movimento lento não as assusta
+- **Coleta Estratégica:** Jogadores podem seguir suas rotas para descobrir locais com frutas
+- **Não-Agressão:** Nunca reagem com hostilidade, apenas fuga temporária
+
+**Código de Referência:**
+
+```csharp
+public class BeeFruitCarrier : MonoBehaviour
+{
+    private enum BeeState { Foraging, Carrying, Resting, Startled }
+    private BeeState currentState = BeeState.Foraging;
+    private GameObject carriedFruit;
+    private bool hasDroppedFruit = false;
+    
+    void Update()
+    {
+        switch(currentState)
+        {
+            case BeeState.Carrying:
+                // 15% chance per second to drop fruit randomly
+                if (carriedFruit != null && Random.value < 0.15f * Time.deltaTime)
+                {
+                    DropFruit();
+                }
+                break;
+        }
+    }
+    
+    public void OnHit()
+    {
+        if (carriedFruit != null)
+        {
+            DropFruit();
+        }
+        currentState = BeeState.Startled;
+    }
+    
+    private void DropFruit()
+    {
+        // Instanciar fruta na posição atual
+        Instantiate(carriedFruit, transform.position, Quaternion.identity);
+        carriedFruit = null;
+        hasDroppedFruit = true;
+    }
+}
+```
+
+**Integração com Outros Sistemas:**
+
+- **Quest Opportunities:** NPCs podem pedir tipos específicos de frutas que as abelhas carregam
+- **Discovery Gameplay:** Observar padrões de voo revela locais secretos com árvores frutíferas
+- **Resource Management:** Fonte renewable de consumíveis de cura
+- **Atmospheric Detail:** Adiciona vida e movimento natural ao bioma
 
 ---
 
