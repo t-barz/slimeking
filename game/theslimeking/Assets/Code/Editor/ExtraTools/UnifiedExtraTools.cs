@@ -69,7 +69,25 @@ namespace ExtraTools.Editor
         }
         #endregion
 
-        // NPC Configuration removed - system deprecated
+        #region Menu Items - Setup
+        [MenuItem("Extra Tools/Setup/🎭 Setup as NPC")]
+        public static void MenuSetupAsNPC()
+        {
+            if (Selection.activeGameObject == null)
+            {
+                UnityEngine.Debug.LogWarning("[UnifiedExtraTools] Nenhum GameObject selecionado.");
+                return;
+            }
+
+            ExtraTools.Editor.NPCSetupTool.SetupAsNPC();
+        }
+
+        [MenuItem("Extra Tools/Setup/🎭 Setup as NPC", true)]
+        public static bool ValidateMenuSetupAsNPC()
+        {
+            return Selection.activeGameObject != null;
+        }
+        #endregion
 
         #region Menu Items - Camera Setup
         [MenuItem("Extra Tools/Camera/📷 Add Camera Manager")]

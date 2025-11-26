@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7170302673964078167, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Attack
       objectReference: {fileID: 0}
     - target: {fileID: -7111898828100931324, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_Layer
@@ -31,6 +31,18 @@ PrefabInstance:
     - target: {fileID: -7111898828100931324, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_TagString
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: -6319623934938742946, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: -4757400586843728671, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: -4673567303181985027, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: -2745210311206455777, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_Layer
@@ -58,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 74592756940380528, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Attack
       objectReference: {fileID: 0}
     - target: {fileID: 911473755738892535, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_Layer
@@ -66,12 +78,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 911473755738892535, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Attack
       objectReference: {fileID: 0}
     - target: {fileID: 1160356261127867848, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 8f569f69428dc894786200c4240a891a, type: 2}
+    - target: {fileID: 2140673747212876409, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3930086621309378627, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -80,9 +96,17 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5995086052100991988, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6491067154292445224, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.69
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -119,6 +143,10 @@ PrefabInstance:
     - target: {fileID: 7878350319992209165, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7948022875021607971, guid: 1175a259b24823f4581977e8a84039d6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -206,7 +234,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -446,7 +474,7 @@ MonoBehaviour:
   baseDefense: 0
   baseSpeed: 2
   enableLogs: 0
-  enableDebugGizmos: 1
+  enableDebugGizmos: 0
 --- !u!114 &-881936651771174391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,7 +512,7 @@ MonoBehaviour:
   squatSound: {fileID: 8300000, guid: f707224a3f88f5f468a7221b12d79d01, type: 3}
   knockbackForce: 1
   knockbackDuration: 0.2
-  enableLogs: 1
+  enableLogs: 0
   enableDebugGizmos: 0
   stealthActivationDelay: 2
   fadeDuration: 0.5

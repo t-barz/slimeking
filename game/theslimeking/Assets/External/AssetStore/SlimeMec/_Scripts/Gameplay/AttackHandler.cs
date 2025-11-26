@@ -188,16 +188,43 @@ namespace SlimeMec.Gameplay
             // Early exit se não há detecções
             if (hitCount == 0) return;
 
+            // Rastreia GameObjects já processados para evitar dano duplo
+            var processedGameObjects = new System.Collections.Generic.HashSet<GameObject>();
+
             // Processa apenas os colliders detectados
             for (int i = 0; i < hitCount; i++)
             {
                 Collider2D col = colliderCache[i];
                 if (col.gameObject == gameObject) continue; // Ignora o próprio atacante
 
+                // Pula se já processou este GameObject
+                if (processedGameObjects.Contains(col.gameObject)) continue;
+                processedGameObjects.Add(col.gameObject);
+
                 bool damageDealt = false;
 
-                // Verifica se tem a tag "Destructable"
-                if (col.CompareTag("Destructable"))
+                // Verifica se é um NPC (NPCBaseController) PRIMEIRO
+                var npcController = col.GetComponent<TheSlimeKing.NPCs.NPCBaseController>();
+                if (npcController != null)
+                {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    if (enableDebugLogs)
+                        Debug.Log($"AttackHandler: Causando dano em NPC '{col.name}'");
+#endif
+                    npcController.TakeDamage();
+                    damageDealt = true;
+                }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                // Log de debug para investigar tag
+                if (enableDebugLogs && !damageDealt)
+                {
+                    Debug.Log($"AttackHandler: Objeto '{col.name}' tem tag '{col.tag}', NPCBaseController: {(npcController != null ? "SIM" : "NÃO")}");
+                }
+#endif
+
+                // Verifica se tem a tag "Destructable" ou "Enemy" (só se ainda não causou dano)
+                if (!damageDealt && (col.CompareTag("Destructable") || col.CompareTag("Enemy")))
                 {
                     // Tenta causar dano em BushDestruct
                     if (!bushCache.TryGetValue(col, out BushDestruct bushDestructable))

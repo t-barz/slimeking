@@ -1,0 +1,252 @@
+- GameObject: env_brown_rockA2
+  Active: True
+  Tag: Destructable
+  Layer: Default (0)
+  Transform: Pos (0.92, 0.55, 0.00), Rot (0.00, 0.00, 0.00), Scale (-1.00, 1.00, 1.00)
+  Components (7):
+    • Transform
+      - position: (0.92, 0.55, 0.00)
+      - localPosition: (0.92, 0.55, 0.00)
+      - eulerAngles: (0.00, 0.00, 0.00)
+      - localEulerAngles: (0.00, 0.00, 0.00)
+      - right: (1.00, 0.00, 0.00)
+      - up: (0.00, 1.00, 0.00)
+      - forward: (0.00, 0.00, 1.00)
+      - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - localScale: (-1.00, 1.00, 1.00)
+      - parent: 
+      - worldToLocalMatrix: -1.00000	0.00000	0.00000	0.92112
+0.00000	1.00000	0.00000	-0.55302
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - localToWorldMatrix: -1.00000	0.00000	0.00000	0.92112
+0.00000	1.00000	0.00000	0.55302
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - root: env_brown_rockA2 (UnityEngine.Transform)
+      - childCount: 0
+      - lossyScale: (-1.00, 1.00, 1.00)
+      - hasChanged: True
+      - hierarchyCapacity: 1
+      - hierarchyCount: 1
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • SpriteRenderer
+      - sprite: Frame_0 (UnityEngine.Sprite)
+      - drawMode: Simple
+      - size: (0.50, 0.69)
+      - adaptiveModeThreshold: 0,5
+      - tileMode: Continuous
+      - color: RGBA(1.000, 1.000, 1.000, 1.000)
+      - maskInteraction: None
+      - flipX: True
+      - flipY: False
+      - spriteSortPoint: Pivot
+      - lightmapTilingOffset: (0.00, 0.00, 0.00, 0.00)
+      - lightProbeAnchor: 
+      - castShadows: False
+      - motionVectors: True
+      - useLightProbes: True
+      - bounds: Center: (0.92, 0.90, 0.00), Extents: (0.25, 0.34, 0.10)
+      - localBounds: Center: (0.00, 0.34, 0.00), Extents: (0.25, 0.34, 0.10)
+      - enabled: True
+      - isVisible: True
+      - shadowCastingMode: Off
+      - receiveShadows: False
+      - forceRenderingOff: False
+      - staticShadowCaster: False
+      - motionVectorGenerationMode: Object
+      - lightProbeUsage: BlendProbes
+      - reflectionProbeUsage: BlendProbes
+      - renderingLayerMask: 1
+      - rendererPriority: 0
+      - rayTracingMode: Off
+      - rayTracingAccelerationStructureBuildFlags: PreferFastTrace
+      - rayTracingAccelerationStructureBuildFlagsOverride: False
+      - sortingLayerName: Default
+      - sortingLayerID: 0
+      - sortingOrder: 0
+      - isLOD0: True
+      - allowOcclusionWhenDynamic: True
+      - forceMeshLod: -1
+      - meshLodSelectionBias: 0
+      - isPartOfStaticBatch: False
+      - worldToLocalMatrix: -1.00000	0.00000	0.00000	0.92112
+0.00000	1.00000	0.00000	-0.55302
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - localToWorldMatrix: -1.00000	0.00000	0.00000	0.92112
+0.00000	1.00000	0.00000	0.55302
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - lightProbeProxyVolumeOverride: 
+      - probeAnchor: 
+      - lightmapIndex: -1
+      - realtimeLightmapIndex: -1
+      - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
+      - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
+      - materials: UnityEngine.Material[]
+      - material: Sprite-Lit-Default (Instance) (UnityEngine.Material)
+      - sharedMaterial: Sprite-Lit-Default (Instance) (UnityEngine.Material)
+      - sharedMaterials: UnityEngine.Material[]
+      - LODGroup: 
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • Animator
+      - isOptimizable: False
+      - isHuman: False
+      - hasRootMotion: False
+      - humanScale: 1
+      - isInitialized: True
+      - deltaPosition: (0.00, 0.00, 0.00)
+      - deltaRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - velocity: (0.00, 0.00, 0.00)
+      - angularVelocity: (0.00, 0.00, 0.00)
+      - rootPosition: (0.92, 0.55, 0.00)
+      - rootRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - applyRootMotion: False
+      - linearVelocityBlending: False
+      - animatePhysics: False
+      - updateMode: Normal
+      - hasTransformHierarchy: True
+      - gravityWeight: 0
+      - bodyPosition: (0.00, 0.00, 0.00)
+      - bodyRotation: (2285999000000000000.00000, 0.00000, 0.00000, 0.00000)
+      - stabilizeFeet: False
+      - layerCount: 1
+      - parameters: UnityEngine.AnimatorControllerParameter[]
+      - parameterCount: 2
+      - feetPivotActive: 1
+      - pivotWeight: 0,5
+      - pivotPosition: (0.00, 0.00, 0.00)
+      - isMatchingTarget: False
+      - speed: 1
+      - targetPosition: (0.00, 0.00, 0.00)
+      - targetRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - avatarRoot: env_brown_rockA2 (UnityEngine.Transform)
+      - cullingMode: AlwaysAnimate
+      - playbackTime: -1
+      - recorderStartTime: -1
+      - recorderStopTime: -1
+      - recorderMode: Offline
+      - runtimeAnimatorController: env_brown_rockA2 (UnityEngine.AnimatorController)
+      - hasBoundPlayables: True
+      - avatar: 
+      - playableGraph: UnityEngine.Playables.PlayableGraph
+      - layersAffectMassCenter: False
+      - leftFeetBottomHeight: 0
+      - rightFeetBottomHeight: 0
+      - logWarnings: True
+      - fireEvents: True
+      - keepAnimatorControllerStateOnDisable: False
+      - keepAnimatorStateOnDisable: False
+      - writeDefaultValuesOnDisable: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • BoxCollider2D
+      - size: (0.50, 0.25)
+      - edgeRadius: 0
+      - autoTiling: False
+      - density: 1
+      - isTrigger: False
+      - usedByEffector: False
+      - compositeOperation: None
+      - compositeOrder: 0
+      - composite: 
+      - offset: (0.00, 0.15)
+      - attachedRigidbody: 
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	0.00000
+0.00000	1.00000	0.00000	0.00000
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - shapeCount: 1
+      - bounds: Center: (0.92, 0.70, 0.00), Extents: (0.25, 0.13, 0.00)
+      - errorState: None
+      - compositeCapable: True
+      - sharedMaterial: 
+      - layerOverridePriority: 0
+      - excludeLayers: UnityEngine.LayerMask
+      - includeLayers: UnityEngine.LayerMask
+      - forceSendLayers: UnityEngine.LayerMask
+      - forceReceiveLayers: UnityEngine.LayerMask
+      - contactCaptureLayers: UnityEngine.LayerMask
+      - callbackLayers: UnityEngine.LayerMask
+      - friction: 0,4
+      - bounciness: 0
+      - frictionCombine: Mean
+      - bounceCombine: Maximum
+      - contactMask: UnityEngine.LayerMask
+      - usedByComposite: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • DropController
+      - PrefabCount: 2
+      - MinDropCount: 1
+      - MaxDropCount: 3
+      - HasValidPrefabs: True
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • RockDestruct
+      - CurrentAttacks: 0
+      - AttacksToDestroy: 5
+      - IsCracked: False
+      - IsDestroyed: False
+      - RockResistance: 3
+      - PlayerAttack: 1
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None
+    • SetupVisualEnvironment
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: True
+      - didAwake: True
+      - runInEditMode: True
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: env_brown_rockA2 (UnityEngine.Transform)
+      - gameObject: env_brown_rockA2 (UnityEngine.GameObject)
+      - tag: Destructable
+      - name: env_brown_rockA2
+      - hideFlags: None

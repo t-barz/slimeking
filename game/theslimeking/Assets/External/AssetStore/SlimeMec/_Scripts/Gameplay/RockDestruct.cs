@@ -159,7 +159,7 @@ namespace SlimeMec.Gameplay
             {
                 // Ataque muito fraco - VFX de falha sem dano
                 PlayFailVFX(vfxPosition);
-                
+
                 // Aplica knockback no player
                 ApplyKnockbackToPlayer();
 
@@ -283,7 +283,7 @@ namespace SlimeMec.Gameplay
                 Instantiate(vfxFailHit, position, Quaternion.identity);
             }
         }
-        
+
         /// <summary>
         /// Aplica knockback no player quando ataque é bloqueado
         /// </summary>
