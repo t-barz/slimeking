@@ -22,6 +22,18 @@ namespace TheSlimeKing.NPCs
         [SerializeField] protected Vector3 vfxOffset = Vector3.up;
         [SerializeField] protected float responseTime = 1f;
 
+        [Header("Attack System")]
+        [SerializeField] protected float attackRange = 0.8f; // Distância para atacar
+        [SerializeField] protected float attackCooldown = 2.0f; // Tempo entre ataques
+        [SerializeField] protected bool enableAttack = true;
+
+        [Header("Idle Movement")]
+        [SerializeField] protected bool enableIdleBouncing = true;
+        [SerializeField] protected float bouncingRange = 1.5f; // Distância horizontal do bouncing
+        [SerializeField] protected float bouncingSpeed = 1.0f; // Velocidade do movimento horizontal
+        [SerializeField] protected float verticalAmplitude = 0.3f; // Altura do movimento vertical
+        [SerializeField] protected float verticalFrequency = 2.0f; // Frequência do movimento vertical
+
         [Header("Debug")]
         [SerializeField] protected bool enableDebugLogs = false;
         [SerializeField] protected bool enableDebugGizmos = true;
@@ -32,6 +44,8 @@ namespace TheSlimeKing.NPCs
         protected Rigidbody2D rb;
         protected Animator animator;
         protected Transform playerTransform;
+        protected SpriteRenderer[] spriteRenderers;
+        protected bool facingRight = true;
 
         // Knockback system
         protected bool isInKnockback = false;
@@ -48,10 +62,22 @@ namespace TheSlimeKing.NPCs
         protected Vector2 targetPosition;
         protected Vector2 moveDirection;
 
+        // Idle bouncing system
+        protected Vector3 initialPosition;
+        protected bool movingRight = true;
+        protected float bouncingTime = 0f;
+        protected bool isIdleBouncing = false;
+
+        // Attack system
+        protected bool isInAttackRange = false;
+        protected float lastAttackTime = 0f;
+        protected bool isAttacking = false;
+
         // Animator parameters cache
         private static readonly int HitTrigger = Animator.StringToHash("Hit");
         private static readonly int IsDying = Animator.StringToHash("isDying");
         private static readonly int IsWalking = Animator.StringToHash("isWalking");
+        private static readonly int AttackTrigger = Animator.StringToHash("Attack");
         #endregion
 
         #region Unity Lifecycle
@@ -62,12 +88,18 @@ namespace TheSlimeKing.NPCs
             rb = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
 
+            // Pega todos os SpriteRenderers do objeto e filhos (inclusive desativados)
+            spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+
         }
 
         protected virtual void Start()
         {
             // Encontra referência do player
             FindPlayer();
+
+            // Armazena posição inicial para bouncing
+            initialPosition = transform.position;
 
             if (enableDebugLogs)
             {
@@ -79,7 +111,6 @@ namespace TheSlimeKing.NPCs
         {
             if (attributesHandler.IsDead)
             {
-
                 return;
             }
 
@@ -88,6 +119,31 @@ namespace TheSlimeKing.NPCs
             UpdateState();
             UpdateMovement();
             UpdateAnimations();
+            UpdateSpriteFlip();
+        }
+        /// <summary>
+        /// Atualiza o flip do sprite conforme a posição do player.
+        /// </summary>
+        protected virtual void UpdateSpriteFlip()
+        {
+            if (spriteRenderers == null || playerTransform == null) return;
+
+            // Flipa se estiver perseguindo, atacando ou em idle/bouncing
+            if (isChasing || isIdleBouncing || isAttacking)
+            {
+                float playerX = playerTransform.position.x;
+                float npcX = transform.position.x;
+                bool shouldFaceRight = playerX > npcX;
+                if (shouldFaceRight != facingRight)
+                {
+                    // Aplica flipX em todos os SpriteRenderers filhos
+                    foreach (var sr in spriteRenderers)
+                    {
+                        sr.flipX = !shouldFaceRight;
+                    }
+                    facingRight = shouldFaceRight;
+                }
+            }
         }
 
         protected virtual void FixedUpdate()
@@ -145,6 +201,9 @@ namespace TheSlimeKing.NPCs
 
                 // Atualiza posição alvo para a posição atual do player
                 targetPosition = playerTransform.position;
+
+                // Verifica se está no range de ataque
+                UpdateAttackRange();
             }
             else
             {
@@ -152,6 +211,21 @@ namespace TheSlimeKing.NPCs
                 if (isChasing)
                 {
                     StopChasing();
+                }
+
+                // Para ataque se player saiu do range
+                if (isInAttackRange)
+                {
+                    isInAttackRange = false;
+                }
+
+                // Inicia movimento Idle se não está perseguindo
+                if (!isChasing && enableIdleBouncing)
+                {
+                    if (!isIdleBouncing)
+                    {
+                        StartIdleBouncing();
+                    }
                 }
             }
         }
@@ -161,8 +235,22 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual void UpdateMovement()
         {
+            // Não se move se estiver atacando
+            if (isAttacking)
+            {
+                moveDirection = Vector2.zero;
+                return;
+            }
+
             if (isChasing && playerTransform != null)
             {
+                // Para de se mover se estiver no range de ataque
+                if (isInAttackRange)
+                {
+                    moveDirection = Vector2.zero;
+                    return;
+                }
+
                 // Calcula direção para o player
                 Vector2 currentPosition = transform.position;
                 moveDirection = (targetPosition - currentPosition).normalized;
@@ -173,6 +261,11 @@ namespace TheSlimeKing.NPCs
                 {
                     moveDirection = Vector2.zero;
                 }
+            }
+            else if (isIdleBouncing)
+            {
+                // Calcula movimento de bouncing
+                UpdateBouncingMovement();
             }
             else
             {
@@ -199,9 +292,14 @@ namespace TheSlimeKing.NPCs
                     Log($"Movimento aplicado - Direção: {moveDirection}, Velocidade: {currentSpeed}");
                 }
             }
+            else if (isIdleBouncing)
+            {
+                // Aplica movimento de bouncing
+                ApplyBouncingMovement();
+            }
             else
             {
-                // Para o movimento se não está perseguindo
+                // Para o movimento se não está perseguindo nem fazendo bouncing
                 rb.linearVelocity = Vector2.zero;
             }
         }
@@ -213,8 +311,8 @@ namespace TheSlimeKing.NPCs
         {
             if (animator == null) return;
 
-            // Controla parâmetro isWalking baseado no estado de perseguição
-            bool shouldWalk = isChasing && moveDirection != Vector2.zero;
+            // Controla parâmetro isWalking baseado no estado de perseguição (mas não durante ataque)
+            bool shouldWalk = isChasing && moveDirection != Vector2.zero && !isAttacking;
             animator.SetBool(IsWalking, shouldWalk);
 
             if (enableDebugLogs && shouldWalk)
@@ -510,6 +608,12 @@ namespace TheSlimeKing.NPCs
         {
             isChasing = true;
 
+            // Para movimento de bouncing quando começa a perseguir
+            if (isIdleBouncing)
+            {
+                StopIdleBouncing();
+            }
+
             if (enableDebugLogs)
             {
                 Log("Iniciou perseguição do player");
@@ -535,6 +639,176 @@ namespace TheSlimeKing.NPCs
                 Log("Parou perseguição do player");
             }
         }
+
+        /// <summary>
+        /// Inicia movimento de bouncing no estado Idle.
+        /// </summary>
+        protected virtual void StartIdleBouncing()
+        {
+            isIdleBouncing = true;
+            bouncingTime = 0f;
+
+            if (enableDebugLogs)
+            {
+                Log("Iniciou movimento de bouncing Idle");
+            }
+        }
+
+        /// <summary>
+        /// Para movimento de bouncing.
+        /// </summary>
+        protected virtual void StopIdleBouncing()
+        {
+            isIdleBouncing = false;
+            bouncingTime = 0f;
+
+            if (enableDebugLogs)
+            {
+                Log("Parou movimento de bouncing Idle");
+            }
+        }
+
+        /// <summary>
+        /// Atualiza cálculos do movimento de bouncing.
+        /// </summary>
+        protected virtual void UpdateBouncingMovement()
+        {
+            bouncingTime += Time.deltaTime;
+
+            // Calcula posição horizontal (movimento de ida e volta)
+            float horizontalOffset = Mathf.Sin(bouncingTime * bouncingSpeed) * bouncingRange;
+
+            // Calcula posição vertical (movimento de sobe e desce)
+            float verticalOffset = Mathf.Abs(Mathf.Sin(bouncingTime * verticalFrequency)) * verticalAmplitude;
+
+            // Calcula posição alvo
+            Vector3 targetPos = new Vector3(
+                initialPosition.x + horizontalOffset,
+                initialPosition.y + verticalOffset,
+                initialPosition.z
+            );
+
+            // Calcula direção do movimento
+            Vector2 currentPosition = transform.position;
+            moveDirection = (Vector2)(targetPos - transform.position).normalized;
+        }
+
+        /// <summary>
+        /// Aplica movimento físico do bouncing.
+        /// </summary>
+        protected virtual void ApplyBouncingMovement()
+        {
+            if (rb == null) return;
+
+            // Aplica velocidade mais suave para o bouncing
+            float bouncingVelocity = attributesHandler.CurrentSpeed * 0.5f; // Metade da velocidade normal
+            Vector2 velocity = moveDirection * bouncingVelocity;
+            rb.linearVelocity = velocity;
+
+            if (enableDebugLogs && bouncingTime % 2f < 0.1f) // Log a cada 2 segundos aproximadamente
+            {
+                Log($"Bouncing - Direção: {moveDirection}, Velocidade: {bouncingVelocity}");
+            }
+        }
+
+        /// <summary>
+        /// Atualiza range de ataque e executa ataque se possível.
+        /// </summary>
+        protected virtual void UpdateAttackRange()
+        {
+            if (!enableAttack || playerTransform == null) return;
+
+            // Calcula distância para o player
+            float distanceToPlayer = Vector2.Distance(transform.position, playerTransform.position);
+            bool playerInAttackRange = distanceToPlayer <= attackRange;
+
+            // Detecta mudança de estado do range de ataque
+            if (playerInAttackRange && !isInAttackRange)
+            {
+                isInAttackRange = true;
+                OnPlayerEnterAttackRange();
+            }
+            else if (!playerInAttackRange && isInAttackRange)
+            {
+                isInAttackRange = false;
+                OnPlayerExitAttackRange();
+            }
+
+            // Executa ataque se estiver no range e cooldown passou
+            if (isInAttackRange && !isAttacking && CanAttack())
+            {
+                PerformAttack();
+            }
+        }
+
+        /// <summary>
+        /// Verifica se pode atacar (cooldown).
+        /// </summary>
+        protected virtual bool CanAttack()
+        {
+            return Time.time - lastAttackTime >= attackCooldown;
+        }
+
+        /// <summary>
+        /// Executa ataque ativando a trigger Attack.
+        /// </summary>
+        protected virtual void PerformAttack()
+        {
+            if (animator == null) return;
+
+            isAttacking = true;
+            lastAttackTime = Time.time;
+
+            // Ativa trigger de ataque
+            animator.SetTrigger(AttackTrigger);
+
+            if (enableDebugLogs)
+            {
+                Log("Executando ataque - trigger Attack ativada");
+            }
+
+            // Agenda o fim do ataque (baseado na duração da animação)
+            // Nota: Em uma implementação mais robusta, isso seria controlado por eventos de animação
+            StartCoroutine(EndAttackAfterDelay());
+        }
+
+        /// <summary>
+        /// Corrotina para finalizar ataque após delay.
+        /// </summary>
+        protected virtual System.Collections.IEnumerator EndAttackAfterDelay()
+        {
+            // Aguarda duração estimada da animação de ataque
+            yield return new WaitForSeconds(1.0f);
+
+            isAttacking = false;
+
+            if (enableDebugLogs)
+            {
+                Log("Ataque finalizado");
+            }
+        }
+
+        /// <summary>
+        /// Chamado quando player entra no range de ataque.
+        /// </summary>
+        protected virtual void OnPlayerEnterAttackRange()
+        {
+            if (enableDebugLogs)
+            {
+                Log("Player ENTROU no range de ataque!");
+            }
+        }
+
+        /// <summary>
+        /// Chamado quando player sai do range de ataque.
+        /// </summary>
+        protected virtual void OnPlayerExitAttackRange()
+        {
+            if (enableDebugLogs)
+            {
+                Log("Player SAIU do range de ataque!");
+            }
+        }
         #endregion
 
         #region Gizmos
@@ -554,6 +828,34 @@ namespace TheSlimeKing.NPCs
                     Gizmos.color = Color.red;
                     Gizmos.DrawLine(transform.position, playerTransform.position);
                 }
+            }
+
+            // Desenha range de ataque
+            if (enableAttack)
+            {
+                Gizmos.color = isInAttackRange ? Color.red : Color.orange;
+                Gizmos.DrawWireSphere(transform.position, attackRange);
+            }
+
+            // Desenha range de bouncing se habilitado
+            if (enableIdleBouncing)
+            {
+                Vector3 basePos = Application.isPlaying ? initialPosition : transform.position;
+
+                Gizmos.color = Color.cyan;
+                // Linha horizontal mostrando range de bouncing
+                Vector3 leftPoint = new Vector3(basePos.x - bouncingRange, basePos.y, basePos.z);
+                Vector3 rightPoint = new Vector3(basePos.x + bouncingRange, basePos.y, basePos.z);
+                Gizmos.DrawLine(leftPoint, rightPoint);
+
+                // Linha vertical mostrando amplitude
+                Vector3 bottomPoint = new Vector3(basePos.x, basePos.y, basePos.z);
+                Vector3 topPoint = new Vector3(basePos.x, basePos.y + verticalAmplitude, basePos.z);
+                Gizmos.DrawLine(bottomPoint, topPoint);
+
+                // Marca posição inicial
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireCube(basePos, Vector3.one * 0.1f);
             }
 
             // TODO: Implementar outros gizmos de debug

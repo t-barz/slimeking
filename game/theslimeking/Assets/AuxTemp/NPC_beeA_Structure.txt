@@ -2,11 +2,11 @@
   Active: True
   Tag: Enemy
   Layer: Default (0)
-  Transform: Pos (1.36, -0.71, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-  Components (10):
+  Transform: Pos (1.07, 0.36, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+  Components (9):
     • Transform
-      - position: (1.36, -0.71, 0.00)
-      - localPosition: (1.36, -0.71, 0.00)
+      - position: (1.07, 0.36, 0.00)
+      - localPosition: (1.07, 0.36, 0.00)
       - eulerAngles: (0.00, 0.00, 0.00)
       - localEulerAngles: (0.00, 0.00, 0.00)
       - right: (1.00, 0.00, 0.00)
@@ -16,13 +16,13 @@
       - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - localScale: (1.00, 1.00, 1.00)
       - parent: 
-      - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.70500
+      - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -59,7 +59,7 @@
       - deltaRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - velocity: (0.00, 0.00, 0.00)
       - angularVelocity: (0.00, 0.00, 0.00)
-      - rootPosition: (1.36, -0.71, 0.00)
+      - rootPosition: (1.07, 0.36, 0.00)
       - rootRotation: (0.00000, 0.00000, 0.00000, 1.00000)
       - applyRootMotion: False
       - linearVelocityBlending: False
@@ -72,7 +72,7 @@
       - stabilizeFeet: False
       - layerCount: 1
       - parameters: UnityEngine.AnimatorControllerParameter[]
-      - parameterCount: 2
+      - parameterCount: 4
       - feetPivotActive: 1
       - pivotWeight: 0,5
       - pivotPosition: (0.00, 0.00, 0.00)
@@ -105,24 +105,6 @@
       - tag: Enemy
       - name: NPC_beeA
       - hideFlags: None
-    • NPCAttributesHandler
-      - CurrentHealthPoints: 3
-      - CurrentAttack: 1
-      - CurrentDefense: 1
-      - CurrentSpeed: 2
-      - IsDead: False
-      - destroyCancellationToken: System.Threading.CancellationToken
-      - useGUILayout: True
-      - didStart: False
-      - didAwake: False
-      - runInEditMode: False
-      - enabled: True
-      - isActiveAndEnabled: True
-      - transform: NPC_beeA (UnityEngine.Transform)
-      - gameObject: NPC_beeA (UnityEngine.GameObject)
-      - tag: Enemy
-      - name: NPC_beeA
-      - hideFlags: None
     • DropController
       - PrefabCount: 1
       - MinDropCount: 1
@@ -141,10 +123,10 @@
       - name: NPC_beeA
       - hideFlags: None
     • NPCAttributesHandler
-      - CurrentHealthPoints: 3
+      - CurrentHealthPoints: 5
       - CurrentAttack: 1
       - CurrentDefense: 1
-      - CurrentSpeed: 2
+      - CurrentSpeed: 0,5
       - IsDead: False
       - destroyCancellationToken: System.Threading.CancellationToken
       - useGUILayout: True
@@ -171,6 +153,51 @@
       - tag: Enemy
       - name: NPC_beeA
       - hideFlags: None
+    • Rigidbody2D
+      - position: (1.07, 0.36)
+      - rotation: 0
+      - linearVelocity: (0.00, 0.00)
+      - linearVelocityX: 0
+      - linearVelocityY: 0
+      - angularVelocity: 0
+      - useAutoMass: False
+      - mass: 1
+      - sharedMaterial: 
+      - centerOfMass: (0.00, 0.00)
+      - worldCenterOfMass: (1.07, 0.36)
+      - inertia: 0
+      - linearDamping: 0
+      - angularDamping: 0,05
+      - gravityScale: 0
+      - bodyType: Kinematic
+      - useFullKinematicContacts: False
+      - freezeRotation: True
+      - constraints: FreezeRotation
+      - simulated: True
+      - interpolation: None
+      - sleepMode: StartAwake
+      - collisionDetectionMode: Discrete
+      - attachedColliderCount: 2
+      - totalForce: (0.00, 0.00)
+      - totalTorque: 0
+      - excludeLayers: UnityEngine.LayerMask
+      - includeLayers: UnityEngine.LayerMask
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - isKinematic: True
+      - drag: 0
+      - angularDrag: 0,05
+      - velocity: (0.00, 0.00)
+      - velocityX: 0
+      - velocityY: 0
+      - transform: NPC_beeA (UnityEngine.Transform)
+      - gameObject: NPC_beeA (UnityEngine.GameObject)
+      - tag: Enemy
+      - name: NPC_beeA
+      - hideFlags: None
     • CircleCollider2D
       - radius: 0,12
       - density: 1
@@ -181,13 +208,13 @@
       - composite: 
       - offset: (0.00, 0.12)
       - attachedRigidbody: NPC_beeA (UnityEngine.Rigidbody2D)
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
       - shapeCount: 1
-      - bounds: Center: (1.36, -0.59, 0.00), Extents: (0.12, 0.12, 0.00)
+      - bounds: Center: (1.07, 0.48, 0.00), Extents: (0.12, 0.12, 0.00)
       - errorState: None
       - compositeCapable: True
       - sharedMaterial: 
@@ -221,13 +248,13 @@
       - composite: 
       - offset: (0.00, 0.12)
       - attachedRigidbody: NPC_beeA (UnityEngine.Rigidbody2D)
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
+      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
       - shapeCount: 1
-      - bounds: Center: (1.36, -0.59, 0.00), Extents: (0.15, 0.15, 0.00)
+      - bounds: Center: (1.07, 0.48, 0.00), Extents: (0.15, 0.15, 0.00)
       - errorState: None
       - compositeCapable: True
       - sharedMaterial: 
@@ -251,51 +278,6 @@
       - tag: Enemy
       - name: NPC_beeA
       - hideFlags: None
-    • Rigidbody2D
-      - position: (1.36, -0.71)
-      - rotation: 0
-      - linearVelocity: (0.00, 0.00)
-      - linearVelocityX: 0
-      - linearVelocityY: 0
-      - angularVelocity: 0
-      - useAutoMass: False
-      - mass: 1
-      - sharedMaterial: 
-      - centerOfMass: (0.00, 0.00)
-      - worldCenterOfMass: (1.36, -0.71)
-      - inertia: 0
-      - linearDamping: 0
-      - angularDamping: 0,05
-      - gravityScale: 0
-      - bodyType: Kinematic
-      - useFullKinematicContacts: False
-      - freezeRotation: True
-      - constraints: FreezeRotation
-      - simulated: True
-      - interpolation: None
-      - sleepMode: StartAwake
-      - collisionDetectionMode: Discrete
-      - attachedColliderCount: 2
-      - totalForce: (0.00, 0.00)
-      - totalTorque: 0
-      - excludeLayers: UnityEngine.LayerMask
-      - includeLayers: UnityEngine.LayerMask
-      - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
-0.00000	0.00000	1.00000	0.00000
-0.00000	0.00000	0.00000	1.00000
-
-      - isKinematic: True
-      - drag: 0
-      - angularDrag: 0,05
-      - velocity: (0.00, 0.00)
-      - velocityX: 0
-      - velocityY: 0
-      - transform: NPC_beeA (UnityEngine.Transform)
-      - gameObject: NPC_beeA (UnityEngine.GameObject)
-      - tag: Enemy
-      - name: NPC_beeA
-      - hideFlags: None
   Children (7):
   - GameObject: side
     Active: True
@@ -304,7 +286,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.36, -0.61, 0.00)
+        - position: (1.07, 0.45, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -315,13 +297,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -352,7 +334,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.36, -0.49, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (1.07, 0.58, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
@@ -370,19 +352,19 @@
         - rayTracingAccelerationStructureBuildFlagsOverride: False
         - sortingLayerName: Default
         - sortingLayerID: 0
-        - sortingOrder: 6
+        - sortingOrder: 1
         - isLOD0: True
         - allowOcclusionWhenDynamic: True
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -393,8 +375,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: side (UnityEngine.Transform)
@@ -409,7 +391,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.36, -0.61, 0.00)
+        - position: (1.07, 0.45, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -420,13 +402,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -457,7 +439,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.36, -0.49, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (1.07, 0.58, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
@@ -475,19 +457,19 @@
         - rayTracingAccelerationStructureBuildFlagsOverride: False
         - sortingLayerName: Default
         - sortingLayerID: 0
-        - sortingOrder: 5
+        - sortingOrder: 1
         - isLOD0: True
         - allowOcclusionWhenDynamic: True
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -498,8 +480,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: back (UnityEngine.Transform)
@@ -514,7 +496,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.36, -0.61, 0.00)
+        - position: (1.07, 0.45, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -525,13 +507,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -562,7 +544,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.36, -0.49, 0.00), Extents: (0.13, 0.13, 0.10)
+        - bounds: Center: (1.07, 0.58, 0.00), Extents: (0.13, 0.13, 0.10)
         - localBounds: Center: (0.00, 0.13, 0.00), Extents: (0.13, 0.13, 0.10)
         - enabled: True
         - isVisible: True
@@ -580,19 +562,19 @@
         - rayTracingAccelerationStructureBuildFlagsOverride: False
         - sortingLayerName: Default
         - sortingLayerID: 0
-        - sortingOrder: 4
+        - sortingOrder: 1
         - isLOD0: True
         - allowOcclusionWhenDynamic: True
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -603,8 +585,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: front (UnityEngine.Transform)
@@ -619,7 +601,7 @@
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.33, -0.71, 0.00)
+        - position: (1.04, 0.36, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -630,13 +612,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.33275
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.04195
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.33275
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.04195
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -667,7 +649,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.33, -0.50, 0.00), Extents: (0.22, 0.20, 0.10)
+        - bounds: Center: (1.04, 0.56, 0.00), Extents: (0.22, 0.20, 0.10)
         - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: True
@@ -685,19 +667,19 @@
         - rayTracingAccelerationStructureBuildFlagsOverride: False
         - sortingLayerName: Default
         - sortingLayerID: 0
-        - sortingOrder: 3
+        - sortingOrder: 2
         - isLOD0: True
         - allowOcclusionWhenDynamic: True
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.33275
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.04195
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.33275
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.04195
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -708,8 +690,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_side (UnityEngine.Transform)
@@ -724,7 +706,7 @@
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.33, -0.71, 0.00)
+        - position: (1.04, 0.36, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -735,13 +717,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.33275
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.04195
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.33275
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.04195
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -772,7 +754,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.33, -0.50, 0.00), Extents: (0.22, 0.20, 0.10)
+        - bounds: Center: (1.04, 0.56, 0.00), Extents: (0.22, 0.20, 0.10)
         - localBounds: Center: (0.00, 0.20, 0.00), Extents: (0.22, 0.20, 0.10)
         - enabled: True
         - isVisible: True
@@ -796,13 +778,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.33275
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.04195
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.33275
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.04195
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -813,8 +795,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_back (UnityEngine.Transform)
@@ -829,7 +811,7 @@
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.36, -0.61, 0.00)
+        - position: (1.07, 0.45, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -840,13 +822,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -877,7 +859,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.36, -0.52, 0.00), Extents: (0.16, 0.09, 0.10)
+        - bounds: Center: (1.07, 0.55, 0.00), Extents: (0.16, 0.09, 0.10)
         - localBounds: Center: (0.00, 0.09, 0.00), Extents: (0.16, 0.09, 0.10)
         - enabled: True
         - isVisible: True
@@ -895,19 +877,19 @@
         - rayTracingAccelerationStructureBuildFlagsOverride: False
         - sortingLayerName: Default
         - sortingLayerID: 0
-        - sortingOrder: 1
+        - sortingOrder: 2
         - isLOD0: True
         - allowOcclusionWhenDynamic: True
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.61125
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.61125
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.45209
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -918,8 +900,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_front (UnityEngine.Transform)
@@ -934,7 +916,7 @@
     Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
     Components (2):
       • Transform
-        - position: (1.36, -0.71, 0.00)
+        - position: (1.07, 0.36, 0.00)
         - localPosition: (0.00, 0.00, 0.00)
         - eulerAngles: (0.00, 0.00, 0.00)
         - localEulerAngles: (0.00, 0.00, 0.00)
@@ -945,13 +927,13 @@
         - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
         - localScale: (1.00, 1.00, 1.00)
         - parent: NPC_beeA (UnityEngine.Transform)
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -982,7 +964,7 @@
         - castShadows: False
         - motionVectors: True
         - useLightProbes: True
-        - bounds: Center: (1.36, -0.66, 0.00), Extents: (0.13, 0.05, 0.10)
+        - bounds: Center: (1.07, 0.41, 0.00), Extents: (0.13, 0.05, 0.10)
         - localBounds: Center: (0.00, 0.05, 0.00), Extents: (0.13, 0.05, 0.10)
         - enabled: True
         - isVisible: True
@@ -1006,13 +988,13 @@
         - forceMeshLod: -1
         - meshLodSelectionBias: 0
         - isPartOfStaticBatch: False
-        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.36400
-0.00000	1.00000	0.00000	0.70500
+        - worldToLocalMatrix: 1.00000	0.00000	0.00000	-1.07320
+0.00000	1.00000	0.00000	-0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
-        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.36400
-0.00000	1.00000	0.00000	-0.70500
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
 0.00000	0.00000	1.00000	0.00000
 0.00000	0.00000	0.00000	1.00000
 
@@ -1023,8 +1005,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprite-Lit-Default (Instance) (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: shadow (UnityEngine.Transform)

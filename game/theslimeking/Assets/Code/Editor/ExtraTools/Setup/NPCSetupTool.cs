@@ -303,13 +303,34 @@ namespace ExtraTools.Editor
                     UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'isWalking' já existe no Animator");
                 }
 
+                // Adiciona parâmetro Attack se não existir
+                bool attackExists = false;
+                foreach (var param in animatorController.parameters)
+                {
+                    if (param.name == "Attack" && param.type == AnimatorControllerParameterType.Trigger)
+                    {
+                        attackExists = true;
+                        break;
+                    }
+                }
+
+                if (!attackExists)
+                {
+                    animatorController.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'Attack' (Trigger) adicionado ao Animator");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[NPCSetupTool] Parâmetro 'Attack' já existe no Animator");
+                }
+
                 // Configura transições de estado
                 SetupAnimatorTransitions(animatorController);
 
                 // Marca como modificado
                 EditorUtility.SetDirty(animatorController);
 
-                UnityEngine.Debug.Log($"[NPCSetupTool] Animator configurado com parâmetros 'Hit', 'isDying', 'isWalking' e transições completas");
+                UnityEngine.Debug.Log($"[NPCSetupTool] Animator configurado com parâmetros 'Hit', 'isDying', 'isWalking', 'Attack' e transições completas");
             }
             catch (System.Exception ex)
             {
@@ -321,11 +342,12 @@ namespace ExtraTools.Editor
         {
             var rootStateMachine = controller.layers[0].stateMachine;
 
-            // Busca estados Idle, Walk, Hit e Die
+            // Busca estados Idle, Walk, Hit, Die e Attack
             AnimatorState idleState = null;
             AnimatorState walkState = null;
             AnimatorState hitState = null;
             AnimatorState dieState = null;
+            AnimatorState attackState = null;
 
             foreach (var state in rootStateMachine.states)
             {
@@ -338,6 +360,8 @@ namespace ExtraTools.Editor
                     hitState = state.state;
                 else if (stateName.Contains("die") || stateName.Contains("death") || stateName.Contains("dead"))
                     dieState = state.state;
+                else if (stateName.Contains("attack"))
+                    attackState = state.state;
             }
 
             // Se não encontrou estado Hit, avisa mas não cria (deve existir no Animator)
@@ -363,6 +387,16 @@ namespace ExtraTools.Editor
 
             // Configura transições Idle ↔ Walk baseadas em isWalking
             SetupWalkingTransitions(idleState, walkState);
+
+            // Configura transições de ataque se estado Attack existir
+            if (attackState != null)
+            {
+                SetupAttackTransitions(idleState, walkState, attackState, hitState);
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Attack' não encontrado. Transições de ataque não serão criadas.");
+            }
         }
 
         private static void CreateHitTransition(AnimatorState fromState, AnimatorState hitState, string fromStateName)
@@ -535,6 +569,106 @@ namespace ExtraTools.Editor
             else
             {
                 UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → {toStateName} já existe");
+            }
+        }
+
+        private static void SetupAttackTransitions(AnimatorState idleState, AnimatorState walkState, AnimatorState attackState, AnimatorState hitState)
+        {
+            // Configura transições Idle → Attack e Walk → Attack (instantâneas)
+            if (idleState != null)
+            {
+                CreateAttackTransition(idleState, attackState, "Idle");
+            }
+
+            if (walkState != null)
+            {
+                CreateAttackTransition(walkState, attackState, "Walk");
+            }
+
+            // Configura transição Attack → Hit (instantânea)
+            if (hitState != null)
+            {
+                CreateHitTransition(attackState, hitState, "Attack");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Hit' não encontrado. Transição Attack → Hit não será criada.");
+            }
+
+            // Configura transição Attack → Idle (com exit time)
+            if (idleState != null)
+            {
+                CreateAttackExitTransition(attackState, idleState);
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"[NPCSetupTool] ⚠️ Estado 'Idle' não encontrado. Transição Attack → Idle não será criada.");
+            }
+        }
+
+        private static void CreateAttackTransition(AnimatorState fromState, AnimatorState attackState, string fromStateName)
+        {
+            // Verifica se já existe transição com trigger Attack
+            bool transitionExists = false;
+            foreach (var transition in fromState.transitions)
+            {
+                if (transition.destinationState == attackState)
+                {
+                    // Verifica se tem a condição Attack
+                    foreach (var condition in transition.conditions)
+                    {
+                        if (condition.parameter == "Attack")
+                        {
+                            transitionExists = true;
+                            break;
+                        }
+                    }
+                    if (transitionExists) break;
+                }
+            }
+
+            if (!transitionExists)
+            {
+                var transition = fromState.AddTransition(attackState);
+                transition.AddCondition(AnimatorConditionMode.If, 0, "Attack");
+                transition.duration = 0f; // Instantânea
+                transition.hasExitTime = false; // Sem tempo de saída
+                transition.hasFixedDuration = true;
+
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → Attack criada (instantânea)");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição {fromStateName} → Attack já existe");
+            }
+        }
+
+        private static void CreateAttackExitTransition(AnimatorState attackState, AnimatorState idleState)
+        {
+            // Verifica se já existe transição Attack → Idle
+            bool transitionExists = false;
+            foreach (var transition in attackState.transitions)
+            {
+                if (transition.destinationState == idleState && transition.hasExitTime)
+                {
+                    transitionExists = true;
+                    break;
+                }
+            }
+
+            if (!transitionExists)
+            {
+                var transition = attackState.AddTransition(idleState);
+                transition.hasExitTime = true;
+                transition.exitTime = 1f; // Sai no final da animação
+                transition.duration = 0.1f; // Pequena duração para suavidade
+                transition.hasFixedDuration = true;
+
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição Attack → Idle criada (exit time = 1)");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[NPCSetupTool] Transição Attack → Idle já existe");
             }
         }
     }

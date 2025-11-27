@@ -763,8 +763,16 @@ MonoBehaviour:
   vfxDetectionAlert: {fileID: 6429605549283721597, guid: 08e6e7b8123ae53498a4e78da2f02e07, type: 3}
   vfxOffset: {x: 0, y: 0.4, z: 0}
   responseTime: 1.5
+  attackRange: 0.4
+  attackCooldown: 2
+  enableAttack: 1
+  enableIdleBouncing: 1
+  bouncingRange: 1
+  bouncingSpeed: 3
+  verticalAmplitude: 0.3
+  verticalFrequency: 5
   enableDebugLogs: 0
-  enableDebugGizmos: 0
+  enableDebugGizmos: 1
 --- !u!50 &4241078229766783160
 Rigidbody2D:
   serializedVersion: 5
