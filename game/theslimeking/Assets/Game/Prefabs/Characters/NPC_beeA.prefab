@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8553484376360643285}
   m_Layer: 0
   m_Name: vfx_side
-  m_TagString: Untagged
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 2
   m_Sprite: {fileID: 4573078939655499306, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -168,7 +168,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 1
   m_Sprite: {fileID: 1812150203723112161, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -258,7 +258,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 6
+  m_SortingOrder: 1
   m_Sprite: {fileID: -8858503719217131207, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 2667056038828718615}
   m_Layer: 0
   m_Name: vfx_back
-  m_TagString: Untagged
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -372,7 +372,7 @@ GameObject:
   - component: {fileID: 5461682214072943874}
   m_Layer: 0
   m_Name: vfx_front
-  m_TagString: Untagged
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -438,7 +438,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 1831813020054836645, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -528,7 +528,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 1
   m_Sprite: {fileID: -3503678169987546096, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -743,7 +743,7 @@ MonoBehaviour:
   baseHealthPoints: 5
   baseAttack: 1
   baseDefense: 1
-  baseSpeed: 0.5
+  baseSpeed: 1
   enableLogs: 0
 --- !u!114 &4287131638364473528
 MonoBehaviour:
@@ -758,7 +758,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheSlimeKing.NPCs.NPCBaseController
   knockbackDuration: 0.3
-  detectionRange: 1
+  detectionRange: 2
   enablePlayerDetection: 1
   vfxDetectionAlert: {fileID: 6429605549283721597, guid: 08e6e7b8123ae53498a4e78da2f02e07, type: 3}
   vfxOffset: {x: 0, y: 0.4, z: 0}
@@ -766,13 +766,14 @@ MonoBehaviour:
   attackRange: 0.4
   attackCooldown: 2
   enableAttack: 1
+  attackHitboxDelay: 1
   enableIdleBouncing: 1
   bouncingRange: 1
   bouncingSpeed: 3
   verticalAmplitude: 0.3
   verticalFrequency: 5
   enableDebugLogs: 0
-  enableDebugGizmos: 1
+  enableDebugGizmos: 0
 --- !u!50 &4241078229766783160
 Rigidbody2D:
   serializedVersion: 5

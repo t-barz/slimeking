@@ -32,9 +32,14 @@ using SlimeKing.Core;
 /// NOTA: Esta classe segue o padrão de não usar Singleton para classes Player*
 /// conforme diretrizes do projeto.
 /// </summary>
+
 [RequireComponent(typeof(Rigidbody2D), typeof(Animator), typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("Transição de Morte")]
+    [Tooltip("Efeito CircleEffect para transição de morte (vinheta fechando)")]
+    [SerializeField] private PixeLadder.EasyTransition.Effects.CircleEffect deathTransitionEffect;
+
     public static PlayerController Instance { get; private set; }
 
     #region Inspector Configuration
@@ -1500,7 +1505,19 @@ public class PlayerController : MonoBehaviour
         _canMove = false;
         _canAttack = false;
 
+        // Seta a flag isDead no Animator
+        if (_animator != null)
+        {
+            int isDeadHash = Animator.StringToHash("isDead");
+            _animator.SetBool(isDeadHash, true);
+        }
 
+        // Faz efeito de vinheta e recarrega a cena atual usando o CircleEffect
+        if (deathTransitionEffect != null && PixeLadder.EasyTransition.SceneTransitioner.Instance != null)
+        {
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            PixeLadder.EasyTransition.SceneTransitioner.Instance.LoadScene(currentScene, deathTransitionEffect);
+        }
     }
 
     /// <summary>
@@ -2099,7 +2116,7 @@ public class PlayerController : MonoBehaviour
     #region TODO: Sistemas a Implementar
     /*
     PRÓXIMOS PASSOS PARA IMPLEMENTAÇÃO:
-    
+
     1. INPUT SYSTEM - CONFIGURAÇÃO FINAL:
        ✅ Arquivo InputSystem_Actions.inputactions criado
        ✅ Classe C# gerada automaticamente pelo Unity
@@ -2111,7 +2128,7 @@ public class PlayerController : MonoBehaviour
            • Space: Ataque especial
            • UseItem1-4: Usar itens dos slots 1-4 do inventário
        ✅ Erros de compilação resolvidos
-    
+
     2. SISTEMA DE INTERAÇÕES E COLETA:
        - InteractionType enum (Shrink, Jump, Talk, CollectItem, Hide)
        - InteractableElement class (elementos do cenário que podem ser interagidos)
@@ -2119,7 +2136,7 @@ public class PlayerController : MonoBehaviour
        - Sistema de detecção de proximidade
        - UI de prompts de interação ("Pressione E para coletar")
        - Lógica de coleta: Interact próximo ao item → adiciona ao inventário
-    
+
     3. SISTEMA DE INVENTÁRIO:
        - InventorySystem class (gerenciar 4 slots de itens)
        - ItemData ScriptableObject (dados dos itens: nome, efeitos, sprite)
@@ -2127,17 +2144,17 @@ public class PlayerController : MonoBehaviour
        - Sistema de uso de itens do inventário (UseItem1-4)
        - Efeitos dos itens (cura, buff de ataque, etc.)
        - Integração com PlayerAttributesHandler
-    
+
     4. SISTEMA DE INIMIGOS:
        - EnemyHealth class (sistema de vida para inimigos)
        - Integração com o sistema de combate do PlayerController
-    
+
     5. FUNCIONALIDADES ADICIONAIS:
        - Sistema de esconderijo (isHiding parameter)
        - Ações especiais ativadas por interação (Shrink, Jump)
        - Sistema de ataque especial
        - Feedback visual de dano/cura
-    
+
     MAPEAMENTO DE FUNCIONALIDADES ATUAIS:
     ✅ Movimento básico com WASD/Arrow Keys
     ✅ Sistema de animação (isWalking, FacingRight)
@@ -2150,7 +2167,7 @@ public class PlayerController : MonoBehaviour
     ❌ Sistema de coleta
     ❌ Detecção de inimigos
     ❌ Sistema de esconderijo
-    
+
     MAPEAMENTO DE CONTROLES ATUALIZADO:
     🎮 WASD/Arrow Keys: Movimento
     🖱️ Mouse Left/Ctrl: Ataque básico
@@ -2160,7 +2177,7 @@ public class PlayerController : MonoBehaviour
     ⌨️ UseItem2: Usar item do slot 2 do inventário  
     ⌨️ UseItem3: Usar item do slot 3 do inventário
     ⌨️ UseItem4: Usar item do slot 4 do inventário
-    
+
     FLUXO DE GAMEPLAY:
     1. Jogador se aproxima de uma fruta/item coletável
     2. Aparece prompt "Pressione E para coletar"

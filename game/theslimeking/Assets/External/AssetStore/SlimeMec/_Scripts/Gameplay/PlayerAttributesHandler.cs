@@ -82,21 +82,12 @@ public class PlayerAttributesHandler : MonoBehaviour
                 InitializeAttributes();
             }
 
-            if (enableLogs)
-            {
-                Debug.Log($"[PlayerAttributes] CurrentAttack acessado: retornando {_currentAttack}");
-            }
             return _currentAttack;
         }
         set
         {
             int oldValue = _currentAttack;
             _currentAttack = Mathf.Max(0, value);
-
-            if (enableLogs && oldValue != _currentAttack)
-            {
-                Debug.Log($"[PlayerAttributes] Attack alterado: {oldValue} → {_currentAttack}");
-            }
         }
     }
 
@@ -110,11 +101,6 @@ public class PlayerAttributesHandler : MonoBehaviour
         {
             int oldValue = _currentDefense;
             _currentDefense = Mathf.Max(0, value);
-
-            if (enableLogs && oldValue != _currentDefense)
-            {
-                Debug.Log($"[PlayerAttributes] Defense alterado: {oldValue} → {_currentDefense}");
-            }
         }
     }
 
@@ -129,10 +115,6 @@ public class PlayerAttributesHandler : MonoBehaviour
             int oldValue = _currentSpeed;
             _currentSpeed = Mathf.Max(0, value);
 
-            if (enableLogs && oldValue != _currentSpeed)
-            {
-                Debug.Log($"[PlayerAttributes] Speed alterado: {oldValue} → {_currentSpeed}");
-            }
         }
     }
 
@@ -255,6 +237,14 @@ public class PlayerAttributesHandler : MonoBehaviour
         }
 
         CurrentHealthPoints -= finalDamage;
+
+        // Aciona trigger Hit no Animator, se existir
+        var animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            int hitHash = Animator.StringToHash("Hit");
+            animator.SetTrigger(hitHash);
+        }
 
         if (enableLogs)
         {

@@ -68,7 +68,7 @@
       - hasTransformHierarchy: True
       - gravityWeight: 0
       - bodyPosition: (0.00, 0.00, 0.00)
-      - bodyRotation: (0.00000, 0.00000, 0.00000, 0.00000)
+      - bodyRotation: (-3.62464, 0.00000, 0.00000, 0.00000)
       - stabilizeFeet: False
       - layerCount: 1
       - parameters: UnityEngine.AnimatorControllerParameter[]
@@ -177,7 +177,7 @@
       - interpolation: None
       - sleepMode: StartAwake
       - collisionDetectionMode: Discrete
-      - attachedColliderCount: 2
+      - attachedColliderCount: 5
       - totalForce: (0.00, 0.00)
       - totalTorque: 0
       - excludeLayers: UnityEngine.LayerMask
@@ -375,8 +375,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: side (UnityEngine.Transform)
@@ -480,8 +480,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: back (UnityEngine.Transform)
@@ -585,8 +585,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: front (UnityEngine.Transform)
@@ -596,10 +596,10 @@
         - hideFlags: None
   - GameObject: vfx_side
     Active: True
-    Tag: Untagged
+    Tag: EnemyAttack
     Layer: Default (0)
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-    Components (2):
+    Components (4):
       • Transform
         - position: (1.04, 0.36, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
@@ -630,7 +630,7 @@
         - hierarchyCount: 8
         - transform: vfx_side (UnityEngine.Transform)
         - gameObject: vfx_side (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
         - name: vfx_side
         - hideFlags: None
       • SpriteRenderer
@@ -690,21 +690,77 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_side (UnityEngine.Transform)
         - gameObject: vfx_side (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
+        - name: vfx_side
+        - hideFlags: None
+      • BoxCollider2D
+        - size: (0.50, 0.70)
+        - edgeRadius: 0
+        - autoTiling: False
+        - density: 1
+        - isTrigger: True
+        - usedByEffector: False
+        - compositeOperation: None
+        - compositeOrder: 0
+        - composite: 
+        - offset: (0.00, 0.20)
+        - attachedRigidbody: NPC_beeA (UnityEngine.Rigidbody2D)
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+        - shapeCount: 1
+        - bounds: Center: (1.04, 0.56, 0.00), Extents: (0.25, 0.35, 0.00)
+        - errorState: None
+        - compositeCapable: True
+        - sharedMaterial: 
+        - layerOverridePriority: 0
+        - excludeLayers: UnityEngine.LayerMask
+        - includeLayers: UnityEngine.LayerMask
+        - forceSendLayers: UnityEngine.LayerMask
+        - forceReceiveLayers: UnityEngine.LayerMask
+        - contactCaptureLayers: UnityEngine.LayerMask
+        - callbackLayers: UnityEngine.LayerMask
+        - friction: 0,4
+        - bounciness: 0
+        - frictionCombine: Mean
+        - bounceCombine: Maximum
+        - contactMask: UnityEngine.LayerMask
+        - usedByComposite: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_side (UnityEngine.Transform)
+        - gameObject: vfx_side (UnityEngine.GameObject)
+        - tag: EnemyAttack
+        - name: vfx_side
+        - hideFlags: None
+      • EnemyAttackHitbox
+        - fixedDamage: 0
+        - destroyCancellationToken: System.Threading.CancellationToken
+        - useGUILayout: True
+        - didStart: False
+        - didAwake: False
+        - runInEditMode: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_side (UnityEngine.Transform)
+        - gameObject: vfx_side (UnityEngine.GameObject)
+        - tag: EnemyAttack
         - name: vfx_side
         - hideFlags: None
   - GameObject: vfx_back
     Active: True
-    Tag: Untagged
+    Tag: EnemyAttack
     Layer: Default (0)
     Transform: Pos (-0.03, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-    Components (2):
+    Components (4):
       • Transform
         - position: (1.04, 0.36, 0.00)
         - localPosition: (-0.03, 0.00, 0.00)
@@ -735,7 +791,7 @@
         - hierarchyCount: 8
         - transform: vfx_back (UnityEngine.Transform)
         - gameObject: vfx_back (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
         - name: vfx_back
         - hideFlags: None
       • SpriteRenderer
@@ -795,21 +851,77 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_back (UnityEngine.Transform)
         - gameObject: vfx_back (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
+        - name: vfx_back
+        - hideFlags: None
+      • BoxCollider2D
+        - size: (0.50, 0.70)
+        - edgeRadius: 0
+        - autoTiling: False
+        - density: 1
+        - isTrigger: True
+        - usedByEffector: False
+        - compositeOperation: None
+        - compositeOrder: 0
+        - composite: 
+        - offset: (0.00, 0.20)
+        - attachedRigidbody: NPC_beeA (UnityEngine.Rigidbody2D)
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+        - shapeCount: 1
+        - bounds: Center: (1.04, 0.56, 0.00), Extents: (0.25, 0.35, 0.00)
+        - errorState: None
+        - compositeCapable: True
+        - sharedMaterial: 
+        - layerOverridePriority: 0
+        - excludeLayers: UnityEngine.LayerMask
+        - includeLayers: UnityEngine.LayerMask
+        - forceSendLayers: UnityEngine.LayerMask
+        - forceReceiveLayers: UnityEngine.LayerMask
+        - contactCaptureLayers: UnityEngine.LayerMask
+        - callbackLayers: UnityEngine.LayerMask
+        - friction: 0,4
+        - bounciness: 0
+        - frictionCombine: Mean
+        - bounceCombine: Maximum
+        - contactMask: UnityEngine.LayerMask
+        - usedByComposite: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_back (UnityEngine.Transform)
+        - gameObject: vfx_back (UnityEngine.GameObject)
+        - tag: EnemyAttack
+        - name: vfx_back
+        - hideFlags: None
+      • EnemyAttackHitbox
+        - fixedDamage: 0
+        - destroyCancellationToken: System.Threading.CancellationToken
+        - useGUILayout: True
+        - didStart: False
+        - didAwake: False
+        - runInEditMode: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_back (UnityEngine.Transform)
+        - gameObject: vfx_back (UnityEngine.GameObject)
+        - tag: EnemyAttack
         - name: vfx_back
         - hideFlags: None
   - GameObject: vfx_front
     Active: True
-    Tag: Untagged
+    Tag: EnemyAttack
     Layer: Default (0)
     Transform: Pos (0.00, 0.09, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
-    Components (2):
+    Components (4):
       • Transform
         - position: (1.07, 0.45, 0.00)
         - localPosition: (0.00, 0.09, 0.00)
@@ -840,7 +952,7 @@
         - hierarchyCount: 8
         - transform: vfx_front (UnityEngine.Transform)
         - gameObject: vfx_front (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
         - name: vfx_front
         - hideFlags: None
       • SpriteRenderer
@@ -900,13 +1012,69 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: vfx_front (UnityEngine.Transform)
         - gameObject: vfx_front (UnityEngine.GameObject)
-        - tag: Untagged
+        - tag: EnemyAttack
+        - name: vfx_front
+        - hideFlags: None
+      • BoxCollider2D
+        - size: (0.50, 0.70)
+        - edgeRadius: 0
+        - autoTiling: False
+        - density: 1
+        - isTrigger: True
+        - usedByEffector: False
+        - compositeOperation: None
+        - compositeOrder: 0
+        - composite: 
+        - offset: (0.00, 0.20)
+        - attachedRigidbody: NPC_beeA (UnityEngine.Rigidbody2D)
+        - localToWorldMatrix: 1.00000	0.00000	0.00000	1.07320
+0.00000	1.00000	0.00000	0.35834
+0.00000	0.00000	1.00000	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+        - shapeCount: 1
+        - bounds: Center: (1.07, 0.65, 0.00), Extents: (0.25, 0.35, 0.00)
+        - errorState: None
+        - compositeCapable: True
+        - sharedMaterial: 
+        - layerOverridePriority: 0
+        - excludeLayers: UnityEngine.LayerMask
+        - includeLayers: UnityEngine.LayerMask
+        - forceSendLayers: UnityEngine.LayerMask
+        - forceReceiveLayers: UnityEngine.LayerMask
+        - contactCaptureLayers: UnityEngine.LayerMask
+        - callbackLayers: UnityEngine.LayerMask
+        - friction: 0,4
+        - bounciness: 0
+        - frictionCombine: Mean
+        - bounceCombine: Maximum
+        - contactMask: UnityEngine.LayerMask
+        - usedByComposite: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_front (UnityEngine.Transform)
+        - gameObject: vfx_front (UnityEngine.GameObject)
+        - tag: EnemyAttack
+        - name: vfx_front
+        - hideFlags: None
+      • EnemyAttackHitbox
+        - fixedDamage: 0
+        - destroyCancellationToken: System.Threading.CancellationToken
+        - useGUILayout: True
+        - didStart: False
+        - didAwake: False
+        - runInEditMode: False
+        - enabled: True
+        - isActiveAndEnabled: True
+        - transform: vfx_front (UnityEngine.Transform)
+        - gameObject: vfx_front (UnityEngine.GameObject)
+        - tag: EnemyAttack
         - name: vfx_front
         - hideFlags: None
   - GameObject: shadow
@@ -1005,8 +1173,8 @@
         - lightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - realtimeLightmapScaleOffset: (1.00, 1.00, 0.00, 0.00)
         - materials: UnityEngine.Material[]
-        - material: Sprites-Default (Instance) (UnityEngine.Material)
-        - sharedMaterial: Sprites-Default (Instance) (UnityEngine.Material)
+        - material: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
+        - sharedMaterial: Sprites-Default (Instance) (Instance) (Instance) (UnityEngine.Material)
         - sharedMaterials: UnityEngine.Material[]
         - LODGroup: 
         - transform: shadow (UnityEngine.Transform)

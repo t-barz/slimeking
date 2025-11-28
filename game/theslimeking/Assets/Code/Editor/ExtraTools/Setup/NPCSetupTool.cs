@@ -52,12 +52,14 @@ namespace ExtraTools.Editor
 
             try
             {
+
                 SetupAttributesHandler(target);
                 SetupController(target);
                 SetupColliders(target);
                 SetupRigidbody(target);
                 SetupTag(target);
                 SetupAnimator(target);
+                // NÃO adiciona mais hitboxes EnemyAttack
 
                 UnityEngine.Debug.Log($"[NPCSetupTool] ✅ '{target.name}' configurado como NPC com sucesso!");
 
@@ -69,6 +71,9 @@ namespace ExtraTools.Editor
                 UnityEngine.Debug.LogError($"[NPCSetupTool] ❌ Erro ao configurar NPC: {ex.Message}");
             }
         }
+
+
+        // Removido: SetupEnemyAttackHitboxes
 
         private static void SetupAttributesHandler(GameObject target)
         {

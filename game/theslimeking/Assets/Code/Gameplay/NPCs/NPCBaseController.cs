@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 using SlimeMec.Gameplay;
 
 namespace TheSlimeKing.NPCs
@@ -10,6 +11,13 @@ namespace TheSlimeKing.NPCs
     [RequireComponent(typeof(NPCAttributesHandler))]
     public class NPCBaseController : MonoBehaviour
     {
+        /// <summary>
+        /// Retorna o valor de ataque atual do NPC (usado por hitboxes de ataque).
+        /// </summary>
+        public int GetAttackValue()
+        {
+            return attributesHandler != null ? attributesHandler.CurrentAttack : 1;
+        }
 
         #region Inspector Variables
         [Header("Knockback")]
@@ -26,6 +34,10 @@ namespace TheSlimeKing.NPCs
         [SerializeField] protected float attackRange = 0.8f; // Distância para atacar
         [SerializeField] protected float attackCooldown = 2.0f; // Tempo entre ataques
         [SerializeField] protected bool enableAttack = true;
+
+        [Header("Attack Hitbox Timing")]
+        [Tooltip("Delay em segundos para ativar o hitbox após o início do ataque.")]
+        [SerializeField] protected float attackHitboxDelay = 1.0f;
 
         [Header("Idle Movement")]
         [SerializeField] protected bool enableIdleBouncing = true;
@@ -90,6 +102,7 @@ namespace TheSlimeKing.NPCs
 
             // Pega todos os SpriteRenderers do objeto e filhos (inclusive desativados)
             spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+
 
         }
 
@@ -767,6 +780,8 @@ namespace TheSlimeKing.NPCs
                 Log("Executando ataque - trigger Attack ativada");
             }
 
+            // Agora o dano será aplicado com delay na corrotina EndAttackAfterDelay
+
             // Agenda o fim do ataque (baseado na duração da animação)
             // Nota: Em uma implementação mais robusta, isso seria controlado por eventos de animação
             StartCoroutine(EndAttackAfterDelay());
@@ -777,14 +792,35 @@ namespace TheSlimeKing.NPCs
         /// </summary>
         protected virtual System.Collections.IEnumerator EndAttackAfterDelay()
         {
-            // Aguarda duração estimada da animação de ataque
-            yield return new WaitForSeconds(1.0f);
+            // Aguarda o delay configurado para simular o tempo do hitbox
+            if (attackHitboxDelay > 0f)
+                yield return new WaitForSeconds(attackHitboxDelay);
+
+            // Após o delay, verifica se o player ainda está no alcance e aplica dano
+            if (playerTransform != null)
+            {
+                float distance = Vector2.Distance(transform.position, playerTransform.position);
+                if (distance <= attackRange)
+                {
+                    var playerAttributes = playerTransform.GetComponent<PlayerAttributesHandler>();
+                    if (playerAttributes != null)
+                    {
+                        playerAttributes.TakeDamage(GetAttackValue());
+                    }
+                }
+            }
+
+            // Aguarda o restante da animação (duração total = 1s padrão)
+            float totalAttackDuration = 1.0f;
+            float remaining = Mathf.Max(0f, totalAttackDuration - attackHitboxDelay);
+            if (remaining > 0f)
+                yield return new WaitForSeconds(remaining);
 
             isAttacking = false;
 
             if (enableDebugLogs)
             {
-                Log("Ataque finalizado");
+                Log($"Ataque finalizado. Dano aplicado após {attackHitboxDelay}s.");
             }
         }
 
