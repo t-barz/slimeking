@@ -24,14 +24,9 @@ namespace ExtraTools.Editor
         }
 
         // Menu de contexto (clique direito)
-        [MenuItem("GameObject/Extra Tools/Setup as NPC", true)]
-        private static bool ValidateContextSetupAsNPC()
-        {
-            return Selection.activeGameObject != null;
-        }
-
-        [MenuItem("GameObject/Extra Tools/Setup as NPC")]
-        public static void ContextSetupAsNPC()
+        // Agrupado logo após Setup Dialogue NPC (priority 50)
+        [MenuItem("GameObject/Extra Tools/Setup Detector NPC", false, 50)]
+        public static void ContextSetupDetectorNPC()
         {
             ExecuteSetup();
         }

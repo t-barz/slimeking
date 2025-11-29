@@ -1,111 +1,202 @@
-# 🎮 SlimeKing - Documentação do Projeto
+# 📚 The Slime King - Documentação
 
-Documentação técnica completa do projeto SlimeKing, organizada por categorias para facilitar navegação e manutenção.
+Bem-vindo à documentação completa do projeto **The Slime King**!
 
-## 📋 Documentos de Projeto
-
-- [📊 Resumo Executivo](Project/Executive-Summary.md) - Visão geral e objetivos do projeto
-- [📖 Game Design Document](Project/Game-Design-Document.md) - Documento de design completo do jogo
-- [✅ Checklist Alpha-1](Project/ALPHA-1-Checklist.md) - Marcos e entregas da versão Alpha
-- [🗺️ Roadmap](Project/Roadmap.md) - Planejamento e cronograma de desenvolvimento
-- [📈 Análise do Roadmap](Project/Roadmap-Analysis-Summary.md) - Análise detalhada do progresso
-- [📁 Estrutura de Pastas](Project/FolderStructure.md) - Organização do projeto Unity
-- [🔧 Setup do Projeto](Project/ProjectSetup-Documentation.md) - Configuração inicial e dependências
-- [✨ Boas Práticas](Project/BoasPraticas.md) - Guidelines e convenções de desenvolvimento
-
-## 🏗️ Arquitetura
-
-- [🎯 Design de Managers](Architecture/Managers-Design-Document.md) - Padrões e estrutura dos managers do sistema
-- [🔧 GameManager AutoCreation](Architecture/GameManager-AutoCreation.md) - Sistema de criação automática do GameManager
-
-## 🎮 Sistemas
-
-### 💎 Crystal System
-
-- [📖 Guia de Implementação](Systems/CrystalSystem/Crystal_System_Implementation_Guide.md) - Como implementar o sistema de cristais
-- [🐛 Guia de Debug](Systems/CrystalSystem/Crystal_System_Debug_Guide.md) - Troubleshooting e debugging
-
-### 💬 Dialogue System  
-
-- [📖 Documentação Principal](Systems/DialogueSystem/DIALOGUE_SYSTEM_README.md) - Visão geral do sistema de diálogo
-- [🔗 Integração PlayerController](Systems/DialogueSystem/PlayerController-Integration.md) - Como integrar com o player
-
-### 🎬 Transition System
-
-- [⚡ Setup Rápido](Systems/TransitionSystem/Setup-Guide.md) - Configuração de transições entre cenas
-
-### 🎨 Interface de Usuário
-
-- [📱 HUD Context Menu](Systems/UI/HUD-ContextMenu-Guide.md) - Sistema de menus contextuais da HUD
-
-### 📦 Pushable Objects
-
-- [📖 Guia de Implementação](Systems/PushableObjects/Implementation-Guide.md) - Como implementar objetos empurráveis
-- [⚡ QuickConfig](Systems/PushableObjects/QuickConfig.md) - Configuração rápida de objetos empurráveis
-- [📋 Guia QuickConfig](Systems/PushableObjects/QuickConfig-Guide.md) - Tutorial detalhado do QuickConfig
-
-## 🛠️ Ferramentas
-
-- [⚡ NPC QuickConfig Otimizações](Tools/NPCQuickConfig-Optimizations.md) - Melhorias de performance para configuração de NPCs
-- [📊 NPC Performance Summary](Tools/NPCQuickConfig-Performance-Summary.md) - Resumo das otimizações de performance
-- [🧪 NPC Testing Guide](Tools/NPCQuickConfig-Testing-Guide.md) - Guia de testes para ferramentas NPC
-
-## 🎨 Assets Visuais
-
-- [🎮 Mapeamento PS5](Assets/mapeamentoslimeps5.png) - Layout dos controles para PlayStation 5
-- [🎮 Mapeamento Switch](Assets/mapeamentoslimeswitch.png) - Layout dos controles para Nintendo Switch
-- [🎮 Mapeamento Xbox](Assets/mapeamentoslimexbox.png) - Layout dos controles para Xbox
-- [🗺️ Mapa da Caverna](Assets/cavemap.png) - Layout visual do mapa da caverna
-- [🚪 Saída da Caverna](Assets/caveexit.png) - Visual da saída da caverna
+Esta documentação está organizada em três categorias principais para facilitar a navegação e consulta.
 
 ---
 
-## 🔍 Navegação Rápida
+## 🗂️ Estrutura da Documentação
 
-| 🔎 Procurando... | 📍 Vá para... |
-|------------------|----------------|
-| Visão geral do projeto | [📊 Resumo Executivo](Project/Executive-Summary.md) |
-| Como configurar sistemas | [🎮 Sistemas](#-sistemas) |
-| Estrutura de código | [🏗️ Arquitetura](#%EF%B8%8F-arquitetura) |
-| Ferramentas de desenvolvimento | [🛠️ Ferramentas](#%EF%B8%8F-ferramentas) |
-| Recursos visuais | [🎨 Assets](#-assets-visuais) |
-| Organização do projeto | [📁 Estrutura de Pastas](Project/FolderStructure.md) |
+### 📘 [01-Project/](01-Project/) - Documentação do Projeto
 
-## 📊 Estatísticas da Documentação
+Documentação geral do projeto, design, planejamento e padrões.
 
-```text
-📂 Categorias: 6 (Project, Architecture, Systems, Tools, Assets)
-📄 Documentos: 23 arquivos Markdown
-🎨 Assets Visuais: 5 imagens
-🎮 Sistemas Documentados: 5 (Crystal, Dialogue, Transition, UI, PushableObjects)
-```
+#### 🎮 [GDD/](01-Project/GDD/) - Game Design Documents
+- **[Game-Design-Document.md](01-Project/GDD/Game-Design-Document.md)** - GDD completo v10.1
+- **[Executive-Summary.md](01-Project/GDD/Executive-Summary.md)** - Resumo executivo do projeto
 
-## 🔧 Estrutura Técnica
+#### 📅 [Planning/](01-Project/Planning/) - Planejamento
+- **[Roadmap.md](01-Project/Planning/Roadmap.md)** ⭐ - Roadmap de desenvolvimento (v2.7)
+- **[ALPHA-1-Checklist.md](01-Project/Planning/ALPHA-1-Checklist.md)** - Checklist detalhado do ALPHA 1
 
-### 📁 Organização por Pastas
+#### 📏 [Standards/](01-Project/Standards/) - Padrões e Boas Práticas
+- **[BoasPraticas.md](01-Project/Standards/BoasPraticas.md)** ⭐ - Boas práticas de desenvolvimento
+- **[FolderStructure.md](01-Project/Standards/FolderStructure.md)** - Estrutura de pastas do projeto
 
-- **Project/**: Documentos de gestão e visão geral
-- **Architecture/**: Design patterns e arquitetura de código  
-- **Systems/**: Documentação específica de cada sistema do jogo
-- **Tools/**: Ferramentas de desenvolvimento e editor
-- **Assets/**: Recursos visuais e referências
-
-### 🏷️ Convenções de Nomenclatura
-
-- Arquivos principais: `NomeDescritivo.md`
-- Guias: `Sistema-TipoGuia.md`
-- Assets: `categoria-descrição.extensão`
+#### 🔧 [Technical/](01-Project/Technical/) - Documentação Técnica
+- **[TechMapping.md](01-Project/Technical/TechMapping.md)** ⭐ - Mapeamento técnico de sistemas
+- **[ProjectSetup-Documentation.md](01-Project/Technical/ProjectSetup-Documentation.md)** - Setup do projeto
 
 ---
 
-## 📝 Como Contribuir
+### 🎮 [02-Systems/](02-Systems/) - Documentação de Sistemas
 
-1. **Novos Documentos**: Adicione na pasta apropriada seguindo a convenção de nomes
-2. **Atualizações**: Mantenha links e referências atualizados
-3. **Assets**: Adicione novos recursos visuais na pasta `Assets/`
-4. **README**: Atualize este índice ao adicionar novos documentos
+Documentação detalhada de todos os sistemas implementados no jogo.
+
+#### 🏗️ [Core/](02-Systems/Core/) - Sistemas Principais
+
+##### [Architecture/](02-Systems/Core/Architecture/)
+- **[Managers-Design-Document.md](02-Systems/Core/Architecture/Managers-Design-Document.md)** - Design de managers
+- **[GameManager-AutoCreation.md](02-Systems/Core/Architecture/GameManager-AutoCreation.md)** - Auto-criação do GameManager
+
+#### 🎯 [Gameplay/](02-Systems/Gameplay/) - Sistemas de Gameplay
+
+##### [Quest/](02-Systems/Gameplay/Quest/) - Sistema de Quests
+- **[README.md](02-Systems/Gameplay/Quest/README.md)** ⭐ - Visão geral do sistema
+- **[QuestSystemQuickGuide.md](02-Systems/Gameplay/Quest/QuestSystemQuickGuide.md)** - Guia rápido
+- **[QuestDialogueIntegration.md](02-Systems/Gameplay/Quest/QuestDialogueIntegration.md)** - Integração com diálogos
+- [Archive/](02-Systems/Gameplay/Quest/Archive/) - Documentos de implementação e testes
+
+##### [Dialogue/](02-Systems/Gameplay/Dialogue/) - Sistema de Diálogos
+- **[DIALOGUE_SYSTEM_README.md](02-Systems/Gameplay/Dialogue/DIALOGUE_SYSTEM_README.md)** ⭐ - Sistema completo de diálogos
+
+##### [Crystal/](02-Systems/Gameplay/Crystal/) - Sistema de Cristais
+- **[Crystal_System_Implementation_Guide.md](02-Systems/Gameplay/Crystal/Crystal_System_Implementation_Guide.md)** - Guia de implementação
+- **[Crystal_System_Debug_Guide.md](02-Systems/Gameplay/Crystal/Crystal_System_Debug_Guide.md)** - Guia de debug
+
+##### [NPC/](02-Systems/Gameplay/NPC/) - Sistema de NPCs
+- **[NPC-Drop-System-Guide.md](02-Systems/Gameplay/NPC/NPC-Drop-System-Guide.md)** - Sistema de drops
+
+##### [PushableObjects/](02-Systems/Gameplay/PushableObjects/) - Objetos Empurráveis
+- **[Implementation-Guide.md](02-Systems/Gameplay/PushableObjects/Implementation-Guide.md)** - Guia de implementação
+- **[QuickConfig-Guide.md](02-Systems/Gameplay/PushableObjects/QuickConfig-Guide.md)** - Configuração rápida
+
+#### 🖥️ [UI/](02-Systems/UI/) - Sistemas de Interface
+
+##### [HUD/](02-Systems/UI/HUD/)
+- **[HeartHudSetup.md](02-Systems/UI/HUD/HeartHudSetup.md)** - Setup do HUD de vida
+- **[HUD-ContextMenu-Guide.md](02-Systems/UI/HUD/HUD-ContextMenu-Guide.md)** - Menu de contexto
+
+##### [Inventory/](02-Systems/UI/Inventory/)
+- **[InventoryUiSetup.md](02-Systems/UI/Inventory/InventoryUiSetup.md)** - Setup do inventário
+
+##### [Menus/](02-Systems/UI/Menus/)
+- **[PauseMenuSetup.md](02-Systems/UI/Menus/PauseMenuSetup.md)** - Setup do menu de pausa
+
+##### [Visual/](02-Systems/UI/Visual/)
+- **[OutlineGuide.md](02-Systems/UI/Visual/OutlineGuide.md)** - Sistema de outline visual
+
+#### 🌍 [World/](02-Systems/World/) - Sistemas de Mundo
+
+##### [Transition/](02-Systems/World/Transition/)
+- **[Setup-Guide.md](02-Systems/World/Transition/Setup-Guide.md)** - Sistema de transições
 
 ---
 
-*📅 Última atualização: Novembro 2025*  
-*🎯 Versão da documentação: 2.0 - Estrutura reorganizada*
+### 🛠️ [03-Tools/](03-Tools/) - Ferramentas de Desenvolvimento
+
+Ferramentas e utilitários para acelerar o desenvolvimento.
+
+#### [Editor/](03-Tools/Editor/) - Ferramentas de Editor
+
+##### [ExtraTools/](03-Tools/Editor/ExtraTools/)
+- **[README.md](03-Tools/Editor/ExtraTools/README.md)** ⭐ - Ferramentas unificadas
+- **[QuickStart.md](03-Tools/Editor/ExtraTools/QuickStart.md)** - Início rápido
+- **[MenuStructure.md](03-Tools/Editor/ExtraTools/MenuStructure.md)** - Estrutura de menus
+- [Archive/](03-Tools/Editor/ExtraTools/Archive/) - Documentos históricos
+
+---
+
+## 🚀 Início Rápido
+
+### Para Novos Desenvolvedores
+
+1. **Leia primeiro**: [BoasPraticas.md](01-Project/Standards/BoasPraticas.md)
+2. **Entenda o projeto**: [Game-Design-Document.md](01-Project/GDD/Game-Design-Document.md)
+3. **Veja o planejamento**: [Roadmap.md](01-Project/Planning/Roadmap.md)
+4. **Configure o ambiente**: [ProjectSetup-Documentation.md](01-Project/Technical/ProjectSetup-Documentation.md)
+
+### Para Implementar Features
+
+1. **Consulte o Roadmap**: [Roadmap.md](01-Project/Planning/Roadmap.md)
+2. **Verifique o TechMapping**: [TechMapping.md](01-Project/Technical/TechMapping.md)
+3. **Siga as boas práticas**: [BoasPraticas.md](01-Project/Standards/BoasPraticas.md)
+4. **Use as ferramentas**: [ExtraTools](03-Tools/Editor/ExtraTools/)
+
+### Para Consultar Sistemas
+
+- **Quest System**: [02-Systems/Gameplay/Quest/](02-Systems/Gameplay/Quest/)
+- **Dialogue System**: [02-Systems/Gameplay/Dialogue/](02-Systems/Gameplay/Dialogue/)
+- **UI Systems**: [02-Systems/UI/](02-Systems/UI/)
+
+---
+
+## 📊 Status do Projeto
+
+**Versão Atual**: Alpha 1 (em desenvolvimento)  
+**Progresso Geral**: 60% completo  
+**Próximo Milestone**: Janeiro 2026  
+**Engine**: Unity 6.2+ com URP
+
+### Sistemas Implementados
+
+- ✅ Sistema de Inventário (100%)
+- ✅ Sistema de Diálogo (95%)
+- ✅ Sistema de Quest (95%)
+- ✅ Sistema de NPC (80%)
+- ✅ Sistema de HUD (100%)
+- ✅ Sistema de Cristais (90%)
+- 🚧 Sistema de Habilidades (0% - próximo)
+- 🚧 Sistema de Evolução (0% - próximo)
+
+---
+
+## 📝 Convenções de Documentação
+
+### Símbolos
+
+- ⭐ - Documento essencial/importante
+- ✅ - Sistema completo
+- 🚧 - Em desenvolvimento
+- 📋 - Planejado
+- 🔮 - Futuro
+
+### Estrutura de Arquivos
+
+- **README.md** - Índice e visão geral
+- **Guide.md** - Guias de uso
+- **Setup.md** - Instruções de configuração
+- **Implementation.md** - Detalhes de implementação
+
+---
+
+## 🗃️ Arquivo
+
+Documentos obsoletos, verificações antigas e notas de implementação históricas estão em:
+
+- **[_Archive/](\_Archive/)** - Documentos arquivados
+
+Estes documentos são mantidos para referência histórica mas não são mais relevantes para o desenvolvimento atual.
+
+---
+
+## 🔄 Atualizações Recentes
+
+### v2.7 (28/11/2025)
+- ✅ Reorganização completa da documentação
+- ✅ Nova estrutura em 3 categorias principais
+- ✅ Arquivamento de documentos obsoletos
+- ✅ README principal criado
+
+### v2.6 (14/11/2025)
+- ✅ Sistema de HUD de Vida implementado
+- ✅ Sistema de Stealth avançado
+- ✅ Ninho do Slime completo
+- ✅ Floresta Calma - Clareira de Entrada
+
+---
+
+## 📞 Contato e Suporte
+
+Para dúvidas sobre a documentação ou sugestões de melhoria, consulte:
+
+- **Roadmap**: Para entender prioridades
+- **BoasPraticas**: Para padrões de código
+- **TechMapping**: Para arquitetura técnica
+
+---
+
+**Última Atualização**: 28/11/2025  
+**Versão da Documentação**: 2.0  
+**Mantido por**: Equipe The Slime King

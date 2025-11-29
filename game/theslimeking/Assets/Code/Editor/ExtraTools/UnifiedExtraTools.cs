@@ -87,6 +87,45 @@ namespace ExtraTools.Editor
         {
             return Selection.activeGameObject != null;
         }
+        
+        [MenuItem("Extra Tools/Setup/💬 Setup Dialogue NPC")]
+        public static void MenuSetupDialogueNPC()
+        {
+            if (Selection.activeGameObject == null)
+            {
+                UnityEngine.Debug.LogWarning("[UnifiedExtraTools] Nenhum GameObject selecionado.");
+                return;
+            }
+
+            ExtraTools.Editor.DialogueNPCSetupTool.SetupDialogueNPC(Selection.activeGameObject);
+        }
+
+        [MenuItem("Extra Tools/Setup/💬 Setup Dialogue NPC", true)]
+        public static bool ValidateMenuSetupDialogueNPC()
+        {
+            return Selection.activeGameObject != null;
+        }
+        
+        [MenuItem("Extra Tools/Setup/🔄 Migrate Old Dialogue System")]
+        public static void MenuMigrateOldDialogueSystem()
+        {
+            if (EditorUtility.DisplayDialog("Migrar Sistema Antigo",
+                "Esta ferramenta irá:\n\n" +
+                "• Buscar componentes do sistema antigo de diálogo\n" +
+                "• Remover componentes obsoletos\n" +
+                "• Gerar relatório de migração\n\n" +
+                "Deseja continuar?",
+                "Sim", "Cancelar"))
+            {
+                ExtraTools.Editor.DialogueMigrationTool.MigrateOldDialogueSystem();
+            }
+        }
+        
+        [MenuItem("Extra Tools/Setup/✅ Validate Dialogue References")]
+        public static void MenuValidateDialogueReferences()
+        {
+            ExtraTools.Editor.DialogueMigrationTool.ValidateReferences();
+        }
         #endregion
 
         #region Menu Items - Camera Setup
