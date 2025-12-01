@@ -1,83 +1,109 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TheSlimeKing.Dialogue
 {
     /// <summary>
-    /// Componente que gerencia o controle do jogador durante diálogos.
-    /// Pausa/limita o movimento quando o diálogo está ativo.
+    /// Controla o estado do jogador durante diálogos.
+    /// Pausa o movimento e outras ações enquanto o diálogo está ativo.
+    /// Escuta eventos de diálogo para pausar/retomar automaticamente.
     /// </summary>
     public class DialoguePlayerController : MonoBehaviour
     {
-        private static DialoguePlayerController instance;
-        private bool isDialogueActive;
+        #region Private Fields
         
-        /// <summary>
-        /// Singleton instance.
-        /// </summary>
-        public static DialoguePlayerController Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindFirstObjectByType<DialoguePlayerController>();
-                    
-                    if (instance == null)
-                    {
-                        GameObject obj = new GameObject("DialoguePlayerController");
-                        instance = obj.AddComponent<DialoguePlayerController>();
-                    }
-                }
-                return instance;
-            }
-        }
+        private PlayerInput playerInput;
+        private InputAction moveAction;
+        private InputAction attackAction;
+        private bool wasMoveEnabled;
+        private bool wasAttackEnabled;
         
-        /// <summary>
-        /// Verifica se o diálogo está ativo.
-        /// </summary>
-        public bool IsDialogueActive => isDialogueActive;
+        #endregion
+        
+        #region Unity Lifecycle
         
         private void Awake()
         {
-            if (instance == null)
+            // Obter PlayerInput (componente do novo Input System)
+            playerInput = GetComponent<PlayerInput>();
+            if (playerInput == null)
             {
-                instance = this;
-                DontDestroyOnLoad(gameObject);
+                UnityEngine.Debug.LogError("[DialoguePlayerController] PlayerInput não encontrado no mesmo GameObject!");
+                return;
             }
-            else if (instance != this)
+            
+            // Obter ações específicas que queremos desabilitar
+            moveAction = playerInput.actions["Move"];
+            attackAction = playerInput.actions["Attack"];
+            
+            if (moveAction == null)
             {
-                Destroy(gameObject);
+                UnityEngine.Debug.LogWarning("[DialoguePlayerController] Ação 'Move' não encontrada!");
+            }
+            
+            if (attackAction == null)
+            {
+                UnityEngine.Debug.LogWarning("[DialoguePlayerController] Ação 'Attack' não encontrada!");
             }
         }
         
-        /// <summary>
-        /// Pausa o controle do jogador.
-        /// </summary>
-        public void PausePlayerControl()
+        private void OnEnable()
         {
-            isDialogueActive = true;
-            
-            // Buscar PlayerController e desabilitar
-            var playerController = FindFirstObjectByType<PlayerController>();
-            if (playerController != null)
+            // Inscrever nos eventos de diálogo
+            DialogueEvents.OnDialogueStart += PausePlayerControl;
+            DialogueEvents.OnDialogueEnd += ResumePlayerControl;
+        }
+        
+        private void OnDisable()
+        {
+            // Desinscrever dos eventos de diálogo
+            DialogueEvents.OnDialogueStart -= PausePlayerControl;
+            DialogueEvents.OnDialogueEnd -= ResumePlayerControl;
+        }
+        
+        #endregion
+        
+        #region Private Methods
+        
+        /// <summary>
+        /// Pausa o controle do jogador desabilitando apenas ações de movimento e ataque.
+        /// Mantém o botão Interact ativo para avançar o diálogo.
+        /// </summary>
+        private void PausePlayerControl()
+        {
+            if (moveAction != null)
             {
-                playerController.enabled = false;
+                wasMoveEnabled = moveAction.enabled;
+                moveAction.Disable();
             }
+            
+            if (attackAction != null)
+            {
+                wasAttackEnabled = attackAction.enabled;
+                attackAction.Disable();
+            }
+            
+            UnityEngine.Debug.Log("[DialoguePlayerController] Movimento e ataque pausados.");
         }
         
         /// <summary>
-        /// Restaura o controle do jogador.
+        /// Retoma o controle do jogador reabilitando as ações.
         /// </summary>
-        public void RestorePlayerControl()
+        private void ResumePlayerControl()
         {
-            isDialogueActive = false;
-            
-            // Buscar PlayerController e habilitar
-            var playerController = FindFirstObjectByType<PlayerController>();
-            if (playerController != null)
+            if (moveAction != null && wasMoveEnabled)
             {
-                playerController.enabled = true;
+                moveAction.Enable();
             }
+            
+            if (attackAction != null && wasAttackEnabled)
+            {
+                attackAction.Enable();
+            }
+            
+            UnityEngine.Debug.Log("[DialoguePlayerController] Movimento e ataque retomados.");
         }
+        
+        #endregion
     }
 }

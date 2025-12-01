@@ -1,0 +1,70 @@
+{
+  "mcpServers": {
+    "ai-game-developer": {
+      "command": "G:/GameDev/slimeking/game/theslimeking/Library/mcp-server/win-x64/unity-mcp-server.exe",
+      "args": [
+        "--port=59614",
+        "--plugin-timeout=10000",
+        "--client-transport=stdio"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "Scene_Load",
+        "GameObject_Find",
+        "Scene_GetLoaded",
+        "GameObject_Create",
+        "GameObject_AddComponent",
+        "Assets_Refresh",
+        "Script_Execute",
+        "Assets_Prefab_Create",
+        "Editor_Selection_Set",
+        "Scene_Save",
+        "Console_GetLogs"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "G:\\GameDev\\slimeking\\game\\theslimeking"
+      ],
+      "disabled": false
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cyanheads/git-mcp-server"
+      ],
+      "disabled": true
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "disabled": true,
+      "autoApprove": [
+        "sequentialthinking"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "disabled": false
+    },
+    "Context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "disabled": true
+    }
+  }
+}

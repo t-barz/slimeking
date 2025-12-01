@@ -142,6 +142,9 @@ namespace TheSlimeKing.Dialogue
             {
                 dialogueText.text = "";
             }
+            
+            // Disparar evento de fim de diálogo
+            DialogueEvents.InvokeDialogueEnd();
         }
         
         /// <summary>
@@ -236,8 +239,8 @@ namespace TheSlimeKing.Dialogue
             isActive = true;
             currentTextIndex = 0;
             
-            // Pausar controle do jogador
-            DialoguePlayerController.Instance.PausePlayerControl();
+            // Disparar evento de início de diálogo
+            DialogueEvents.InvokeDialogueStart();
             
             if (dialoguePanel != null)
             {
@@ -332,9 +335,6 @@ namespace TheSlimeKing.Dialogue
             
             // Esconder UI
             Hide();
-            
-            // Restaurar controle do jogador
-            DialoguePlayerController.Instance.RestorePlayerControl();
             
             // Invocar callback após esconder
             callback?.Invoke();

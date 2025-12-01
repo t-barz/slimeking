@@ -1,6 +1,6 @@
 using UnityEditor;
 using UnityEngine;
-using TheSlimeKing.NPCs;
+using TheSlimeKing.Dialogue;
 using System.Linq;
 
 namespace ExtraTools.Editor.NPC
@@ -32,12 +32,12 @@ namespace ExtraTools.Editor.NPC
         {
             if (obj == null) return;
 
-            // Adiciona NPCDialogueController se não existir
-            var dialogue = obj.GetComponent<NPCDialogueController>();
+            // Adiciona DialogueNPC se não existir
+            var dialogue = obj.GetComponent<DialogueNPC>();
             if (dialogue == null)
             {
-                dialogue = obj.AddComponent<NPCDialogueController>();
-                Debug.Log($"[DialogueNPCSetupTool] NPCDialogueController adicionado em {obj.name}");
+                dialogue = obj.AddComponent<DialogueNPC>();
+                Debug.Log($"[DialogueNPCSetupTool] DialogueNPC adicionado em {obj.name}");
             }
 
             // Garante Collider2D (BoxCollider2D por padrão)
