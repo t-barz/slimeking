@@ -1,7 +1,7 @@
 # The Slime King - Roadmap de Desenvolvimento
 
 **Versão:** 2.7  
-**Última Atualização:** 01/12/2025  
+**Última Atualização:** 15/11/2025  
 **Baseado em:** GDD v10.1 + TechMapping atual + Análise Completa de Código  
 **Metodologia:** Desenvolvimento Iterativo em 6 Milestones
 
@@ -155,7 +155,7 @@
 
 - **Progresso Geral:** 60% completo ⬆️ (+5% desde última atualização)
 - **Milestone Atual:** ALPHA 1 (Vertical Slice Interno)
-- **Próximo Marco:** Janeiro 2026 ⚡ (ajustado)
+- **Próximo Marco:** Dezembro 2025 ⚡ (Adiantado!)
 - **Lançamento Previsto:** Maio 2027 ⚡
 - **Aceleração:** Gen AI (Vibe Coding) - Redução de 33-37% no tempo
 - **Sistemas Recentes:** 2 biomas completos + Floresta Calma expandida + quest system funcional
@@ -163,9 +163,9 @@
 ### Milestones Planejados (Acelerados)
 
 1. 🟢 **ALPHA 1** - Jan 2026 (2 meses) ⚡ - Vertical Slice Interno
-2. 🟢 **ALPHA 2** - Abr 2026 (5 meses) ⚡ - Vertical Slice Público
-3. 🟡 **BETA** - Out 2026 (10 meses) ⚡ - Feature Complete
-4. 🔵 **STEAM NEXT FEST** - Jan 2027 (13 meses) ⚡ - Demo Pública
+2. � **ALPAHA 2** - Abr 2026 (5 meses) ⚡ - Vertical Slice Público
+3. � **SBETA** - Out 2026 (10 meses) ⚡ - Feature Complete
+4. � **STLEAM NEXT FEST** - Jan 2027 (13 meses) ⚡ - Demo Pública
 5. 🚀 **RELEASE** - Mai 2027 (16 meses) ⚡ - Lançamento v1.0
 6. 🎁 **POST-RELEASE** - Jul 2027 (18 meses) - Suporte e DLC
 
@@ -240,7 +240,7 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 ### 🟢 **ALPHA 1 - Vertical Slice Interno** (Foco Atual)
 
-**Data Alvo:** 31 Janeiro 2026 (2 meses) ⚡ Acelerado com Gen AI  
+**Data Alvo:** Janeiro 2026 (2 meses) ⚡ Acelerado com Gen AI  
 **Objetivo:** Demonstrar core gameplay com 2 biomas jogáveis
 
 **Conteúdo:**
@@ -539,7 +539,7 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 ```
 2025 Nov ████████████████████████████████████████████████ (Atual - 40% completo) ⬆️
          ↑ 2 biomas completos + puzzle stealth + sistema combate simplificado
-2026 Jan ████████████████ ALPHA 1 ✓ ⚡ (31 Jan)
+2026 Jan ████████████████ ALPHA 1 ✓ ⚡
 2026 Abr ████████████████ ALPHA 2 ✓ ⚡
 2026 Out ████████████████ BETA ✓ ⚡
 2027 Jan ████████████████ STEAM NEXT FEST ✓ ⚡
@@ -569,7 +569,7 @@ Este projeto utiliza **Vibe Coding** (desenvolvimento assistido por Gen AI) para
 
 | Milestone | Data Original | Data Atual | Status | Variação | Motivo |
 |-----------|---------------|------------|--------|----------|---------|
-| **ALPHA 1** | Fev 2026 | **31 Jan 2026** | 🟢 Adiantado | **-4 semanas** | Sistemas base já implementados |
+| **ALPHA 1** | Fev 2026 | **Jan 2026** | 🟢 Adiantado | **-4 semanas** | Sistemas base já implementados |
 | **ALPHA 2** | Jun 2026 | **Abr 2026** | 🟡 Mantido | -2 semanas | Aceleração com Gen AI |
 | **BETA** | Jan 2027 | **Out 2026** | 🟡 Mantido | -3 meses | Progressão acelerada |
 | **STEAM NEXT FEST** | Abr 2027 | **Jan 2027** | 🟡 Mantido | -3 meses | Conforme planejamento |

@@ -2021,6 +2021,46 @@ public class PlayerController : MonoBehaviour
     #region Public Methods
 
     /// <summary>
+    /// Retorna a instância do Input System Actions para acesso externo.
+    /// Usado por managers (como PauseManager) para controlar action maps.
+    /// </summary>
+    /// <returns>Referência ao InputSystem_Actions ou null se não inicializado</returns>
+    public InputSystem_Actions GetInputActions()
+    {
+        return _inputActions;
+    }
+
+    /// <summary>
+    /// Desabilita o input do Gameplay action map.
+    /// Usado por sistemas que precisam bloquear input do jogador (diálogos, pause, etc).
+    /// </summary>
+    public void DisableGameplayInput()
+    {
+        if (_inputActions != null)
+        {
+            _inputActions.Gameplay.Disable();
+
+            if (enableLogs)
+                UnityEngine.Debug.Log("[PlayerController] Gameplay input disabled");
+        }
+    }
+
+    /// <summary>
+    /// Reabilita o input do Gameplay action map.
+    /// Restaura o input do jogador após ser bloqueado por sistemas externos.
+    /// </summary>
+    public void EnableGameplayInput()
+    {
+        if (_inputActions != null)
+        {
+            _inputActions.Gameplay.Enable();
+
+            if (enableLogs)
+                UnityEngine.Debug.Log("[PlayerController] Gameplay input enabled");
+        }
+    }
+
+    /// <summary>
     /// Desabilita o movimento e ataque do jogador.
     /// Usado durante teletransporte, cutscenes ou outras situações onde o controle deve ser bloqueado.
     /// </summary>
@@ -2030,7 +2070,7 @@ public class PlayerController : MonoBehaviour
         _canAttack = false;
 
         if (enableLogs)
-            Debug.Log("PlayerController: Movimento e ataque desabilitados.");
+            UnityEngine.Debug.Log("[PlayerController] Movimento e ataque desabilitados");
     }
 
     /// <summary>
@@ -2043,7 +2083,7 @@ public class PlayerController : MonoBehaviour
         _canAttack = true;
 
         if (enableLogs)
-            Debug.Log("PlayerController: Movimento e ataque reabilitados.");
+            UnityEngine.Debug.Log("[PlayerController] Movimento e ataque reabilitados");
     }
 
     #endregion

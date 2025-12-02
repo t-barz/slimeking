@@ -28,7 +28,6 @@ namespace TheSlimeKing.UI
         [SerializeField] private Button closeButton;
 
         private bool isInitialized = false;
-        private PauseMenu pauseMenu;
 
         private void Awake()
         {
@@ -37,9 +36,6 @@ namespace TheSlimeKing.UI
             {
                 closeButton.onClick.AddListener(Hide);
             }
-
-            // Tenta encontrar o PauseMenu na cena
-            pauseMenu = FindObjectOfType<PauseMenu>();
 
             // Inicializa os slots
             InitializeSlots();
@@ -103,14 +99,6 @@ namespace TheSlimeKing.UI
             }
 
             isInitialized = true;
-        }
-
-        /// <summary>
-        /// Define a referência ao PauseMenu.
-        /// </summary>
-        public void SetPauseMenu(PauseMenu menu)
-        {
-            pauseMenu = menu;
         }
 
         /// <summary>
