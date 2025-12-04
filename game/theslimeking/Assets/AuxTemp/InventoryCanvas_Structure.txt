@@ -1,0 +1,2425 @@
+- GameObject: InventoryCanvas
+  Active: True
+  Tag: Untagged
+  Layer: Default (0)
+  Transform: Pos (960.00, 481.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (0.94, 0.94, 0.94)
+  Components (5):
+    • RectTransform
+      - rect: (x:-1017.18, y:-509.65, width:2034.35, height:1019.29)
+      - anchorMin: (0.00, 0.00)
+      - anchorMax: (0.00, 0.00)
+      - anchoredPosition: (960.00, 481.00)
+      - sizeDelta: (2034.35, 1019.29)
+      - pivot: (0.50, 0.50)
+      - anchoredPosition3D: (960.00, 481.00, 0.00)
+      - offsetMin: (-57.17, -28.65)
+      - offsetMax: (1977.18, 990.65)
+      - drivenByObject: InventoryCanvas (UnityEngine.Canvas)
+      - sendChildDimensionsChange: False
+      - position: (960.00, 481.00, 0.00)
+      - localPosition: (960.00, 481.00, 0.00)
+      - eulerAngles: (0.00, 0.00, 0.00)
+      - localEulerAngles: (0.00, 0.00, 0.00)
+      - right: (1.00, 0.00, 0.00)
+      - up: (0.00, 1.00, 0.00)
+      - forward: (0.00, 0.00, 1.00)
+      - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+      - localScale: (0.94, 0.94, 0.94)
+      - parent: 
+      - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-509.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	481.00000
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+      - root: InventoryCanvas (UnityEngine.RectTransform)
+      - childCount: 1
+      - lossyScale: (0.94, 0.94, 0.94)
+      - hasChanged: True
+      - hierarchyCapacity: 18
+      - hierarchyCount: 18
+      - transform: InventoryCanvas (UnityEngine.RectTransform)
+      - gameObject: InventoryCanvas (UnityEngine.GameObject)
+      - tag: Untagged
+      - name: InventoryCanvas
+      - hideFlags: None
+    • Canvas
+      - renderMode: ScreenSpaceOverlay
+      - isRootCanvas: True
+      - pixelRect: (x:0.00, y:0.00, width:1920.00, height:962.00)
+      - scaleFactor: 0,9437906
+      - referencePixelsPerUnit: 100
+      - overridePixelPerfect: False
+      - vertexColorAlwaysGammaSpace: False
+      - pixelPerfect: False
+      - planeDistance: 100
+      - renderOrder: 0
+      - overrideSorting: False
+      - sortingOrder: 10
+      - targetDisplay: 0
+      - sortingLayerID: 0
+      - cachedSortingLayerValue: 0
+      - additionalShaderChannels: None
+      - sortingLayerName: Default
+      - rootCanvas: InventoryCanvas (UnityEngine.Canvas)
+      - renderingDisplaySize: (1920.00, 962.00)
+      - updateRectTransformForStandalone: Enabled
+      - worldCamera: 
+      - normalizedSortingGridSize: 0,1
+      - sortingGridNormalizedSize: 0
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: InventoryCanvas (UnityEngine.RectTransform)
+      - gameObject: InventoryCanvas (UnityEngine.GameObject)
+      - tag: Untagged
+      - name: InventoryCanvas
+      - hideFlags: None
+    • CanvasScaler
+      - uiScaleMode: ScaleWithScreenSize
+      - referencePixelsPerUnit: 100
+      - scaleFactor: 1
+      - referenceResolution: (1920.00, 1080.00)
+      - screenMatchMode: MatchWidthOrHeight
+      - matchWidthOrHeight: 0,5
+      - physicalUnit: Points
+      - fallbackScreenDPI: 96
+      - defaultSpriteDPI: 96
+      - dynamicPixelsPerUnit: 1
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: True
+      - didAwake: True
+      - runInEditMode: True
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: InventoryCanvas (UnityEngine.RectTransform)
+      - gameObject: InventoryCanvas (UnityEngine.GameObject)
+      - tag: Untagged
+      - name: InventoryCanvas
+      - hideFlags: None
+    • GraphicRaycaster
+      - sortOrderPriority: 10
+      - renderOrderPriority: 0
+      - ignoreReversedGraphics: True
+      - blockingObjects: None
+      - blockingMask: UnityEngine.LayerMask
+      - eventCamera: 
+      - priority: 0
+      - rootRaycaster: Name: InventoryCanvas (UnityEngine.GameObject)
+eventCamera: 
+sortOrderPriority: 10
+renderOrderPriority: 0
+      - destroyCancellationToken: System.Threading.CancellationToken
+      - useGUILayout: True
+      - didStart: False
+      - didAwake: False
+      - runInEditMode: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: InventoryCanvas (UnityEngine.RectTransform)
+      - gameObject: InventoryCanvas (UnityEngine.GameObject)
+      - tag: Untagged
+      - name: InventoryCanvas
+      - hideFlags: None
+    • CanvasGroup
+      - alpha: 0
+      - interactable: False
+      - blocksRaycasts: False
+      - ignoreParentGroups: False
+      - enabled: True
+      - isActiveAndEnabled: True
+      - transform: InventoryCanvas (UnityEngine.RectTransform)
+      - gameObject: InventoryCanvas (UnityEngine.GameObject)
+      - tag: Untagged
+      - name: InventoryCanvas
+      - hideFlags: None
+  Children (1):
+  - GameObject: InventoryPanel
+    Active: False
+    Tag: Untagged
+    Layer: Default (0)
+    Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+    Components (3):
+      • RectTransform
+        - rect: (x:-300.00, y:-225.00, width:600.00, height:450.00)
+        - anchorMin: (0.50, 0.50)
+        - anchorMax: (0.50, 0.50)
+        - anchoredPosition: (0.00, 0.00)
+        - sizeDelta: (600.00, 450.00)
+        - pivot: (0.50, 0.50)
+        - anchoredPosition3D: (0.00, 0.00, 0.00)
+        - offsetMin: (-300.00, -225.00)
+        - offsetMax: (300.00, 225.00)
+        - drivenByObject: 
+        - sendChildDimensionsChange: False
+        - position: (960.00, 481.00, 0.00)
+        - localPosition: (0.00, 0.00, 0.00)
+        - eulerAngles: (0.00, 0.00, 0.00)
+        - localEulerAngles: (0.00, 0.00, 0.00)
+        - right: (1.00, 0.00, 0.00)
+        - up: (0.00, 1.00, 0.00)
+        - forward: (0.00, 0.00, 1.00)
+        - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+        - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+        - localScale: (1.00, 1.00, 1.00)
+        - parent: InventoryCanvas (UnityEngine.RectTransform)
+        - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-509.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+        - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	481.00000
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+        - root: InventoryCanvas (UnityEngine.RectTransform)
+        - childCount: 3
+        - lossyScale: (0.94, 0.94, 0.94)
+        - hasChanged: True
+        - hierarchyCapacity: 18
+        - hierarchyCount: 18
+        - transform: InventoryPanel (UnityEngine.RectTransform)
+        - gameObject: InventoryPanel (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: InventoryPanel
+        - hideFlags: None
+      • CanvasRenderer
+        - hasPopInstruction: False
+        - materialCount: 0
+        - popMaterialCount: 0
+        - absoluteDepth: -1
+        - hasMoved: False
+        - cullTransparentMesh: True
+        - hasRectClipping: False
+        - relativeDepth: -1
+        - cull: False
+        - isMask: False
+        - clippingSoftness: (0.00, 0.00)
+        - transform: InventoryPanel (UnityEngine.RectTransform)
+        - gameObject: InventoryPanel (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: InventoryPanel
+        - hideFlags: None
+      • Image
+        - sprite: null
+        - overrideSprite: null
+        - type: Simple
+        - preserveAspect: False
+        - fillCenter: True
+        - fillMethod: Radial360
+        - fillAmount: 1
+        - fillClockwise: True
+        - fillOrigin: 0
+        - eventAlphaThreshold: 1
+        - alphaHitTestMinimumThreshold: 0
+        - useSpriteMesh: False
+        - mainTexture: UnityWhite (UnityEngine.Texture2D)
+        - hasBorder: False
+        - pixelsPerUnitMultiplier: 1
+        - pixelsPerUnit: 1
+        - material: Default UI Material (UnityEngine.Material)
+        - minWidth: 0
+        - preferredWidth: 0
+        - flexibleWidth: -1
+        - minHeight: 0
+        - preferredHeight: 0
+        - flexibleHeight: -1
+        - layoutPriority: 0
+        - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+        - maskable: True
+        - isMaskingGraphic: False
+        - color: RGBA(0.360, 0.250, 0.200, 1.000)
+        - raycastTarget: True
+        - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+        - depth: -1
+        - rectTransform: InventoryPanel (UnityEngine.RectTransform)
+        - canvas: InventoryCanvas (UnityEngine.Canvas)
+        - canvasRenderer: InventoryPanel (UnityEngine.CanvasRenderer)
+        - defaultMaterial: Default UI Material (UnityEngine.Material)
+        - materialForRendering: Default UI Material (UnityEngine.Material)
+        - destroyCancellationToken: System.Threading.CancellationToken
+        - useGUILayout: True
+        - didStart: False
+        - didAwake: False
+        - runInEditMode: True
+        - enabled: True
+        - isActiveAndEnabled: False
+        - transform: InventoryPanel (UnityEngine.RectTransform)
+        - gameObject: InventoryPanel (UnityEngine.GameObject)
+        - tag: Untagged
+        - name: InventoryPanel
+        - hideFlags: None
+    Children (3):
+    - GameObject: Title
+      Active: True
+      Tag: Untagged
+      Layer: Default (0)
+      Transform: Pos (0.00, 215.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+      Components (3):
+        • RectTransform
+          - rect: (x:-250.00, y:-60.00, width:500.00, height:60.00)
+          - anchorMin: (0.50, 1.00)
+          - anchorMax: (0.50, 1.00)
+          - anchoredPosition: (0.00, -10.00)
+          - sizeDelta: (500.00, 60.00)
+          - pivot: (0.50, 1.00)
+          - anchoredPosition3D: (0.00, -10.00, 0.00)
+          - offsetMin: (-250.00, -70.00)
+          - offsetMax: (250.00, -10.00)
+          - drivenByObject: 
+          - sendChildDimensionsChange: False
+          - position: (960.00, 683.92, 0.00)
+          - localPosition: (0.00, 215.00, 0.00)
+          - eulerAngles: (0.00, 0.00, 0.00)
+          - localEulerAngles: (0.00, 0.00, 0.00)
+          - right: (1.00, 0.00, 0.00)
+          - up: (0.00, 1.00, 0.00)
+          - forward: (0.00, 0.00, 1.00)
+          - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localScale: (1.00, 1.00, 1.00)
+          - parent: InventoryPanel (UnityEngine.RectTransform)
+          - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-724.64700
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	683.91500
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - root: InventoryCanvas (UnityEngine.RectTransform)
+          - childCount: 0
+          - lossyScale: (0.94, 0.94, 0.94)
+          - hasChanged: True
+          - hierarchyCapacity: 18
+          - hierarchyCount: 18
+          - transform: Title (UnityEngine.RectTransform)
+          - gameObject: Title (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: Title
+          - hideFlags: None
+        • CanvasRenderer
+          - hasPopInstruction: False
+          - materialCount: 0
+          - popMaterialCount: 0
+          - absoluteDepth: -1
+          - hasMoved: False
+          - cullTransparentMesh: True
+          - hasRectClipping: False
+          - relativeDepth: -1
+          - cull: False
+          - isMask: False
+          - clippingSoftness: (0.00, 0.00)
+          - transform: Title (UnityEngine.RectTransform)
+          - gameObject: Title (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: Title
+          - hideFlags: None
+        • TextMeshProUGUI
+          - materialForRendering: LiberationSans SDF Material (UnityEngine.Material)
+          - autoSizeTextContainer: False
+          - mesh: 
+          - canvasRenderer: Title (UnityEngine.CanvasRenderer)
+          - maskOffset: (0.00, 0.00, 0.00, 0.00)
+          - text: INVENTÁRIO
+          - textPreprocessor: 
+          - isRightToLeftText: False
+          - font: LiberationSans SDF (TMPro.TMP_FontAsset)
+          - fontSharedMaterial: LiberationSans SDF Material (UnityEngine.Material)
+          - fontMaterial: LiberationSans SDF Material (Instance) (UnityEngine.Material)
+          - color: RGBA(1.000, 1.000, 1.000, 1.000)
+          - alpha: 1
+          - enableVertexGradient: False
+          - colorGradient: TMPro.VertexGradient
+          - colorGradientPreset: 
+          - spriteAsset: 
+          - tintAllSprites: False
+          - styleSheet: 
+          - textStyle: TMPro.TMP_Style
+          - overrideColorTags: False
+          - faceColor: RGBA(255, 255, 255, 255)
+          - outlineColor: RGBA(0, 0, 0, 255)
+          - outlineWidth: 0,2
+          - fontSize: 36
+          - fontWeight: Regular
+          - pixelsPerUnit: 1
+          - enableAutoSizing: False
+          - fontSizeMin: 18
+          - fontSizeMax: 72
+          - fontStyle: Bold
+          - isUsingBold: False
+          - horizontalAlignment: Center
+          - verticalAlignment: Middle
+          - alignment: Center
+          - characterSpacing: 0
+          - characterHorizontalScale: 1
+          - wordSpacing: 0
+          - lineSpacing: 0
+          - lineSpacingAdjustment: 0
+          - paragraphSpacing: 0
+          - characterWidthAdjustment: 0
+          - textWrappingMode: Normal
+          - enableWordWrapping: True
+          - wordWrappingRatios: 0,4
+          - overflowMode: Overflow
+          - isTextOverflowing: False
+          - firstOverflowCharacterIndex: -1
+          - linkedTextComponent: 
+          - isTextTruncated: False
+          - enableKerning: True
+          - fontFeatures: System.Collections.Generic.List`1[UnityEngine.TextCore.OTL_FeatureTag]
+          - extraPadding: False
+          - richText: True
+          - emojiFallbackSupport: True
+          - parseCtrlCharacters: True
+          - isOverlay: False
+          - isOrthographic: True
+          - enableCulling: False
+          - ignoreVisibility: True
+          - horizontalMapping: Character
+          - verticalMapping: Character
+          - mappingUvLineOffset: 0
+          - renderMode: Render
+          - geometrySortingOrder: Normal
+          - isTextObjectScaleStatic: False
+          - vertexBufferAutoSizeReduction: False
+          - firstVisibleCharacter: 0
+          - maxVisibleCharacters: 99999
+          - maxVisibleWords: 99999
+          - maxVisibleLines: 99999
+          - useMaxVisibleDescender: True
+          - pageToDisplay: 1
+          - margin: (0.00, 0.00, 0.00, 0.00)
+          - textInfo: TMPro.TMP_TextInfo
+          - havePropertiesChanged: False
+          - isUsingLegacyAnimationComponent: False
+          - transform: Title (UnityEngine.RectTransform)
+          - rectTransform: Title (UnityEngine.RectTransform)
+          - isVolumetricText: False
+          - bounds: Center: (0.00, 0.00, 0.00), Extents: (0.00, 0.00, 0.00)
+          - textBounds: Center: (0.00, 0.00, 0.00), Extents: (-2147484000.00, -2147484000.00, 0.00)
+          - flexibleHeight: -1
+          - flexibleWidth: -1
+          - minWidth: 0
+          - minHeight: 0
+          - maxWidth: 0
+          - maxHeight: 0
+          - preferredWidth: 0
+          - preferredHeight: 0
+          - renderedWidth: -4,294967E+09
+          - renderedHeight: -4,294967E+09
+          - layoutPriority: 0
+          - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+          - maskable: True
+          - isMaskingGraphic: False
+          - raycastTarget: True
+          - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+          - depth: -1
+          - canvas: InventoryCanvas (UnityEngine.Canvas)
+          - defaultMaterial: Default UI Material (UnityEngine.Material)
+          - material: Default UI Material (UnityEngine.Material)
+          - mainTexture: UnityWhite (UnityEngine.Texture2D)
+          - destroyCancellationToken: System.Threading.CancellationToken
+          - useGUILayout: True
+          - didStart: False
+          - didAwake: False
+          - runInEditMode: True
+          - enabled: True
+          - isActiveAndEnabled: False
+          - gameObject: Title (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: Title
+          - hideFlags: None
+    - GameObject: CloseButton
+      Active: True
+      Tag: Untagged
+      Layer: Default (0)
+      Transform: Pos (290.00, 215.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+      Components (4):
+        • RectTransform
+          - rect: (x:-40.00, y:-40.00, width:40.00, height:40.00)
+          - anchorMin: (1.00, 1.00)
+          - anchorMax: (1.00, 1.00)
+          - anchoredPosition: (-10.00, -10.00)
+          - sizeDelta: (40.00, 40.00)
+          - pivot: (1.00, 1.00)
+          - anchoredPosition3D: (-10.00, -10.00, 0.00)
+          - offsetMin: (-50.00, -50.00)
+          - offsetMax: (-10.00, -10.00)
+          - drivenByObject: 
+          - sendChildDimensionsChange: False
+          - position: (1233.70, 683.92, 0.00)
+          - localPosition: (290.00, 215.00, 0.00)
+          - eulerAngles: (0.00, 0.00, 0.00)
+          - localEulerAngles: (0.00, 0.00, 0.00)
+          - right: (1.00, 0.00, 0.00)
+          - up: (0.00, 1.00, 0.00)
+          - forward: (0.00, 0.00, 1.00)
+          - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localScale: (1.00, 1.00, 1.00)
+          - parent: InventoryPanel (UnityEngine.RectTransform)
+          - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1307.17500
+0.00000	1.05956	0.00000	-724.64700
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - localToWorldMatrix: 0.94379	0.00000	0.00000	1233.69900
+0.00000	0.94379	0.00000	683.91500
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - root: InventoryCanvas (UnityEngine.RectTransform)
+          - childCount: 1
+          - lossyScale: (0.94, 0.94, 0.94)
+          - hasChanged: True
+          - hierarchyCapacity: 18
+          - hierarchyCount: 18
+          - transform: CloseButton (UnityEngine.RectTransform)
+          - gameObject: CloseButton (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: CloseButton
+          - hideFlags: None
+        • CanvasRenderer
+          - hasPopInstruction: False
+          - materialCount: 0
+          - popMaterialCount: 0
+          - absoluteDepth: -1
+          - hasMoved: False
+          - cullTransparentMesh: True
+          - hasRectClipping: False
+          - relativeDepth: -1
+          - cull: False
+          - isMask: False
+          - clippingSoftness: (0.00, 0.00)
+          - transform: CloseButton (UnityEngine.RectTransform)
+          - gameObject: CloseButton (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: CloseButton
+          - hideFlags: None
+        • Image
+          - sprite: null
+          - overrideSprite: null
+          - type: Simple
+          - preserveAspect: False
+          - fillCenter: True
+          - fillMethod: Radial360
+          - fillAmount: 1
+          - fillClockwise: True
+          - fillOrigin: 0
+          - eventAlphaThreshold: 1
+          - alphaHitTestMinimumThreshold: 0
+          - useSpriteMesh: False
+          - mainTexture: UnityWhite (UnityEngine.Texture2D)
+          - hasBorder: False
+          - pixelsPerUnitMultiplier: 1
+          - pixelsPerUnit: 1
+          - material: Default UI Material (UnityEngine.Material)
+          - minWidth: 0
+          - preferredWidth: 0
+          - flexibleWidth: -1
+          - minHeight: 0
+          - preferredHeight: 0
+          - flexibleHeight: -1
+          - layoutPriority: 0
+          - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+          - maskable: True
+          - isMaskingGraphic: False
+          - color: RGBA(1.000, 0.270, 0.270, 1.000)
+          - raycastTarget: True
+          - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+          - depth: -1
+          - rectTransform: CloseButton (UnityEngine.RectTransform)
+          - canvas: InventoryCanvas (UnityEngine.Canvas)
+          - canvasRenderer: CloseButton (UnityEngine.CanvasRenderer)
+          - defaultMaterial: Default UI Material (UnityEngine.Material)
+          - materialForRendering: Default UI Material (UnityEngine.Material)
+          - destroyCancellationToken: System.Threading.CancellationToken
+          - useGUILayout: True
+          - didStart: False
+          - didAwake: False
+          - runInEditMode: True
+          - enabled: True
+          - isActiveAndEnabled: False
+          - transform: CloseButton (UnityEngine.RectTransform)
+          - gameObject: CloseButton (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: CloseButton
+          - hideFlags: None
+        • Button
+          - onClick: UnityEngine.UI.Button+ButtonClickedEvent UnityEngine.UI.Button+ButtonClickedEvent
+          - navigation: UnityEngine.UI.Navigation
+          - transition: ColorTint
+          - colors: UnityEngine.UI.ColorBlock
+          - spriteState: UnityEngine.UI.SpriteState
+          - animationTriggers: UnityEngine.UI.AnimationTriggers
+          - targetGraphic: CloseButton (UnityEngine.UI.Image)
+          - interactable: True
+          - image: CloseButton (UnityEngine.UI.Image)
+          - animator: null
+          - destroyCancellationToken: System.Threading.CancellationToken
+          - useGUILayout: True
+          - didStart: False
+          - didAwake: False
+          - runInEditMode: True
+          - enabled: True
+          - isActiveAndEnabled: False
+          - transform: CloseButton (UnityEngine.RectTransform)
+          - gameObject: CloseButton (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: CloseButton
+          - hideFlags: None
+      Children (1):
+      - GameObject: Text
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (-20.00, -20.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (3):
+          • RectTransform
+            - rect: (x:-20.00, y:-20.00, width:40.00, height:40.00)
+            - anchorMin: (0.00, 0.00)
+            - anchorMax: (1.00, 1.00)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (0.00, 0.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (0.00, 0.00)
+            - offsetMax: (0.00, 0.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (1214.82, 665.04, 0.00)
+            - localPosition: (-20.00, -20.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: CloseButton (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1287.17500
+0.00000	1.05956	0.00000	-704.64700
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	1214.82300
+0.00000	0.94379	0.00000	665.03920
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Text (UnityEngine.RectTransform)
+            - gameObject: Text (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Text
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Text (UnityEngine.RectTransform)
+            - gameObject: Text (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Text
+            - hideFlags: None
+          • TextMeshProUGUI
+            - materialForRendering: LiberationSans SDF Material (UnityEngine.Material)
+            - autoSizeTextContainer: False
+            - mesh: 
+            - canvasRenderer: Text (UnityEngine.CanvasRenderer)
+            - maskOffset: (0.00, 0.00, 0.00, 0.00)
+            - text: X
+            - textPreprocessor: 
+            - isRightToLeftText: False
+            - font: LiberationSans SDF (TMPro.TMP_FontAsset)
+            - fontSharedMaterial: LiberationSans SDF Material (UnityEngine.Material)
+            - fontMaterial: LiberationSans SDF Material (Instance) (UnityEngine.Material)
+            - color: RGBA(1.000, 1.000, 1.000, 1.000)
+            - alpha: 1
+            - enableVertexGradient: False
+            - colorGradient: TMPro.VertexGradient
+            - colorGradientPreset: 
+            - spriteAsset: 
+            - tintAllSprites: False
+            - styleSheet: 
+            - textStyle: TMPro.TMP_Style
+            - overrideColorTags: False
+            - faceColor: RGBA(255, 255, 255, 255)
+            - outlineColor: RGBA(0, 0, 0, 255)
+            - outlineWidth: 0,2
+            - fontSize: 24
+            - fontWeight: Regular
+            - pixelsPerUnit: 1
+            - enableAutoSizing: False
+            - fontSizeMin: 18
+            - fontSizeMax: 72
+            - fontStyle: Normal
+            - isUsingBold: False
+            - horizontalAlignment: Center
+            - verticalAlignment: Middle
+            - alignment: Center
+            - characterSpacing: 0
+            - characterHorizontalScale: 1
+            - wordSpacing: 0
+            - lineSpacing: 0
+            - lineSpacingAdjustment: 0
+            - paragraphSpacing: 0
+            - characterWidthAdjustment: 0
+            - textWrappingMode: Normal
+            - enableWordWrapping: True
+            - wordWrappingRatios: 0,4
+            - overflowMode: Overflow
+            - isTextOverflowing: False
+            - firstOverflowCharacterIndex: -1
+            - linkedTextComponent: 
+            - isTextTruncated: False
+            - enableKerning: True
+            - fontFeatures: System.Collections.Generic.List`1[UnityEngine.TextCore.OTL_FeatureTag]
+            - extraPadding: False
+            - richText: True
+            - emojiFallbackSupport: True
+            - parseCtrlCharacters: True
+            - isOverlay: False
+            - isOrthographic: True
+            - enableCulling: False
+            - ignoreVisibility: True
+            - horizontalMapping: Character
+            - verticalMapping: Character
+            - mappingUvLineOffset: 0
+            - renderMode: Render
+            - geometrySortingOrder: Normal
+            - isTextObjectScaleStatic: False
+            - vertexBufferAutoSizeReduction: False
+            - firstVisibleCharacter: 0
+            - maxVisibleCharacters: 99999
+            - maxVisibleWords: 99999
+            - maxVisibleLines: 99999
+            - useMaxVisibleDescender: True
+            - pageToDisplay: 1
+            - margin: (0.00, 0.00, 0.00, 0.00)
+            - textInfo: TMPro.TMP_TextInfo
+            - havePropertiesChanged: False
+            - isUsingLegacyAnimationComponent: False
+            - transform: Text (UnityEngine.RectTransform)
+            - rectTransform: Text (UnityEngine.RectTransform)
+            - isVolumetricText: False
+            - bounds: Center: (0.00, 0.00, 0.00), Extents: (0.00, 0.00, 0.00)
+            - textBounds: Center: (0.00, 0.00, 0.00), Extents: (-2147484000.00, -2147484000.00, 0.00)
+            - flexibleHeight: -1
+            - flexibleWidth: -1
+            - minWidth: 0
+            - minHeight: 0
+            - maxWidth: 0
+            - maxHeight: 0
+            - preferredWidth: 0
+            - preferredHeight: 0
+            - renderedWidth: -4,294967E+09
+            - renderedHeight: -4,294967E+09
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - material: Default UI Material (UnityEngine.Material)
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - gameObject: Text (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Text
+            - hideFlags: None
+    - GameObject: SlotsContainer
+      Active: True
+      Tag: Untagged
+      Layer: Default (0)
+      Transform: Pos (0.00, -30.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+      Components (2):
+        • RectTransform
+          - rect: (x:-260.00, y:-165.00, width:520.00, height:330.00)
+          - anchorMin: (0.50, 0.50)
+          - anchorMax: (0.50, 0.50)
+          - anchoredPosition: (0.00, -30.00)
+          - sizeDelta: (520.00, 330.00)
+          - pivot: (0.50, 0.50)
+          - anchoredPosition3D: (0.00, -30.00, 0.00)
+          - offsetMin: (-260.00, -195.00)
+          - offsetMax: (260.00, 135.00)
+          - drivenByObject: 
+          - sendChildDimensionsChange: False
+          - position: (960.00, 452.69, 0.00)
+          - localPosition: (0.00, -30.00, 0.00)
+          - eulerAngles: (0.00, 0.00, 0.00)
+          - localEulerAngles: (0.00, 0.00, 0.00)
+          - right: (1.00, 0.00, 0.00)
+          - up: (0.00, 1.00, 0.00)
+          - forward: (0.00, 0.00, 1.00)
+          - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+          - localScale: (1.00, 1.00, 1.00)
+          - parent: InventoryPanel (UnityEngine.RectTransform)
+          - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+          - root: InventoryCanvas (UnityEngine.RectTransform)
+          - childCount: 12
+          - lossyScale: (0.94, 0.94, 0.94)
+          - hasChanged: True
+          - hierarchyCapacity: 18
+          - hierarchyCount: 18
+          - transform: SlotsContainer (UnityEngine.RectTransform)
+          - gameObject: SlotsContainer (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: SlotsContainer
+          - hideFlags: None
+        • GridLayoutGroup
+          - startCorner: UpperLeft
+          - startAxis: Horizontal
+          - cellSize: (120.00, 100.00)
+          - spacing: (10.00, 10.00)
+          - constraint: FixedColumnCount
+          - constraintCount: 4
+          - padding: RectOffset (l:0 r:0 t:0 b:0)
+          - childAlignment: MiddleCenter
+          - minWidth: 0
+          - preferredWidth: 0
+          - flexibleWidth: 0
+          - minHeight: 0
+          - preferredHeight: 0
+          - flexibleHeight: 0
+          - layoutPriority: 0
+          - destroyCancellationToken: System.Threading.CancellationToken
+          - useGUILayout: True
+          - didStart: False
+          - didAwake: False
+          - runInEditMode: True
+          - enabled: True
+          - isActiveAndEnabled: False
+          - transform: SlotsContainer (UnityEngine.RectTransform)
+          - gameObject: SlotsContainer (UnityEngine.GameObject)
+          - tag: Untagged
+          - name: SlotsContainer
+          - hideFlags: None
+      Children (12):
+      - GameObject: Slot_0
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_0 (UnityEngine.RectTransform)
+            - gameObject: Slot_0 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_0
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_0 (UnityEngine.RectTransform)
+            - gameObject: Slot_0 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_0
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_0 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_0 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_0 (UnityEngine.RectTransform)
+            - gameObject: Slot_0 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_0
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_0 (UnityEngine.RectTransform)
+            - gameObject: Slot_0 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_0
+            - hideFlags: None
+      - GameObject: Slot_1
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_1 (UnityEngine.RectTransform)
+            - gameObject: Slot_1 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_1
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_1 (UnityEngine.RectTransform)
+            - gameObject: Slot_1 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_1
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_1 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_1 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_1 (UnityEngine.RectTransform)
+            - gameObject: Slot_1 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_1
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_1 (UnityEngine.RectTransform)
+            - gameObject: Slot_1 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_1
+            - hideFlags: None
+      - GameObject: Slot_2
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_2 (UnityEngine.RectTransform)
+            - gameObject: Slot_2 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_2
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_2 (UnityEngine.RectTransform)
+            - gameObject: Slot_2 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_2
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_2 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_2 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_2 (UnityEngine.RectTransform)
+            - gameObject: Slot_2 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_2
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_2 (UnityEngine.RectTransform)
+            - gameObject: Slot_2 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_2
+            - hideFlags: None
+      - GameObject: Slot_3
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_3 (UnityEngine.RectTransform)
+            - gameObject: Slot_3 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_3
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_3 (UnityEngine.RectTransform)
+            - gameObject: Slot_3 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_3
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_3 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_3 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_3 (UnityEngine.RectTransform)
+            - gameObject: Slot_3 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_3
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_3 (UnityEngine.RectTransform)
+            - gameObject: Slot_3 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_3
+            - hideFlags: None
+      - GameObject: Slot_4
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_4 (UnityEngine.RectTransform)
+            - gameObject: Slot_4 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_4
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_4 (UnityEngine.RectTransform)
+            - gameObject: Slot_4 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_4
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_4 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_4 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_4 (UnityEngine.RectTransform)
+            - gameObject: Slot_4 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_4
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_4 (UnityEngine.RectTransform)
+            - gameObject: Slot_4 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_4
+            - hideFlags: None
+      - GameObject: Slot_5
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_5 (UnityEngine.RectTransform)
+            - gameObject: Slot_5 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_5
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_5 (UnityEngine.RectTransform)
+            - gameObject: Slot_5 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_5
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_5 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_5 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_5 (UnityEngine.RectTransform)
+            - gameObject: Slot_5 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_5
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_5 (UnityEngine.RectTransform)
+            - gameObject: Slot_5 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_5
+            - hideFlags: None
+      - GameObject: Slot_6
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_6 (UnityEngine.RectTransform)
+            - gameObject: Slot_6 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_6
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_6 (UnityEngine.RectTransform)
+            - gameObject: Slot_6 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_6
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_6 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_6 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_6 (UnityEngine.RectTransform)
+            - gameObject: Slot_6 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_6
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_6 (UnityEngine.RectTransform)
+            - gameObject: Slot_6 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_6
+            - hideFlags: None
+      - GameObject: Slot_7
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_7 (UnityEngine.RectTransform)
+            - gameObject: Slot_7 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_7
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_7 (UnityEngine.RectTransform)
+            - gameObject: Slot_7 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_7
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_7 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_7 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_7 (UnityEngine.RectTransform)
+            - gameObject: Slot_7 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_7
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_7 (UnityEngine.RectTransform)
+            - gameObject: Slot_7 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_7
+            - hideFlags: None
+      - GameObject: Slot_8
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_8 (UnityEngine.RectTransform)
+            - gameObject: Slot_8 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_8
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_8 (UnityEngine.RectTransform)
+            - gameObject: Slot_8 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_8
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_8 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_8 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_8 (UnityEngine.RectTransform)
+            - gameObject: Slot_8 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_8
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_8 (UnityEngine.RectTransform)
+            - gameObject: Slot_8 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_8
+            - hideFlags: None
+      - GameObject: Slot_9
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_9 (UnityEngine.RectTransform)
+            - gameObject: Slot_9 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_9
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_9 (UnityEngine.RectTransform)
+            - gameObject: Slot_9 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_9
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_9 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_9 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_9 (UnityEngine.RectTransform)
+            - gameObject: Slot_9 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_9
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_9 (UnityEngine.RectTransform)
+            - gameObject: Slot_9 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_9
+            - hideFlags: None
+      - GameObject: Slot_10
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_10 (UnityEngine.RectTransform)
+            - gameObject: Slot_10 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_10
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_10 (UnityEngine.RectTransform)
+            - gameObject: Slot_10 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_10
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_10 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_10 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_10 (UnityEngine.RectTransform)
+            - gameObject: Slot_10 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_10
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_10 (UnityEngine.RectTransform)
+            - gameObject: Slot_10 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_10
+            - hideFlags: None
+      - GameObject: Slot_11
+        Active: True
+        Tag: Untagged
+        Layer: Default (0)
+        Transform: Pos (0.00, 0.00, 0.00), Rot (0.00, 0.00, 0.00), Scale (1.00, 1.00, 1.00)
+        Components (4):
+          • RectTransform
+            - rect: (x:-50.00, y:-50.00, width:100.00, height:100.00)
+            - anchorMin: (0.50, 0.50)
+            - anchorMax: (0.50, 0.50)
+            - anchoredPosition: (0.00, 0.00)
+            - sizeDelta: (100.00, 100.00)
+            - pivot: (0.50, 0.50)
+            - anchoredPosition3D: (0.00, 0.00, 0.00)
+            - offsetMin: (-50.00, -50.00)
+            - offsetMax: (50.00, 50.00)
+            - drivenByObject: 
+            - sendChildDimensionsChange: False
+            - position: (960.00, 452.69, 0.00)
+            - localPosition: (0.00, 0.00, 0.00)
+            - eulerAngles: (0.00, 0.00, 0.00)
+            - localEulerAngles: (0.00, 0.00, 0.00)
+            - right: (1.00, 0.00, 0.00)
+            - up: (0.00, 1.00, 0.00)
+            - forward: (0.00, 0.00, 1.00)
+            - rotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localRotation: (0.00000, 0.00000, 0.00000, 1.00000)
+            - localScale: (1.00, 1.00, 1.00)
+            - parent: SlotsContainer (UnityEngine.RectTransform)
+            - worldToLocalMatrix: 1.05956	0.00000	0.00000	-1017.17500
+0.00000	1.05956	0.00000	-479.64690
+0.00000	0.00000	1.05956	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - localToWorldMatrix: 0.94379	0.00000	0.00000	960.00000
+0.00000	0.94379	0.00000	452.68630
+0.00000	0.00000	0.94379	0.00000
+0.00000	0.00000	0.00000	1.00000
+
+            - root: InventoryCanvas (UnityEngine.RectTransform)
+            - childCount: 0
+            - lossyScale: (0.94, 0.94, 0.94)
+            - hasChanged: True
+            - hierarchyCapacity: 18
+            - hierarchyCount: 18
+            - transform: Slot_11 (UnityEngine.RectTransform)
+            - gameObject: Slot_11 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_11
+            - hideFlags: None
+          • CanvasRenderer
+            - hasPopInstruction: False
+            - materialCount: 0
+            - popMaterialCount: 0
+            - absoluteDepth: -1
+            - hasMoved: False
+            - cullTransparentMesh: True
+            - hasRectClipping: False
+            - relativeDepth: -1
+            - cull: False
+            - isMask: False
+            - clippingSoftness: (0.00, 0.00)
+            - transform: Slot_11 (UnityEngine.RectTransform)
+            - gameObject: Slot_11 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_11
+            - hideFlags: None
+          • Image
+            - sprite: null
+            - overrideSprite: null
+            - type: Simple
+            - preserveAspect: False
+            - fillCenter: True
+            - fillMethod: Radial360
+            - fillAmount: 1
+            - fillClockwise: True
+            - fillOrigin: 0
+            - eventAlphaThreshold: 1
+            - alphaHitTestMinimumThreshold: 0
+            - useSpriteMesh: False
+            - mainTexture: UnityWhite (UnityEngine.Texture2D)
+            - hasBorder: False
+            - pixelsPerUnitMultiplier: 1
+            - pixelsPerUnit: 1
+            - material: Default UI Material (UnityEngine.Material)
+            - minWidth: 0
+            - preferredWidth: 0
+            - flexibleWidth: -1
+            - minHeight: 0
+            - preferredHeight: 0
+            - flexibleHeight: -1
+            - layoutPriority: 0
+            - onCullStateChanged: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent UnityEngine.UI.MaskableGraphic+CullStateChangedEvent
+            - maskable: True
+            - isMaskingGraphic: False
+            - color: RGBA(0.550, 0.440, 0.280, 1.000)
+            - raycastTarget: True
+            - raycastPadding: (0.00, 0.00, 0.00, 0.00)
+            - depth: -1
+            - rectTransform: Slot_11 (UnityEngine.RectTransform)
+            - canvas: InventoryCanvas (UnityEngine.Canvas)
+            - canvasRenderer: Slot_11 (UnityEngine.CanvasRenderer)
+            - defaultMaterial: Default UI Material (UnityEngine.Material)
+            - materialForRendering: Default UI Material (UnityEngine.Material)
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_11 (UnityEngine.RectTransform)
+            - gameObject: Slot_11 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_11
+            - hideFlags: None
+          • Outline
+            - effectColor: RGBA(1.000, 1.000, 1.000, 1.000)
+            - effectDistance: (2.00, -2.00)
+            - useGraphicAlpha: True
+            - destroyCancellationToken: System.Threading.CancellationToken
+            - useGUILayout: True
+            - didStart: False
+            - didAwake: False
+            - runInEditMode: True
+            - enabled: True
+            - isActiveAndEnabled: False
+            - transform: Slot_11 (UnityEngine.RectTransform)
+            - gameObject: Slot_11 (UnityEngine.GameObject)
+            - tag: Untagged
+            - name: Slot_11
+            - hideFlags: None

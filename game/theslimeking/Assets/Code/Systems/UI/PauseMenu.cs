@@ -177,6 +177,32 @@ namespace SlimeKing.UI
         #region Menu Control
 
         /// <summary>
+        /// Oculta o menu temporariamente para o inventário.
+        /// </summary>
+        public void HideMenuForInventory()
+        {
+            Log("Hiding pause menu for inventory");
+            
+            if (pauseMenuPanel != null)
+            {
+                pauseMenuPanel.SetActive(false);
+            }
+            
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        /// <summary>
+        /// Mostra o menu novamente após fechar o inventário.
+        /// </summary>
+        public void ShowMenuAfterInventory()
+        {
+            Log("Showing pause menu after inventory");
+            ShowMenu();
+        }
+
+        /// <summary>
         /// Mostra o menu de pausa com fade in.
         /// </summary>
         private void ShowMenu()
@@ -396,11 +422,21 @@ namespace SlimeKing.UI
         {
             Log("Opening inventory - closing pause menu");
 
-            // Apenas retoma do pause menu
-            // InventoryUI deve pausar novamente se necessário
+            // Fecha o menu de pausa
             if (PauseManager.Instance != null)
             {
                 PauseManager.Instance.Resume();
+            }
+
+            // Abre o inventário
+            InventoryUI inventoryUI = FindObjectOfType<InventoryUI>();
+            if (inventoryUI != null)
+            {
+                inventoryUI.OpenInventory();
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("[PauseMenu] InventoryUI not found in scene!");
             }
         }
 
