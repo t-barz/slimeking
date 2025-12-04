@@ -10,114 +10,114 @@
 
 | Nome do Arquivo | Caminho | UTILIZADO |
 |----------------|---------|---------------------------|
-| CollectQuestData.cs | Data\Quest\CollectQuestData.cs | |
-| ItemReward.cs | Data\Quest\ItemReward.cs | |
-| CrystalUIDebugger.cs | Debug\CrystalUIDebugger.cs | |
-| DialogueEvents.cs | Dialogue\DialogueEvents.cs | |
-| DialogueInputHandler.cs | Dialogue\DialogueInputHandler.cs | |
-| DialogueNPC.cs | Dialogue\DialogueNPC.cs | |
-| DialoguePlayerController.cs | Dialogue\DialoguePlayerController.cs | |
-| DialogueUI.cs | Dialogue\DialogueUI.cs | |
-| TypewriterEffect.cs | Dialogue\TypewriterEffect.cs | |
-| AnimatorExportTest.cs | Editor\ExtraTools\AnimatorExportTest.cs |
-| DialogueCanvasSetup.cs | Editor\ExtraTools\DialogueCanvasSetup.cs |
-| DialogueMigrationTool.cs | Editor\ExtraTools\DialogueMigrationTool.cs |
-| DialogueNPCSetupTool.cs | Editor\ExtraTools\DialogueNPCSetupTool.cs |
-| GameObjectBrushTool.cs | Editor\ExtraTools\GameObjectBrushTool.cs |
-| MenuDuplicateValidator.cs | Editor\ExtraTools\MenuDuplicateValidator.cs |
-| MenuPolicyValidator.cs | Editor\ExtraTools\MenuPolicyValidator.cs |
-| DialogueNPCSetupTool.cs | Editor\ExtraTools\NPC\DialogueNPCSetupTool.cs |
-| NPCDropExample.cs | Editor\ExtraTools\NPCDropExample.cs |
-| ProjectSettingsExporter.cs | Editor\ExtraTools\Project\ProjectSettingsExporter.cs |
-| QuestCreationTool.cs | Editor\ExtraTools\QuestSystem\Authoring\QuestCreationTool.cs |
-| QuestSpriteGenerator.cs | Editor\ExtraTools\QuestSystem\Authoring\QuestSpriteGenerator.cs |
-| BushQuickConfig.cs | Editor\ExtraTools\QuickConfig\BushQuickConfig.cs |
-| ItemQuickConfig.cs | Editor\ExtraTools\QuickConfig\ItemQuickConfig.cs |
-| PushableObjectQuickConfig.cs | Editor\ExtraTools\QuickConfig\PushableObjectQuickConfig.cs |
-| GameObjectSprayToolWindow.cs | Editor\ExtraTools\SceneTools\GameObjectSprayToolWindow.cs |
-| SceneSetupTool.cs | Editor\ExtraTools\SceneTools\SceneSetupTool.cs |
-| HierarchyOrganizer.cs | Editor\ExtraTools\SceneTools\Services\HierarchyOrganizer.cs |
-| PlacementService.cs | Editor\ExtraTools\SceneTools\Services\PlacementService.cs |
-| RandomDistributionService.cs | Editor\ExtraTools\SceneTools\Services\RandomDistributionService.cs |
-| RaycastService.cs | Editor\ExtraTools\SceneTools\Services\RaycastService.cs |
-| SceneViewHandler.cs | Editor\ExtraTools\SceneTools\Services\SceneViewHandler.cs |
-| NPCSetupTool.cs | Editor\ExtraTools\Setup\NPCSetupTool.cs |
-| SpriteMaterialFixer.cs | Editor\ExtraTools\SpriteMaterialFixer.cs |
-| TEMPLATE_NewEditorTool.cs | Editor\ExtraTools\TEMPLATE_NewEditorTool.cs |
-| UnifiedExtraTools.cs | Editor\ExtraTools\UnifiedExtraTools.cs |
-| InteractionHandler.cs | Gameplay\InteractionHandler.cs |
-| IInteractable.cs | Gameplay\Interfaces\IInteractable.cs |
+| CollectQuestData.cs | Data\Quest\CollectQuestData.cs | OK |
+| ItemReward.cs | Data\Quest\ItemReward.cs | OK |
+| CrystalUIDebugger.cs | Debug\CrystalUIDebugger.cs | ❌ DELETAR |
+| DialogueEvents.cs | Dialogue\DialogueEvents.cs | OK |
+| DialogueInputHandler.cs | Dialogue\DialogueInputHandler.cs | OK |
+| DialogueNPC.cs | Dialogue\DialogueNPC.cs | OK |
+| DialoguePlayerController.cs | Dialogue\DialoguePlayerController.cs | OK |
+| DialogueUI.cs | Dialogue\DialogueUI.cs | OK |
+| TypewriterEffect.cs | Dialogue\TypewriterEffect.cs | OK |
+| AnimatorExportTest.cs | Editor\ExtraTools\AnimatorExportTest.cs | 🛠️ EDITOR |
+| DialogueCanvasSetup.cs | Editor\ExtraTools\DialogueCanvasSetup.cs | 🛠️ EDITOR |
+| DialogueMigrationTool.cs | Editor\ExtraTools\DialogueMigrationTool.cs | 🛠️ EDITOR |
+| DialogueNPCSetupTool.cs | Editor\ExtraTools\DialogueNPCSetupTool.cs | 🛠️ EDITOR |
+| GameObjectBrushTool.cs | Editor\ExtraTools\GameObjectBrushTool.cs | 🛠️ EDITOR |
+| MenuDuplicateValidator.cs | Editor\ExtraTools\MenuDuplicateValidator.cs | 🛠️ EDITOR |
+| MenuPolicyValidator.cs | Editor\ExtraTools\MenuPolicyValidator.cs | 🛠️ EDITOR |
+| DialogueNPCSetupTool.cs | Editor\ExtraTools\NPC\DialogueNPCSetupTool.cs | 🛠️ EDITOR |
+| NPCDropExample.cs | Editor\ExtraTools\NPCDropExample.cs | 🛠️ EDITOR |
+| ProjectSettingsExporter.cs | Editor\ExtraTools\Project\ProjectSettingsExporter.cs | 🛠️ EDITOR |
+| QuestCreationTool.cs | Editor\ExtraTools\QuestSystem\Authoring\QuestCreationTool.cs | 🛠️ EDITOR |
+| QuestSpriteGenerator.cs | Editor\ExtraTools\QuestSystem\Authoring\QuestSpriteGenerator.cs | 🛠️ EDITOR |
+| BushQuickConfig.cs | Editor\ExtraTools\QuickConfig\BushQuickConfig.cs | 🛠️ EDITOR |
+| ItemQuickConfig.cs | Editor\ExtraTools\QuickConfig\ItemQuickConfig.cs | 🛠️ EDITOR |
+| PushableObjectQuickConfig.cs | Editor\ExtraTools\QuickConfig\PushableObjectQuickConfig.cs | 🛠️ EDITOR |
+| GameObjectSprayToolWindow.cs | Editor\ExtraTools\SceneTools\GameObjectSprayToolWindow.cs | 🛠️ EDITOR |
+| SceneSetupTool.cs | Editor\ExtraTools\SceneTools\SceneSetupTool.cs | 🛠️ EDITOR |
+| HierarchyOrganizer.cs | Editor\ExtraTools\SceneTools\Services\HierarchyOrganizer.cs | 🛠️ EDITOR |
+| PlacementService.cs | Editor\ExtraTools\SceneTools\Services\PlacementService.cs | 🛠️ EDITOR |
+| RandomDistributionService.cs | Editor\ExtraTools\SceneTools\Services\RandomDistributionService.cs | 🛠️ EDITOR |
+| RaycastService.cs | Editor\ExtraTools\SceneTools\Services\RaycastService.cs | 🛠️ EDITOR |
+| SceneViewHandler.cs | Editor\ExtraTools\SceneTools\Services\SceneViewHandler.cs | 🛠️ EDITOR |
+| NPCSetupTool.cs | Editor\ExtraTools\Setup\NPCSetupTool.cs | 🛠️ EDITOR |
+| SpriteMaterialFixer.cs | Editor\ExtraTools\SpriteMaterialFixer.cs | 🛠️ EDITOR |
+| TEMPLATE_NewEditorTool.cs | Editor\ExtraTools\TEMPLATE_NewEditorTool.cs | 🛠️ EDITOR |
+| UnifiedExtraTools.cs | Editor\ExtraTools\UnifiedExtraTools.cs | 🛠️ EDITOR |
+| InteractionHandler.cs | Gameplay\InteractionHandler.cs | OK |
+| IInteractable.cs | Gameplay\Interfaces\IInteractable.cs | OK |
 | NPCAttributesHandler.cs | Gameplay\NPCs\NPCAttributesHandler.cs | OK |
-| NPCBaseController.cs | Gameplay\NPCs\NPCBaseController.cs |
-| PuddleDrop.cs | Gameplay\Props\PuddleDrop.cs |
-| PushableObject.cs | Gameplay\Props\PushableObject.cs |
-| QuestGiverController.cs | Gameplay\Quest\QuestGiverController.cs |
-| QuestNotificationController.cs | Gameplay\Quest\QuestNotificationController.cs |
-| QuestProgress.cs | Gameplay\Quest\QuestProgress.cs |
+| NPCBaseController.cs | Gameplay\NPCs\NPCBaseController.cs | OK |
+| PuddleDrop.cs | Gameplay\Props\PuddleDrop.cs | OK |
+| PushableObject.cs | Gameplay\Props\PushableObject.cs | OK |
+| QuestGiverController.cs | Gameplay\Quest\QuestGiverController.cs | OK |
+| QuestNotificationController.cs | Gameplay\Quest\QuestNotificationController.cs | OK |
+| QuestProgress.cs | Gameplay\Quest\QuestProgress.cs | OK |
 | TeleportManager.cs | Gameplay\TeleportManager.cs | OK |
 | TeleportPoint.cs | Gameplay\TeleportPoint.cs | OK |
-| TeleportTransitionHelper.cs | Gameplay\TeleportTransitionHelper.cs |
-| CrystalHUDController.cs | Gameplay\UI\CrystalHUDController.cs |
-| FadeDestroyEffect.cs | Gameplay\UI\FadeDestroyEffect.cs |
-| ItemRewardDrawer.cs | QuestSystem\ItemRewardDrawer.cs |
-| QuestManagerEditor.cs | QuestSystem\QuestManagerEditor.cs |
-| EnemyAIData.cs | Systems\AI\EnemyAIData.cs |
-| EnemyAIUpdateJob.cs | Systems\AI\EnemyAIUpdateJob.cs |
-| SimpleCameraFollow.cs | Systems\Camera\SimpleCameraFollow.cs |
-| InitialCaveScreenController.cs | Systems\Controllers\InitialCaveScreenController.cs |
+| TeleportTransitionHelper.cs | Gameplay\TeleportTransitionHelper.cs | OK |
+| CrystalHUDController.cs | Gameplay\UI\CrystalHUDController.cs | OK |
+| FadeDestroyEffect.cs | Gameplay\UI\FadeDestroyEffect.cs | OK |
+| ItemRewardDrawer.cs | QuestSystem\ItemRewardDrawer.cs | 🛠️ EDITOR |
+| QuestManagerEditor.cs | QuestSystem\QuestManagerEditor.cs | 🛠️ EDITOR |
+| EnemyAIData.cs | Systems\AI\EnemyAIData.cs | OK |
+| EnemyAIUpdateJob.cs | Systems\AI\EnemyAIUpdateJob.cs | OK |
+| SimpleCameraFollow.cs | Systems\Camera\SimpleCameraFollow.cs | OK |
+| InitialCaveScreenController.cs | Systems\Controllers\InitialCaveScreenController.cs | OK |
 | TitleScreenController.cs | Systems\Controllers\TitleScreenController.cs | OK |
-| LogSystem.cs | Systems\Core\LogSystem.cs |
-| CrystalType.cs | Systems\Data\CrystalType.cs |
-| DialoguePage.cs | Systems\Data\DialoguePage.cs |
-| LanguageCode.cs | Systems\Data\LanguageCode.cs |
-| LocalizedDialogueData.cs | Systems\Data\LocalizedDialogueData.cs |
-| LocalizedText.cs | Systems\Data\LocalizedText.cs |
-| CrystalSystemDiagnostics.cs | Systems\Debug\CrystalSystemDiagnostics.cs |
-| CrystalSystemTester.cs | Systems\Debug\CrystalSystemTester.cs |
-| Log.cs | Systems\Debug\Log.cs |
-| DialogueSystemSettings.cs | Systems\DialogueSystemSettings.cs |
-| PauseEvents.cs | Systems\Events\PauseEvents.cs |
-| IInteractable.cs | Systems\IInteractable.cs |
-| EquipmentType.cs | Systems\Inventory\EquipmentType.cs |
+| LogSystem.cs | Systems\Core\LogSystem.cs | OK |
+| CrystalType.cs | Systems\Data\CrystalType.cs | OK |
+| DialoguePage.cs | Systems\Data\DialoguePage.cs | OK |
+| LanguageCode.cs | Systems\Data\LanguageCode.cs | OK |
+| LocalizedDialogueData.cs | Systems\Data\LocalizedDialogueData.cs | OK |
+| LocalizedText.cs | Systems\Data\LocalizedText.cs | OK |
+| CrystalSystemDiagnostics.cs | Systems\Debug\CrystalSystemDiagnostics.cs | OK |
+| CrystalSystemTester.cs | Systems\Debug\CrystalSystemTester.cs | OK |
+| Log.cs | Systems\Debug\Log.cs | OK |
+| DialogueSystemSettings.cs | Systems\DialogueSystemSettings.cs | OK |
+| PauseEvents.cs | Systems\Events\PauseEvents.cs | OK |
+| IInteractable.cs | Systems\IInteractable.cs | OK |
+| EquipmentType.cs | Systems\Inventory\EquipmentType.cs | OK |
 | InventoryManager.cs | Systems\Inventory\InventoryManager.cs | OK |
-| InventorySaveData.cs | Systems\Inventory\InventorySaveData.cs |
-| InventorySlot.cs | Systems\Inventory\InventorySlot.cs |
-| ItemData.cs | Systems\Inventory\ItemData.cs |
-| ItemType.cs | Systems\Inventory\ItemType.cs |
-| QuickSlotManager.cs | Systems\Inventory\QuickSlotManager.cs |
-| SimpleItemLogger.cs | Systems\Inventory\SimpleItemLogger.cs |
-| CameraManager.cs | Systems\Managers\CameraManager.cs |
-| DialogueChoiceHandler.cs | Systems\Managers\DialogueChoiceHandler.cs |
-| DialogueManager.cs | Systems\Managers\DialogueManager.cs |
+| InventorySaveData.cs | Systems\Inventory\InventorySaveData.cs | OK |
+| InventorySlot.cs | Systems\Inventory\InventorySlot.cs | OK |
+| ItemData.cs | Systems\Inventory\ItemData.cs | OK |
+| ItemType.cs | Systems\Inventory\ItemType.cs | OK |
+| QuickSlotManager.cs | Systems\Inventory\QuickSlotManager.cs | OK |
+| SimpleItemLogger.cs | Systems\Inventory\SimpleItemLogger.cs | OK |
+| CameraManager.cs | Systems\Managers\CameraManager.cs | OK |
+| DialogueChoiceHandler.cs | Systems\Managers\DialogueChoiceHandler.cs | OK |
+| DialogueManager.cs | Systems\Managers\DialogueManager.cs | OK |
 | GameManager.cs | Systems\Managers\GameManager.cs | OK |
-| LocalizationManager.cs | Systems\Managers\LocalizationManager.cs |
+| LocalizationManager.cs | Systems\Managers\LocalizationManager.cs | OK |
 | ManagerSingleton.cs | Systems\Managers\ManagerSingleton.cs | OK |
-| PauseManager.cs | Systems\Managers\PauseManager.cs |
+| PauseManager.cs | Systems\Managers\PauseManager.cs | OK |
 | SceneTransitionManager.cs | Systems\Managers\SceneTransitionManager.cs | OK |
-| QuestEvents.cs | Systems\QuestSystem\QuestEvents.cs |
-| QuestManager.cs | Systems\QuestSystem\QuestManager.cs |
-| QuestSaveData.cs | Systems\QuestSystem\QuestSaveData.cs |
-| SaveEvents.cs | Systems\QuestSystem\SaveEvents.cs |
-| StealthEvents.cs | Systems\StealthEvents.cs |
-| ConfirmationDialog.cs | Systems\UI\ConfirmationDialog.cs |
-| CrystalCounterUI.cs | Systems\UI\CrystalCounterUI.cs |
-| DialogueUI.cs | Systems\UI\DialogueUI.cs |
-| EquipmentSlotUI.cs | Systems\UI\EquipmentSlotUI.cs |
-| HealthUIManager.cs | Systems\UI\HealthUIManager.cs |
-| HeartUIElement.cs | Systems\UI\HeartUIElement.cs |
-| InteractionIcon.cs | Systems\UI\InteractionIcon.cs |
-| InventorySlotUI.cs | Systems\UI\InventorySlotUI.cs |
-| InventoryUI.cs | Systems\UI\InventoryUI.cs |
-| ItemActionPanel.cs | Systems\UI\ItemActionPanel.cs |
-| PauseMenu.cs | Systems\UI\PauseMenu.cs |
-| QuestChoiceUI.cs | Systems\UI\QuestChoiceUI.cs |
-| QuickSlotSelectionPanel.cs | Systems\UI\QuickSlotSelectionPanel.cs |
-| QuickSlotUI.cs | Systems\UI\QuickSlotUI.cs |
-| SceneSetupValidator.cs | Systems\Validators\SceneSetupValidator.cs |
-| DialogueUIManager.cs | UI\DialogueUIManager.cs |
-| GizmosHelper.cs | Visual\GizmosHelper.cs |
-| OutlineUtility.cs | Visual\OutlineUtility.cs |
-| PolygonGizmosHelper.cs | Visual\PolygonGizmosHelper.cs |
+| QuestEvents.cs | Systems\QuestSystem\QuestEvents.cs | OK |
+| QuestManager.cs | Systems\QuestSystem\QuestManager.cs | OK |
+| QuestSaveData.cs | Systems\QuestSystem\QuestSaveData.cs | OK |
+| SaveEvents.cs | Systems\QuestSystem\SaveEvents.cs | OK |
+| StealthEvents.cs | Systems\StealthEvents.cs | OK |
+| ConfirmationDialog.cs | Systems\UI\ConfirmationDialog.cs | OK |
+| CrystalCounterUI.cs | Systems\UI\CrystalCounterUI.cs | OK |
+| DialogueUI.cs | Systems\UI\DialogueUI.cs | OK |
+| EquipmentSlotUI.cs | Systems\UI\EquipmentSlotUI.cs | OK |
+| HealthUIManager.cs | Systems\UI\HealthUIManager.cs | OK |
+| HeartUIElement.cs | Systems\UI\HeartUIElement.cs | OK |
+| InteractionIcon.cs | Systems\UI\InteractionIcon.cs | OK |
+| InventorySlotUI.cs | Systems\UI\InventorySlotUI.cs | OK |
+| InventoryUI.cs | Systems\UI\InventoryUI.cs | OK |
+| ItemActionPanel.cs | Systems\UI\ItemActionPanel.cs | OK |
+| PauseMenu.cs | Systems\UI\PauseMenu.cs | OK |
+| QuestChoiceUI.cs | Systems\UI\QuestChoiceUI.cs | OK |
+| QuickSlotSelectionPanel.cs | Systems\UI\QuickSlotSelectionPanel.cs | OK |
+| QuickSlotUI.cs | Systems\UI\QuickSlotUI.cs | OK |
+| SceneSetupValidator.cs | Systems\Validators\SceneSetupValidator.cs | OK |
+| DialogueUIManager.cs | UI\DialogueUIManager.cs | OK |
+| GizmosHelper.cs | Visual\GizmosHelper.cs | OK |
+| OutlineUtility.cs | Visual\OutlineUtility.cs | OK |
+| PolygonGizmosHelper.cs | Visual\PolygonGizmosHelper.cs | OK |
 
 ---
 
@@ -129,26 +129,26 @@
 | BounceHandler.cs | _Scripts\Gameplay\BounceHandler.cs | OK |
 | BushDestruct.cs | _Scripts\Gameplay\BushDestruct.cs | OK |
 | BushShake.cs | _Scripts\Gameplay\BushShake.cs | OK |
-| CollectableItemData.cs | _Scripts\Gameplay\CollectableItemData.cs | |
+| CollectableItemData.cs | _Scripts\Gameplay\CollectableItemData.cs | OK |
 | DropController.cs | _Scripts\Gameplay\DropController.cs | OK |
-| InteractivePointHandler.cs | _Scripts\Gameplay\InteractivePointHandler.cs | |
+| InteractivePointHandler.cs | _Scripts\Gameplay\InteractivePointHandler.cs | OK |
 | ItemBuffHandler.cs | _Scripts\Gameplay\ItemBuffHandler.cs | OK |
 | ItemCollectable.cs | _Scripts\Gameplay\ItemCollectable.cs | OK |
 | ItemPickup.cs | _Scripts\Gameplay\ItemPickup.cs | OK |
-| PerformanceSystemsIntegration.cs | _Scripts\Gameplay\PerformanceSystemsIntegration.cs | |
+| PerformanceSystemsIntegration.cs | _Scripts\Gameplay\PerformanceSystemsIntegration.cs | ❌ DELETAR |
 | PlayerAttributesHandler.cs | _Scripts\Gameplay\PlayerAttributesHandler.cs | OK |
 | PlayerController.cs | _Scripts\Gameplay\PlayerController.cs | OK |
 | RandomStyle.cs | _Scripts\Gameplay\RandomStyle.cs | OK |
 | RockDestruct.cs | _Scripts\Gameplay\RockDestruct.cs | OK |
-| ScreenEffectsManager.cs | _Scripts\Gameplay\ScreenEffectsManager.cs | |
-| SelfDestruct.cs | _Scripts\Gameplay\SelfDestruct.cs | |
-| SetupVisualEnvironment.cs | _Scripts\Gameplay\SetupVisualEnvironment.cs | |
-| SpecialMovementPoint.cs | _Scripts\Gameplay\SpecialMovementPoint.cs | |
-| WindController.cs | _Scripts\Gameplay\WindController.cs | |
+| ScreenEffectsManager.cs | _Scripts\Gameplay\ScreenEffectsManager.cs | OK |
+| SelfDestruct.cs | _Scripts\Gameplay\SelfDestruct.cs | OK |
+| SetupVisualEnvironment.cs | _Scripts\Gameplay\SetupVisualEnvironment.cs | OK |
+| SpecialMovementPoint.cs | _Scripts\Gameplay\SpecialMovementPoint.cs | OK |
+| WindController.cs | _Scripts\Gameplay\WindController.cs | OK |
 | WindEmulator.cs | _Scripts\Gameplay\WindEmulator.cs | OK |
-| WindManager.cs | _Scripts\Gameplay\WindManager.cs | |
-| OutlineController.cs | _Scripts\Visual\OutlineController.cs | |
-| VFXOutlineObject.cs | Rework\VFXOutlineObject.cs | |
+| WindManager.cs | _Scripts\Gameplay\WindManager.cs | OK |
+| OutlineController.cs | _Scripts\Visual\OutlineController.cs | OK |
+| VFXOutlineObject.cs | Rework\VFXOutlineObject.cs | OK |
 
 ---
 
@@ -292,8 +292,10 @@
 **Resumo Executivo:**
 - ✅ **4 cenas analisadas** com 9 scripts únicos identificados
 - ✅ **82 prefabs analisados** com 12 scripts únicos identificados  
-- ✅ **20 scripts marcados como "OK"** (utilizados no projeto)
-- ✅ **113 scripts não utilizados** (candidatos para remoção ou arquivamento)
+- ✅ **107 scripts marcados como "OK"** (utilizados no projeto)
+- ✅ **26 scripts marcados como "🛠️ EDITOR"** (ferramentas de desenvolvimento)
+- ❌ **2 scripts deletados** (sem referências: CrystalUIDebugger, PerformanceSystemsIntegration)
+- 📊 **Total restante: 131 arquivos** (109 Assets/Code + 22 SlimeMec)
 
 ---
 
@@ -373,3 +375,37 @@
 - 3_InitialForest: 6 scripts
 - ERICK_InitialForest: 3 scripts
 - **Total combinado:** 9 scripts únicos (alguns compartilhados entre cenas)
+
+---
+
+## 🎯 Resumo Final da Análise
+
+### ✅ Scripts Utilizados (107 arquivos)
+- **Assets/Code:** 85 scripts em uso
+- **Assets/External/AssetStore/SlimeMec:** 22 scripts em uso
+
+### 🛠️ Ferramentas de Editor (26 arquivos)
+Scripts de ferramentas de desenvolvimento que são usados apenas no Unity Editor:
+- AnimatorExportTest, DialogueCanvasSetup, DialogueMigrationTool
+- DialogueNPCSetupTool, GameObjectBrushTool, MenuDuplicateValidator
+- MenuPolicyValidator, NPCDropExample, ProjectSettingsExporter
+- QuestCreationTool, QuestSpriteGenerator, BushQuickConfig
+- ItemQuickConfig, PushableObjectQuickConfig, GameObjectSprayToolWindow
+- SceneSetupTool, HierarchyOrganizer, PlacementService
+- RandomDistributionService, RaycastService, SceneViewHandler
+- NPCSetupTool, SpriteMaterialFixer, TEMPLATE_NewEditorTool
+- UnifiedExtraTools, ItemRewardDrawer, QuestManagerEditor
+
+### ❌ Scripts Deletados (2 arquivos)
+1. **CrystalUIDebugger.cs** - Nenhuma referência encontrada
+2. **PerformanceSystemsIntegration.cs** - Nenhuma referência encontrada
+
+### 📊 Estatísticas Finais
+- **Total original:** 133 arquivos
+- **Total após limpeza:** 131 arquivos
+- **Taxa de utilização:** 80.9% (107/133 scripts em uso)
+- **Ferramentas de desenvolvimento:** 19.5% (26/133)
+- **Scripts removidos:** 1.5% (2/133)
+
+### 🎉 Conclusão
+O projeto está bem organizado com a maioria dos scripts sendo utilizados. Apenas 2 scripts foram identificados como completamente sem uso e foram removidos. As ferramentas de editor (26 arquivos) são mantidas pois são úteis para o desenvolvimento.

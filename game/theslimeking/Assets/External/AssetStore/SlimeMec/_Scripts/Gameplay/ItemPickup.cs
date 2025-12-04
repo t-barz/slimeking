@@ -69,26 +69,6 @@ namespace SlimeMec.Gameplay
         {
             FindPlayer();
             SetupItem();
-            CheckIfAlreadyCollected();
-        }
-
-        /// <summary>
-        /// Verifica se este item já foi coletado antes (KISS - Keep It Simple)
-        /// </summary>
-        private void CheckIfAlreadyCollected()
-        {
-            string itemID = gameObject.name;
-            int wasCollected = PlayerPrefs.GetInt($"Item_{itemID}", 0);
-            
-            if (wasCollected == 1)
-            {
-                Debug.Log($"🚫 Item já coletado anteriormente: {itemID}");
-                Destroy(gameObject);
-            }
-            else
-            {
-                Debug.Log($"📦 Item disponível: {itemID}");
-            }
         }
 
         private void Update()
@@ -226,28 +206,16 @@ namespace SlimeMec.Gameplay
             if (_isAbsorbed) return;
 
             _isAbsorbed = true;
+            
+            string itemID = gameObject.name;
+            Debug.Log($"✅ Item coletado: {itemID}");
             LogDebug($"Absorção completa de {GetItemName()}");
-
-            // SALVA O ITEM COLETADO
-            SaveItemCollected();
 
             // Executa efeitos de coleta
             PlayCollectionEffects();
 
             // Destrói o item após pequeno delay para permitir efeitos
             StartCoroutine(DestroyAfterEffects());
-        }
-
-        /// <summary>
-        /// Salva que este item foi coletado (KISS - Keep It Simple)
-        /// </summary>
-        private void SaveItemCollected()
-        {
-            string itemID = gameObject.name; // Usa o nome do GameObject como ID
-            PlayerPrefs.SetInt($"Item_{itemID}", 1);
-            PlayerPrefs.Save();
-            
-            Debug.Log($"✅ Item coletado e salvo: {itemID}");
         }
 
         /// <summary>
@@ -500,29 +468,7 @@ namespace SlimeMec.Gameplay
             Debug.Log(status);
         }
 
-        [ContextMenu("Clear Save Data (This Item)")]
-        private void EditorClearSaveData()
-        {
-            string itemID = gameObject.name;
-            PlayerPrefs.DeleteKey($"Item_{itemID}");
-            PlayerPrefs.Save();
-            Debug.Log($"🗑️ Dados salvos limpos para: {itemID}");
-        }
 
-        [MenuItem("Extra Tools/Items/Clear ALL Item Save Data")]
-        private static void ClearAllItemSaveData()
-        {
-            if (UnityEditor.EditorUtility.DisplayDialog(
-                "Limpar Todos os Dados de Itens",
-                "Isso vai limpar TODOS os dados salvos de itens coletados. Continuar?",
-                "Sim, Limpar Tudo",
-                "Cancelar"))
-            {
-                PlayerPrefs.DeleteAll();
-                PlayerPrefs.Save();
-                Debug.Log("🗑️ TODOS os dados de itens foram limpos!");
-            }
-        }
 #endif
 
         #endregion
