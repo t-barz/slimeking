@@ -2266,6 +2266,34 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Movement Control
+
+    /// <summary>
+    /// Controla se o player pode se mover.
+    /// Útil para pausar movimento durante interações, cutscenes, etc.
+    /// </summary>
+    /// <param name="canMove">True para permitir movimento, False para bloquear</param>
+    public void SetCanMove(bool canMove)
+    {
+        _canMove = canMove;
+        
+        // Se desabilitou movimento, para o player imediatamente
+        if (!canMove && _rigidbody != null)
+        {
+            _rigidbody.linearVelocity = Vector2.zero;
+        }
+    }
+
+    /// <summary>
+    /// Retorna se o player pode se mover atualmente
+    /// </summary>
+    public bool CanMove()
+    {
+        return _canMove;
+    }
+
+    #endregion
+
     #region Stealth System
 
     /// <summary>

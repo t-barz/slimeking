@@ -211,6 +211,9 @@ namespace SlimeMec.Gameplay
             Debug.Log($"✅ Item coletado: {itemID}");
             LogDebug($"Absorção completa de {GetItemName()}");
 
+            // RETOMA O MOVIMENTO DO PLAYER
+            ResumePlayerMovement();
+
             // Executa efeitos de coleta
             PlayCollectionEffects();
 
@@ -272,6 +275,9 @@ namespace SlimeMec.Gameplay
 
             LogDebug($"Iniciando coleta de {GetItemName()}");
 
+            // PAUSA O MOVIMENTO DO PLAYER
+            PausePlayerMovement();
+
             // Desabilita interação
             _interactionEnabled = false;
             if (_collider != null)
@@ -314,6 +320,9 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private void RevertCollection()
         {
+            // RETOMA O MOVIMENTO DO PLAYER se a coleta falhou
+            ResumePlayerMovement();
+            
             _interactionEnabled = true;
             if (_collider != null)
                 _collider.enabled = true;
@@ -332,6 +341,44 @@ namespace SlimeMec.Gameplay
             {
                 buffHandler.AddBuff(itemData);
                 LogDebug($"Buffs aplicados de {itemData.itemName}");
+            }
+        }
+
+        #endregion
+
+        #region Player Movement Control
+
+        /// <summary>
+        /// Pausa o movimento do player durante a coleta
+        /// </summary>
+        private void PausePlayerMovement()
+        {
+            if (_playerTransform == null) return;
+
+            PlayerController playerController = _playerTransform.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetCanMove(false);
+                LogDebug("Movimento do player pausado");
+            }
+            else
+            {
+                Debug.LogWarning("[ItemPickup] PlayerController não encontrado no player!");
+            }
+        }
+
+        /// <summary>
+        /// Retoma o movimento do player após a coleta
+        /// </summary>
+        private void ResumePlayerMovement()
+        {
+            if (_playerTransform == null) return;
+
+            PlayerController playerController = _playerTransform.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.SetCanMove(true);
+                LogDebug("Movimento do player retomado");
             }
         }
 

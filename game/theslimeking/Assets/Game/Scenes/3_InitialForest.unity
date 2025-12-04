@@ -436,7 +436,6 @@ MonoBehaviour:
   inventoryPanel: {fileID: 436591382}
   canvasGroup: {fileID: 186105126}
   fadeDuration: 0.3
-  canOpenWithInput: 1
   enableLogs: 0
 --- !u!1 &212714558
 GameObject:
@@ -4924,11 +4923,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1310026503858217730, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Color.a
-      value: 0.39215687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1739522225702488502, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Color.a
-      value: 0.39215687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1914052929372897466, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Colors.m_NormalColor.a
@@ -5024,7 +5023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2655036046262270265, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Color.a
-      value: 0.39215687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2869320153794466386, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -5132,7 +5131,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5079707549781887220, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Color.a
-      value: 0.39215687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5346216768773052702, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_fontSize
@@ -5336,7 +5335,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8695888804714137589, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_Color.a
-      value: 0.39215687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8942822979265380738, guid: d2b22eb45566d7943bc2114159c982e0, type: 3}
       propertyPath: m_fontSize
