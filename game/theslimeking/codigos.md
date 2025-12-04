@@ -6,19 +6,19 @@
 
 ---
 
-## 📊 Tabela de Arquivos
+## 📊 Tabela de Arquivos - Assets/Code
 
-| Nome do Arquivo | Caminho |
-|----------------|---------|
-| CollectQuestData.cs | Data\Quest\CollectQuestData.cs |
-| ItemReward.cs | Data\Quest\ItemReward.cs |
-| CrystalUIDebugger.cs | Debug\CrystalUIDebugger.cs |
-| DialogueEvents.cs | Dialogue\DialogueEvents.cs |
-| DialogueInputHandler.cs | Dialogue\DialogueInputHandler.cs |
-| DialogueNPC.cs | Dialogue\DialogueNPC.cs |
-| DialoguePlayerController.cs | Dialogue\DialoguePlayerController.cs |
-| DialogueUI.cs | Dialogue\DialogueUI.cs |
-| TypewriterEffect.cs | Dialogue\TypewriterEffect.cs |
+| Nome do Arquivo | Caminho | UTILIZADO |
+|----------------|---------|---------------------------|
+| CollectQuestData.cs | Data\Quest\CollectQuestData.cs | |
+| ItemReward.cs | Data\Quest\ItemReward.cs | |
+| CrystalUIDebugger.cs | Debug\CrystalUIDebugger.cs | |
+| DialogueEvents.cs | Dialogue\DialogueEvents.cs | |
+| DialogueInputHandler.cs | Dialogue\DialogueInputHandler.cs | |
+| DialogueNPC.cs | Dialogue\DialogueNPC.cs | |
+| DialoguePlayerController.cs | Dialogue\DialoguePlayerController.cs | |
+| DialogueUI.cs | Dialogue\DialogueUI.cs | |
+| TypewriterEffect.cs | Dialogue\TypewriterEffect.cs | |
 | AnimatorExportTest.cs | Editor\ExtraTools\AnimatorExportTest.cs |
 | DialogueCanvasSetup.cs | Editor\ExtraTools\DialogueCanvasSetup.cs |
 | DialogueMigrationTool.cs | Editor\ExtraTools\DialogueMigrationTool.cs |
@@ -47,15 +47,15 @@
 | UnifiedExtraTools.cs | Editor\ExtraTools\UnifiedExtraTools.cs |
 | InteractionHandler.cs | Gameplay\InteractionHandler.cs |
 | IInteractable.cs | Gameplay\Interfaces\IInteractable.cs |
-| NPCAttributesHandler.cs | Gameplay\NPCs\NPCAttributesHandler.cs |
+| NPCAttributesHandler.cs | Gameplay\NPCs\NPCAttributesHandler.cs | OK |
 | NPCBaseController.cs | Gameplay\NPCs\NPCBaseController.cs |
 | PuddleDrop.cs | Gameplay\Props\PuddleDrop.cs |
 | PushableObject.cs | Gameplay\Props\PushableObject.cs |
 | QuestGiverController.cs | Gameplay\Quest\QuestGiverController.cs |
 | QuestNotificationController.cs | Gameplay\Quest\QuestNotificationController.cs |
 | QuestProgress.cs | Gameplay\Quest\QuestProgress.cs |
-| TeleportManager.cs | Gameplay\TeleportManager.cs |
-| TeleportPoint.cs | Gameplay\TeleportPoint.cs |
+| TeleportManager.cs | Gameplay\TeleportManager.cs | OK |
+| TeleportPoint.cs | Gameplay\TeleportPoint.cs | OK |
 | TeleportTransitionHelper.cs | Gameplay\TeleportTransitionHelper.cs |
 | CrystalHUDController.cs | Gameplay\UI\CrystalHUDController.cs |
 | FadeDestroyEffect.cs | Gameplay\UI\FadeDestroyEffect.cs |
@@ -65,7 +65,7 @@
 | EnemyAIUpdateJob.cs | Systems\AI\EnemyAIUpdateJob.cs |
 | SimpleCameraFollow.cs | Systems\Camera\SimpleCameraFollow.cs |
 | InitialCaveScreenController.cs | Systems\Controllers\InitialCaveScreenController.cs |
-| TitleScreenController.cs | Systems\Controllers\TitleScreenController.cs |
+| TitleScreenController.cs | Systems\Controllers\TitleScreenController.cs | OK |
 | LogSystem.cs | Systems\Core\LogSystem.cs |
 | CrystalType.cs | Systems\Data\CrystalType.cs |
 | DialoguePage.cs | Systems\Data\DialoguePage.cs |
@@ -79,7 +79,7 @@
 | PauseEvents.cs | Systems\Events\PauseEvents.cs |
 | IInteractable.cs | Systems\IInteractable.cs |
 | EquipmentType.cs | Systems\Inventory\EquipmentType.cs |
-| InventoryManager.cs | Systems\Inventory\InventoryManager.cs |
+| InventoryManager.cs | Systems\Inventory\InventoryManager.cs | OK |
 | InventorySaveData.cs | Systems\Inventory\InventorySaveData.cs |
 | InventorySlot.cs | Systems\Inventory\InventorySlot.cs |
 | ItemData.cs | Systems\Inventory\ItemData.cs |
@@ -89,11 +89,11 @@
 | CameraManager.cs | Systems\Managers\CameraManager.cs |
 | DialogueChoiceHandler.cs | Systems\Managers\DialogueChoiceHandler.cs |
 | DialogueManager.cs | Systems\Managers\DialogueManager.cs |
-| GameManager.cs | Systems\Managers\GameManager.cs |
+| GameManager.cs | Systems\Managers\GameManager.cs | OK |
 | LocalizationManager.cs | Systems\Managers\LocalizationManager.cs |
-| ManagerSingleton.cs | Systems\Managers\ManagerSingleton.cs |
+| ManagerSingleton.cs | Systems\Managers\ManagerSingleton.cs | OK |
 | PauseManager.cs | Systems\Managers\PauseManager.cs |
-| SceneTransitionManager.cs | Systems\Managers\SceneTransitionManager.cs |
+| SceneTransitionManager.cs | Systems\Managers\SceneTransitionManager.cs | OK |
 | QuestEvents.cs | Systems\QuestSystem\QuestEvents.cs |
 | QuestManager.cs | Systems\QuestSystem\QuestManager.cs |
 | QuestSaveData.cs | Systems\QuestSystem\QuestSaveData.cs |
@@ -121,34 +121,34 @@
 
 ---
 
-## � Astsets/External/AssetStore/SlimeMec (24 arquivos)
+## 📦 Assets/External/AssetStore/SlimeMec (24 arquivos)
 
-| Nome do Arquivo | Caminho |
-|----------------|---------|
-| AttackHandler.cs | _Scripts\Gameplay\AttackHandler.cs |
-| BounceHandler.cs | _Scripts\Gameplay\BounceHandler.cs |
-| BushDestruct.cs | _Scripts\Gameplay\BushDestruct.cs |
-| BushShake.cs | _Scripts\Gameplay\BushShake.cs |
-| CollectableItemData.cs | _Scripts\Gameplay\CollectableItemData.cs |
-| DropController.cs | _Scripts\Gameplay\DropController.cs |
-| InteractivePointHandler.cs | _Scripts\Gameplay\InteractivePointHandler.cs |
-| ItemBuffHandler.cs | _Scripts\Gameplay\ItemBuffHandler.cs |
-| ItemCollectable.cs | _Scripts\Gameplay\ItemCollectable.cs |
-| ItemPickup.cs | _Scripts\Gameplay\ItemPickup.cs |
-| PerformanceSystemsIntegration.cs | _Scripts\Gameplay\PerformanceSystemsIntegration.cs |
-| PlayerAttributesHandler.cs | _Scripts\Gameplay\PlayerAttributesHandler.cs |
-| PlayerController.cs | _Scripts\Gameplay\PlayerController.cs |
-| RandomStyle.cs | _Scripts\Gameplay\RandomStyle.cs |
-| RockDestruct.cs | _Scripts\Gameplay\RockDestruct.cs |
-| ScreenEffectsManager.cs | _Scripts\Gameplay\ScreenEffectsManager.cs |
-| SelfDestruct.cs | _Scripts\Gameplay\SelfDestruct.cs |
-| SetupVisualEnvironment.cs | _Scripts\Gameplay\SetupVisualEnvironment.cs |
-| SpecialMovementPoint.cs | _Scripts\Gameplay\SpecialMovementPoint.cs |
-| WindController.cs | _Scripts\Gameplay\WindController.cs |
-| WindEmulator.cs | _Scripts\Gameplay\WindEmulator.cs |
-| WindManager.cs | _Scripts\Gameplay\WindManager.cs |
-| OutlineController.cs | _Scripts\Visual\OutlineController.cs |
-| VFXOutlineObject.cs | Rework\VFXOutlineObject.cs |
+| Nome do Arquivo | Caminho | UTILIZADO |
+|----------------|---------|---------------------------|
+| AttackHandler.cs | _Scripts\Gameplay\AttackHandler.cs | OK |
+| BounceHandler.cs | _Scripts\Gameplay\BounceHandler.cs | OK |
+| BushDestruct.cs | _Scripts\Gameplay\BushDestruct.cs | OK |
+| BushShake.cs | _Scripts\Gameplay\BushShake.cs | OK |
+| CollectableItemData.cs | _Scripts\Gameplay\CollectableItemData.cs | |
+| DropController.cs | _Scripts\Gameplay\DropController.cs | OK |
+| InteractivePointHandler.cs | _Scripts\Gameplay\InteractivePointHandler.cs | |
+| ItemBuffHandler.cs | _Scripts\Gameplay\ItemBuffHandler.cs | OK |
+| ItemCollectable.cs | _Scripts\Gameplay\ItemCollectable.cs | OK |
+| ItemPickup.cs | _Scripts\Gameplay\ItemPickup.cs | OK |
+| PerformanceSystemsIntegration.cs | _Scripts\Gameplay\PerformanceSystemsIntegration.cs | |
+| PlayerAttributesHandler.cs | _Scripts\Gameplay\PlayerAttributesHandler.cs | OK |
+| PlayerController.cs | _Scripts\Gameplay\PlayerController.cs | OK |
+| RandomStyle.cs | _Scripts\Gameplay\RandomStyle.cs | OK |
+| RockDestruct.cs | _Scripts\Gameplay\RockDestruct.cs | OK |
+| ScreenEffectsManager.cs | _Scripts\Gameplay\ScreenEffectsManager.cs | |
+| SelfDestruct.cs | _Scripts\Gameplay\SelfDestruct.cs | |
+| SetupVisualEnvironment.cs | _Scripts\Gameplay\SetupVisualEnvironment.cs | |
+| SpecialMovementPoint.cs | _Scripts\Gameplay\SpecialMovementPoint.cs | |
+| WindController.cs | _Scripts\Gameplay\WindController.cs | |
+| WindEmulator.cs | _Scripts\Gameplay\WindEmulator.cs | OK |
+| WindManager.cs | _Scripts\Gameplay\WindManager.cs | |
+| OutlineController.cs | _Scripts\Visual\OutlineController.cs | |
+| VFXOutlineObject.cs | Rework\VFXOutlineObject.cs | |
 
 ---
 
@@ -203,4 +203,173 @@
 
 ---
 
-**Gerado automaticamente em:** 03/12/2025
+## 📋 Resumo de Utilização - Cenas Analisadas
+
+### Total de Scripts Utilizados: 20 arquivos marcados com OK
+
+---
+
+### 🎬 Cena 1_TitleScreen (2 scripts)
+
+**Assets/Code/Systems:**
+
+1. **TitleScreenController.cs** - Controller principal da tela de título
+2. **GameManager.cs** - Gerenciador central do jogo
+
+**Observação:** Cena simples focada apenas na tela inicial. Usa componentes do Unity (Canvas, Button, Image, Text) e Easy Transition para transições de cena.
+
+---
+
+### 🏔️ Cena 2_InitialCave (4 scripts)
+
+**Assets/Code:**
+
+1. **GameManager.cs** - Gerenciador central (compartilhado)
+2. **TeleportPoint.cs** - Pontos de teleporte na caverna
+3. **TeleportManager.cs** - Gerenciamento de teleporte
+
+**Assets/External/AssetStore/SlimeMec:**
+
+4. **ItemPickup.cs** - Sistema de coleta de itens (cogumelos, frutas)
+
+**Observação:** Cena tutorial focada em movimento e coleta básica. Contém objetos destrutíveis (bushes, rocks) e itens coletáveis.
+
+---
+
+### 🌲 Cena 3_InitialForest (6 scripts)
+
+**Assets/Code:**
+
+1. **GameManager.cs** - Gerenciador central (compartilhado)
+2. **TeleportManager.cs** - Gerenciamento de teleporte (compartilhado)
+3. **InventoryManager.cs** - Sistema de inventário do jogador
+4. **PauseManager.cs** - Sistema de pausa do jogo
+
+**Assets/External/AssetStore/SlimeMec:**
+
+5. **PlayerController.cs** - Controle completo do jogador (movimento, ataque, agachar)
+6. **NPCAttributesHandler.cs** - Atributos de NPCs (usado em NPCs da floresta)
+
+**Observação:** Primeira cena com gameplay completo - jogador controlável, inventário, NPCs e sistema de pausa.
+
+---
+
+### 🌳 Cena ERICK_InitialForest (3 scripts)
+
+**Assets/Code:**
+
+1. **GameManager.cs** - Gerenciador central (compartilhado)
+2. **TeleportPoint.cs** - Pontos de teleporte
+3. **SimpleCameraFollow.cs** - Câmera simples que segue o jogador
+
+**Observação:** Cena de teste/desenvolvimento com setup básico de câmera e teleporte.
+
+---
+
+### 📊 Análise Geral das 4 Cenas
+
+**Scripts Compartilhados entre Cenas:**
+- **GameManager.cs** - Usado em TODAS as 4 cenas (essencial)
+- **TeleportManager.cs** - Usado em 2_InitialCave e 3_InitialForest
+- **TeleportPoint.cs** - Usado em 2_InitialCave e ERICK_InitialForest
+
+**Progressão de Complexidade:**
+1. **1_TitleScreen** (2 scripts) → UI e menu inicial apenas
+2. **ERICK_InitialForest** (3 scripts) → Cena de teste básica
+3. **2_InitialCave** (4 scripts) → Tutorial básico + coleta de itens
+4. **3_InitialForest** (6 scripts) → Gameplay completo (player, inventário, NPCs, pausa)
+
+**Scripts Únicos por Cena:**
+- **1_TitleScreen:** TitleScreenController
+- **2_InitialCave:** ItemPickup
+- **3_InitialForest:** InventoryManager, PauseManager, PlayerController, NPCAttributesHandler
+- **ERICK_InitialForest:** SimpleCameraFollow
+
+**Distribuição por Pasta:**
+- **Assets/Code:** 8 scripts únicos nas cenas
+- **Assets/External/AssetStore/SlimeMec:** 12 scripts únicos nos prefabs
+
+**Resumo Executivo:**
+- ✅ **4 cenas analisadas** com 9 scripts únicos identificados
+- ✅ **82 prefabs analisados** com 12 scripts únicos identificados  
+- ✅ **20 scripts marcados como "OK"** (utilizados no projeto)
+- ✅ **113 scripts não utilizados** (candidatos para remoção ou arquivamento)
+
+---
+
+### 🎁 Prefabs Analisados (82 prefabs encontrados)
+
+**Prefabs Principais com Scripts:**
+
+1. **player_Slime.prefab** - Prefab do jogador principal
+   - PlayerController.cs - Controle completo do jogador (movimento, ataque, agachar, stealth)
+   - PlayerAttributesHandler.cs - Atributos (HP, ataque, defesa, velocidade, skill points)
+
+2. **crystalA.prefab** (e variações B-F) - Cristais coletáveis elementais
+   - ItemCollectable.cs - Sistema de coleta com atração magnética
+   - BounceHandler.cs - Física de bounce e lançamento
+
+3. **item_RedFruit.prefab** - Fruta coletável
+   - ItemPickup.cs - Sistema de coleta para inventário
+   - BounceHandler.cs - Física de bounce
+   - ItemBuffHandler.cs - Sistema de buffs temporários
+
+4. **bushA2.prefab** (e variações B, C) - Arbustos destrutíveis
+   - BushDestruct.cs - Sistema de destruição
+   - BushShake.cs - Animação de balanço
+   - RandomStyle.cs - Variações visuais aleatórias (escala, cor, flip)
+   - WindEmulator.cs - Efeito de vento
+   - DropController.cs - Sistema de drop de itens
+
+5. **rollingRock.prefab** - Pedra empurrável
+   - PushableObject.cs - Sistema de empurrar objetos
+   - (Usa componentes de física do Unity)
+
+6. **art_rickA.prefab** - Arte/decoração NPC
+   - RandomStyle.cs - Variações visuais aleatórias
+
+7. **NPC_beeA.prefab** - NPC abelha (inimigo)
+   - NPCBaseController.cs - Controller base de NPCs
+   - NPCAttributesHandler.cs - Atributos do NPC (HP, ataque, defesa, velocidade)
+   - DropController.cs - Sistema de drop de itens ao morrer
+
+8. **GameManager.prefab** - Gerenciador central do jogo
+   - GameManager.cs - Gerenciamento de estado do jogo, contadores de cristais
+
+9. **TeleportManager.prefab** - Gerenciador de teleporte
+   - TeleportManager.cs - Sistema de teleporte entre cenas
+
+**Categorias de Prefabs:**
+
+- **Tilesets (7):** tilesetCave_WSA/B/C, tilesetForest_WSA/B/D, tilesetLake_WSA
+- **Ambiente (18):** env_brown_rockA-F (variações), env_grassA, WindManager, wind_vfx
+- **Itens Coletáveis (9):** crystalA-F (6 tipos elementais), item_RedFruit, mushroomA, appleA, fireStarA
+- **Props Interativos (4):** jumpPoint, shrinkPoint, interactivePointAct1/2
+- **Managers (5):** Camera Manager, EventSystem, GameManager, PauseManager, SceneTransitioner, TeleportManager
+- **Pontos de Teleporte (1):** teleportPoint
+- **Personagens (9):** art_beeB, art_beeQueenA, art_butterFlyA, art_gobuA, art_grassuA, art_helpyA, art_nabuA, art_rickA, NPC_beeA, player_Slime
+- **VFX (11):** absorve_vfx (variações B-G), attack01_vfx, hit01_vfx, notHit01_vfx, vfx_exclamationB
+- **Props Destrutíveis (2):** bushA2, bushB
+- **Props Cenário (11):** caveEntrance, escadaria, flowerA/B, grassA/B, prop_puddle, rollingRock, treeA, item_RoundedRockA
+- **UI (7):** CanvasHUD, DialogueCanvas, DialogueUI, HeartPrefab, InteractionIcon, PauseCanvas, QuestIndicatorAvailable/Ready, QuestNotificationPanel
+
+**Observações sobre Prefabs:**
+
+- **82 prefabs** encontrados no total
+- **Prefabs mais complexos:** player_Slime (2 scripts), NPC_beeA (3 scripts), bushA2 (5 scripts)
+- **Prefabs simples:** Itens coletáveis (2-3 scripts cada)
+- **Sistema de variações:** Cristais (6 tipos), Rochas ambientais (múltiplas variações)
+- **Padrão de uso:** RandomStyle.cs é amplamente usado para variações visuais
+- **Sistema de física:** BounceHandler.cs usado em itens coletáveis para efeito de bounce
+
+---
+
+**Gerado automaticamente em:** 03/12/2025  
+**Última análise:** 03/12/2025 - 4 Cenas (1_TitleScreen, 2_InitialCave, 3_InitialForest, ERICK_InitialForest) + 82 Prefabs
+
+**Total de Scripts Únicos Utilizados nas Cenas:**
+- 1_TitleScreen: 2 scripts
+- 2_InitialCave: 4 scripts  
+- 3_InitialForest: 6 scripts
+- ERICK_InitialForest: 3 scripts
+- **Total combinado:** 9 scripts únicos (alguns compartilhados entre cenas)
