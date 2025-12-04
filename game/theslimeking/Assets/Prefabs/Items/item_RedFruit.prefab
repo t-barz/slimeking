@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.0047593
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.6071461
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -85,11 +85,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -3.7908564
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2.0540752
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: 25cd85d344b72354aa545ca8cad52dd0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -200,7 +200,7 @@ MonoBehaviour:
   verticalForceMultiplier: 1.5
   minAngle: 45
   maxAngle: 135
-  bounceCount: 2
+  bounceCount: 0
   timeToBounce: 0.1
   forceReductionFactor: 0.8
   shadowObject: {fileID: 1787758591116441632}
