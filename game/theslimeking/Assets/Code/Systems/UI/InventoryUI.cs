@@ -1,15 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
 using System.Collections;
-using SlimeKing.Core;
 
 namespace SlimeKing.UI
 {
     /// <summary>
     /// Gerencia a interface do inventário.
     /// Exibe 12 slots (3 linhas x 4 colunas) centralizados na tela.
-    /// Pode ser aberto via menu pause ou input direto.
+    /// Controlado pelo PauseManager.
     /// </summary>
     public class InventoryUI : MonoBehaviour
     {
@@ -22,9 +20,6 @@ namespace SlimeKing.UI
         [Header("Fade Settings")]
         [SerializeField] private float fadeDuration = 0.3f;
 
-        [Header("Input")]
-        [SerializeField] private bool canOpenWithInput = true;
-
         [Header("Debug")]
         [SerializeField] private bool enableLogs = false;
 
@@ -33,9 +28,7 @@ namespace SlimeKing.UI
         #region Private Fields
 
         private Coroutine fadeCoroutine;
-        private InputSystem_Actions inputActions;
         private bool isOpen = false;
-        private bool isInputSubscribed = false;
 
         #endregion
 
@@ -71,125 +64,9 @@ namespace SlimeKing.UI
             canvasGroup.blocksRaycasts = false;
         }
 
-        private void Start()
-        {
-            // Aguarda um frame para garantir que PlayerController está inicializado
-            StartCoroutine(InitializeInputDelayed());
-        }
-
-        private void OnEnable()
-        {
-            // Resubscribe se já tínhamos subscrito antes
-            if (inputActions != null && !isInputSubscribed && canOpenWithInput)
-            {
-                SubscribeToInput();
-            }
-        }
-
         private void OnDisable()
         {
-            UnsubscribeFromInput();
             StopAllCoroutines();
-        }
-
-        private void OnDestroy()
-        {
-            UnsubscribeFromInput();
-        }
-
-        #endregion
-
-        #region Initialization
-
-        /// <summary>
-        /// Inicializa input system após PlayerController estar pronto.
-        /// </summary>
-        private IEnumerator InitializeInputDelayed()
-        {
-            yield return null; // Aguarda um frame
-
-            if (!canOpenWithInput) yield break;
-
-            // Tenta obter referência ao input do PlayerController
-            if (PlayerController.Instance != null)
-            {
-                inputActions = PlayerController.Instance.GetInputActions();
-                
-                if (inputActions != null)
-                {
-                    SubscribeToInput();
-                    LogMessage("Input system connected successfully");
-                }
-                else
-                {
-                    LogWarningMessage("Failed to get InputActions from PlayerController");
-                }
-            }
-            else
-            {
-                LogWarningMessage("PlayerController.Instance not found. Inventory input will not work.");
-            }
-        }
-
-        #endregion
-
-        #region Input Management
-
-        /// <summary>
-        /// Subscreve ao evento de Inventory no InputSystem.
-        /// </summary>
-        private void SubscribeToInput()
-        {
-            if (inputActions == null || isInputSubscribed) return;
-            
-            // Subscreve ao input de Inventory (assumindo que existe no Gameplay action map)
-            // NOTA: Se o input "Inventory" não existir, esta parte será ignorada
-            try
-            {
-                // Tenta acessar o input de Inventory
-                var inventoryAction = inputActions.Gameplay.Inventory;
-                if (inventoryAction != null)
-                {
-                    inventoryAction.performed += OnInventoryInput;
-                    isInputSubscribed = true;
-                    LogMessage("Subscribed to Inventory input");
-                }
-            }
-            catch
-            {
-                LogWarningMessage("Inventory action not found in InputSystem_Actions. Add it manually if needed.");
-            }
-        }
-
-        /// <summary>
-        /// Remove subscrição ao evento de Inventory.
-        /// </summary>
-        private void UnsubscribeFromInput()
-        {
-            if (inputActions == null || !isInputSubscribed) return;
-
-            try
-            {
-                var inventoryAction = inputActions.Gameplay.Inventory;
-                if (inventoryAction != null)
-                {
-                    inventoryAction.performed -= OnInventoryInput;
-                    isInputSubscribed = false;
-                    LogMessage("Unsubscribed from Inventory input");
-                }
-            }
-            catch
-            {
-                // Ignora se o input não existir
-            }
-        }
-
-        /// <summary>
-        /// Callback para input de Inventory.
-        /// </summary>
-        private void OnInventoryInput(InputAction.CallbackContext context)
-        {
-            ToggleInventory();
         }
 
         #endregion
@@ -197,27 +74,14 @@ namespace SlimeKing.UI
         #region Public Methods
 
         /// <summary>
-        /// Abre o inventário.
+        /// Abre o inventário com fade in.
         /// </summary>
-        public void OpenInventory()
+        public void Show()
         {
             if (isOpen) return;
 
-            LogMessage("Opening inventory");
+            LogMessage("Showing inventory");
             isOpen = true;
-
-            // Oculta o PauseMenu se estiver aberto
-            PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
-            if (pauseMenu != null)
-            {
-                pauseMenu.HideMenuForInventory();
-            }
-
-            // Pausa o jogo
-            if (PauseManager.HasInstance)
-            {
-                PauseManager.Instance.Pause();
-            }
 
             if (inventoryPanel != null)
             {
@@ -234,13 +98,13 @@ namespace SlimeKing.UI
         }
 
         /// <summary>
-        /// Fecha o inventário.
+        /// Fecha o inventário com fade out.
         /// </summary>
-        public void CloseInventory()
+        public void Hide()
         {
             if (!isOpen) return;
 
-            LogMessage("Closing inventory");
+            LogMessage("Hiding inventory");
             isOpen = false;
 
             // Para fade anterior se existir
@@ -250,36 +114,6 @@ namespace SlimeKing.UI
             }
 
             fadeCoroutine = StartCoroutine(FadeOut());
-
-            // Mostra o PauseMenu novamente se o jogo ainda estiver pausado
-            if (PauseManager.HasInstance && PauseManager.Instance.IsPaused)
-            {
-                PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
-                if (pauseMenu != null)
-                {
-                    pauseMenu.ShowMenuAfterInventory();
-                }
-            }
-            else if (PauseManager.HasInstance)
-            {
-                // Despausa o jogo se não estava pausado antes
-                PauseManager.Instance.Resume();
-            }
-        }
-
-        /// <summary>
-        /// Alterna entre aberto e fechado.
-        /// </summary>
-        public void ToggleInventory()
-        {
-            if (isOpen)
-            {
-                CloseInventory();
-            }
-            else
-            {
-                OpenInventory();
-            }
         }
 
         #endregion
@@ -366,11 +200,6 @@ namespace SlimeKing.UI
             {
                 UnityEngine.Debug.Log($"[InventoryUI] {message}");
             }
-        }
-
-        private void LogWarningMessage(string message)
-        {
-            UnityEngine.Debug.LogWarning($"[InventoryUI] {message}");
         }
 
         #endregion

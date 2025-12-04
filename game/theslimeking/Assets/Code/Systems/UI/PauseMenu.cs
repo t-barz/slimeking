@@ -8,8 +8,7 @@ namespace SlimeKing.UI
 {
     /// <summary>
     /// Gerencia o menu de pausa do jogo.
-    /// Integra com PauseManager para controle de pause via eventos.
-    /// Implementa fade animations e navegação com gamepad/teclado.
+    /// Controlado pelo PauseManager.
     /// </summary>
     public class PauseMenu : MonoBehaviour
     {
@@ -41,6 +40,13 @@ namespace SlimeKing.UI
         #region Private Fields
 
         private Coroutine fadeCoroutine;
+        private bool isVisible = false;
+
+        #endregion
+
+        #region Properties
+
+        public bool IsVisible => isVisible;
 
         #endregion
 
@@ -62,27 +68,27 @@ namespace SlimeKing.UI
             // Configura botões
             if (inventoryButton != null)
             {
-                inventoryButton.onClick.AddListener(OpenInventory);
+                inventoryButton.onClick.AddListener(OnInventoryButtonClicked);
             }
 
             if (saveButton != null)
             {
-                saveButton.onClick.AddListener(SaveGame);
+                saveButton.onClick.AddListener(OnSaveButtonClicked);
             }
 
             if (loadButton != null)
             {
-                loadButton.onClick.AddListener(LoadGame);
+                loadButton.onClick.AddListener(OnLoadButtonClicked);
             }
 
             if (resumeButton != null)
             {
-                resumeButton.onClick.AddListener(Resume);
+                resumeButton.onClick.AddListener(OnResumeButtonClicked);
             }
 
             if (quitButton != null)
             {
-                quitButton.onClick.AddListener(QuitToMainMenu);
+                quitButton.onClick.AddListener(OnQuitButtonClicked);
             }
 
             // Estado inicial: oculto
@@ -104,22 +110,12 @@ namespace SlimeKing.UI
 
         private void OnEnable()
         {
-            // Subscreve ao evento de mudança de pause do PauseManager
-            PauseManager.OnPauseStateChanged += HandlePauseStateChanged;
-
-            Log("Subscribed to PauseManager events");
-
             // Inicia corrotina de atualização da seta
             StartCoroutine(UpdateSelectionIndicator());
         }
 
         private void OnDisable()
         {
-            // Desinscreve do evento
-            PauseManager.OnPauseStateChanged -= HandlePauseStateChanged;
-
-            Log("Unsubscribed from PauseManager events");
-
             // Para todas as corrotinas
             StopAllCoroutines();
         }
@@ -129,85 +125,43 @@ namespace SlimeKing.UI
             // Remove listeners dos botões
             if (inventoryButton != null)
             {
-                inventoryButton.onClick.RemoveListener(OpenInventory);
+                inventoryButton.onClick.RemoveListener(OnInventoryButtonClicked);
             }
 
             if (saveButton != null)
             {
-                saveButton.onClick.RemoveListener(SaveGame);
+                saveButton.onClick.RemoveListener(OnSaveButtonClicked);
             }
 
             if (loadButton != null)
             {
-                loadButton.onClick.RemoveListener(LoadGame);
+                loadButton.onClick.RemoveListener(OnLoadButtonClicked);
             }
 
             if (resumeButton != null)
             {
-                resumeButton.onClick.RemoveListener(Resume);
+                resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
             }
 
             if (quitButton != null)
             {
-                quitButton.onClick.RemoveListener(QuitToMainMenu);
+                quitButton.onClick.RemoveListener(OnQuitButtonClicked);
             }
         }
 
         #endregion
 
-        #region Event Handlers
-
-        /// <summary>
-        /// Handler para mudança de estado de pause.
-        /// </summary>
-        private void HandlePauseStateChanged(bool isPaused)
-        {
-            if (isPaused)
-            {
-                ShowMenu();
-            }
-            else
-            {
-                HideMenu();
-            }
-        }
-
-        #endregion
-
-        #region Menu Control
-
-        /// <summary>
-        /// Oculta o menu temporariamente para o inventário.
-        /// </summary>
-        public void HideMenuForInventory()
-        {
-            Log("Hiding pause menu for inventory");
-            
-            if (pauseMenuPanel != null)
-            {
-                pauseMenuPanel.SetActive(false);
-            }
-            
-            canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-
-        /// <summary>
-        /// Mostra o menu novamente após fechar o inventário.
-        /// </summary>
-        public void ShowMenuAfterInventory()
-        {
-            Log("Showing pause menu after inventory");
-            ShowMenu();
-        }
+        #region Public Methods
 
         /// <summary>
         /// Mostra o menu de pausa com fade in.
         /// </summary>
-        private void ShowMenu()
+        public void Show()
         {
+            if (isVisible) return;
+
             Log("Showing pause menu");
+            isVisible = true;
 
             if (pauseMenuPanel != null)
             {
@@ -226,9 +180,12 @@ namespace SlimeKing.UI
         /// <summary>
         /// Oculta o menu de pausa com fade out.
         /// </summary>
-        private void HideMenu()
+        public void Hide()
         {
+            if (!isVisible) return;
+
             Log("Hiding pause menu");
+            isVisible = false;
 
             // Para fade anterior se existir
             if (fadeCoroutine != null)
@@ -254,6 +211,19 @@ namespace SlimeKing.UI
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = true;
 
+            // Inicia a seta com alpha 0
+            CanvasGroup arrowCanvasGroup = null;
+            if (selectionArrow != null)
+            {
+                arrowCanvasGroup = selectionArrow.GetComponent<CanvasGroup>();
+                if (arrowCanvasGroup == null)
+                {
+                    arrowCanvasGroup = selectionArrow.AddComponent<CanvasGroup>();
+                }
+                arrowCanvasGroup.alpha = 0f;
+            }
+
+            // Fade do menu
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
@@ -268,6 +238,20 @@ namespace SlimeKing.UI
             // Seleciona o primeiro botão para navegação com gamepad/teclado
             SelectFirstButton();
 
+            // Fade da seta após o menu estar visível
+            if (arrowCanvasGroup != null)
+            {
+                elapsed = 0f;
+                while (elapsed < fadeDuration)
+                {
+                    elapsed += Time.unscaledDeltaTime;
+                    float t = Mathf.Clamp01(elapsed / fadeDuration);
+                    arrowCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t);
+                    yield return null;
+                }
+                arrowCanvasGroup.alpha = 1f;
+            }
+
             fadeCoroutine = null;
             Log("Fade in completed");
         }
@@ -281,6 +265,17 @@ namespace SlimeKing.UI
             float elapsed = 0f;
 
             canvasGroup.interactable = false;
+
+            // Oculta a seta imediatamente
+            if (selectionArrow != null)
+            {
+                CanvasGroup arrowCanvasGroup = selectionArrow.GetComponent<CanvasGroup>();
+                if (arrowCanvasGroup != null)
+                {
+                    arrowCanvasGroup.alpha = 0f;
+                }
+                selectionArrow.SetActive(false);
+            }
 
             while (elapsed < fadeDuration)
             {
@@ -390,12 +385,6 @@ namespace SlimeKing.UI
 
             if (arrowRect != null && buttonRect != null)
             {
-                // Usa o mesmo parent para garantir posicionamento correto
-                if (arrowRect.parent != buttonRect.parent)
-                {
-                    Log($"Warning: Arrow and button have different parents!");
-                }
-
                 // Copia a posição Y do botão, mantém offset X
                 Vector2 newPos = new Vector2(
                     buttonRect.anchoredPosition.x + arrowOffsetX,
@@ -403,11 +392,6 @@ namespace SlimeKing.UI
                 );
 
                 arrowRect.anchoredPosition = newPos;
-
-                if (enableLogs)
-                {
-                    Log($"Arrow positioned at button '{button.name}': {newPos}");
-                }
             }
         }
 
@@ -416,69 +400,55 @@ namespace SlimeKing.UI
         #region Button Handlers
 
         /// <summary>
-        /// Abre o inventário a partir do menu de pausa.
+        /// Handler do botão Inventory.
+        /// Notifica o PauseManager.
         /// </summary>
-        private void OpenInventory()
+        private void OnInventoryButtonClicked()
         {
-            Log("Opening inventory - closing pause menu");
-
-            // Fecha o menu de pausa
-            if (PauseManager.Instance != null)
+            Log("Inventory button clicked");
+            
+            if (PauseManager.HasInstance)
             {
-                PauseManager.Instance.Resume();
-            }
-
-            // Abre o inventário
-            InventoryUI inventoryUI = FindObjectOfType<InventoryUI>();
-            if (inventoryUI != null)
-            {
-                inventoryUI.OpenInventory();
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning("[PauseMenu] InventoryUI not found in scene!");
+                PauseManager.Instance.OnInventoryButtonPressed();
             }
         }
 
         /// <summary>
-        /// Salva o jogo.
+        /// Handler do botão Save.
         /// TODO: Implementar quando SaveManager estiver pronto.
         /// </summary>
-        private void SaveGame()
+        private void OnSaveButtonClicked()
         {
             UnityEngine.Debug.Log("[PauseMenu] Save game - Not implemented yet");
         }
 
         /// <summary>
-        /// Carrega um save do jogo.
+        /// Handler do botão Load.
         /// TODO: Implementar quando SaveManager estiver pronto.
         /// </summary>
-        private void LoadGame()
+        private void OnLoadButtonClicked()
         {
             UnityEngine.Debug.Log("[PauseMenu] Load game - Not implemented yet");
         }
 
         /// <summary>
-        /// Resume o jogo através do PauseManager.
+        /// Handler do botão Resume.
+        /// Notifica o PauseManager.
         /// </summary>
-        private void Resume()
+        private void OnResumeButtonClicked()
         {
-            Log("Resume button pressed");
+            Log("Resume button clicked");
 
             if (PauseManager.HasInstance)
             {
-                PauseManager.Instance.Resume();
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("[PauseMenu] PauseManager.Instance not found!");
+                PauseManager.Instance.OnResumeButtonPressed();
             }
         }
 
         /// <summary>
-        /// Sai para o menu principal (cena 1_TitleScreen).
+        /// Handler do botão Quit.
         /// </summary>
-        private void QuitToMainMenu()
+        private void OnQuitButtonClicked()
         {
             Log("Quit to main menu");
 

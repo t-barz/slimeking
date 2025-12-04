@@ -110,7 +110,7 @@ public static class CreateInventoryUIEditor
         // Configurar evento do botão
         closeButton.onClick.AddListener(() => {
             var invUI = closeButtonGO.GetComponentInParent<SlimeKing.UI.InventoryUI>();
-            if (invUI != null) invUI.CloseInventory();
+            if (invUI != null) invUI.Hide();
         });
 
         // 5. Criar Container dos Slots
