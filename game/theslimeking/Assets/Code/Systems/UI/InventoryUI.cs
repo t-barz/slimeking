@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TheSlimeKing.Inventory;
+using TheSlimeKing.UI;
 
 namespace SlimeKing.UI
 {
     /// <summary>
     /// Gerencia a interface do inventário.
     /// Exibe 12 slots (3 linhas x 4 colunas) centralizados na tela.
+    /// Sincroniza automaticamente com o InventoryManager via eventos.
     /// Controlado pelo PauseManager.
     /// </summary>
     public class InventoryUI : MonoBehaviour
@@ -17,11 +20,14 @@ namespace SlimeKing.UI
         [SerializeField] private GameObject inventoryPanel;
         [SerializeField] private CanvasGroup canvasGroup;
 
+        [Header("Slots")]
+        [SerializeField] private Transform slotsContainer;
+
         [Header("Fade Settings")]
         [SerializeField] private float fadeDuration = 0.3f;
 
         [Header("Debug")]
-        [SerializeField] private bool enableLogs = false;
+        [SerializeField] private bool enableInventoryLogs = false;
 
         #endregion
 
@@ -29,6 +35,7 @@ namespace SlimeKing.UI
 
         private Coroutine fadeCoroutine;
         private bool isOpen = false;
+        private InventorySlotUI[] slotUIComponents = new InventorySlotUI[12];
 
         #endregion
 
@@ -64,9 +71,16 @@ namespace SlimeKing.UI
             canvasGroup.blocksRaycasts = false;
         }
 
+        private void Start()
+        {
+            InitializeSlots();
+            SubscribeToEvents();
+        }
+
         private void OnDisable()
         {
             StopAllCoroutines();
+            UnsubscribeFromEvents();
         }
 
         #endregion
@@ -74,7 +88,7 @@ namespace SlimeKing.UI
         #region Public Methods
 
         /// <summary>
-        /// Abre o inventário com fade in.
+        /// Abre o inventário com fade in e sincroniza com o estado atual.
         /// </summary>
         public void Show()
         {
@@ -87,6 +101,9 @@ namespace SlimeKing.UI
             {
                 inventoryPanel.SetActive(true);
             }
+
+            // Sincroniza UI com estado atual do inventário
+            RefreshAllSlots();
 
             // Para fade anterior se existir
             if (fadeCoroutine != null)
@@ -178,16 +195,106 @@ namespace SlimeKing.UI
 
         #endregion
 
+        #region Slot Management
+
+        /// <summary>
+        /// Inicializa as referências aos 12 slots de UI.
+        /// Obtém os componentes InventorySlotUI dos filhos do container.
+        /// </summary>
+        private void InitializeSlots()
+        {
+            if (slotsContainer == null)
+            {
+                UnityEngine.Debug.LogError("[InventoryUI] Slots container não configurado!");
+                return;
+            }
+
+            // Obtém todos os InventorySlotUI do container
+            InventorySlotUI[] foundSlots = slotsContainer.GetComponentsInChildren<InventorySlotUI>(true);
+
+            if (foundSlots.Length < 12)
+            {
+                UnityEngine.Debug.LogError($"[InventoryUI] Esperado 12 slots, encontrados {foundSlots.Length}!");
+                return;
+            }
+
+            // Armazena referências aos primeiros 12 slots
+            for (int i = 0; i < 12; i++)
+            {
+                slotUIComponents[i] = foundSlots[i];
+            }
+
+            LogMessage($"Inicializados {slotUIComponents.Length} slots");
+        }
+
+        /// <summary>
+        /// Inscreve-se nos eventos do InventoryManager.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            if (InventoryManager.Instance == null)
+            {
+                UnityEngine.Debug.LogError("[InventoryUI] InventoryManager.Instance não encontrado!");
+                return;
+            }
+
+            InventoryManager.Instance.OnInventoryChanged += RefreshAllSlots;
+            LogMessage("Inscrito nos eventos do InventoryManager");
+        }
+
+        /// <summary>
+        /// Desinscreve-se dos eventos do InventoryManager.
+        /// </summary>
+        private void UnsubscribeFromEvents()
+        {
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.OnInventoryChanged -= RefreshAllSlots;
+                LogMessage("Desinscrito dos eventos do InventoryManager");
+            }
+        }
+
+        /// <summary>
+        /// Atualiza todos os 12 slots com o estado atual do inventário.
+        /// </summary>
+        private void RefreshAllSlots()
+        {
+            if (InventoryManager.Instance == null)
+            {
+                UnityEngine.Debug.LogWarning("[InventoryUI] InventoryManager.Instance não disponível para refresh");
+                return;
+            }
+
+            UnityEngine.Debug.Log($"[InventoryUI] 🔄 Atualizando todos os slots. UI está {(isOpen ? "ABERTA" : "FECHADA")}");
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (slotUIComponents[i] != null)
+                {
+                    InventorySlot slot = InventoryManager.Instance.GetSlot(i);
+                    slotUIComponents[i].Setup(slot, i);
+                    
+                    if (!slot.IsEmpty)
+                    {
+                        UnityEngine.Debug.Log($"[InventoryUI] ✅ Slot {i} atualizado com '{slot.item.itemName}'");
+                    }
+                }
+            }
+
+            LogMessage("Todos os slots atualizados");
+        }
+
+        #endregion
+
         #region Slot Interaction
 
         /// <summary>
         /// Callback quando um slot é clicado.
-        /// TODO: Implementar lógica de interação com slots.
         /// </summary>
         public void OnSlotClicked(int slotIndex)
         {
             LogMessage($"Slot {slotIndex} clicked");
-            // TODO: Implementar lógica de uso/seleção de item
+            // Futura implementação: usar item, equipar, etc.
         }
 
         #endregion
@@ -196,7 +303,7 @@ namespace SlimeKing.UI
 
         private void LogMessage(string message)
         {
-            if (enableLogs)
+            if (enableInventoryLogs)
             {
                 UnityEngine.Debug.Log($"[InventoryUI] {message}");
             }

@@ -10,7 +10,8 @@ namespace TheSlimeKing.Inventory
 
         public bool CanStack(ItemData newItem)
         {
-            return item == newItem && quantity < 99 && item != null && item.isStackable;
+            // Sistema não empilhável - sempre retorna false
+            return false;
         }
     }
 }

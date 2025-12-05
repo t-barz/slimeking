@@ -302,15 +302,31 @@ namespace SlimeMec.Gameplay
         /// </summary>
         private bool TryAddToInventory()
         {
-            if (inventoryItemData == null || InventoryManager.Instance == null)
-                return true;
+            if (inventoryItemData == null)
+            {
+                Debug.LogWarning($"[ItemPickup] ⚠️ inventoryItemData é NULL em {gameObject.name}! Item não será adicionado ao inventário.");
+                return true; // Retorna true para não bloquear a coleta visual
+            }
 
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogWarning($"[ItemPickup] ⚠️ InventoryManager.Instance é NULL! Item não será adicionado ao inventário.");
+                return true;
+            }
+
+            Debug.Log($"[ItemPickup] 🔄 Tentando adicionar '{inventoryItemData.itemName}' ao inventário (x{itemQuantity})");
             bool success = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
 
             if (success)
+            {
+                Debug.Log($"[ItemPickup] ✅ '{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity})");
                 LogDebug($"'{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity})");
+            }
             else
+            {
+                Debug.LogWarning($"[ItemPickup] ❌ Inventário cheio! '{inventoryItemData.itemName}' não foi coletado");
                 LogDebug($"Inventário cheio! '{inventoryItemData.itemName}' não foi coletado");
+            }
 
             return success;
         }

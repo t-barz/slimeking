@@ -9,7 +9,6 @@ namespace TheSlimeKing.Inventory
         public string itemName;
         public Sprite icon;
         public ItemType type;
-        public bool isStackable = true;
 
         [Header("Consumable Properties")]
         public int healAmount;

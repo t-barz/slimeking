@@ -22,6 +22,37 @@ namespace TheSlimeKing.UI
 
         private void Awake()
         {
+            // Auto-configura referências se não estiverem atribuídas
+            if (iconImage == null)
+            {
+                // Procura por um componente Image filho chamado "Icon" ou o primeiro Image encontrado
+                Image[] images = GetComponentsInChildren<Image>(true);
+                foreach (var img in images)
+                {
+                    // Ignora a imagem de fundo do próprio slot
+                    if (img.gameObject != gameObject)
+                    {
+                        iconImage = img;
+                        UnityEngine.Debug.Log($"[InventorySlotUI] Auto-configurado iconImage: {img.gameObject.name}");
+                        break;
+                    }
+                }
+                
+                if (iconImage == null)
+                {
+                    UnityEngine.Debug.LogError($"[InventorySlotUI] Não foi possível encontrar Image para iconImage em {gameObject.name}!");
+                }
+            }
+
+            if (quantityText == null)
+            {
+                quantityText = GetComponentInChildren<TextMeshProUGUI>(true);
+                if (quantityText != null)
+                {
+                    UnityEngine.Debug.Log($"[InventorySlotUI] Auto-configurado quantityText: {quantityText.gameObject.name}");
+                }
+            }
+
             if (button == null)
             {
                 button = GetComponent<Button>();
@@ -47,9 +78,25 @@ namespace TheSlimeKing.UI
 
         /// <summary>
         /// Atualiza a visualização do slot com os dados atuais.
+        /// Sistema não empilhável: quantidade nunca é exibida.
         /// </summary>
         public void Refresh()
         {
+            // Tenta reconfigurar iconImage se estiver null
+            if (iconImage == null)
+            {
+                Image[] images = GetComponentsInChildren<Image>(true);
+                foreach (var img in images)
+                {
+                    if (img.gameObject != gameObject)
+                    {
+                        iconImage = img;
+                        UnityEngine.Debug.LogWarning($"[InventorySlotUI] iconImage estava NULL, reconfigurado para: {img.gameObject.name}");
+                        break;
+                    }
+                }
+            }
+
             if (currentSlot == null || currentSlot.IsEmpty)
             {
                 // Slot vazio
@@ -68,21 +115,28 @@ namespace TheSlimeKing.UI
                 // Slot com item
                 if (iconImage != null)
                 {
-                    iconImage.enabled = true;
-                    iconImage.sprite = currentSlot.item.icon;
+                    // Verifica se o item tem ícone
+                    if (currentSlot.item.icon != null)
+                    {
+                        iconImage.enabled = true;
+                        iconImage.sprite = currentSlot.item.icon;
+                    }
+                    else
+                    {
+                        // Item sem ícone - oculta imagem
+                        iconImage.enabled = false;
+                        UnityEngine.Debug.LogWarning($"[InventorySlotUI] ⚠️ Item '{currentSlot.item.itemName}' não possui ícone configurado!");
+                    }
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"[InventorySlotUI] ❌ iconImage é NULL no slot {slotIndex} e não foi possível reconfigurar! Verifique a hierarquia do prefab.");
                 }
 
                 if (quantityText != null)
                 {
-                    // Mostra quantidade apenas se for maior que 1
-                    if (currentSlot.quantity > 1)
-                    {
-                        quantityText.text = currentSlot.quantity.ToString();
-                    }
-                    else
-                    {
-                        quantityText.text = "";
-                    }
+                    // Sistema não empilhável: nunca exibe quantidade
+                    quantityText.text = "";
                 }
             }
         }

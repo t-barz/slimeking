@@ -589,29 +589,7 @@ namespace TheSlimeKing.Quest
                 if (reward.item == null)
                     continue;
                 
-                // Se item é stackable, pode caber em slots existentes
-                if (reward.item.isStackable)
-                {
-                    // Verifica se já existe no inventário com espaço
-                    bool canStack = false;
-                    InventorySlot[] slots = InventoryManager.Instance.GetAllSlots();
-                    
-                    foreach (InventorySlot slot in slots)
-                    {
-                        if (slot != null && slot.item == reward.item && slot.quantity < 99)
-                        {
-                            canStack = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!canStack)
-                    {
-                        // Precisa de novo slot
-                        slotsNeeded++;
-                    }
-                }
-                else
+                // Sistema não empilhável - cada item precisa de um slot
                 {
                     // Item não stackable precisa de slot próprio
                     slotsNeeded++;

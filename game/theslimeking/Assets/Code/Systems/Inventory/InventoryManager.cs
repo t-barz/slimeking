@@ -5,7 +5,7 @@ namespace TheSlimeKing.Inventory
 {
     /// <summary>
     /// Gerenciador central do sistema de inventário.
-    /// Controla 20 slots de inventário, 3 slots de equipamento e 4 quick slots.
+    /// Controla 12 slots de inventário (não empilháveis), 3 slots de equipamento e 4 quick slots.
     /// </summary>
     public class InventoryManager : MonoBehaviour
     {
@@ -19,7 +19,7 @@ namespace TheSlimeKing.Inventory
         #endregion
 
         #region Private Fields
-        private InventorySlot[] slots = new InventorySlot[20];
+        private InventorySlot[] slots = new InventorySlot[12];
         private ItemData[] equipment = new ItemData[3]; // Amulet(0), Ring(1), Cape(2)
         private ItemData[] quickSlots = new ItemData[4]; // Up(0), Down(1), Left(2), Right(3)
         #endregion
@@ -53,8 +53,8 @@ namespace TheSlimeKing.Inventory
 
         #region Public Methods - Item Management
         /// <summary>
-        /// Adiciona um item ao inventário com lógica de empilhamento.
-        /// Tenta empilhar primeiro, depois procura slot vazio.
+        /// Adiciona um item ao inventário sem empilhamento.
+        /// Cada item ocupa exatamente 1 slot, independentemente do tipo.
         /// </summary>
         /// <param name="item">Item a ser adicionado</param>
         /// <param name="quantity">Quantidade a adicionar (padrão: 1)</param>
@@ -63,36 +63,12 @@ namespace TheSlimeKing.Inventory
         {
             if (item == null || quantity <= 0)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de adicionar item nulo ou quantidade inválida.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de adicionar item nulo ou quantidade inválida.");
                 return false;
             }
 
-            // Tenta empilhar em slot existente primeiro (até 99)
-            if (item.isStackable)
-            {
-                for (int i = 0; i < slots.Length; i++)
-                {
-                    if (slots[i].CanStack(item))
-                    {
-                        int spaceAvailable = 99 - slots[i].quantity;
-                        int amountToAdd = Mathf.Min(quantity, spaceAvailable);
-
-                        slots[i].quantity += amountToAdd;
-                        quantity -= amountToAdd;
-
-                        OnInventoryChanged?.Invoke();
-
-                        // Se adicionou tudo, retorna sucesso
-                        if (quantity <= 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // Se não conseguiu empilhar tudo, procura slots vazios
-            while (quantity > 0)
+            // Sistema não empilhável: cada item ocupa 1 slot
+            for (int i = 0; i < quantity; i++)
             {
                 int emptySlotIndex = FindEmptySlot();
 
@@ -100,15 +76,16 @@ namespace TheSlimeKing.Inventory
                 {
                     // Inventário cheio
                     OnInventoryFull?.Invoke();
-                    return false;
+                    UnityEngine.Debug.LogWarning($"[InventoryManager] Inventário cheio. Adicionados {i}/{quantity} itens.");
+                    return i > 0; // Retorna true se pelo menos 1 item foi adicionado
                 }
 
-                // Adiciona ao slot vazio
-                int amountToAdd = item.isStackable ? Mathf.Min(quantity, 99) : 1;
+                // Adiciona ao slot vazio (sempre quantidade 1)
                 slots[emptySlotIndex].item = item;
-                slots[emptySlotIndex].quantity = amountToAdd;
-                quantity -= amountToAdd;
-
+                slots[emptySlotIndex].quantity = 1;
+                
+                UnityEngine.Debug.Log($"[InventoryManager] ✅ Item '{item.itemName}' adicionado ao slot {emptySlotIndex}");
+                
                 OnInventoryChanged?.Invoke();
             }
 
@@ -148,25 +125,14 @@ namespace TheSlimeKing.Inventory
 
             for (int i = 0; i < slots.Length; i++)
             {
-                if (slots[i].item == item)
+                if (slots[i].item == item && remainingToRemove > 0)
                 {
-                    int amountToRemove = Mathf.Min(remainingToRemove, slots[i].quantity);
-                    slots[i].quantity -= amountToRemove;
-                    remainingToRemove -= amountToRemove;
-
-                    // Se quantidade chegou a zero, limpa o slot
-                    if (slots[i].quantity <= 0)
-                    {
-                        slots[i].item = null;
-                        slots[i].quantity = 0;
-                    }
+                    // Remove o item do slot (sempre limpa completamente)
+                    slots[i].item = null;
+                    slots[i].quantity = 0;
+                    remainingToRemove--;
 
                     OnInventoryChanged?.Invoke();
-
-                    if (remainingToRemove <= 0)
-                    {
-                        return true;
-                    }
                 }
             }
 
@@ -182,7 +148,7 @@ namespace TheSlimeKing.Inventory
         {
             if (slotIndex < 0 || slotIndex >= slots.Length)
             {
-                Debug.LogWarning($"InventoryManager: Índice de slot inválido: {slotIndex}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Índice de slot inválido: {slotIndex}");
                 return;
             }
 
@@ -190,7 +156,7 @@ namespace TheSlimeKing.Inventory
 
             if (slot.IsEmpty)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de usar item de slot vazio.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de usar item de slot vazio.");
                 return;
             }
 
@@ -199,22 +165,16 @@ namespace TheSlimeKing.Inventory
             // Verifica se é um item consumível
             if (item.type != ItemType.Consumable)
             {
-                Debug.LogWarning($"InventoryManager: Item '{item.itemName}' não é consumível.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não é consumível.");
                 return;
             }
 
             // Aplica efeitos do consumível
             ApplyConsumableEffects(item);
 
-            // Remove 1 unidade do item
-            slot.quantity--;
-
-            // Se quantidade chegou a zero, limpa o slot
-            if (slot.quantity <= 0)
-            {
-                slot.item = null;
-                slot.quantity = 0;
-            }
+            // Remove o item do slot (não empilhável, sempre remove completamente)
+            slot.item = null;
+            slot.quantity = 0;
 
             OnInventoryChanged?.Invoke();
         }
@@ -237,16 +197,16 @@ namespace TheSlimeKing.Inventory
                     if (attributesHandler != null)
                     {
                         int actualHeal = attributesHandler.Heal(item.healAmount);
-                        Debug.Log($"InventoryManager: Curado {actualHeal} pontos de vida usando '{item.itemName}'.");
+                        UnityEngine.Debug.Log($"[InventoryManager] Curado {actualHeal} pontos de vida usando '{item.itemName}'.");
                     }
                     else
                     {
-                        Debug.LogWarning("InventoryManager: PlayerAttributesHandler não encontrado no PlayerController. Cura não aplicada.");
+                        UnityEngine.Debug.LogWarning("[InventoryManager] PlayerAttributesHandler não encontrado no PlayerController. Cura não aplicada.");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("InventoryManager: PlayerController.Instance não encontrado. Cura não aplicada.");
+                    UnityEngine.Debug.LogWarning("[InventoryManager] PlayerController.Instance não encontrado. Cura não aplicada.");
                 }
             }
         }
@@ -261,7 +221,7 @@ namespace TheSlimeKing.Inventory
         {
             if (slotIndex < 0 || slotIndex >= slots.Length)
             {
-                Debug.LogWarning($"InventoryManager: Índice de slot inválido: {slotIndex}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Índice de slot inválido: {slotIndex}");
                 return;
             }
 
@@ -269,15 +229,14 @@ namespace TheSlimeKing.Inventory
 
             if (slot.IsEmpty)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de descartar item de slot vazio.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de descartar item de slot vazio.");
                 return;
             }
 
             // Verifica se é quest item (bloqueia descarte)
             if (slot.item.isQuestItem)
             {
-                Debug.LogWarning($"InventoryManager: Itens de quest não podem ser descartados: {slot.item.itemName}");
-                // TODO: Mostrar notificação na UI
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Itens de quest não podem ser descartados: {slot.item.itemName}");
                 return;
             }
 
@@ -319,14 +278,14 @@ namespace TheSlimeKing.Inventory
         {
             if (item == null)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de equipar item nulo.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de equipar item nulo.");
                 return false;
             }
 
             // Verifica se é um item de equipamento
             if (item.type != ItemType.Equipment)
             {
-                Debug.LogWarning($"InventoryManager: Item '{item.itemName}' não é equipamento.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não é equipamento.");
                 return false;
             }
 
@@ -341,7 +300,7 @@ namespace TheSlimeKing.Inventory
                 // Tenta retornar ao inventário
                 if (!AddItem(previousItem, 1))
                 {
-                    Debug.LogWarning($"InventoryManager: Inventário cheio. Não foi possível desequipar '{previousItem.itemName}'.");
+                    UnityEngine.Debug.LogWarning($"[InventoryManager] Inventário cheio. Não foi possível desequipar '{previousItem.itemName}'.");
                     return false;
                 }
             }
@@ -358,7 +317,7 @@ namespace TheSlimeKing.Inventory
             OnEquipmentChanged?.Invoke();
             OnInventoryChanged?.Invoke();
 
-            Debug.Log($"InventoryManager: Equipado '{item.itemName}' no slot {item.equipmentType}.");
+            UnityEngine.Debug.Log($"[InventoryManager] Equipado '{item.itemName}' no slot {item.equipmentType}.");
             return true;
         }
 
@@ -373,7 +332,7 @@ namespace TheSlimeKing.Inventory
 
             if (equipment[equipmentSlotIndex] == null)
             {
-                Debug.LogWarning($"InventoryManager: Nenhum item equipado no slot {equipmentType}.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Nenhum item equipado no slot {equipmentType}.");
                 return false;
             }
 
@@ -382,7 +341,7 @@ namespace TheSlimeKing.Inventory
             // Tenta adicionar ao inventário
             if (!AddItem(itemToUnequip, 1))
             {
-                Debug.LogWarning($"InventoryManager: Inventário cheio. Não foi possível desequipar '{itemToUnequip.itemName}'.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Inventário cheio. Não foi possível desequipar '{itemToUnequip.itemName}'.");
                 return false;
             }
 
@@ -395,7 +354,7 @@ namespace TheSlimeKing.Inventory
             OnEquipmentChanged?.Invoke();
             OnInventoryChanged?.Invoke();
 
-            Debug.Log($"InventoryManager: Desequipado '{itemToUnequip.itemName}' do slot {equipmentType}.");
+            UnityEngine.Debug.Log($"[InventoryManager] Desequipado '{itemToUnequip.itemName}' do slot {equipmentType}.");
             return true;
         }
 
@@ -422,11 +381,11 @@ namespace TheSlimeKing.Inventory
             {
                 PlayerController.Instance.SetDefenseBonus(totalDefense);
                 PlayerController.Instance.SetSpeedBonus(totalSpeed);
-                Debug.Log($"InventoryManager: Buffs aplicados - Defesa: {totalDefense}, Velocidade: {totalSpeed}");
+                UnityEngine.Debug.Log($"[InventoryManager] Buffs aplicados - Defesa: {totalDefense}, Velocidade: {totalSpeed}");
             }
             else
             {
-                Debug.LogWarning("InventoryManager: PlayerController.Instance não encontrado. Buffs não aplicados.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] PlayerController.Instance não encontrado. Buffs não aplicados.");
             }
         }
 
@@ -452,13 +411,13 @@ namespace TheSlimeKing.Inventory
         {
             if (direction < 0 || direction >= quickSlots.Length)
             {
-                Debug.LogWarning($"InventoryManager: Direção de quick slot inválida: {direction}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Direção de quick slot inválida: {direction}");
                 return;
             }
 
             if (item == null)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de atribuir item nulo ao quick slot.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de atribuir item nulo ao quick slot.");
                 return;
             }
 
@@ -475,7 +434,7 @@ namespace TheSlimeKing.Inventory
 
             if (!itemExists)
             {
-                Debug.LogWarning($"InventoryManager: Item '{item.itemName}' não está no inventário.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não está no inventário.");
                 return;
             }
 
@@ -483,7 +442,7 @@ namespace TheSlimeKing.Inventory
             quickSlots[direction] = item;
             OnQuickSlotsChanged?.Invoke();
 
-            Debug.Log($"InventoryManager: Item '{item.itemName}' atribuído ao quick slot {direction}.");
+            UnityEngine.Debug.Log($"[InventoryManager] Item '{item.itemName}' atribuído ao quick slot {direction}.");
         }
 
         /// <summary>
@@ -495,7 +454,7 @@ namespace TheSlimeKing.Inventory
         {
             if (direction < 0 || direction >= quickSlots.Length)
             {
-                Debug.LogWarning($"InventoryManager: Direção de quick slot inválida: {direction}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Direção de quick slot inválida: {direction}");
                 return;
             }
 
@@ -503,7 +462,7 @@ namespace TheSlimeKing.Inventory
 
             if (item == null)
             {
-                Debug.Log($"InventoryManager: Nenhum item atribuído ao quick slot {direction}.");
+                UnityEngine.Debug.Log($"[InventoryManager] Nenhum item atribuído ao quick slot {direction}.");
                 return;
             }
 
@@ -520,7 +479,7 @@ namespace TheSlimeKing.Inventory
 
             if (slotIndex == -1)
             {
-                Debug.LogWarning($"InventoryManager: Item '{item.itemName}' não encontrado no inventário.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não encontrado no inventário.");
                 // Remove do quick slot pois não existe mais no inventário
                 quickSlots[direction] = null;
                 OnQuickSlotsChanged?.Invoke();
@@ -530,28 +489,21 @@ namespace TheSlimeKing.Inventory
             // Verifica se é um item consumível
             if (item.type != ItemType.Consumable)
             {
-                Debug.LogWarning($"InventoryManager: Item '{item.itemName}' não é consumível.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não é consumível.");
                 return;
             }
 
             // Aplica efeitos do consumível
             ApplyConsumableEffects(item);
 
-            // Reduz quantidade
-            slots[slotIndex].quantity--;
-
-            // Se quantidade chegou a zero, limpa o slot e remove do quick slot
-            if (slots[slotIndex].quantity <= 0)
-            {
-                slots[slotIndex].item = null;
-                slots[slotIndex].quantity = 0;
-                quickSlots[direction] = null;
-                OnQuickSlotsChanged?.Invoke();
-                Debug.Log($"InventoryManager: Item '{item.itemName}' esgotado e removido do quick slot {direction}.");
-            }
+            // Remove o item do slot (não empilhável)
+            slots[slotIndex].item = null;
+            slots[slotIndex].quantity = 0;
+            quickSlots[direction] = null;
+            OnQuickSlotsChanged?.Invoke();
 
             OnInventoryChanged?.Invoke();
-            Debug.Log($"InventoryManager: Usado item '{item.itemName}' do quick slot {direction}.");
+            UnityEngine.Debug.Log($"[InventoryManager] Usado item '{item.itemName}' do quick slot {direction}.");
         }
 
         /// <summary>
@@ -563,7 +515,7 @@ namespace TheSlimeKing.Inventory
         {
             if (direction < 0 || direction >= quickSlots.Length)
             {
-                Debug.LogWarning($"InventoryManager: Direção de quick slot inválida: {direction}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Direção de quick slot inválida: {direction}");
                 return null;
             }
 
@@ -575,13 +527,13 @@ namespace TheSlimeKing.Inventory
         /// <summary>
         /// Obtém um slot do inventário pelo índice.
         /// </summary>
-        /// <param name="index">Índice do slot (0-19)</param>
+        /// <param name="index">Índice do slot (0-11)</param>
         /// <returns>Slot do inventário ou null se índice inválido</returns>
         public InventorySlot GetSlot(int index)
         {
-            if (index < 0 || index >= slots.Length)
+            if (index < 0 || index >= 12)
             {
-                Debug.LogWarning($"InventoryManager: Índice de slot inválido: {index}");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Índice de slot inválido: {index}");
                 return null;
             }
 
@@ -639,7 +591,7 @@ namespace TheSlimeKing.Inventory
                 saveData.quickSlotIDs[i] = quickSlots[i] != null ? quickSlots[i].name : string.Empty;
             }
 
-            Debug.Log($"InventoryManager: Inventário salvo com {saveData.items.Length} itens.");
+            UnityEngine.Debug.Log($"[InventoryManager] Inventário salvo com {saveData.items.Length} itens.");
             return saveData;
         }
 
@@ -652,7 +604,7 @@ namespace TheSlimeKing.Inventory
         {
             if (saveData == null)
             {
-                Debug.LogWarning("InventoryManager: Tentativa de carregar dados nulos.");
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de carregar dados nulos.");
                 return;
             }
 
@@ -671,20 +623,20 @@ namespace TheSlimeKing.Inventory
 
                     if (item == null)
                     {
-                        Debug.LogWarning($"InventoryManager: Item '{itemData.itemID}' não encontrado em Resources/Items/");
+                        UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{itemData.itemID}' não encontrado em Resources/Items/");
                         continue;
                     }
 
-                    // Validar índice do slot
-                    if (itemData.slotIndex < 0 || itemData.slotIndex >= slots.Length)
+                    // Validar índice do slot (0-11)
+                    if (itemData.slotIndex < 0 || itemData.slotIndex >= 12)
                     {
-                        Debug.LogWarning($"InventoryManager: Índice de slot inválido: {itemData.slotIndex}");
+                        UnityEngine.Debug.LogWarning($"[InventoryManager] Índice de slot inválido: {itemData.slotIndex}");
                         continue;
                     }
 
-                    // Recriar slot com item correto
+                    // Recriar slot com item correto (sempre quantidade 1)
                     slots[itemData.slotIndex].item = item;
-                    slots[itemData.slotIndex].quantity = itemData.quantity;
+                    slots[itemData.slotIndex].quantity = 1;
                 }
             }
 
@@ -703,7 +655,7 @@ namespace TheSlimeKing.Inventory
                         }
                         else
                         {
-                            Debug.LogWarning($"InventoryManager: Equipamento '{saveData.equipmentIDs[i]}' não encontrado em Resources/Items/");
+                            UnityEngine.Debug.LogWarning($"[InventoryManager] Equipamento '{saveData.equipmentIDs[i]}' não encontrado em Resources/Items/");
                         }
                     }
                 }
@@ -724,7 +676,7 @@ namespace TheSlimeKing.Inventory
                         }
                         else
                         {
-                            Debug.LogWarning($"InventoryManager: Quick slot item '{saveData.quickSlotIDs[i]}' não encontrado em Resources/Items/");
+                            UnityEngine.Debug.LogWarning($"[InventoryManager] Quick slot item '{saveData.quickSlotIDs[i]}' não encontrado em Resources/Items/");
                         }
                     }
                 }
@@ -738,7 +690,7 @@ namespace TheSlimeKing.Inventory
             OnEquipmentChanged?.Invoke();
             OnQuickSlotsChanged?.Invoke();
 
-            Debug.Log($"InventoryManager: Inventário carregado com {saveData.items?.Length ?? 0} itens.");
+            UnityEngine.Debug.Log($"[InventoryManager] Inventário carregado com {saveData.items?.Length ?? 0} itens.");
         }
         #endregion
     }

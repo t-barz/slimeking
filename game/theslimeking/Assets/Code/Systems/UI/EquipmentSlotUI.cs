@@ -6,7 +6,7 @@ using TheSlimeKing.Inventory;
 namespace TheSlimeKing.UI
 {
     /// <summary>
-    /// Representa visualmente um slot de equipamento (Amuleto, Anel, Capa).
+    /// Representa visualmente um slot de equipamento (Topo, Meio, Baixo).
     /// </summary>
     public class EquipmentSlotUI : MonoBehaviour
     {
@@ -80,12 +80,12 @@ namespace TheSlimeKing.UI
         {
             switch (type)
             {
-                case EquipmentType.Amulet:
-                    return "Amuleto";
-                case EquipmentType.Ring:
-                    return "Anel";
-                case EquipmentType.Cape:
-                    return "Capa";
+                case EquipmentType.Topo:
+                    return "Topo";
+                case EquipmentType.Meio:
+                    return "Meio";
+                case EquipmentType.Baixo:
+                    return "Baixo";
                 default:
                     return "";
             }
