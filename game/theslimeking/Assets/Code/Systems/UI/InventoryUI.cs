@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System.Collections;
+using TMPro;
 using TheSlimeKing.Inventory;
 using TheSlimeKing.UI;
 
@@ -23,6 +24,12 @@ namespace SlimeKing.UI
 
         [Header("Slots")]
         [SerializeField] private Transform slotsContainer;
+
+        [Header("Item Details Panel")]
+        [SerializeField] private GameObject itemDetailsPanel;
+        [SerializeField] private Image detailsIconImage;
+        [SerializeField] private TextMeshProUGUI detailsTitleText;
+        [SerializeField] private TextMeshProUGUI detailsDescriptionText;
 
         [Header("Fade Settings")]
         [SerializeField] private float fadeDuration = 0.3f;
@@ -82,12 +89,22 @@ namespace SlimeKing.UI
             InitializeSlots();
             SubscribeToEvents();
             InitializeInputSystem();
+
+            // Inscreve-se no evento de seleção de slot
+            InventorySlotUI.OnSlotSelected += UpdateItemDetails;
+
+            // Oculta painel de detalhes inicialmente
+            if (itemDetailsPanel != null)
+            {
+                itemDetailsPanel.SetActive(false);
+            }
         }
 
         private void OnDisable()
         {
             StopAllCoroutines();
             UnsubscribeFromEvents();
+            InventorySlotUI.OnSlotSelected -= UpdateItemDetails;
         }
 
         #endregion
@@ -681,6 +698,69 @@ namespace SlimeKing.UI
         {
             LogMessage($"Slot {slotIndex} clicked");
             // Futura implementação: usar item, equipar, etc.
+        }
+
+        #endregion
+
+        #region Item Details
+
+        /// <summary>
+        /// Atualiza o painel de detalhes com as informações do item selecionado.
+        /// Se item for null, oculta o painel ou exibe mensagem placeholder.
+        /// </summary>
+        private void UpdateItemDetails(ItemData item)
+        {
+            if (itemDetailsPanel == null)
+            {
+                LogMessage("Item details panel não configurado");
+                return;
+            }
+
+            if (item == null)
+            {
+                // Nenhum item selecionado - oculta painel ou exibe placeholder
+                itemDetailsPanel.SetActive(false);
+                LogMessage("Ocultando painel de detalhes (sem item selecionado)");
+                return;
+            }
+
+            // Exibe painel
+            itemDetailsPanel.SetActive(true);
+
+            // Atualiza ícone
+            if (detailsIconImage != null)
+            {
+                if (item.icon != null)
+                {
+                    detailsIconImage.enabled = true;
+                    detailsIconImage.sprite = item.icon;
+                }
+                else
+                {
+                    detailsIconImage.enabled = false;
+                }
+            }
+
+            // Atualiza título
+            if (detailsTitleText != null)
+            {
+                detailsTitleText.text = item.itemName;
+            }
+
+            // Atualiza descrição
+            if (detailsDescriptionText != null)
+            {
+                if (!string.IsNullOrEmpty(item.description))
+                {
+                    detailsDescriptionText.text = item.description;
+                }
+                else
+                {
+                    detailsDescriptionText.text = "<i>Sem descrição disponível</i>";
+                }
+            }
+
+            LogMessage($"Exibindo detalhes do item: {item.itemName}");
         }
 
         #endregion

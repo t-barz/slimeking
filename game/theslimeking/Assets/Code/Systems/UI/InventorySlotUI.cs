@@ -12,6 +12,12 @@ namespace TheSlimeKing.UI
     /// </summary>
     public class InventorySlotUI : MonoBehaviour
     {
+        /// <summary>
+        /// Evento disparado quando um slot é selecionado.
+        /// Passa o ItemData do slot selecionado (ou null se vazio).
+        /// </summary>
+        public static event System.Action<ItemData> OnSlotSelected;
+
         [Header("UI References")]
         [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI quantityText;
@@ -161,6 +167,13 @@ namespace TheSlimeKing.UI
             if (slotBackgroundImage != null)
             {
                 slotBackgroundImage.color = selected ? selectedColor : deselectedColor;
+            }
+
+            // Dispara evento quando slot é selecionado
+            if (selected)
+            {
+                ItemData itemToShow = (currentSlot != null && !currentSlot.IsEmpty) ? currentSlot.item : null;
+                OnSlotSelected?.Invoke(itemToShow);
             }
         }
 
