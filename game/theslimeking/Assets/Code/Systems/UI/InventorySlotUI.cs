@@ -16,12 +16,21 @@ namespace TheSlimeKing.UI
         [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI quantityText;
         [SerializeField] private Button button;
+        private Image slotBackgroundImage;
+
+        [Header("Selection Settings")]
+        [SerializeField] private Color selectedColor = new Color(1f, 0.9f, 0.5f, 0.95f);  // Amarelo claro
+        [SerializeField] private Color deselectedColor = new Color(1f, 0.8f, 0.37f, 0.78f); // Amarelo original
 
         private int slotIndex;
         private InventorySlot currentSlot;
+        private bool isSelected = false;
 
         private void Awake()
         {
+            // Obtém a imagem de fundo do slot
+            slotBackgroundImage = GetComponent<Image>();
+
             // Auto-configura referências se não estiverem atribuídas
             if (iconImage == null)
             {
@@ -37,7 +46,7 @@ namespace TheSlimeKing.UI
                         break;
                     }
                 }
-                
+
                 if (iconImage == null)
                 {
                     UnityEngine.Debug.LogError($"[InventorySlotUI] Não foi possível encontrar Image para iconImage em {gameObject.name}!");
@@ -138,6 +147,19 @@ namespace TheSlimeKing.UI
                     // Sistema não empilhável: nunca exibe quantidade
                     quantityText.text = "";
                 }
+            }
+        }
+
+        /// <summary>
+        /// Define o estado de seleção visual do slot.
+        /// </summary>
+        public void SetSelected(bool selected)
+        {
+            isSelected = selected;
+
+            if (slotBackgroundImage != null)
+            {
+                slotBackgroundImage.color = selected ? selectedColor : deselectedColor;
             }
         }
 

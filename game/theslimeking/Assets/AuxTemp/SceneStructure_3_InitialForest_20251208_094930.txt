@@ -1,0 +1,117 @@
+ESTRUTURA DA CENA: 3_InitialForest
+Exportado em: 08/12/2025 09:49:30
+Total de GameObjects: 16
+
+[1] grassA
+[2] player_Slime
+  └─ back
+  └─ vfx_back
+  └─ vfx_front
+  └─ front
+  └─ side
+  └─ vfx_side
+  └─ shadow
+[3] env_brown_rockA2
+[4] CanvasHUD
+  └─ HeartsContainer
+  └─ CrystalContainer
+    └─ Crystal_Nature
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Fire
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Water
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Shadow
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Earth
+      └─ Icon
+      └─ Count_Text
+    └─ Crystal_Air
+      └─ Icon
+      └─ Count_Text
+[5] Camera Manager
+[6] EventSystem
+[7] GameManager
+[8] SceneTransitioner
+[9] TeleportManager
+[10] Main Camera
+[11] art_helpyA
+[12] DialogueCanvasHUD
+  └─ DialoguePanel
+    └─ Background
+    └─ DialogueText
+    └─ ContinueIndicator
+[13] art_rickA
+  └─ front
+  └─ shadow
+[14] PauseCanvasHUD
+  └─ PauseMenuPanel
+    └─ ButtonContainer
+      └─ InventoryButton
+        └─ Text
+      └─ SaveButton
+        └─ Text
+      └─ LoadButton
+        └─ Text
+      └─ ResumeButton
+        └─ Text
+      └─ QuitButton
+        └─ Text
+      └─ SelectionArrow
+[15] CollectablesTest
+  └─ item_RedFruit (1)
+    └─ shadowA
+  └─ item_appleA
+    └─ shadowA
+  └─ item_MushroomA
+    └─ shadowA
+  └─ item_MushroomA (1)
+    └─ shadowA
+  └─ item_RoundedRockA
+    └─ shadowA
+  └─ item_RoundedRockA (1)
+    └─ shadowA
+  └─ item_RoundedRockA (2)
+    └─ shadowA
+  └─ item_RoundedRockA (3)
+    └─ shadowA
+  └─ item_RoundedRockA (4)
+    └─ shadowA
+  └─ item_RoundedRockA (5)
+    └─ shadowA
+  └─ item_RoundedRockA (6)
+    └─ shadowA
+  └─ item_RoundedRockA (7)
+    └─ shadowA
+[16] InventoryCanvas
+  └─ InventoryPanel
+    └─ Title
+    └─ SlotsContainer
+      └─ Slot_0
+        └─ Icon
+      └─ Slot_1
+        └─ Icon
+      └─ Slot_2
+        └─ Icon
+      └─ Slot_3
+        └─ Icon
+      └─ Slot_4
+        └─ Icon
+      └─ Slot_5
+        └─ Icon
+      └─ Slot_6
+        └─ Icon
+      └─ Slot_7
+        └─ Icon
+      └─ Slot_8
+        └─ Icon
+      └─ Slot_9
+        └─ Icon
+      └─ Slot_10
+        └─ Icon
+      └─ Slot_11
+        └─ Icon

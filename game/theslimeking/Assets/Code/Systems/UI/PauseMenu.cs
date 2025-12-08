@@ -26,7 +26,8 @@ namespace SlimeKing.UI
         [SerializeField] private Button quitButton;
 
         [Header("Selection Indicator")]
-        [SerializeField] private GameObject selectionArrow;
+        [SerializeField] private GameObject selectionArrowPrefab;
+        [SerializeField] private Transform arrowParent;
         [SerializeField] private float arrowOffsetX = -50f;
 
         [Header("Fade Settings")]
@@ -41,12 +42,15 @@ namespace SlimeKing.UI
 
         private Coroutine fadeCoroutine;
         private bool isVisible = false;
+        private bool allowArrowUpdate = false;
+        private GameObject selectionArrowInstance;
 
         #endregion
 
         #region Properties
 
         public bool IsVisible => isVisible;
+        private GameObject selectionArrow => selectionArrowInstance;
 
         #endregion
 
@@ -97,15 +101,17 @@ namespace SlimeKing.UI
                 pauseMenuPanel.SetActive(false);
             }
 
-            // Oculta seta inicialmente
-            if (selectionArrow != null)
+            // Valida parent da seta
+            if (arrowParent == null)
             {
-                selectionArrow.SetActive(false);
+                arrowParent = pauseMenuPanel != null ? pauseMenuPanel.transform : transform;
             }
 
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+            allowArrowUpdate = false;
+            selectionArrowInstance = null;
         }
 
         private void OnEnable()
@@ -162,6 +168,7 @@ namespace SlimeKing.UI
 
             Log("Showing pause menu");
             isVisible = true;
+            allowArrowUpdate = false; // Desabilita atualização da seta durante o fade
 
             if (pauseMenuPanel != null)
             {
@@ -186,6 +193,7 @@ namespace SlimeKing.UI
 
             Log("Hiding pause menu");
             isVisible = false;
+            allowArrowUpdate = false; // Desabilita atualização da seta durante o fade
 
             // Para fade anterior se existir
             if (fadeCoroutine != null)
@@ -211,18 +219,6 @@ namespace SlimeKing.UI
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = true;
 
-            // Inicia a seta com alpha 0
-            CanvasGroup arrowCanvasGroup = null;
-            if (selectionArrow != null)
-            {
-                arrowCanvasGroup = selectionArrow.GetComponent<CanvasGroup>();
-                if (arrowCanvasGroup == null)
-                {
-                    arrowCanvasGroup = selectionArrow.AddComponent<CanvasGroup>();
-                }
-                arrowCanvasGroup.alpha = 0f;
-            }
-
             // Fade do menu
             while (elapsed < fadeDuration)
             {
@@ -238,19 +234,19 @@ namespace SlimeKing.UI
             // Seleciona o primeiro botão para navegação com gamepad/teclado
             SelectFirstButton();
 
-            // Fade da seta após o menu estar visível
-            if (arrowCanvasGroup != null)
+            // Aguarda alguns frames para garantir que tudo está estável
+            yield return null;
+            yield return null;
+
+            // Instancia a seta APÓS o menu estar completamente visível
+            if (selectionArrowPrefab != null && selectionArrowInstance == null)
             {
-                elapsed = 0f;
-                while (elapsed < fadeDuration)
-                {
-                    elapsed += Time.unscaledDeltaTime;
-                    float t = Mathf.Clamp01(elapsed / fadeDuration);
-                    arrowCanvasGroup.alpha = Mathf.Lerp(0f, 1f, t);
-                    yield return null;
-                }
-                arrowCanvasGroup.alpha = 1f;
+                selectionArrowInstance = Instantiate(selectionArrowPrefab, arrowParent);
+                Log("Selection arrow instantiated");
             }
+
+            // Habilita atualização da seta - ela aparecerá já na posição correta
+            allowArrowUpdate = true;
 
             fadeCoroutine = null;
             Log("Fade in completed");
@@ -266,15 +262,12 @@ namespace SlimeKing.UI
 
             canvasGroup.interactable = false;
 
-            // Oculta a seta imediatamente
-            if (selectionArrow != null)
+            // Destrói a seta imediatamente
+            if (selectionArrowInstance != null)
             {
-                CanvasGroup arrowCanvasGroup = selectionArrow.GetComponent<CanvasGroup>();
-                if (arrowCanvasGroup != null)
-                {
-                    arrowCanvasGroup.alpha = 0f;
-                }
-                selectionArrow.SetActive(false);
+                Destroy(selectionArrowInstance);
+                selectionArrowInstance = null;
+                Log("Selection arrow destroyed");
             }
 
             while (elapsed < fadeDuration)
@@ -328,14 +321,13 @@ namespace SlimeKing.UI
             while (true)
             {
                 // Usa unscaledDeltaTime para funcionar durante pause
-                yield return new WaitForSecondsRealtime(0.1f);
+                yield return new WaitForSecondsRealtime(0.05f);
 
-                if (selectionArrow == null || pauseMenuPanel == null || !pauseMenuPanel.activeSelf)
+                // Só atualiza a seta se o fade estiver completo
+                if (!allowArrowUpdate || selectionArrow == null || pauseMenuPanel == null || !pauseMenuPanel.activeSelf)
                 {
-                    if (selectionArrow != null)
-                    {
-                        selectionArrow.SetActive(false);
-                    }
+                    // Não desativa a seta aqui se allowArrowUpdate for false
+                    // Isso evita que ela pisque durante transições
                     continue;
                 }
 
@@ -349,7 +341,10 @@ namespace SlimeKing.UI
                     if (selectedButton != null && IsMenuButton(selectedButton) && selectedButton.gameObject.activeInHierarchy)
                     {
                         // Mostra e posiciona a seta
-                        selectionArrow.SetActive(true);
+                        if (!selectionArrow.activeSelf)
+                        {
+                            selectionArrow.SetActive(true);
+                        }
                         PositionArrowAtButton(selectedButton);
                     }
                     else

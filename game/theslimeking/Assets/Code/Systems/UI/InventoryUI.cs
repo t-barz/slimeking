@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using System.Collections;
 using TheSlimeKing.Inventory;
 using TheSlimeKing.UI;
@@ -36,6 +37,10 @@ namespace SlimeKing.UI
         private Coroutine fadeCoroutine;
         private bool isOpen = false;
         private InventorySlotUI[] slotUIComponents = new InventorySlotUI[12];
+        private int currentSelectedIndex = -1;
+        private InputSystem_Actions inputActions;
+        private bool isInputSubscribed = false;
+        private float timeWhenOpened = -999f; // Timestamp de quando o inventário foi aberto
 
         #endregion
 
@@ -75,6 +80,7 @@ namespace SlimeKing.UI
         {
             InitializeSlots();
             SubscribeToEvents();
+            InitializeInputSystem();
         }
 
         private void OnDisable()
@@ -96,6 +102,8 @@ namespace SlimeKing.UI
 
             LogMessage("Showing inventory");
             isOpen = true;
+            timeWhenOpened = Time.realtimeSinceStartup; // Registra o tempo em que foi aberto
+            currentSelectedIndex = -1;
 
             if (inventoryPanel != null)
             {
@@ -116,10 +124,20 @@ namespace SlimeKing.UI
 
         /// <summary>
         /// Fecha o inventário com fade out.
+        /// Retorna false se o inventário foi aberto muito recentemente (proteção contra fechamento duplo).
         /// </summary>
-        public void Hide()
+        public bool Hide()
         {
-            if (!isOpen) return;
+            if (!isOpen) return false;
+
+            // Proteção: não fechar se foi aberto há menos de 0.1 segundos
+            // Isso previne transições acidentais logo após abrir
+            float timeSinceOpened = Time.realtimeSinceStartup - timeWhenOpened;
+            if (timeSinceOpened < 0.1f)
+            {
+                LogMessage($"Hide() called too soon after Show() ({timeSinceOpened:F3}s). Ignoring to prevent accidental close.");
+                return false;
+            }
 
             LogMessage("Hiding inventory");
             isOpen = false;
@@ -131,6 +149,7 @@ namespace SlimeKing.UI
             }
 
             fadeCoroutine = StartCoroutine(FadeOut());
+            return true;
         }
 
         #endregion
@@ -159,6 +178,12 @@ namespace SlimeKing.UI
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
 
+            // Seleciona o primeiro slot com item
+            SelectFirstAvailableSlot();
+
+            // Ativa input de navegação
+            EnableNavigationInput();
+
             fadeCoroutine = null;
             LogMessage("Fade in completed");
         }
@@ -172,6 +197,16 @@ namespace SlimeKing.UI
             float elapsed = 0f;
 
             canvasGroup.interactable = false;
+
+            // Desativa input de navegação
+            DisableNavigationInput();
+
+            // Deseleciona o slot atual
+            if (currentSelectedIndex >= 0 && currentSelectedIndex < 12)
+            {
+                slotUIComponents[currentSelectedIndex].SetSelected(false);
+            }
+            currentSelectedIndex = -1;
 
             while (elapsed < fadeDuration)
             {
@@ -191,6 +226,271 @@ namespace SlimeKing.UI
 
             fadeCoroutine = null;
             LogMessage("Fade out completed");
+        }
+
+        #endregion
+
+        #region Navigation
+
+        /// <summary>
+        /// Inicializa o InputSystem_Actions para navegação do inventário.
+        /// </summary>
+        private void InitializeInputSystem()
+        {
+            if (PlayerController.Instance != null)
+            {
+                inputActions = PlayerController.Instance.GetInputActions();
+
+                if (inputActions != null)
+                {
+                    LogMessage("Input system connected for inventory navigation");
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("[InventoryUI] Failed to get InputActions from PlayerController");
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("[InventoryUI] PlayerController.Instance not found during Initialize");
+            }
+        }
+
+        /// <summary>
+        /// Habilita o input de navegação do inventário (mapa UI.Navigate).
+        /// </summary>
+        private void EnableNavigationInput()
+        {
+            if (inputActions == null || isInputSubscribed)
+                return;
+
+            try
+            {
+                inputActions.UI.Navigate.performed += OnNavigateInput;
+                isInputSubscribed = true;
+                LogMessage("Navigation input enabled");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to subscribe to Navigate input: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Desabilita o input de navegação do inventário.
+        /// </summary>
+        private void DisableNavigationInput()
+        {
+            if (inputActions == null || !isInputSubscribed)
+                return;
+
+            try
+            {
+                inputActions.UI.Navigate.performed -= OnNavigateInput;
+                isInputSubscribed = false;
+                LogMessage("Navigation input disabled");
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to unsubscribe from Navigate input: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Callback para o input de navegação (cima/baixo/esquerda/direita).
+        /// Implementa navegação linear (apenas cima/baixo) pulando slots vazios.
+        /// </summary>
+        private void OnNavigateInput(InputAction.CallbackContext context)
+        {
+            if (!isOpen)
+                return;
+
+            Vector2 direction = context.ReadValue<Vector2>();
+
+            if (direction.y > 0.5f) // Cima
+            {
+                NavigateUp();
+            }
+            else if (direction.y < -0.5f) // Baixo
+            {
+                NavigateDown();
+            }
+            else if (direction.x > 0.5f) // Direita
+            {
+                NavigateRight();
+            }
+            else if (direction.x < -0.5f) // Esquerda
+            {
+                NavigateLeft();
+            }
+        }
+
+        /// <summary>
+        /// Navega para cima (slot anterior).
+        /// </summary>
+        private void NavigateUp()
+        {
+            if (currentSelectedIndex < 0)
+            {
+                SelectFirstAvailableSlot();
+                return;
+            }
+
+            int newIndex = currentSelectedIndex - 4; // Grid 3 colunas: -4 linhas
+
+            if (newIndex < 0)
+            {
+                // Fica no mesmo se não há espaço acima
+                return;
+            }
+
+            SelectSlot(newIndex, skipEmpty: true);
+        }
+
+        /// <summary>
+        /// Navega para baixo (próximo slot).
+        /// </summary>
+        private void NavigateDown()
+        {
+            if (currentSelectedIndex < 0)
+            {
+                SelectFirstAvailableSlot();
+                return;
+            }
+
+            int newIndex = currentSelectedIndex + 4; // Grid 3 colunas: +4 linhas
+
+            if (newIndex >= 12)
+            {
+                // Fica no mesmo se não há espaço abaixo
+                return;
+            }
+
+            SelectSlot(newIndex, skipEmpty: true);
+        }
+
+        /// <summary>
+        /// Navega para a direita (próximo slot na mesma linha).
+        /// </summary>
+        private void NavigateRight()
+        {
+            if (currentSelectedIndex < 0)
+            {
+                SelectFirstAvailableSlot();
+                return;
+            }
+
+            int row = currentSelectedIndex / 4;
+            int col = currentSelectedIndex % 4;
+
+            col++;
+            if (col >= 4)
+            {
+                // Fica na mesma coluna se está na borda direita
+                return;
+            }
+
+            int newIndex = row * 4 + col;
+            SelectSlot(newIndex, skipEmpty: true);
+        }
+
+        /// <summary>
+        /// Navega para a esquerda (slot anterior na mesma linha).
+        /// </summary>
+        private void NavigateLeft()
+        {
+            if (currentSelectedIndex < 0)
+            {
+                SelectFirstAvailableSlot();
+                return;
+            }
+
+            int row = currentSelectedIndex / 4;
+            int col = currentSelectedIndex % 4;
+
+            col--;
+            if (col < 0)
+            {
+                // Fica na mesma coluna se está na borda esquerda
+                return;
+            }
+
+            int newIndex = row * 4 + col;
+            SelectSlot(newIndex, skipEmpty: true);
+        }
+
+        /// <summary>
+        /// Seleciona o primeiro slot disponível (com item ou vazio, dependendo do filtro).
+        /// </summary>
+        private void SelectFirstAvailableSlot()
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                if (slotUIComponents[i] != null)
+                {
+                    SelectSlot(i, skipEmpty: false);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Seleciona um slot específico por índice.
+        /// </summary>
+        /// <param name="index">Índice do slot (0-11)</param>
+        /// <param name="skipEmpty">Se true, pula para o próximo slot não-vazio se o slot for vazio</param>
+        private void SelectSlot(int index, bool skipEmpty = false)
+        {
+            // Valida índice
+            if (index < 0 || index >= 12)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryUI] Tentativa de selecionar slot inválido: {index}");
+                return;
+            }
+
+            // Se skipEmpty está ativo e o slot é vazio, encontra o próximo não-vazio
+            if (skipEmpty && InventoryManager.Instance != null)
+            {
+                InventorySlot slot = InventoryManager.Instance.GetSlot(index);
+                if (slot != null && slot.IsEmpty)
+                {
+                    // Procura para baixo primeiro
+                    for (int i = index + 1; i < 12; i++)
+                    {
+                        if (InventoryManager.Instance.GetSlot(i) != null && !InventoryManager.Instance.GetSlot(i).IsEmpty)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+                    // Se não encontrou para baixo, procura para cima
+                    if (InventoryManager.Instance.GetSlot(index).IsEmpty)
+                    {
+                        for (int i = index - 1; i >= 0; i--)
+                        {
+                            if (InventoryManager.Instance.GetSlot(i) != null && !InventoryManager.Instance.GetSlot(i).IsEmpty)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Deseleciona o slot anterior
+            if (currentSelectedIndex >= 0 && currentSelectedIndex < 12 && slotUIComponents[currentSelectedIndex] != null)
+            {
+                slotUIComponents[currentSelectedIndex].SetSelected(false);
+            }
+
+            // Seleciona o novo slot
+            if (slotUIComponents[index] != null)
+            {
+                currentSelectedIndex = index;
+                slotUIComponents[index].SetSelected(true);
+                LogMessage($"Selected slot {index}");
+            }
         }
 
         #endregion
@@ -273,7 +573,7 @@ namespace SlimeKing.UI
                 {
                     InventorySlot slot = InventoryManager.Instance.GetSlot(i);
                     slotUIComponents[i].Setup(slot, i);
-                    
+
                     if (!slot.IsEmpty)
                     {
                         UnityEngine.Debug.Log($"[InventoryUI] ✅ Slot {i} atualizado com '{slot.item.itemName}'");

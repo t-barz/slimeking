@@ -144,7 +144,7 @@ namespace SlimeKing.Core
             if (PlayerController.Instance != null)
             {
                 inputActions = PlayerController.Instance.GetInputActions();
-                
+
                 if (inputActions != null)
                 {
                     SubscribeToInputs();
@@ -182,7 +182,7 @@ namespace SlimeKing.Core
         protected override void OnManagerDestroy()
         {
             UnsubscribeFromInputs();
-            
+
             // Garante que o jogo não fica pausado ao destruir o manager
             if (IsPaused)
             {
@@ -201,7 +201,7 @@ namespace SlimeKing.Core
         private void SubscribeToInputs()
         {
             if (inputActions == null || isInputSubscribed) return;
-            
+
             // Gameplay inputs
             inputActions.Gameplay.Menu.performed += OnGameplayMenuInput;
             inputActions.Gameplay.Inventory.performed += OnGameplayInventoryInput;
@@ -452,6 +452,7 @@ namespace SlimeKing.Core
 
         /// <summary>
         /// Transição: PauseMenu → Gameplay ou Inventory → Gameplay
+        /// Protegido contra fechar inventário que foi aberto muito recentemente.
         /// </summary>
         private void TransitionToGameplay()
         {
@@ -462,9 +463,16 @@ namespace SlimeKing.Core
             }
 
             // Oculta o Inventory se estiver aberto
+            // Hide() retorna false se foi aberto muito recentemente, neste caso não transiciona ainda
             if (inventoryUI != null && inventoryUI.IsOpen)
             {
-                inventoryUI.Hide();
+                bool didHide = inventoryUI.Hide();
+                if (!didHide)
+                {
+                    // Inventário foi aberto muito recentemente, aborta a transição
+                    Log("TransitionToGameplay aborted: Inventory was just opened");
+                    return;
+                }
             }
 
             // Despausa o jogo
