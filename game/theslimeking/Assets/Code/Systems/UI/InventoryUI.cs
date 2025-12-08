@@ -41,6 +41,7 @@ namespace SlimeKing.UI
         private InputSystem_Actions inputActions;
         private bool isInputSubscribed = false;
         private float timeWhenOpened = -999f; // Timestamp de quando o inventário foi aberto
+        private int swapFirstSlotIndex = -1; // Índice do primeiro slot selecionado para swap (-1 = nenhum)
 
         #endregion
 
@@ -208,6 +209,13 @@ namespace SlimeKing.UI
             }
             currentSelectedIndex = -1;
 
+            // Limpa o estado de swap
+            if (swapFirstSlotIndex >= 0 && swapFirstSlotIndex < 12)
+            {
+                slotUIComponents[swapFirstSlotIndex].SetSwapSelected(false);
+            }
+            swapFirstSlotIndex = -1;
+
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
@@ -267,6 +275,7 @@ namespace SlimeKing.UI
             try
             {
                 inputActions.UI.Navigate.performed += OnNavigateInput;
+                inputActions.UI.Submit.performed += OnSubmitInput;
                 isInputSubscribed = true;
                 LogMessage("Navigation input enabled");
             }
@@ -287,6 +296,7 @@ namespace SlimeKing.UI
             try
             {
                 inputActions.UI.Navigate.performed -= OnNavigateInput;
+                inputActions.UI.Submit.performed -= OnSubmitInput;
                 isInputSubscribed = false;
                 LogMessage("Navigation input disabled");
             }
@@ -490,6 +500,54 @@ namespace SlimeKing.UI
                 currentSelectedIndex = index;
                 slotUIComponents[index].SetSelected(true);
                 LogMessage($"Selected slot {index}");
+            }
+        }
+
+        /// <summary>
+        /// Callback para o input de submit (A/Enter/Space).
+        /// Implementa a lógica de swap de slots.
+        /// Primeiro clique: marca o slot para swap (cor azulada).
+        /// Segundo clique: executa o swap com o slot marcado.
+        /// </summary>
+        private void OnSubmitInput(InputAction.CallbackContext context)
+        {
+            if (!isOpen || currentSelectedIndex < 0)
+                return;
+
+            // Se nenhum slot foi marcado para swap ainda
+            if (swapFirstSlotIndex < 0)
+            {
+                // Marca o slot atual
+                swapFirstSlotIndex = currentSelectedIndex;
+                slotUIComponents[swapFirstSlotIndex].SetSwapSelected(true);
+                LogMessage($"Primeiro slot marcado para swap: {swapFirstSlotIndex}");
+            }
+            else if (swapFirstSlotIndex == currentSelectedIndex)
+            {
+                // Se clicar no mesmo slot, desmarca
+                slotUIComponents[swapFirstSlotIndex].SetSwapSelected(false);
+                swapFirstSlotIndex = -1;
+                LogMessage($"Swap cancelado");
+            }
+            else
+            {
+                // Executa o swap entre os dois slots
+                int secondSlotIndex = currentSelectedIndex;
+
+                if (InventoryManager.Instance != null)
+                {
+                    bool success = InventoryManager.Instance.SwapSlots(swapFirstSlotIndex, secondSlotIndex);
+
+                    if (success)
+                    {
+                        LogMessage($"Swap executado: slot {swapFirstSlotIndex} <-> slot {secondSlotIndex}");
+                        RefreshAllSlots(); // Atualiza a visualização de todos os slots
+
+                        // Se o primeiro slot estava em mode swap selection, ainda mantém seleção
+                        slotUIComponents[swapFirstSlotIndex].SetSwapSelected(false);
+                        swapFirstSlotIndex = -1;
+                    }
+                }
             }
         }
 

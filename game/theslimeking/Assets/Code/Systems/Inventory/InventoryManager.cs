@@ -83,9 +83,9 @@ namespace TheSlimeKing.Inventory
                 // Adiciona ao slot vazio (sempre quantidade 1)
                 slots[emptySlotIndex].item = item;
                 slots[emptySlotIndex].quantity = 1;
-                
+
                 UnityEngine.Debug.Log($"[InventoryManager] ✅ Item '{item.itemName}' adicionado ao slot {emptySlotIndex}");
-                
+
                 OnInventoryChanged?.Invoke();
             }
 
@@ -547,6 +547,48 @@ namespace TheSlimeKing.Inventory
         public InventorySlot[] GetAllSlots()
         {
             return slots;
+        }
+
+        /// <summary>
+        /// Troca o conteúdo de dois slots do inventário.
+        /// Funciona com slots vazios também.
+        /// </summary>
+        /// <param name="slotIndex1">Índice do primeiro slot</param>
+        /// <param name="slotIndex2">Índice do segundo slot</param>
+        /// <returns>True se o swap foi bem-sucedido</returns>
+        public bool SwapSlots(int slotIndex1, int slotIndex2)
+        {
+            // Validar índices
+            if (slotIndex1 < 0 || slotIndex1 >= slots.Length ||
+                slotIndex2 < 0 || slotIndex2 >= slots.Length)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Índices de slot inválidos para swap: {slotIndex1}, {slotIndex2}");
+                return false;
+            }
+
+            // Não faz nada se os índices são iguais
+            if (slotIndex1 == slotIndex2)
+            {
+                return false;
+            }
+
+            // Troca os conteúdos dos slots
+            InventorySlot temp = new InventorySlot
+            {
+                item = slots[slotIndex1].item,
+                quantity = slots[slotIndex1].quantity
+            };
+
+            slots[slotIndex1].item = slots[slotIndex2].item;
+            slots[slotIndex1].quantity = slots[slotIndex2].quantity;
+
+            slots[slotIndex2].item = temp.item;
+            slots[slotIndex2].quantity = temp.quantity;
+
+            UnityEngine.Debug.Log($"[InventoryManager] ✓ Swap entre slots {slotIndex1} e {slotIndex2} concluído.");
+            OnInventoryChanged?.Invoke();
+
+            return true;
         }
         #endregion
 

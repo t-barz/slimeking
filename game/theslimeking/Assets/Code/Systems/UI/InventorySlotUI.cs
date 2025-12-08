@@ -21,6 +21,7 @@ namespace TheSlimeKing.UI
         [Header("Selection Settings")]
         [SerializeField] private Color selectedColor = new Color(1f, 0.9f, 0.5f, 0.95f);  // Amarelo claro
         [SerializeField] private Color deselectedColor = new Color(1f, 0.8f, 0.37f, 0.78f); // Amarelo original
+        [SerializeField] private Color swapSelectedColor = new Color(0.3f, 0.6f, 1f, 0.95f); // Azul claro
 
         private int slotIndex;
         private InventorySlot currentSlot;
@@ -160,6 +161,18 @@ namespace TheSlimeKing.UI
             if (slotBackgroundImage != null)
             {
                 slotBackgroundImage.color = selected ? selectedColor : deselectedColor;
+            }
+        }
+
+        /// <summary>
+        /// Define o estado de seleção para swap (cor azulada).
+        /// Indica que este é o primeiro slot selecionado para swap.
+        /// </summary>
+        public void SetSwapSelected(bool selected)
+        {
+            if (slotBackgroundImage != null)
+            {
+                slotBackgroundImage.color = selected ? swapSelectedColor : deselectedColor;
             }
         }
 
