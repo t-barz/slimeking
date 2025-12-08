@@ -276,6 +276,7 @@ namespace SlimeKing.UI
             {
                 inputActions.UI.Navigate.performed += OnNavigateInput;
                 inputActions.UI.Submit.performed += OnSubmitInput;
+                inputActions.UI.Cancel.performed += OnCancelInput;
                 isInputSubscribed = true;
                 LogMessage("Navigation input enabled");
             }
@@ -297,6 +298,7 @@ namespace SlimeKing.UI
             {
                 inputActions.UI.Navigate.performed -= OnNavigateInput;
                 inputActions.UI.Submit.performed -= OnSubmitInput;
+                inputActions.UI.Cancel.performed -= OnCancelInput;
                 isInputSubscribed = false;
                 LogMessage("Navigation input disabled");
             }
@@ -488,17 +490,25 @@ namespace SlimeKing.UI
                 }
             }
 
-            // Deseleciona o slot anterior
+            // Deseleciona o slot anterior (mas não se ele está em modo swap)
             if (currentSelectedIndex >= 0 && currentSelectedIndex < 12 && slotUIComponents[currentSelectedIndex] != null)
             {
-                slotUIComponents[currentSelectedIndex].SetSelected(false);
+                // Só remove a seleção se não é o slot em modo swap
+                if (currentSelectedIndex != swapFirstSlotIndex)
+                {
+                    slotUIComponents[currentSelectedIndex].SetSelected(false);
+                }
             }
 
             // Seleciona o novo slot
             if (slotUIComponents[index] != null)
             {
                 currentSelectedIndex = index;
-                slotUIComponents[index].SetSelected(true);
+                // Só muda a cor se o novo slot não está em modo swap
+                if (index != swapFirstSlotIndex)
+                {
+                    slotUIComponents[index].SetSelected(true);
+                }
                 LogMessage($"Selected slot {index}");
             }
         }
@@ -548,6 +558,24 @@ namespace SlimeKing.UI
                         swapFirstSlotIndex = -1;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Callback para o input de cancel (B/Escape).
+        /// Cancela a operação de swap se houver um slot marcado.
+        /// </summary>
+        private void OnCancelInput(InputAction.CallbackContext context)
+        {
+            if (!isOpen)
+                return;
+
+            // Se há um slot em modo swap, cancela a operação
+            if (swapFirstSlotIndex >= 0)
+            {
+                slotUIComponents[swapFirstSlotIndex].SetSwapSelected(false);
+                swapFirstSlotIndex = -1;
+                LogMessage("Operação de swap cancelada pelo usuário");
             }
         }
 
