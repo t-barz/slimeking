@@ -750,7 +750,7 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 
 ## 7. Sistema de Inventário
 
-**Capacidade:** 20 slots (expansível até 40)
+**Capacidade:** 12 slots
 
 **Categorias:**
 
@@ -765,19 +765,16 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 
 **Organização:**
 
-- Grid 5x4 (20 slots iniciais)
-- Expansível para 5x8 (40 slots) através de upgrades
+- Grid 4x3 (12 slots iniciais)
+- Expansível até 24 slots através de upgrades
 - Drag and drop para reorganizar
-- Stacking automático de itens idênticos
-- Stack máximo: 99 unidades por slot
+- Não faz stacking de itens idênticos
 
 **UI do Inventário:**
 
 - Atalho: Tab (teclado) / - (Switch) / Touchpad (PlayStation) / View (Xbox)
 - Pausa o jogo quando aberto
-- Exibe informações detalhadas ao passar mouse/cursor sobre item
-- Filtros por categoria (All, Consumables, Materials, Quest, Equipment)
-- Peso visual: itens raros têm borda colorida (comum=cinza, raro=azul, épico=roxo, lendário=dourado)
+- Exibe informações detalhadas ao navegar até o item
 
 ### 7.2 Tipos de Itens
 
@@ -803,9 +800,6 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 
 **Equipamentos:**
 
-- Amuletos (buffs passivos)
-- Anéis (efeitos especiais)
-- Capas (defesa adicional)
 - Máximo 3 equipamentos simultâneos
 
 ### 7.3 Gerenciamento de Inventário
@@ -815,14 +809,21 @@ Região montanhosa rica em cristais elementais que emanam energia mágica. Dez R
 - **Usar:** Consome item (apenas consumíveis)
 - **Equipar:** Equipa item (apenas equipamentos)
 - **Descartar:** Remove item do inventário (confirmação necessária)
-- **Dividir Stack:** Divide pilha de itens em duas
-- **Favoritar:** Marca item para não ser vendido acidentalmente
 
 **Inventário Cheio:**
 
 - Notificação visual quando tentar coletar item
 - Opção de descartar item automaticamente ou abrir inventário
 - Itens no chão permanecem por 5 minutos antes de desaparecer
+
+**Acesso Rápido:**
+
+- Barra de acesso rápido com 4 slots (1-4 no teclado, D-pad no controle)
+- Essa barra não fecha junto com o inventário, ficando visível durante o jogo no canto inferior
+- Pode mapear consumíveis para acesso rápido
+- Os itens na barra não ocupam slots do inventário
+- Ao abrir o inventário, a barra de acesso rápido permanece visível para que seja possível enviar itens do inventário para a barra rapidamente
+- Na fase filhote, o slime começa com 1 slot na barra de acesso rápido desbloqueado; ao evoluir para jovem, passa para 2; ao evoluir para adulto, desbloqueia mais 2 slots, totalizando 4 slots disponíveis
 
 ---
 
