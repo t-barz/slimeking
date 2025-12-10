@@ -307,7 +307,7 @@ namespace SlimeKing.UI
             {
                 inputActions.InventoryNavigation.Navigate.performed += OnNavigateInput;
                 inputActions.InventoryNavigation.SelectItem.performed += OnSubmitInput;
-                inputActions.InventoryNavigation.Cancel.performed += OnCancelInput;
+                inputActions.InventoryNavigation.CloseInventory.performed += OnCancelInput;
 
                 // Subscibe aos botões de atribuição rápida
                 inputActions.InventoryNavigation.AddToSlot1.performed += (ctx) => OnAssignToQuickSlot(0);
@@ -336,7 +336,7 @@ namespace SlimeKing.UI
             {
                 inputActions.InventoryNavigation.Navigate.performed -= OnNavigateInput;
                 inputActions.InventoryNavigation.SelectItem.performed -= OnSubmitInput;
-                inputActions.InventoryNavigation.Cancel.performed -= OnCancelInput;
+                inputActions.InventoryNavigation.CloseInventory.performed -= OnCancelInput;
 
                 // Unsubscribe dos botões de atribuição rápida
                 inputActions.InventoryNavigation.AddToSlot1.performed -= (ctx) => OnAssignToQuickSlot(0);

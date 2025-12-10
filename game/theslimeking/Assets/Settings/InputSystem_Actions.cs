@@ -574,6 +574,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""7609b6b3-8441-4706-8ad4-2e09d95779b1"",
+                    ""path"": ""<XInputController>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""acbf26b2-96b5-4b04-8093-ba8ac919a838"",
                     ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
@@ -618,17 +629,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9f5c8b1a-2d3e-4f5a-6b7c-8d9e0f1a2b3c"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Attack"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""df1fdb47-1f2e-4926-85d3-f5464eaec15b"",
                     ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
@@ -642,17 +642,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""a52b6d72-378d-4c61-a768-68b6a2e41774"",
                     ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""c7d8e9f0-a1b2-3c4d-5e6f-7a8b9c0d1e2f"",
-                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
@@ -684,6 +673,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""18bd0e9e-98be-4122-a2c0-6970030215ba"",
+                    ""path"": ""<XInputController>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""b82bd3a8-5e5d-4eec-a2be-1ff162865f44"",
                     ""path"": ""<Gamepad>/select"",
                     ""interactions"": """",
@@ -700,6 +700,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""OpenInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""33081264-2155-4cc7-a1b6-9dbf2a7fecff"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
                     ""action"": ""OpenInventory"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -768,6 +779,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""AddToSlot4"",
                     ""type"": ""Button"",
                     ""id"": ""35a6b7c8-d9e0-1f2a-3b4c-5d6e7f8a9b1a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CloseInventory"",
+                    ""type"": ""Button"",
+                    ""id"": ""a9388085-f8ca-4175-962d-5544a29f091d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -909,8 +929,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""d598cdb1-1f73-4c71-9cd8-bd2fa58f3be3"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectItem"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -931,19 +962,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a8b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""id"": ""3a26bcac-7867-409a-ab52-0472b40fde1c"",
+                    ""path"": ""<XInputController>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""SelectItem"",
+                    ""groups"": """",
+                    ""action"": ""Cancel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""754e0467-29e0-46a4-9ed9-97e13d6af4bb"",
-                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -955,17 +986,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""c0d1e2f3-a4b5-6c7d-8e9f-0a1b2c3d4e5f"",
                     ""path"": ""<Keyboard>/escape"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Cancel"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a"",
-                    ""path"": ""<Keyboard>/i"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
@@ -1058,6 +1078,50 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""AddToSlot4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""93975e89-c756-43fd-9501-d2ad49c4c0f7"",
+                    ""path"": ""<XInputController>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CloseInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db6fd191-1efb-45d9-9963-45704f58a0ff"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CloseInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""22515fe0-f10b-4387-b4ce-b9b3e260078e"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CloseInventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""593f309c-5a25-49ec-b232-a618df8bfff6"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CloseInventory"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1239,6 +1303,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""44bac324-4a06-491f-891d-deb49b35abb7"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e3da4b06-9348-479d-94f2-b903381314bd"",
                     ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
@@ -1267,6 +1342,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9cccd4a7-3bd9-4128-be75-f7f4e1b3385b"",
+                    ""path"": ""<XInputController>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1405,6 +1491,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_InventoryNavigation_AddToSlot2 = m_InventoryNavigation.FindAction("AddToSlot2", throwIfNotFound: true);
         m_InventoryNavigation_AddToSlot3 = m_InventoryNavigation.FindAction("AddToSlot3", throwIfNotFound: true);
         m_InventoryNavigation_AddToSlot4 = m_InventoryNavigation.FindAction("AddToSlot4", throwIfNotFound: true);
+        m_InventoryNavigation_CloseInventory = m_InventoryNavigation.FindAction("CloseInventory", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Navigate = m_Menus.FindAction("Navigate", throwIfNotFound: true);
@@ -1739,6 +1826,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InventoryNavigation_AddToSlot2;
     private readonly InputAction m_InventoryNavigation_AddToSlot3;
     private readonly InputAction m_InventoryNavigation_AddToSlot4;
+    private readonly InputAction m_InventoryNavigation_CloseInventory;
     /// <summary>
     /// Provides access to input actions defined in input action map "InventoryNavigation".
     /// </summary>
@@ -1778,6 +1866,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "InventoryNavigation/AddToSlot4".
         /// </summary>
         public InputAction @AddToSlot4 => m_Wrapper.m_InventoryNavigation_AddToSlot4;
+        /// <summary>
+        /// Provides access to the underlying input action "InventoryNavigation/CloseInventory".
+        /// </summary>
+        public InputAction @CloseInventory => m_Wrapper.m_InventoryNavigation_CloseInventory;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1825,6 +1917,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @AddToSlot4.started += instance.OnAddToSlot4;
             @AddToSlot4.performed += instance.OnAddToSlot4;
             @AddToSlot4.canceled += instance.OnAddToSlot4;
+            @CloseInventory.started += instance.OnCloseInventory;
+            @CloseInventory.performed += instance.OnCloseInventory;
+            @CloseInventory.canceled += instance.OnCloseInventory;
         }
 
         /// <summary>
@@ -1857,6 +1952,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @AddToSlot4.started -= instance.OnAddToSlot4;
             @AddToSlot4.performed -= instance.OnAddToSlot4;
             @AddToSlot4.canceled -= instance.OnAddToSlot4;
+            @CloseInventory.started -= instance.OnCloseInventory;
+            @CloseInventory.performed -= instance.OnCloseInventory;
+            @CloseInventory.canceled -= instance.OnCloseInventory;
         }
 
         /// <summary>
@@ -2246,6 +2344,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAddToSlot4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CloseInventory" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCloseInventory(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Menus" which allows adding and removing callbacks.

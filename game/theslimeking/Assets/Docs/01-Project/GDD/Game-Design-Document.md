@@ -2168,17 +2168,17 @@ Fortaleza de formigas com 8 guardas. Alcançar cristal no centro sem ser detecta
 
 ### 16.1 Mapeamento de Controles
 
-Para cada Action Map do InputSystem_Actions temos um mapa de controles.
+Mapeamentos baseados no `InputSystem_Actions.inputactions` da build atual.
 
 **Gameplay:**
 
 | Ação                 | Xbox Series | PS5               | Switch        | Teclado                  |
 | -------------------- | ----------- | ----------------- | ------------- | ------------------------ |
 | Move                 | leftStick   | leftStick         | leftStick     | WASD ou Setas            |
-| Attack/Confirm       | A           | X                 | B             | Mouse Esquerdo ou Espaço |
-| Couch/Discard Item   | X           | Square            | Y             | X                        |
-| Interact/Cancel      | B           | Circle            | A             | E ou Mouse Direito       |
-| Open/Close Inventory | Y ou View   | Triangle ou Share | Minus ou Plus | I                        |
+| Attack/Confirm       | B (East)    | Circle (Red)      | A (East)      | Espaço                   |
+| Crouch/Discard Item  | X (West)    | Square (Blue)     | Y (North)     | X                        |
+| Interact/Cancel      | A (South)   | Cross (Blue)      | B (West)      | E                        |
+| Open/Close Inventory | Select      | Share             | Minus         | I                        |
 | Use Item/Skill 1     | LB          | L1                | L             | 1                        |
 | Use Item/Skill 2     | LT          | L2                | ZL            | 2                        |
 | Use Item/Skill 3     | RB          | R1                | R             | 3                        |
@@ -2187,33 +2187,33 @@ Para cada Action Map do InputSystem_Actions temos um mapa de controles.
 | Move Left            | dpadLeft    | dpadLeft          | dpadLeft      | A ou Seta Esquerda       |
 | Move Up              | dpadUp      | dpadUp            | dpadUp        | W ou Seta Cima           |
 | Move Down            | dpadDown    | dpadDown          | dpadDown      | S ou Seta Baixo          |
-| Pause Game           | Menu        | Options           | +             | Esc                      |
+| Pause Game           | Start       | Options           | Plus          | Esc                      |
 
 **Inventory Navigation:**
 
 | Ação                   | Xbox Series | PS5                  | Switch        | Teclado                 |
 | ---------------------- | ----------- | -------------------- | -------------- | ----------------------- |
 | Move Selector          | leftStick   | leftStick            | leftStick      | WASD ou Setas           |
-| Select Item            | A           | X                    | B              | Enter ou Mouse Esquerdo |
-| Cancel                 | B           | Circle               | A              | Esc                     |
-| Close Inventory        | Y ou View   | Triangle ou Share    | Minus ou Plus  | I                       |
-| Add to Slot 1          | LB          | L1                   | L              | 1                       |
-| Add to Slot 2          | LT          | L2                   | ZL             | 2                       |
-| Add to Slot 3          | RB          | R1                   | R              | 3                       |
-| Add to Slot 4          | RT          | R2                   | ZR             | 4                       |
+| Select Item            | B (East)    | Circle (Red)         | A (East)       | Enter ou Espaço         |
+| Cancel                 | A (South)   | Cross (Blue)         | B (West)       | Esc                     |
+| Close Inventory        | Select      | Share                | Minus          | I ou Esc                |
+| Add to Slot 1 (Quick)  | LB          | L1                   | L              | 1                       |
+| Add to Slot 2 (Quick)  | LT          | L2                   | ZL             | 2                       |
+| Add to Slot 3 (Quick)  | RB          | R1                   | R              | 3                       |
+| Add to Slot 4 (Quick)  | RT          | R2                   | ZR             | 4                       |
 
 **Menus:**
 
 | Ação                    | Xbox Series | PS5       | Switch    | Teclado         |
 | ----------------------- | ----------- | --------- | --------- | --------------- |
 | Move Selector           | leftStick   | leftStick | leftStick | WASD ou Setas   |
-| Confirm/Forward         | A           | X         | B         | Enter           |
-| Back/Return to Gameplay | B           | Circle    | A         | Esc             |
+| Confirm/Forward         | B (East)    | Circle    | A (East)  | Enter ou Espaço |
+| Back/Return to Gameplay | A (South)   | Cross     | B (West)  | Esc             |
 | Move Selector Up        | dpadUp      | dpadUp    | dpadUp    | W ou Seta Cima  |
 | Move Selector Down      | dpadDown    | dpadDown  | dpadDown  | S ou Seta Baixo |
-| Return to Gameplay      | Menu        | Options   | +         | Esc             |
+| Return to Gameplay      | Start       | Options   | Plus      | Esc             |
 
-### 13.2 HUD
+### 16.2 HUD
 
 **Elementos Mínimos:**
 
@@ -2222,6 +2222,7 @@ Para cada Action Map do InputSystem_Actions temos um mapa de controles.
 - Habilidades Equipadas (canto inferior direito, com cooldowns)
 - Quest Tracker (canto superior direito, opcional)
 - Minimapa (canto inferior esquerdo, pode ser desativado)
+- Quick Slots (4 slots: canto inferior direito ou central)
 
 ---
 

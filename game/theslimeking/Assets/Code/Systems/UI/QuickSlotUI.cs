@@ -17,6 +17,21 @@ namespace TheSlimeKing.UI
         [Header("Quick Slot Configuration")]
         [SerializeField] private int slotDirection; // 0=Up, 1=Down, 2=Left, 3=Right
 
+        private void Awake()
+        {
+            // Configura a imagem do ícone para não ser distorcida
+            if (iconImage != null)
+            {
+                iconImage.type = Image.Type.Simple;
+                iconImage.preserveAspect = true;
+                iconImage.raycastTarget = false; // Quick slots não são interativos
+            }
+            else
+            {
+                Debug.LogWarning($"[QuickSlotUI] iconImage não está configurada no slot {slotDirection}!");
+            }
+        }
+
         /// <summary>
         /// Atualiza a visualização do quick slot com os dados atuais do InventoryManager.
         /// Sistema não empilhável: cada slot é independente e mostra apenas o ícone.
@@ -48,6 +63,12 @@ namespace TheSlimeKing.UI
                 {
                     iconImage.enabled = true;
                     iconImage.sprite = item.icon;
+
+                    // Garante que a imagem não seja distorcida
+                    // Mesmas configurações que o Inventory para consistência
+                    iconImage.type = Image.Type.Simple;
+                    iconImage.preserveAspect = true;
+                    iconImage.raycastTarget = false; // Quick slots não são interativos
                 }
             }
         }

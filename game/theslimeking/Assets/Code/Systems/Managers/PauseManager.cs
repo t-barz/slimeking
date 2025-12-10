@@ -206,8 +206,12 @@ namespace SlimeKing.Core
             inputActions.Gameplay.PauseGame.performed += OnGameplayMenuInput;
             inputActions.Gameplay.OpenInventory.performed += OnGameplayInventoryInput;
 
+            // Menu inputs
+            inputActions.Menus.ReturnToGameplay.performed += OnMenuReturnToGameplayInput;
+            inputActions.Menus.Confirm.performed += OnMenuConfirmInput;
+
             // Inventory Navigation inputs
-            inputActions.InventoryNavigation.Cancel.performed += OnUICancelInput;
+            inputActions.InventoryNavigation.CloseInventory.performed += OnUICancelInput;
             inputActions.InventoryNavigation.SelectItem.performed += OnUISubmitInput;
 
             isInputSubscribed = true;
@@ -225,8 +229,12 @@ namespace SlimeKing.Core
             inputActions.Gameplay.PauseGame.performed -= OnGameplayMenuInput;
             inputActions.Gameplay.OpenInventory.performed -= OnGameplayInventoryInput;
 
+            // Menu inputs
+            inputActions.Menus.ReturnToGameplay.performed -= OnMenuReturnToGameplayInput;
+            inputActions.Menus.Confirm.performed -= OnMenuConfirmInput;
+
             // Inventory Navigation inputs
-            inputActions.InventoryNavigation.Cancel.performed -= OnUICancelInput;
+            inputActions.InventoryNavigation.CloseInventory.performed -= OnUICancelInput;
             inputActions.InventoryNavigation.SelectItem.performed -= OnUISubmitInput;
 
             isInputSubscribed = false;
@@ -247,60 +255,55 @@ namespace SlimeKing.Core
         }
 
         /// <summary>
-        /// Callback para Gameplay.Inventory (Select/I).
-        /// Gameplay → Inventory
+        /// Callback para Gameplay.OpenInventory (Select/I/Y).
+        /// Gameplay → Inventory (direto, sem pausar via menu)
         /// </summary>
         private void OnGameplayInventoryInput(InputAction.CallbackContext context)
         {
             if (currentState == NavigationState.Gameplay)
             {
-                Log("Gameplay → Inventory");
-                TransitionToInventory();
+                Log("Gameplay → Inventory (direct)");
+                TransitionToInventoryFromGameplay();
             }
         }
 
         /// <summary>
-        /// Callback para UI.Menu (Start/Esc/Tab).
-        /// PauseMenu → Gameplay
+        /// Callback para Menus.ReturnToGameplay (Start/Esc).
+        /// PauseMenu → Gameplay ou Inventory → Gameplay (fecha tudo)
         /// </summary>
-        private void OnUIMenuInput(InputAction.CallbackContext context)
+        private void OnMenuReturnToGameplayInput(InputAction.CallbackContext context)
+        {
+            if (currentState == NavigationState.PauseMenu || currentState == NavigationState.Inventory)
+            {
+                Log($"{currentState} → Gameplay (ReturnToGameplay button)");
+                TransitionToGameplay();
+            }
+        }
+
+        /// <summary>
+        /// Callback para Menus.Confirm (A/Enter).
+        /// PauseMenu → Inventory (via botão do menu)
+        /// </summary>
+        private void OnMenuConfirmInput(InputAction.CallbackContext context)
         {
             if (currentState == NavigationState.PauseMenu)
             {
-                Log("PauseMenu → Gameplay (Menu button)");
-                TransitionToGameplay();
+                // EventSystem do Unity vai disparar os botões selecionados
+                // Este handler é um fallback caso necessário
+                Log("Menus.Confirm pressed (handled by EventSystem/Buttons)");
             }
         }
 
         /// <summary>
-        /// Callback para UI.Inventory (Select/I).
-        /// Inventory → Gameplay
-        /// </summary>
-        private void OnUIInventoryInput(InputAction.CallbackContext context)
-        {
-            if (currentState == NavigationState.Inventory)
-            {
-                Log("Inventory → Gameplay (Inventory button)");
-                TransitionToGameplay();
-            }
-        }
-
-        /// <summary>
-        /// Callback para UI.Cancel (B/Escape).
-        /// PauseMenu → Gameplay
-        /// Inventory → PauseMenu
+        /// Callback para InventoryNavigation.CloseInventory (Select/I).
+        /// Inventory → Gameplay (fecha completamente)
         /// </summary>
         private void OnUICancelInput(InputAction.CallbackContext context)
         {
-            if (currentState == NavigationState.PauseMenu)
+            if (currentState == NavigationState.Inventory)
             {
-                Log("PauseMenu → Gameplay (Cancel button)");
+                Log("Inventory → Gameplay (CloseInventory button)");
                 TransitionToGameplay();
-            }
-            else if (currentState == NavigationState.Inventory)
-            {
-                Log("Inventory → PauseMenu (Cancel button)");
-                TransitionToPauseMenu();
             }
         }
 
@@ -421,7 +424,34 @@ namespace SlimeKing.Core
         }
 
         /// <summary>
-        /// Transição: Gameplay → Inventory ou PauseMenu → Inventory
+        /// Transição: Gameplay → Inventory (via botão Select/I/Y)
+        /// Similar a TransitionToInventory, mas rastreada como vindo do Gameplay
+        /// </summary>
+        private void TransitionToInventoryFromGameplay()
+        {
+            // Pausa o jogo se não estava pausado
+            if (!IsPaused)
+            {
+                Pause();
+            }
+
+            // Oculta o PauseMenu se estiver aberto
+            if (pauseMenu != null && pauseMenu.IsVisible)
+            {
+                pauseMenu.Hide();
+            }
+
+            // Mostra o Inventory
+            if (inventoryUI != null)
+            {
+                inventoryUI.Show();
+            }
+
+            currentState = NavigationState.Inventory;
+        }
+
+        /// <summary>
+        /// Transição: PauseMenu → Inventory (via botão Confirm do menu)
         /// </summary>
         private void TransitionToInventory()
         {
@@ -448,6 +478,7 @@ namespace SlimeKing.Core
 
         /// <summary>
         /// Transição: PauseMenu → Gameplay ou Inventory → Gameplay
+        /// Fecha qualquer UI aberta e retorna ao jogo.
         /// Protegido contra fechar inventário que foi aberto muito recentemente.
         /// </summary>
         private void TransitionToGameplay()
