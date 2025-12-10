@@ -203,14 +203,12 @@ namespace SlimeKing.Core
             if (inputActions == null || isInputSubscribed) return;
 
             // Gameplay inputs
-            inputActions.Gameplay.Menu.performed += OnGameplayMenuInput;
-            inputActions.Gameplay.Inventory.performed += OnGameplayInventoryInput;
+            inputActions.Gameplay.PauseGame.performed += OnGameplayMenuInput;
+            inputActions.Gameplay.OpenInventory.performed += OnGameplayInventoryInput;
 
-            // UI inputs
-            inputActions.UI.Menu.performed += OnUIMenuInput;
-            inputActions.UI.Inventory.performed += OnUIInventoryInput;
-            inputActions.UI.Cancel.performed += OnUICancelInput;
-            inputActions.UI.Submit.performed += OnUISubmitInput;
+            // Inventory Navigation inputs
+            inputActions.InventoryNavigation.Cancel.performed += OnUICancelInput;
+            inputActions.InventoryNavigation.SelectItem.performed += OnUISubmitInput;
 
             isInputSubscribed = true;
             Log("Subscribed to all inputs");
@@ -224,14 +222,12 @@ namespace SlimeKing.Core
             if (inputActions == null || !isInputSubscribed) return;
 
             // Gameplay inputs
-            inputActions.Gameplay.Menu.performed -= OnGameplayMenuInput;
-            inputActions.Gameplay.Inventory.performed -= OnGameplayInventoryInput;
+            inputActions.Gameplay.PauseGame.performed -= OnGameplayMenuInput;
+            inputActions.Gameplay.OpenInventory.performed -= OnGameplayInventoryInput;
 
-            // UI inputs
-            inputActions.UI.Menu.performed -= OnUIMenuInput;
-            inputActions.UI.Inventory.performed -= OnUIInventoryInput;
-            inputActions.UI.Cancel.performed -= OnUICancelInput;
-            inputActions.UI.Submit.performed -= OnUISubmitInput;
+            // Inventory Navigation inputs
+            inputActions.InventoryNavigation.Cancel.performed -= OnUICancelInput;
+            inputActions.InventoryNavigation.SelectItem.performed -= OnUISubmitInput;
 
             isInputSubscribed = false;
             Log("Unsubscribed from all inputs");

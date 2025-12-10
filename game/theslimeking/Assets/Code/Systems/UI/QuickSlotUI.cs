@@ -13,13 +13,13 @@ namespace TheSlimeKing.UI
     {
         [Header("UI References")]
         [SerializeField] private Image iconImage;
-        [SerializeField] private TextMeshProUGUI quantityText;
 
         [Header("Quick Slot Configuration")]
         [SerializeField] private int slotDirection; // 0=Up, 1=Down, 2=Left, 3=Right
 
         /// <summary>
         /// Atualiza a visualização do quick slot com os dados atuais do InventoryManager.
+        /// Sistema não empilhável: cada slot é independente e mostra apenas o ícone.
         /// </summary>
         public void Refresh()
         {
@@ -31,6 +31,8 @@ namespace TheSlimeKing.UI
 
             ItemData item = InventoryManager.Instance.GetQuickSlotItem(slotDirection);
 
+            Debug.Log($"[QuickSlotUI] Refresh slot {slotDirection}: item={(item != null ? item.itemName : "NULL")}");
+
             if (item == null)
             {
                 // Quick slot vazio
@@ -38,67 +40,16 @@ namespace TheSlimeKing.UI
                 {
                     iconImage.enabled = false;
                 }
-
-                if (quantityText != null)
-                {
-                    quantityText.text = "";
-                }
             }
             else
             {
-                // Quick slot com item
+                // Quick slot com item - sistema não empilhável: sempre mostra sem quantidade
                 if (iconImage != null)
                 {
                     iconImage.enabled = true;
                     iconImage.sprite = item.icon;
                 }
-
-                // Atualiza quantidade do item no inventário
-                if (quantityText != null)
-                {
-                    int quantity = GetItemQuantityInInventory(item);
-                    
-                    if (quantity > 1)
-                    {
-                        quantityText.text = quantity.ToString();
-                    }
-                    else if (quantity == 1)
-                    {
-                        quantityText.text = "";
-                    }
-                    else
-                    {
-                        // Item não existe mais no inventário
-                        quantityText.text = "";
-                    }
-                }
             }
-        }
-
-        /// <summary>
-        /// Obtém a quantidade total de um item no inventário.
-        /// </summary>
-        /// <param name="item">Item a verificar</param>
-        /// <returns>Quantidade total</returns>
-        private int GetItemQuantityInInventory(ItemData item)
-        {
-            if (item == null || InventoryManager.Instance == null)
-            {
-                return 0;
-            }
-
-            int totalQuantity = 0;
-            InventorySlot[] slots = InventoryManager.Instance.GetAllSlots();
-
-            foreach (InventorySlot slot in slots)
-            {
-                if (slot.item == item)
-                {
-                    totalQuantity += slot.quantity;
-                }
-            }
-
-            return totalQuantity;
         }
 
         /// <summary>

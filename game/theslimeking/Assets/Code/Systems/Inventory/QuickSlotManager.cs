@@ -1,11 +1,13 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TheSlimeKing.UI;
+using SlimeKing.Core;
 
 namespace TheSlimeKing.Inventory
 {
     /// <summary>
-    /// Gerencia os 4 quick slots mapeados aos direcionais do gamepad.
-    /// Detecta input e usa itens atribuídos aos direcionais.
+    /// Gerencia os 4 quick slots mapeados aos UseItem1-4 do InputSystem.
+    /// Detecta input e usa itens atribuídos aos quick slots.
     /// Atualiza a UI dos quick slots no HUD.
     /// </summary>
     public class QuickSlotManager : MonoBehaviour
@@ -13,7 +15,15 @@ namespace TheSlimeKing.Inventory
         [Header("UI References")]
         [SerializeField] private QuickSlotUI[] quickSlotUIs = new QuickSlotUI[4];
 
+        private InputSystem_Actions inputActions;
+
         #region Unity Lifecycle
+        private void Awake()
+        {
+            // Inicializar InputSystem_Actions
+            inputActions = new InputSystem_Actions();
+        }
+
         private void Start()
         {
             // Inscrever-se nos eventos do InventoryManager
@@ -36,9 +46,36 @@ namespace TheSlimeKing.Inventory
             RefreshUI();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            DetectQuickSlotInput();
+            // Habilitar mapa Gameplay e subscrever aos eventos UseItem
+            inputActions.Gameplay.Enable();
+            inputActions.Gameplay.UseItem1.performed += OnUseItem1Input;
+            inputActions.Gameplay.UseItem2.performed += OnUseItem2Input;
+            inputActions.Gameplay.UseItem3.performed += OnUseItem3Input;
+            inputActions.Gameplay.UseItem4.performed += OnUseItem4Input;
+
+            // Subscrever ao evento de pause para desabilitar/habilitar quick slots
+            if (PauseManager.Instance != null)
+            {
+                PauseManager.OnPauseStateChanged += OnPauseStateChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            // Desinscrever dos eventos UseItem
+            inputActions.Gameplay.UseItem1.performed -= OnUseItem1Input;
+            inputActions.Gameplay.UseItem2.performed -= OnUseItem2Input;
+            inputActions.Gameplay.UseItem3.performed -= OnUseItem3Input;
+            inputActions.Gameplay.UseItem4.performed -= OnUseItem4Input;
+            inputActions.Gameplay.Disable();
+
+            // Desinscrever do evento de pause
+            if (PauseManager.Instance != null)
+            {
+                PauseManager.OnPauseStateChanged -= OnPauseStateChanged;
+            }
         }
 
         private void OnDestroy()
@@ -49,34 +86,49 @@ namespace TheSlimeKing.Inventory
                 InventoryManager.Instance.OnInventoryChanged -= RefreshUI;
                 InventoryManager.Instance.OnQuickSlotsChanged -= RefreshUI;
             }
+
+            inputActions?.Dispose();
         }
         #endregion
 
-        #region Input Detection
-        /// <summary>
-        /// Detecta input dos 4 direcionais e usa o item correspondente.
-        /// </summary>
-        private void DetectQuickSlotInput()
+        #region Input Handlers
+        private void OnUseItem1Input(InputAction.CallbackContext context)
         {
-            // Direcional Cima (Up) - Quick Slot 0
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            InventoryManager.Instance?.UseQuickSlot(0);
+        }
+
+        private void OnUseItem2Input(InputAction.CallbackContext context)
+        {
+            InventoryManager.Instance?.UseQuickSlot(1);
+        }
+
+        private void OnUseItem3Input(InputAction.CallbackContext context)
+        {
+            InventoryManager.Instance?.UseQuickSlot(2);
+        }
+
+        private void OnUseItem4Input(InputAction.CallbackContext context)
+        {
+            InventoryManager.Instance?.UseQuickSlot(3);
+        }
+
+        /// <summary>
+        /// Desabilita/habilita os UseItem inputs quando o jogo está pausado/despausado.
+        /// Isso previne que os itens sejam usados quando o inventário está aberto.
+        /// </summary>
+        private void OnPauseStateChanged(bool isPaused)
+        {
+            if (isPaused)
             {
-                InventoryManager.Instance?.UseQuickSlot(0);
+                // Jogo pausado (inventário aberto) - desabilitar uso de quick slots
+                inputActions.Gameplay.Disable();
+                UnityEngine.Debug.Log("[QuickSlotManager] Gameplay desabilitado (inventário aberto)");
             }
-            // Direcional Baixo (Down) - Quick Slot 1
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else
             {
-                InventoryManager.Instance?.UseQuickSlot(1);
-            }
-            // Direcional Esquerda (Left) - Quick Slot 2
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                InventoryManager.Instance?.UseQuickSlot(2);
-            }
-            // Direcional Direita (Right) - Quick Slot 3
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                InventoryManager.Instance?.UseQuickSlot(3);
+                // Jogo despausado - habilitar uso de quick slots
+                inputActions.Gameplay.Enable();
+                UnityEngine.Debug.Log("[QuickSlotManager] Gameplay habilitado (inventário fechado)");
             }
         }
         #endregion
@@ -88,11 +140,18 @@ namespace TheSlimeKing.Inventory
         /// </summary>
         public void RefreshUI()
         {
+            UnityEngine.Debug.Log($"[QuickSlotManager] RefreshUI chamado. Quick slots configurados: {quickSlotUIs.Length}");
+
             for (int i = 0; i < quickSlotUIs.Length; i++)
             {
                 if (quickSlotUIs[i] != null)
                 {
+                    UnityEngine.Debug.Log($"[QuickSlotManager] Atualizando quick slot {i}");
                     quickSlotUIs[i].Refresh();
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning($"[QuickSlotManager] Quick slot UI {i} é NULL!");
                 }
             }
         }

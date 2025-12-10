@@ -138,6 +138,13 @@ namespace SlimeKing.UI
             }
 
             fadeCoroutine = StartCoroutine(FadeIn());
+
+            // Habilitar mapa InventoryNavigation
+            if (inputActions != null)
+            {
+                inputActions.InventoryNavigation.Enable();
+                LogMessage("InventoryNavigation map enabled");
+            }
         }
 
         /// <summary>
@@ -159,6 +166,13 @@ namespace SlimeKing.UI
 
             LogMessage("Hiding inventory");
             isOpen = false;
+
+            // Desabilitar mapa InventoryNavigation
+            if (inputActions != null)
+            {
+                inputActions.InventoryNavigation.Disable();
+                LogMessage("InventoryNavigation map disabled");
+            }
 
             // Para fade anterior se existir
             if (fadeCoroutine != null)
@@ -282,7 +296,7 @@ namespace SlimeKing.UI
         }
 
         /// <summary>
-        /// Habilita o input de navegação do inventário (mapa UI.Navigate).
+        /// Habilita o input de navegação do inventário (mapa UI.Navigate) e quick slot assignment.
         /// </summary>
         private void EnableNavigationInput()
         {
@@ -291,9 +305,16 @@ namespace SlimeKing.UI
 
             try
             {
-                inputActions.UI.Navigate.performed += OnNavigateInput;
-                inputActions.UI.Submit.performed += OnSubmitInput;
-                inputActions.UI.Cancel.performed += OnCancelInput;
+                inputActions.InventoryNavigation.Navigate.performed += OnNavigateInput;
+                inputActions.InventoryNavigation.SelectItem.performed += OnSubmitInput;
+                inputActions.InventoryNavigation.Cancel.performed += OnCancelInput;
+
+                // Subscibe aos botões de atribuição rápida
+                inputActions.InventoryNavigation.AddToSlot1.performed += (ctx) => OnAssignToQuickSlot(0);
+                inputActions.InventoryNavigation.AddToSlot2.performed += (ctx) => OnAssignToQuickSlot(1);
+                inputActions.InventoryNavigation.AddToSlot3.performed += (ctx) => OnAssignToQuickSlot(2);
+                inputActions.InventoryNavigation.AddToSlot4.performed += (ctx) => OnAssignToQuickSlot(3);
+
                 isInputSubscribed = true;
                 LogMessage("Navigation input enabled");
             }
@@ -313,9 +334,16 @@ namespace SlimeKing.UI
 
             try
             {
-                inputActions.UI.Navigate.performed -= OnNavigateInput;
-                inputActions.UI.Submit.performed -= OnSubmitInput;
-                inputActions.UI.Cancel.performed -= OnCancelInput;
+                inputActions.InventoryNavigation.Navigate.performed -= OnNavigateInput;
+                inputActions.InventoryNavigation.SelectItem.performed -= OnSubmitInput;
+                inputActions.InventoryNavigation.Cancel.performed -= OnCancelInput;
+
+                // Unsubscribe dos botões de atribuição rápida
+                inputActions.InventoryNavigation.AddToSlot1.performed -= (ctx) => OnAssignToQuickSlot(0);
+                inputActions.InventoryNavigation.AddToSlot2.performed -= (ctx) => OnAssignToQuickSlot(1);
+                inputActions.InventoryNavigation.AddToSlot3.performed -= (ctx) => OnAssignToQuickSlot(2);
+                inputActions.InventoryNavigation.AddToSlot4.performed -= (ctx) => OnAssignToQuickSlot(3);
+
                 isInputSubscribed = false;
                 LogMessage("Navigation input disabled");
             }
@@ -594,6 +622,49 @@ namespace SlimeKing.UI
                 swapFirstSlotIndex = -1;
                 LogMessage("Operação de swap cancelada pelo usuário");
             }
+            else
+            {
+                // Se não há swap ativo, fechar o inventário
+                Hide();
+                LogMessage("Inventário fechado via tecla Cancel (I)");
+            }
+        }
+
+        /// <summary>
+        /// Callback para atribuir item selecionado a um slot de acesso rápido.
+        /// Valida se o item é consumível antes de atribuir.
+        /// </summary>
+        /// <param name="slotIndex">Índice do slot rápido (0-3)</param>
+        private void OnAssignToQuickSlot(int slotIndex)
+        {
+            LogMessage($"🎯 OnAssignToQuickSlot chamado: slotIndex={slotIndex}, isOpen={isOpen}, currentSelectedIndex={currentSelectedIndex}");
+
+            if (!isOpen || currentSelectedIndex < 0 || InventoryManager.Instance == null)
+            {
+                LogMessage($"❌ Atribuição cancelada: isOpen={isOpen}, currentSelectedIndex={currentSelectedIndex}, InventoryManager={InventoryManager.Instance != null}");
+                return;
+            }
+
+            // Obtém o item do slot selecionado
+            InventorySlot slot = InventoryManager.Instance.GetSlot(currentSelectedIndex);
+
+            if (slot == null || slot.IsEmpty)
+            {
+                LogMessage($"Tentativa de atribuir item de slot vazio: {currentSelectedIndex}");
+                return;
+            }
+
+            // Valida se é um item consumível
+            if (slot.item.type != ItemType.Consumable)
+            {
+                LogMessage($"Apenas itens consumíveis podem ser atribuídos a slots rápidos. Item: {slot.item.itemName} é {slot.item.type}");
+                return;
+            }
+
+            // Atribui o item ao slot rápido usando instanceID específico (não apenas ItemData)
+            InventoryManager.Instance.AssignQuickSlot(slot.instanceID, slotIndex);
+            LogMessage($"Item '{slot.item.itemName}' (ID {slot.instanceID}) atribuído ao slot rápido {slotIndex + 1}");
+            // TODO: Adicionar feedback visual/audio (efeito animado, som de confirmação, etc)
         }
 
         #endregion

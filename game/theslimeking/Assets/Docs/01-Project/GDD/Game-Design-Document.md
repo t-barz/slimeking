@@ -2168,18 +2168,50 @@ Fortaleza de formigas com 8 guardas. Alcançar cristal no centro sem ser detecta
 
 ### 16.1 Mapeamento de Controles
 
-| Função | Switch | PlayStation | Xbox | Keyboard |
-|:--|:--|:--|:--|:--|
-| Movimento | Analógico L | Analógico L | Analógico L | WASD |
-| Habilidade 1 | ZL | L2 | LT | Q |
-| Habilidade 2 | L | L1 | LB | E |
-| Habilidade 3 | R | R1 | RB | R |
-| Habilidade 4 | ZR | R2 | RT | F |
-| Ataque | A | X | A | Space |
-| Interagir | A | X | A | Space |
-| **Agachar (parado)** | **B (segurar)** | **Circle (segurar)** | **B (segurar)** | **Ctrl (segurar)** |
-| Menu | + | Options | Menu | Esc |
-| Inventário | - | Touchpad | View | Tab |
+Para cada Action Map do InputSystem_Actions temos um mapa de controles.
+
+**Gameplay:**
+
+| Ação                 | Xbox Series | PS5               | Switch        | Teclado                  |
+| -------------------- | ----------- | ----------------- | ------------- | ------------------------ |
+| Move                 | leftStick   | leftStick         | leftStick     | WASD ou Setas            |
+| Attack/Confirm       | A           | X                 | B             | Mouse Esquerdo ou Espaço |
+| Couch/Discard Item   | X           | Square            | Y             | X                        |
+| Interact/Cancel      | B           | Circle            | A             | E ou Mouse Direito       |
+| Open/Close Inventory | Y ou View   | Triangle ou Share | Minus ou Plus | I                        |
+| Use Item/Skill 1     | LB          | L1                | L             | 1                        |
+| Use Item/Skill 2     | LT          | L2                | ZL            | 2                        |
+| Use Item/Skill 3     | RB          | R1                | R             | 3                        |
+| Use Item/Skill 4     | RT          | R2                | ZR            | 4                        |
+| Move Right           | dpadRight   | dpadRight         | dpadRight     | D ou Seta Direita        |
+| Move Left            | dpadLeft    | dpadLeft          | dpadLeft      | A ou Seta Esquerda       |
+| Move Up              | dpadUp      | dpadUp            | dpadUp        | W ou Seta Cima           |
+| Move Down            | dpadDown    | dpadDown          | dpadDown      | S ou Seta Baixo          |
+| Pause Game           | Menu        | Options           | +             | Esc                      |
+
+**Inventory Navigation:**
+
+| Ação                   | Xbox Series | PS5                  | Switch        | Teclado                 |
+| ---------------------- | ----------- | -------------------- | -------------- | ----------------------- |
+| Move Selector          | leftStick   | leftStick            | leftStick      | WASD ou Setas           |
+| Select Item            | A           | X                    | B              | Enter ou Mouse Esquerdo |
+| Cancel                 | B           | Circle               | A              | Esc                     |
+| Close Inventory        | Y ou View   | Triangle ou Share    | Minus ou Plus  | I                       |
+| Add to Slot 1          | LB          | L1                   | L              | 1                       |
+| Add to Slot 2          | LT          | L2                   | ZL             | 2                       |
+| Add to Slot 3          | RB          | R1                   | R              | 3                       |
+| Add to Slot 4          | RT          | R2                   | ZR             | 4                       |
+
+**Menus:**
+
+| Ação                    | Xbox Series | PS5       | Switch    | Teclado         |
+| ----------------------- | ----------- | --------- | --------- | --------------- |
+| Move Selector           | leftStick   | leftStick | leftStick | WASD ou Setas   |
+| Confirm/Forward         | A           | X         | B         | Enter           |
+| Back/Return to Gameplay | B           | Circle    | A         | Esc             |
+| Move Selector Up        | dpadUp      | dpadUp    | dpadUp    | W ou Seta Cima  |
+| Move Selector Down      | dpadDown    | dpadDown  | dpadDown  | S ou Seta Baixo |
+| Return to Gameplay      | Menu        | Options   | +         | Esc             |
 
 ### 13.2 HUD
 

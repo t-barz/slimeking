@@ -21,7 +21,14 @@ namespace TheSlimeKing.Inventory
         #region Private Fields
         private InventorySlot[] slots = new InventorySlot[12];
         private ItemData[] equipment = new ItemData[3]; // Amulet(0), Ring(1), Cape(2)
-        private ItemData[] quickSlots = new ItemData[4]; // Up(0), Down(1), Left(2), Right(3)
+
+        // Quick slots armazenam o ID único da instância do item
+        // Isso permite múltiplos itens do mesmo tipo em quick slots diferentes
+        // 0 = slot vazio
+        private int[] quickSlots = new int[4] { 0, 0, 0, 0 }; // Up(0), Down(1), Left(2), Right(3)
+
+        // HashSet para garantir IDs únicos
+        private System.Collections.Generic.HashSet<int> usedInstanceIDs = new System.Collections.Generic.HashSet<int>();
         #endregion
 
         #region Unity Lifecycle
@@ -47,6 +54,47 @@ namespace TheSlimeKing.Inventory
             for (int i = 0; i < slots.Length; i++)
             {
                 slots[i] = new InventorySlot();
+            }
+        }
+
+        /// <summary>
+        /// Gera um ID único de 6 dígitos (100000-999999) para uma instância de item.
+        /// Garante que o ID gerado não está em uso.
+        /// </summary>
+        /// <returns>ID único de 6 dígitos</returns>
+        private int GenerateUniqueInstanceID()
+        {
+            int newID;
+            int attempts = 0;
+            const int maxAttempts = 1000;
+
+            do
+            {
+                // Gera número aleatório entre 100000 e 999999 (6 dígitos)
+                newID = UnityEngine.Random.Range(100000, 1000000);
+                attempts++;
+
+                if (attempts >= maxAttempts)
+                {
+                    UnityEngine.Debug.LogError("[InventoryManager] Não foi possível gerar ID único após 1000 tentativas!");
+                    return 0;
+                }
+            }
+            while (usedInstanceIDs.Contains(newID));
+
+            usedInstanceIDs.Add(newID);
+            return newID;
+        }
+
+        /// <summary>
+        /// Remove um ID da lista de IDs em uso (quando item é removido do inventário).
+        /// </summary>
+        /// <param name="instanceID">ID da instância a ser liberado</param>
+        private void ReleaseInstanceID(int instanceID)
+        {
+            if (instanceID > 0)
+            {
+                usedInstanceIDs.Remove(instanceID);
             }
         }
         #endregion
@@ -80,11 +128,15 @@ namespace TheSlimeKing.Inventory
                     return i > 0; // Retorna true se pelo menos 1 item foi adicionado
                 }
 
+                // Gera ID único para esta instância do item
+                int uniqueID = GenerateUniqueInstanceID();
+
                 // Adiciona ao slot vazio (sempre quantidade 1)
                 slots[emptySlotIndex].item = item;
                 slots[emptySlotIndex].quantity = 1;
+                slots[emptySlotIndex].instanceID = uniqueID;
 
-                UnityEngine.Debug.Log($"[InventoryManager] ✅ Item '{item.itemName}' adicionado ao slot {emptySlotIndex}");
+                UnityEngine.Debug.Log($"[InventoryManager] ✅ Item '{item.itemName}' adicionado ao slot {emptySlotIndex} com ID {uniqueID}");
 
                 OnInventoryChanged?.Invoke();
             }
@@ -127,9 +179,13 @@ namespace TheSlimeKing.Inventory
             {
                 if (slots[i].item == item && remainingToRemove > 0)
                 {
+                    // Libera o ID único desta instância
+                    ReleaseInstanceID(slots[i].instanceID);
+
                     // Remove o item do slot (sempre limpa completamente)
                     slots[i].item = null;
                     slots[i].quantity = 0;
+                    slots[i].instanceID = 0;
                     remainingToRemove--;
 
                     OnInventoryChanged?.Invoke();
@@ -243,27 +299,64 @@ namespace TheSlimeKing.Inventory
             // Executa callback de confirmação se fornecido
             onConfirm?.Invoke();
 
-            // Remove item do quick slot se estiver atribuído
-            RemoveFromQuickSlots(slot.item);
+            // Remove item do quick slot se estiver atribuído (usando instanceID)
+            RemoveFromQuickSlots(slot.instanceID);
+
+            // Libera o ID único
+            ReleaseInstanceID(slot.instanceID);
 
             // Limpa o slot
             slot.item = null;
             slot.quantity = 0;
+            slot.instanceID = 0;
 
             OnInventoryChanged?.Invoke();
         }
 
         /// <summary>
-        /// Remove um item de todos os quick slots onde estiver atribuído.
+        /// Remove referências de quick slots para um instanceID específico.
+        /// Deve ser chamado quando um item é removido do inventário ou quando um slot é esvaziado.
         /// </summary>
-        /// <param name="item">Item a ser removido</param>
-        private void RemoveFromQuickSlots(ItemData item)
+        /// <param name="instanceID">ID da instância do item que foi removido</param>
+        private void RemoveFromQuickSlots(int instanceID)
         {
+            if (instanceID == 0) return;
+
+            // Percorre todos os quick slots e remove referências ao instanceID
             for (int i = 0; i < quickSlots.Length; i++)
             {
-                if (quickSlots[i] == item)
+                if (quickSlots[i] == instanceID)
                 {
-                    quickSlots[i] = null;
+                    quickSlots[i] = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove referências de quick slots baseado no ItemData (busca todos os instanceIDs deste item).
+        /// Sobrecarga para manter compatibilidade com código existente.
+        /// </summary>
+        /// <param name="item">Item que foi removido</param>
+        private void RemoveFromQuickSlots(ItemData item)
+        {
+            if (item == null) return;
+
+            // Percorre todos os quick slots e remove referências a instanceIDs deste item
+            for (int i = 0; i < quickSlots.Length; i++)
+            {
+                int instanceID = quickSlots[i];
+
+                if (instanceID > 0)
+                {
+                    // Busca o slot que contém este instanceID
+                    for (int s = 0; s < slots.Length; s++)
+                    {
+                        if (slots[s].instanceID == instanceID && slots[s].item == item)
+                        {
+                            quickSlots[i] = 0;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -403,7 +496,68 @@ namespace TheSlimeKing.Inventory
 
         #region Public Methods - Quick Slots
         /// <summary>
-        /// Atribui um item a um dos 4 direcionais (quick slots).
+        /// Atribui um item específico (identificado por instanceID único) a um dos 4 direcionais (quick slots).
+        /// Sistema não empilhável: cada instanceID só pode estar em UM quick slot por vez.
+        /// Se o mesmo instanceID já estiver em outro quick slot, ele será movido (slot anterior fica vazio).
+        /// Esta é a sobrecarga que recebe instanceID diretamente (recomendada).
+        /// </summary>
+        /// <param name="instanceID">ID único da instância do item</param>
+        /// <param name="direction">Direção (0=Up, 1=Down, 2=Left, 3=Right)</param>
+        public void AssignQuickSlot(int instanceID, int direction)
+        {
+            if (direction < 0 || direction >= quickSlots.Length)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Direção de quick slot inválida: {direction}");
+                return;
+            }
+
+            if (instanceID <= 0)
+            {
+                UnityEngine.Debug.LogWarning("[InventoryManager] Tentativa de atribuir instanceID inválido ao quick slot.");
+                return;
+            }
+
+            // Busca o slot que contém este instanceID
+            ItemData item = null;
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i].instanceID == instanceID)
+                {
+                    item = slots[i].item;
+                    break;
+                }
+            }
+
+            if (item == null)
+            {
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Nenhum item com instanceID {instanceID} encontrado no inventário.");
+                return;
+            }
+
+            // Verifica se este instanceID já está em outro quick slot
+            // Se sim, remove do slot antigo (move para o novo)
+            for (int q = 0; q < quickSlots.Length; q++)
+            {
+                if (quickSlots[q] == instanceID && q != direction)
+                {
+                    UnityEngine.Debug.Log($"[InventoryManager] Item '{item.itemName}' (ID {instanceID}) movido do quick slot {q} para {direction}.");
+                    quickSlots[q] = 0;
+                    break;
+                }
+            }
+
+            // Atribui o instanceID ao quick slot de destino
+            quickSlots[direction] = instanceID;
+            OnQuickSlotsChanged?.Invoke();
+
+            UnityEngine.Debug.Log($"[InventoryManager] Item '{item.itemName}' (ID {instanceID}) atribuído ao quick slot {direction}.");
+        }
+
+        /// <summary>
+        /// Atribui um item por ItemData - encontra o PRIMEIRO instanceID disponível (não atribuído).
+        /// Sistema não empilhável: cada instanceID só pode estar em UM quick slot por vez.
+        /// NOTA: Use a sobrecarga AssignQuickSlot(int instanceID, int direction) se souber o instanceID específico.
+        /// Esta versão é útil apenas para atribuir qualquer item disponível do tipo.
         /// </summary>
         /// <param name="item">Item a ser atribuído</param>
         /// <param name="direction">Direção (0=Up, 1=Down, 2=Left, 3=Right)</param>
@@ -421,33 +575,44 @@ namespace TheSlimeKing.Inventory
                 return;
             }
 
-            // Verifica se o item existe no inventário
-            bool itemExists = false;
+            // Encontra o PRIMEIRO slot do inventário que contém este item e NÃO está atribuído a nenhum quick slot
+            int targetInstanceID = 0;
             for (int i = 0; i < slots.Length; i++)
             {
-                if (slots[i].item == item)
+                if (slots[i].item == item && slots[i].instanceID > 0)
                 {
-                    itemExists = true;
-                    break;
+                    // Verifica se este instanceID já está atribuído a algum quick slot
+                    bool isAlreadyAssigned = false;
+                    for (int q = 0; q < quickSlots.Length; q++)
+                    {
+                        if (quickSlots[q] == slots[i].instanceID)
+                        {
+                            isAlreadyAssigned = true;
+                            break;
+                        }
+                    }
+
+                    if (!isAlreadyAssigned)
+                    {
+                        targetInstanceID = slots[i].instanceID;
+                        break;
+                    }
                 }
             }
 
-            if (!itemExists)
+            if (targetInstanceID == 0)
             {
-                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não está no inventário.");
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não encontrado no inventário ou todos já estão atribuídos a quick slots.");
                 return;
             }
 
-            // Atribui o item ao quick slot
-            quickSlots[direction] = item;
-            OnQuickSlotsChanged?.Invoke();
-
-            UnityEngine.Debug.Log($"[InventoryManager] Item '{item.itemName}' atribuído ao quick slot {direction}.");
+            // Delega para a sobrecarga de instanceID
+            AssignQuickSlot(targetInstanceID, direction);
         }
 
         /// <summary>
         /// Usa o item atribuído a um direcional específico.
-        /// Reduz quantidade e remove do quick slot se chegar a zero.
+        /// Reduz quantidade e remove do quick slot se o item for consumido.
         /// </summary>
         /// <param name="direction">Direção (0=Up, 1=Down, 2=Left, 3=Right)</param>
         public void UseQuickSlot(int direction)
@@ -458,33 +623,34 @@ namespace TheSlimeKing.Inventory
                 return;
             }
 
-            ItemData item = quickSlots[direction];
+            int instanceID = quickSlots[direction];
 
-            if (item == null)
+            if (instanceID == 0)
             {
                 UnityEngine.Debug.Log($"[InventoryManager] Nenhum item atribuído ao quick slot {direction}.");
                 return;
             }
 
-            // Encontra o slot do item no inventário
+            // Busca o slot que contém o item com este instanceID
             int slotIndex = -1;
             for (int i = 0; i < slots.Length; i++)
             {
-                if (slots[i].item == item)
+                if (slots[i].instanceID == instanceID)
                 {
                     slotIndex = i;
                     break;
                 }
             }
 
-            if (slotIndex == -1)
+            if (slotIndex == -1 || slots[slotIndex].item == null)
             {
-                UnityEngine.Debug.LogWarning($"[InventoryManager] Item '{item.itemName}' não encontrado no inventário.");
-                // Remove do quick slot pois não existe mais no inventário
-                quickSlots[direction] = null;
+                UnityEngine.Debug.LogWarning($"[InventoryManager] Item com ID {instanceID} não encontrado, mas quick slot {direction} ainda referencia ele.");
+                quickSlots[direction] = 0;
                 OnQuickSlotsChanged?.Invoke();
                 return;
             }
+
+            ItemData item = slots[slotIndex].item;
 
             // Verifica se é um item consumível
             if (item.type != ItemType.Consumable)
@@ -496,10 +662,14 @@ namespace TheSlimeKing.Inventory
             // Aplica efeitos do consumível
             ApplyConsumableEffects(item);
 
-            // Remove o item do slot (não empilhável)
+            // Libera o ID único
+            ReleaseInstanceID(slots[slotIndex].instanceID);
+
+            // Remove o item do slot (sistema não empilhável)
             slots[slotIndex].item = null;
             slots[slotIndex].quantity = 0;
-            quickSlots[direction] = null;
+            slots[slotIndex].instanceID = 0;
+            quickSlots[direction] = 0;
             OnQuickSlotsChanged?.Invoke();
 
             OnInventoryChanged?.Invoke();
@@ -519,7 +689,23 @@ namespace TheSlimeKing.Inventory
                 return null;
             }
 
-            return quickSlots[direction];
+            int instanceID = quickSlots[direction];
+
+            if (instanceID == 0)
+            {
+                return null;
+            }
+
+            // Busca o slot que contém o item com este instanceID
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i].instanceID == instanceID)
+                {
+                    return slots[i].item;
+                }
+            }
+
+            return null;
         }
         #endregion
 
@@ -572,21 +758,25 @@ namespace TheSlimeKing.Inventory
                 return false;
             }
 
-            // Troca os conteúdos dos slots
+            // Troca os conteúdos dos slots (incluindo instanceID)
             InventorySlot temp = new InventorySlot
             {
                 item = slots[slotIndex1].item,
-                quantity = slots[slotIndex1].quantity
+                quantity = slots[slotIndex1].quantity,
+                instanceID = slots[slotIndex1].instanceID
             };
 
             slots[slotIndex1].item = slots[slotIndex2].item;
             slots[slotIndex1].quantity = slots[slotIndex2].quantity;
+            slots[slotIndex1].instanceID = slots[slotIndex2].instanceID;
 
             slots[slotIndex2].item = temp.item;
             slots[slotIndex2].quantity = temp.quantity;
+            slots[slotIndex2].instanceID = temp.instanceID;
 
             UnityEngine.Debug.Log($"[InventoryManager] ✓ Swap entre slots {slotIndex1} e {slotIndex2} concluído.");
             OnInventoryChanged?.Invoke();
+            OnQuickSlotsChanged?.Invoke(); // Quick slots podem referenciar os instanceIDs que mudaram de posição
 
             return true;
         }
@@ -613,7 +803,8 @@ namespace TheSlimeKing.Inventory
                     {
                         itemID = slots[i].item.name, // Nome do ScriptableObject
                         quantity = slots[i].quantity,
-                        slotIndex = i
+                        slotIndex = i,
+                        instanceID = slots[i].instanceID
                     };
                     itemList.Add(itemData);
                 }
@@ -627,10 +818,10 @@ namespace TheSlimeKing.Inventory
                 saveData.equipmentIDs[i] = equipment[i] != null ? equipment[i].name : string.Empty;
             }
 
-            // Salvar IDs dos quick slots
+            // Salvar índices dos quick slots
             for (int i = 0; i < quickSlots.Length; i++)
             {
-                saveData.quickSlotIDs[i] = quickSlots[i] != null ? quickSlots[i].name : string.Empty;
+                saveData.quickSlotIndices[i] = quickSlots[i];
             }
 
             UnityEngine.Debug.Log($"[InventoryManager] Inventário salvo com {saveData.items.Length} itens.");
@@ -653,7 +844,8 @@ namespace TheSlimeKing.Inventory
             // Limpar inventário atual
             InitializeSlots();
             equipment = new ItemData[3];
-            quickSlots = new ItemData[4];
+            quickSlots = new int[4] { 0, 0, 0, 0 };
+            usedInstanceIDs.Clear();
 
             // Carregar itens
             if (saveData.items != null)
@@ -676,9 +868,16 @@ namespace TheSlimeKing.Inventory
                         continue;
                     }
 
-                    // Recriar slot com item correto (sempre quantidade 1)
+                    // Recriar slot com item correto (sempre quantidade 1) e instanceID
                     slots[itemData.slotIndex].item = item;
                     slots[itemData.slotIndex].quantity = 1;
+                    slots[itemData.slotIndex].instanceID = itemData.instanceID;
+
+                    // Adiciona instanceID ao HashSet
+                    if (itemData.instanceID > 0)
+                    {
+                        usedInstanceIDs.Add(itemData.instanceID);
+                    }
                 }
             }
 
@@ -704,23 +903,11 @@ namespace TheSlimeKing.Inventory
             }
 
             // Restaurar quick slots
-            if (saveData.quickSlotIDs != null)
+            if (saveData.quickSlotIndices != null)
             {
-                for (int i = 0; i < saveData.quickSlotIDs.Length && i < quickSlots.Length; i++)
+                for (int i = 0; i < saveData.quickSlotIndices.Length && i < quickSlots.Length; i++)
                 {
-                    if (!string.IsNullOrEmpty(saveData.quickSlotIDs[i]))
-                    {
-                        ItemData item = Resources.Load<ItemData>($"Items/{saveData.quickSlotIDs[i]}");
-
-                        if (item != null)
-                        {
-                            quickSlots[i] = item;
-                        }
-                        else
-                        {
-                            UnityEngine.Debug.LogWarning($"[InventoryManager] Quick slot item '{saveData.quickSlotIDs[i]}' não encontrado em Resources/Items/");
-                        }
-                    }
+                    quickSlots[i] = saveData.quickSlotIndices[i];
                 }
             }
 

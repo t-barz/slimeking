@@ -386,7 +386,6 @@ public class PlayerController : MonoBehaviour
         // Eventos de ação - apenas performed pois são actions pontuais
         _inputActions.Gameplay.Attack.performed += OnAttackInput;
         _inputActions.Gameplay.Interact.performed += OnInteractInput;
-        _inputActions.Gameplay.SpecialAttack.performed += OnSpecialAttackInput;
 
         // Eventos de esconderijo - tanto performed quanto canceled para controle contínuo
         _inputActions.Gameplay.Crouch.performed += OnCrouchInput;
@@ -412,7 +411,6 @@ public class PlayerController : MonoBehaviour
         // Remove eventos de ação
         _inputActions.Gameplay.Attack.performed -= OnAttackInput;
         _inputActions.Gameplay.Interact.performed -= OnInteractInput;
-        _inputActions.Gameplay.SpecialAttack.performed -= OnSpecialAttackInput;
 
         // Remove eventos de esconderijo
         _inputActions.Gameplay.Crouch.performed -= OnCrouchInput;
@@ -2276,7 +2274,7 @@ public class PlayerController : MonoBehaviour
     public void SetCanMove(bool canMove)
     {
         _canMove = canMove;
-        
+
         // Se desabilitou movimento, para o player imediatamente
         if (!canMove && _rigidbody != null)
         {

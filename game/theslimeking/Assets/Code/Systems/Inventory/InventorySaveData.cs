@@ -21,10 +21,11 @@ namespace TheSlimeKing.Inventory
         public string[] equipmentIDs = new string[3];
 
         /// <summary>
-        /// IDs dos itens atribuídos aos 4 quick slots (Up, Down, Left, Right).
-        /// Null ou string vazia indica slot vazio.
+        /// Índices dos slots do inventário atribuídos aos 4 quick slots (Up, Down, Left, Right).
+        /// -1 indica slot vazio.
+        /// Mudança: agora armazena índice do slot ao invés de ItemData ID para suportar múltiplos itens do mesmo tipo.
         /// </summary>
-        public string[] quickSlotIDs = new string[4];
+        public int[] quickSlotIndices = new int[4] { -1, -1, -1, -1 };
     }
 
     /// <summary>
@@ -47,5 +48,11 @@ namespace TheSlimeKing.Inventory
         /// Índice do slot no inventário (0-19).
         /// </summary>
         public int slotIndex;
+
+        /// <summary>
+        /// ID único da instância (6 dígitos: 100000-999999).
+        /// Cada item tem um instanceID único, mesmo se forem do mesmo tipo.
+        /// </summary>
+        public int instanceID;
     }
 }
