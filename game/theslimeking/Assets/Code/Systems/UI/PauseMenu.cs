@@ -22,13 +22,11 @@ namespace SlimeKing.UI
         [SerializeField] private Button inventoryButton;
         [SerializeField] private Button saveButton;
         [SerializeField] private Button loadButton;
-        [SerializeField] private Button resumeButton;
         [SerializeField] private Button quitButton;
 
         [Header("Selection Indicator")]
-        [SerializeField] private GameObject selectionArrowPrefab;
-        [SerializeField] private Transform arrowParent;
-        [SerializeField] private float arrowOffsetX = -50f;
+        [SerializeField] private Color selectedButtonColor = Color.yellow;
+        [SerializeField] private Color deselectedButtonColor = Color.white;
 
         [Header("Fade Settings")]
         [SerializeField] private float fadeDuration = 0.3f;
@@ -42,15 +40,13 @@ namespace SlimeKing.UI
 
         private Coroutine fadeCoroutine;
         private bool isVisible = false;
-        private bool allowArrowUpdate = false;
-        private GameObject selectionArrowInstance;
+        private Button previouslySelectedButton;
 
         #endregion
 
         #region Properties
 
         public bool IsVisible => isVisible;
-        private GameObject selectionArrow => selectionArrowInstance;
 
         #endregion
 
@@ -85,15 +81,13 @@ namespace SlimeKing.UI
                 loadButton.onClick.AddListener(OnLoadButtonClicked);
             }
 
-            if (resumeButton != null)
-            {
-                resumeButton.onClick.AddListener(OnResumeButtonClicked);
-            }
-
             if (quitButton != null)
             {
                 quitButton.onClick.AddListener(OnQuitButtonClicked);
             }
+
+            // Configura navegação vertical dos botões
+            ConfigureButtonNavigation();
 
             // Estado inicial: oculto
             if (pauseMenuPanel != null)
@@ -101,17 +95,10 @@ namespace SlimeKing.UI
                 pauseMenuPanel.SetActive(false);
             }
 
-            // Valida parent da seta
-            if (arrowParent == null)
-            {
-                arrowParent = pauseMenuPanel != null ? pauseMenuPanel.transform : transform;
-            }
-
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
-            allowArrowUpdate = false;
-            selectionArrowInstance = null;
+            previouslySelectedButton = null;
         }
 
         private void OnEnable()
@@ -144,11 +131,6 @@ namespace SlimeKing.UI
                 loadButton.onClick.RemoveListener(OnLoadButtonClicked);
             }
 
-            if (resumeButton != null)
-            {
-                resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
-            }
-
             if (quitButton != null)
             {
                 quitButton.onClick.RemoveListener(OnQuitButtonClicked);
@@ -168,7 +150,6 @@ namespace SlimeKing.UI
 
             Log("Showing pause menu");
             isVisible = true;
-            allowArrowUpdate = false; // Desabilita atualização da seta durante o fade
 
             if (pauseMenuPanel != null)
             {
@@ -193,7 +174,6 @@ namespace SlimeKing.UI
 
             Log("Hiding pause menu");
             isVisible = false;
-            allowArrowUpdate = false; // Desabilita atualização da seta durante o fade
 
             // Para fade anterior se existir
             if (fadeCoroutine != null)
@@ -238,16 +218,6 @@ namespace SlimeKing.UI
             yield return null;
             yield return null;
 
-            // Instancia a seta APÓS o menu estar completamente visível
-            if (selectionArrowPrefab != null && selectionArrowInstance == null)
-            {
-                selectionArrowInstance = Instantiate(selectionArrowPrefab, arrowParent);
-                Log("Selection arrow instantiated");
-            }
-
-            // Habilita atualização da seta - ela aparecerá já na posição correta
-            allowArrowUpdate = true;
-
             fadeCoroutine = null;
             Log("Fade in completed");
         }
@@ -261,14 +231,6 @@ namespace SlimeKing.UI
             float elapsed = 0f;
 
             canvasGroup.interactable = false;
-
-            // Destrói a seta imediatamente
-            if (selectionArrowInstance != null)
-            {
-                Destroy(selectionArrowInstance);
-                selectionArrowInstance = null;
-                Log("Selection arrow destroyed");
-            }
 
             while (elapsed < fadeDuration)
             {
@@ -295,14 +257,53 @@ namespace SlimeKing.UI
         #region UI Navigation
 
         /// <summary>
-        /// Seleciona o primeiro botão disponível para navegação.
+        /// Configura a navegação explícita entre os botões do menu.
+        /// </summary>
+        private void ConfigureButtonNavigation()
+        {
+            // Ordem vertical: Inventory -> Save -> Load -> Quit
+            if (inventoryButton != null && saveButton != null && loadButton != null && quitButton != null)
+            {
+                // Inventory: cima = Quit, baixo = Save
+                SetButtonNavigation(inventoryButton, quitButton, saveButton);
+
+                // Save: cima = Inventory, baixo = Load
+                SetButtonNavigation(saveButton, inventoryButton, loadButton);
+
+                // Load: cima = Save, baixo = Quit
+                SetButtonNavigation(loadButton, saveButton, quitButton);
+
+                // Quit: cima = Load, baixo = Inventory
+                SetButtonNavigation(quitButton, loadButton, inventoryButton);
+
+                Log("Button navigation configured");
+            }
+        }
+
+        /// <summary>
+        /// Define a navegação de um botão específico.
+        /// </summary>
+        private void SetButtonNavigation(Button button, Button upButton, Button downButton)
+        {
+            if (button == null) return;
+
+            Navigation nav = button.navigation;
+            nav.mode = Navigation.Mode.Explicit;
+            nav.selectOnUp = upButton;
+            nav.selectOnDown = downButton;
+            button.navigation = nav;
+        }
+
+        /// <summary>
+        /// Seleciona o botão Inventory como padrão para navegação.
         /// Facilita controle com gamepad/teclado.
         /// </summary>
         private void SelectFirstButton()
         {
-            // Tenta selecionar botões na ordem de prioridade
+            // Seleciona Inventory como padrão, depois tenta os outros
             Button firstButton = inventoryButton != null && inventoryButton.interactable ? inventoryButton :
-                                resumeButton != null && resumeButton.interactable ? resumeButton :
+                                saveButton != null && saveButton.interactable ? saveButton :
+                                loadButton != null && loadButton.interactable ? loadButton :
                                 quitButton != null && quitButton.interactable ? quitButton : null;
 
             if (firstButton != null && EventSystem.current != null)
@@ -313,7 +314,7 @@ namespace SlimeKing.UI
         }
 
         /// <summary>
-        /// Corrotina que atualiza a posição da seta indicadora.
+        /// Corrotina que atualiza a cor dos botões indicando seleção.
         /// Roda continuamente enquanto o menu está ativo.
         /// </summary>
         private IEnumerator UpdateSelectionIndicator()
@@ -323,16 +324,15 @@ namespace SlimeKing.UI
                 // Usa unscaledDeltaTime para funcionar durante pause
                 yield return new WaitForSecondsRealtime(0.05f);
 
-                // Só atualiza a seta se o fade estiver completo
-                if (!allowArrowUpdate || selectionArrow == null || pauseMenuPanel == null || !pauseMenuPanel.activeSelf)
+                // Se o menu não está visível, aguarda
+                if (pauseMenuPanel == null || !pauseMenuPanel.activeSelf)
                 {
-                    // Não desativa a seta aqui se allowArrowUpdate for false
-                    // Isso evita que ela pisque durante transições
                     continue;
                 }
 
                 // Pega o objeto selecionado pelo EventSystem
                 GameObject selectedObj = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+                Button currentlySelectedButton = null;
 
                 if (selectedObj != null)
                 {
@@ -340,22 +340,12 @@ namespace SlimeKing.UI
                     Button selectedButton = selectedObj.GetComponent<Button>();
                     if (selectedButton != null && IsMenuButton(selectedButton) && selectedButton.gameObject.activeInHierarchy)
                     {
-                        // Mostra e posiciona a seta
-                        if (!selectionArrow.activeSelf)
-                        {
-                            selectionArrow.SetActive(true);
-                        }
-                        PositionArrowAtButton(selectedButton);
-                    }
-                    else
-                    {
-                        selectionArrow.SetActive(false);
+                        currentlySelectedButton = selectedButton;
                     }
                 }
-                else
-                {
-                    selectionArrow.SetActive(false);
-                }
+
+                // Atualiza cores dos botões
+                UpdateButtonColors(currentlySelectedButton);
             }
         }
 
@@ -365,29 +355,35 @@ namespace SlimeKing.UI
         private bool IsMenuButton(Button button)
         {
             return button == inventoryButton || button == saveButton ||
-                   button == loadButton || button == resumeButton || button == quitButton;
+                   button == loadButton || button == quitButton;
         }
 
         /// <summary>
-        /// Posiciona a seta ao lado esquerdo do botão selecionado.
+        /// Atualiza as cores dos botões para indicar seleção.
         /// </summary>
-        private void PositionArrowAtButton(Button button)
+        private void UpdateButtonColors(Button currentlySelectedButton)
         {
-            if (selectionArrow == null || button == null) return;
+            // Atualiza cor de todos os botões
+            UpdateButtonColor(inventoryButton, currentlySelectedButton);
+            UpdateButtonColor(saveButton, currentlySelectedButton);
+            UpdateButtonColor(loadButton, currentlySelectedButton);
+            UpdateButtonColor(quitButton, currentlySelectedButton);
 
-            RectTransform arrowRect = selectionArrow.GetComponent<RectTransform>();
-            RectTransform buttonRect = button.GetComponent<RectTransform>();
+            previouslySelectedButton = currentlySelectedButton;
+        }
 
-            if (arrowRect != null && buttonRect != null)
-            {
-                // Copia a posição Y do botão, mantém offset X
-                Vector2 newPos = new Vector2(
-                    buttonRect.anchoredPosition.x + arrowOffsetX,
-                    buttonRect.anchoredPosition.y
-                );
+        /// <summary>
+        /// Atualiza a cor de um botão específico.
+        /// </summary>
+        private void UpdateButtonColor(Button button, Button selectedButton)
+        {
+            if (button == null) return;
 
-                arrowRect.anchoredPosition = newPos;
-            }
+            Image buttonImage = button.GetComponent<Image>();
+            if (buttonImage == null) return;
+
+            // Define a cor baseado se é o botão selecionado
+            buttonImage.color = button == selectedButton ? selectedButtonColor : deselectedButtonColor;
         }
 
         #endregion
@@ -401,7 +397,7 @@ namespace SlimeKing.UI
         private void OnInventoryButtonClicked()
         {
             Log("Inventory button clicked");
-            
+
             if (PauseManager.HasInstance)
             {
                 PauseManager.Instance.OnInventoryButtonPressed();
@@ -424,20 +420,6 @@ namespace SlimeKing.UI
         private void OnLoadButtonClicked()
         {
             UnityEngine.Debug.Log("[PauseMenu] Load game - Not implemented yet");
-        }
-
-        /// <summary>
-        /// Handler do botão Resume.
-        /// Notifica o PauseManager.
-        /// </summary>
-        private void OnResumeButtonClicked()
-        {
-            Log("Resume button clicked");
-
-            if (PauseManager.HasInstance)
-            {
-                PauseManager.Instance.OnResumeButtonPressed();
-            }
         }
 
         /// <summary>
