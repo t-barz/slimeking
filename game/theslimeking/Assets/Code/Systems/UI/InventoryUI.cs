@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using System.Collections;
 using TMPro;
 using TheSlimeKing.Inventory;
@@ -815,13 +817,49 @@ namespace SlimeKing.UI
             // Atualiza título
             if (detailsTitleText != null)
             {
-                detailsTitleText.text = item.itemName;
+                // Usa localização se disponível
+                if (!string.IsNullOrEmpty(item.localizationKey))
+                {
+                    var localizedString = new LocalizedString("Items", item.localizationKey);
+                    var operation = localizedString.GetLocalizedStringAsync();
+                    operation.Completed += (op) =>
+                    {
+                        if (detailsTitleText != null)
+                        {
+                            detailsTitleText.text = op.Result;
+                        }
+                    };
+                }
+                else
+                {
+                    detailsTitleText.text = item.itemName;
+                }
             }
 
             // Atualiza descrição
             if (detailsDescriptionText != null)
             {
-                if (!string.IsNullOrEmpty(item.description))
+                // Usa localização se disponível (chave + "D")
+                if (!string.IsNullOrEmpty(item.localizationKey))
+                {
+                    var localizedString = new LocalizedString("Items", item.localizationKey + "D");
+                    var operation = localizedString.GetLocalizedStringAsync();
+                    operation.Completed += (op) =>
+                    {
+                        if (detailsDescriptionText != null)
+                        {
+                            if (!string.IsNullOrEmpty(op.Result))
+                            {
+                                detailsDescriptionText.text = op.Result;
+                            }
+                            else
+                            {
+                                detailsDescriptionText.text = "<i>Sem descrição disponível</i>";
+                            }
+                        }
+                    };
+                }
+                else if (!string.IsNullOrEmpty(item.description))
                 {
                     detailsDescriptionText.text = item.description;
                 }

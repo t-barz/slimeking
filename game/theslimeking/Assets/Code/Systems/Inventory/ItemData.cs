@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 namespace TheSlimeKing.Inventory
 {
@@ -11,6 +12,10 @@ namespace TheSlimeKing.Inventory
         public string description;
         public Sprite icon;
         public ItemType type;
+
+        [Header("Localization")]
+        [Tooltip("Chave da tabela Items para o nome localizado")]
+        public string localizationKey;
 
         [Header("Consumable Properties")]
         public int healAmount;
