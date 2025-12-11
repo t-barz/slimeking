@@ -9,6 +9,14 @@ namespace SlimeKing.UI
     /// <summary>
     /// Gerencia o menu de pausa do jogo.
     /// Controlado pelo PauseManager.
+    /// 
+    /// LOCALIZAÇÃO:
+    /// Os textos dos botões devem usar LocalizeStringEvent nos componentes Text/TextMeshProUGUI do Inspector.
+    /// Chaves esperadas na tabela UIMenus:
+    /// - "pause_inventory" para botão Inventory
+    /// - "pause_save" para botão Save
+    /// - "pause_load" para botão Load
+    /// - "pause_quit" para botão Quit
     /// </summary>
     public class PauseMenu : MonoBehaviour
     {
@@ -27,6 +35,7 @@ namespace SlimeKing.UI
         [Header("Selection Indicator")]
         [SerializeField] private Color selectedButtonColor = Color.yellow;
         [SerializeField] private Color deselectedButtonColor = Color.white;
+        [SerializeField] private float selectedColorAlpha = 0.3f; // Opacidade da cor de seleção (0-1)
 
         [Header("Fade Settings")]
         [SerializeField] private float fadeDuration = 0.3f;
@@ -383,7 +392,16 @@ namespace SlimeKing.UI
             if (buttonImage == null) return;
 
             // Define a cor baseado se é o botão selecionado
-            buttonImage.color = button == selectedButton ? selectedButtonColor : deselectedButtonColor;
+            if (button == selectedButton)
+            {
+                Color selected = selectedButtonColor;
+                selected.a = selectedColorAlpha;
+                buttonImage.color = selected;
+            }
+            else
+            {
+                buttonImage.color = deselectedButtonColor;
+            }
         }
 
         #endregion

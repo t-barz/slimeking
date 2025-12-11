@@ -10,20 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
-  m_Name: Localization_ja-JP
+  m_Name: UIMenus_ko-KR
   m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
   m_LocaleId:
-    m_Code: ja-JP
+    m_Code: ko-KR
   m_SharedData: {fileID: 11400000, guid: e548f6694e12ba34ba4fa3ea536f12e3, type: 2}
   m_Metadata:
     m_Items: []
   m_TableData:
   - m_Id: 148372949417984
-    m_Localized: "\u30B2\u30FC\u30E0\u958B\u59CB"
+    m_Localized: "\uAC8C\uC784 \uC2DC\uC791"
     m_Metadata:
       m_Items: []
   - m_Id: 1263555319021568
-    m_Localized: MENU2
+    m_Localized: "\uC778\uBCA4\uD1A0\uB9AC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661762728247296
+    m_Localized: "\uC800\uC7A5"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661826565554176
+    m_Localized: "\uBD88\uB7EC\uC624\uAE30"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661853123887104
+    m_Localized: "\uC885\uB8CC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4664380468871168
+    m_Localized: "\uC124\uC815"
     m_Metadata:
       m_Items: []
   references:

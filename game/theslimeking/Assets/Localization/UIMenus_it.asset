@@ -10,20 +10,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
-  m_Name: Localization_nl-NL
+  m_Name: UIMenus_it
   m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
   m_LocaleId:
-    m_Code: nl-NL
+    m_Code: it
   m_SharedData: {fileID: 11400000, guid: e548f6694e12ba34ba4fa3ea536f12e3, type: 2}
   m_Metadata:
     m_Items: []
   m_TableData:
   - m_Id: 148372949417984
-    m_Localized: Spiel starten
+    m_Localized: Avvia gioco
     m_Metadata:
       m_Items: []
   - m_Id: 1263555319021568
-    m_Localized: MENU2
+    m_Localized: Inventario
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661762728247296
+    m_Localized: Salva
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661826565554176
+    m_Localized: Carica
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4661853123887104
+    m_Localized: Esci
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4664380468871168
+    m_Localized: Impostazioni
     m_Metadata:
       m_Items: []
   references:

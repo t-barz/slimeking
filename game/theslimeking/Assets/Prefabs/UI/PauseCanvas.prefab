@@ -500,6 +500,7 @@ GameObject:
   - component: {fileID: 3223756468459492507}
   - component: {fileID: 3232489138338912712}
   - component: {fileID: 7686983788711016261}
+  - component: {fileID: 3976153334586341288}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -626,6 +627,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &3976153334586341288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3747579805115432587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Components.LocalizeStringEvent
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:e548f6694e12ba34ba4fa3ea536f12e3
+    m_TableEntryReference:
+      m_KeyId: 4661853123887104
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &4297763206646615669
 GameObject:
   m_ObjectHideFlags: 0
@@ -637,6 +666,7 @@ GameObject:
   - component: {fileID: 3947265416963920393}
   - component: {fileID: 3039285496204942552}
   - component: {fileID: 6773500644729376481}
+  - component: {fileID: 7329755275357620357}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -763,6 +793,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7329755275357620357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297763206646615669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Components.LocalizeStringEvent
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:e548f6694e12ba34ba4fa3ea536f12e3
+    m_TableEntryReference:
+      m_KeyId: 4661826565554176
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &4588756044713297568
 GameObject:
   m_ObjectHideFlags: 0
@@ -1053,6 +1111,7 @@ GameObject:
   - component: {fileID: 3756681754528188069}
   - component: {fileID: 7204073390446327555}
   - component: {fileID: 5346216768773052702}
+  - component: {fileID: 6210151271151119067}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1179,6 +1238,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6210151271151119067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4911703271297726544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Components.LocalizeStringEvent
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:e548f6694e12ba34ba4fa3ea536f12e3
+    m_TableEntryReference:
+      m_KeyId: 4661762728247296
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &5035887046850469797
 GameObject:
   m_ObjectHideFlags: 0
@@ -1312,10 +1399,9 @@ MonoBehaviour:
   inventoryButton: {fileID: 4859003593432043829}
   saveButton: {fileID: 3765838384615134283}
   loadButton: {fileID: 1914052929372897466}
-  resumeButton: {fileID: 7788193954025865005}
   quitButton: {fileID: 1018140954822860873}
-  selectionArrow: {fileID: 325266436767493336}
-  arrowOffsetX: -50
+  selectedButtonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  deselectedButtonColor: {r: 1, g: 1, b: 1, a: 1}
   fadeDuration: 0.3
   enableLogs: 0
 --- !u!1 &5497849186546677813
@@ -1329,6 +1415,7 @@ GameObject:
   - component: {fileID: 7394957575658200036}
   - component: {fileID: 907263111034664457}
   - component: {fileID: 8942822979265380738}
+  - component: {fileID: 8045002503063987922}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -1455,6 +1542,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8045002503063987922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5497849186546677813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Components.LocalizeStringEvent
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:e548f6694e12ba34ba4fa3ea536f12e3
+    m_TableEntryReference:
+      m_KeyId: 1263555319021568
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &5848233586011169279
 GameObject:
   m_ObjectHideFlags: 0
