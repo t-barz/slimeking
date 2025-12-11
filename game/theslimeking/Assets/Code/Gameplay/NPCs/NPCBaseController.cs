@@ -163,6 +163,13 @@ namespace TheSlimeKing.NPCs
         {
             if (attributesHandler.IsDead) return;
 
+            // Para movimento se o jogo está pausado
+            if (SlimeKing.Core.PauseManager.HasInstance && SlimeKing.Core.PauseManager.Instance.IsPaused)
+            {
+                rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
             PerformMovement();
         }
         #endregion

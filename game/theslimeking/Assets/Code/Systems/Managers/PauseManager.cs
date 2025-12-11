@@ -521,18 +521,26 @@ namespace SlimeKing.Core
         private void PauseGame()
         {
             Log("Pausing game");
+            UnityEngine.Debug.LogError($"[PauseManager] PAUSING: Setting Time.timeScale to 0. Currently: {Time.timeScale}");
 
             // Pausa o tempo do jogo
             Time.timeScale = 0f;
+            UnityEngine.Debug.LogError($"[PauseManager] PAUSED: Time.timeScale is now {Time.timeScale}");
 
             // Inicia fade de áudio para volume reduzido
             StartAudioFade(pausedAudioVolume);
 
-            // Switch action maps: disable Gameplay, UI já está enabled
+            // Switch action maps: disable Gameplay, enable Menus
             if (inputActions != null)
             {
+                UnityEngine.Debug.LogError($"[PauseManager] Disabling Gameplay, Enabling Menus");
                 inputActions.Gameplay.Disable();
-                Log("Gameplay input disabled");
+                inputActions.Menus.Enable();
+                Log("Gameplay input disabled, Menus input enabled");
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("[PauseManager] inputActions is NULL!");
             }
 
             // Dispara eventos
@@ -555,11 +563,12 @@ namespace SlimeKing.Core
             // Inicia fade de áudio para volume normal
             StartAudioFade(resumedAudioVolume);
 
-            // Switch action maps: enable Gameplay, mantém UI enabled
+            // Switch action maps: enable Gameplay, disable Menus
             if (inputActions != null)
             {
                 inputActions.Gameplay.Enable();
-                Log("Gameplay input enabled");
+                inputActions.Menus.Disable();
+                Log("Gameplay input enabled, Menus input disabled");
             }
 
             // Dispara eventos

@@ -1099,6 +1099,22 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
+        // Para movimento se o jogo está pausado
+        if (SlimeKing.Core.PauseManager.HasInstance && SlimeKing.Core.PauseManager.Instance.IsPaused)
+        {
+            if (_rigidbody.linearVelocity.magnitude > 0.1f)
+            {
+                UnityEngine.Debug.LogError($"[PlayerController] PAUSED DETECTED in HandleMovement! Zeroing velocity. IsPaused={SlimeKing.Core.PauseManager.Instance.IsPaused}");
+            }
+            _rigidbody.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        if (!SlimeKing.Core.PauseManager.HasInstance)
+        {
+            UnityEngine.Debug.LogWarning("[PlayerController] PauseManager.HasInstance is FALSE!");
+        }
+
         // Early exit se movimento estiver desabilitado (ex: cutscenes, morte, movimento especial, etc.)
         if (!_canMove) return;
 

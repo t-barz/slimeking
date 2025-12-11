@@ -545,18 +545,16 @@ public class TitleScreenController : MonoBehaviour
             StartCoroutine(InputUIEffect());
         }
 
-        // Se a cena foi pré-carregada, usa ativação coordenada
+        // Se a cena foi pré-carregada, ativa após transição
         if (GameManager.Instance != null && GameManager.Instance.HasPreloadedScene(gameSceneName))
         {
             TransitionEffect effectToUse = useCustomTransitionEffect ? customTransitionEffect : null;
             if (SceneTransitioner.Instance != null)
             {
-                // Usa nova API que realiza fade out, ativa cena pré-carregada e fade in
-                SceneTransitioner.Instance.ActivatePreloadedWithTransition(
-                    gameSceneName,
-                    () => GameManager.Instance.ActivatePreloadedScene(() => { StartCoroutine(UnloadTitleSceneAfterActivation()); }),
-                    effectToUse
-                );
+                // Usa SceneTransitioner que ativa a cena pré-carregada automaticamente
+                SceneTransitioner.Instance.LoadScene(gameSceneName, effectToUse);
+                // Ativa a cena pré-carregada após a transição
+                StartCoroutine(ActivatePreloadedAfterTransition());
             }
             else
             {
@@ -712,6 +710,28 @@ public class TitleScreenController : MonoBehaviour
     #endregion
 
     #region Utility Methods
+
+    /// <summary>
+    /// Aguarda a transição do SceneTransitioner e depois ativa a cena pré-carregada
+    /// </summary>
+    private IEnumerator ActivatePreloadedAfterTransition()
+    {
+        // Aguarda um frame para a transição iniciar
+        yield return null;
+
+        // Aguarda a transição completar
+        // SceneTransitioner dispara OnSceneLoaded quando termina
+        while (SceneTransitioner.Instance != null && SceneManager.GetActiveScene().name == "TitleScreen")
+        {
+            yield return null;
+        }
+
+        // Ativa a cena pré-carregada se ainda houver
+        if (GameManager.Instance != null && GameManager.Instance.HasPreloadedScene(gameSceneName))
+        {
+            GameManager.Instance.ActivatePreloadedScene(() => { StartCoroutine(UnloadTitleSceneAfterActivation()); });
+        }
+    }
 
     /// <summary>
     /// Executa efeito de transição (se disponível) e ativa a cena pré-carregada.

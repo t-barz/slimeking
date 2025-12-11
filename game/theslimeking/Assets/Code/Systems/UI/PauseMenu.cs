@@ -50,6 +50,7 @@ namespace SlimeKing.UI
         private Coroutine fadeCoroutine;
         private bool isVisible = false;
         private Button previouslySelectedButton;
+        private float timeWhenShown = -999f; // Timestamp de quando o menu foi aberto
 
         #endregion
 
@@ -159,6 +160,7 @@ namespace SlimeKing.UI
 
             Log("Showing pause menu");
             isVisible = true;
+            timeWhenShown = Time.realtimeSinceStartup; // Registra o tempo em que foi aberto
 
             if (pauseMenuPanel != null)
             {
@@ -176,10 +178,20 @@ namespace SlimeKing.UI
 
         /// <summary>
         /// Oculta o menu de pausa com fade out.
+        /// Retorna false se o menu foi aberto muito recentemente (proteção contra fechamento duplo).
         /// </summary>
-        public void Hide()
+        public bool Hide()
         {
-            if (!isVisible) return;
+            if (!isVisible) return false;
+
+            // Proteção: não fechar se foi aberto há menos de 0.2 segundos
+            // Isso previne que o input de pause feche o menu imediatamente após abrir
+            float timeSinceShown = Time.realtimeSinceStartup - timeWhenShown;
+            if (timeSinceShown < 0.2f)
+            {
+                Log($"Hide() called too soon after Show() ({timeSinceShown:F3}s). Ignoring to prevent accidental close.");
+                return false;
+            }
 
             Log("Hiding pause menu");
             isVisible = false;
@@ -191,6 +203,7 @@ namespace SlimeKing.UI
             }
 
             fadeCoroutine = StartCoroutine(FadeOut());
+            return true;
         }
 
         #endregion
