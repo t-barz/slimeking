@@ -34,7 +34,12 @@
         "@modelcontextprotocol/server-filesystem",
         "G:\\GameDev\\slimeking\\game\\theslimeking"
       ],
-      "disabled": false
+      "disabled": false,
+      "autoApprove": [
+        "create_directory",
+        "read_text_file",
+        "write_file"
+      ]
     },
     "git": {
       "command": "npx",

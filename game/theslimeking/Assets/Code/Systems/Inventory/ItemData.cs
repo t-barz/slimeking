@@ -3,7 +3,7 @@ using UnityEngine.Localization;
 
 namespace TheSlimeKing.Inventory
 {
-    [CreateAssetMenu(fileName = "NewItem", menuName = "Extra Tools/Items/Item")]
+    [CreateAssetMenu(fileName = "NewItem", menuName = "Items/Item")]
     public class ItemData : ScriptableObject
     {
         [Header("Basic Info")]

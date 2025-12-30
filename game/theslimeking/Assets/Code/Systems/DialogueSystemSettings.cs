@@ -6,7 +6,7 @@ namespace SlimeMec.Systems
     /// ScriptableObject que contém configurações globais do sistema de diálogos.
     /// Permite configurar caminhos, valores padrão, prefabs e input.
     /// </summary>
-    [CreateAssetMenu(fileName = "DialogueSystemSettings", menuName = "Extra Tools/Dialogue System Settings")]
+    [CreateAssetMenu(fileName = "DialogueSystemSettings", menuName = "Settings/Dialogue System Settings")]
     public class DialogueSystemSettings : ScriptableObject
     {
         #region Paths
@@ -160,7 +160,7 @@ namespace SlimeMec.Systems
         /// <summary>
         /// Cria uma instância padrão do DialogueSystemSettings.
         /// </summary>
-        [UnityEditor.MenuItem("Assets/Create/Extra Tools/Dialogue System Settings (Default)", priority = 1)]
+        [UnityEditor.MenuItem("Assets/Create/Settings/Dialogue System Settings (Default)", priority = 1)]
         private static void CreateDefaultSettings()
         {
             // Verifica se já existe um asset em Data/Settings
