@@ -8,6 +8,7 @@ namespace PixeLadder.EasyTransition
     /// <summary>
     /// A singleton manager that controls the entire scene transition process.
     /// </summary>
+    [DisallowMultipleComponent]
     public class SceneTransitioner : MonoBehaviour
     {
         public static SceneTransitioner Instance;
@@ -15,11 +16,17 @@ namespace PixeLadder.EasyTransition
         [Header("Configuration")]
         [Tooltip("The screen-covering Image prefab used for transitions.")]
         [SerializeField] private Image transitionImagePrefab;
+
         [Tooltip("The default transition effect to use if none is provided in the LoadScene call.")]
         [SerializeField] private TransitionEffect defaultTransition;
 
         // --- Private State ---
         private Image transitionImageInstance;
+        private bool isTransitioning = false;
+
+        // Cache shader property ID for performance
+        private static readonly int RectSizeID = Shader.PropertyToID("_RectSize");
+
         public static event System.Action OnSceneLoaded;
 
         private void Awake()
@@ -41,13 +48,23 @@ namespace PixeLadder.EasyTransition
             // Create a dedicated, persistent canvas for the transition UI.
             GameObject canvasGO = new GameObject("TransitionCanvas");
             canvasGO.transform.SetParent(this.transform);
+
             var transitionCanvas = canvasGO.AddComponent<Canvas>();
             transitionCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             transitionCanvas.sortingOrder = 999;
+
             canvasGO.AddComponent<CanvasScaler>();
             canvasGO.AddComponent<GraphicRaycaster>();
 
             transitionImageInstance = Instantiate(transitionImagePrefab, canvasGO.transform);
+
+            // Ensure the image stretches to fill the screen
+            RectTransform rectT = transitionImageInstance.rectTransform;
+            rectT.anchorMin = Vector2.zero;
+            rectT.anchorMax = Vector2.one;
+            rectT.sizeDelta = Vector2.zero;
+            rectT.anchoredPosition = Vector2.zero;
+
             transitionImageInstance.gameObject.SetActive(false);
         }
 
@@ -58,6 +75,12 @@ namespace PixeLadder.EasyTransition
         /// <param name="effect">The TransitionEffect ScriptableObject defining the visuals.</param>
         public void LoadScene(string sceneName, TransitionEffect effect = null)
         {
+            if (isTransitioning)
+            {
+                Debug.LogWarning("SceneTransitioner: Transition already in progress.");
+                return;
+            }
+
             var effectToUse = effect ?? defaultTransition;
             if (effectToUse == null)
             {
@@ -65,32 +88,43 @@ namespace PixeLadder.EasyTransition
                 return;
             }
 
-            StopAllCoroutines();
             StartCoroutine(TransitionRoutine(sceneName, effectToUse));
         }
 
         private IEnumerator TransitionRoutine(string sceneName, TransitionEffect effect)
         {
-            // Prepare the material and activate the image.
+            isTransitioning = true;
             transitionImageInstance.gameObject.SetActive(true);
+
+            // 1. Create a fresh instance of the material for this specific transition
             Material materialInstance = new Material(effect.transitionMaterial);
-            transitionImageInstance.material = materialInstance;
+
+            // 2. CRITICAL FIX: Pass the RectSize (Aspect Ratio) to the shader immediately
+            Rect rect = transitionImageInstance.rectTransform.rect;
+            materialInstance.SetVector(RectSizeID, new Vector4(rect.width, rect.height, 0, 0));
+
+            // 3. Apply custom effect properties
             effect.SetEffectProperties(materialInstance);
 
-            // Run the fade-out animation.
+            // 4. Assign the material to the image
+            transitionImageInstance.material = materialInstance;
+
+            // Run the fade-out animation
             yield return effect.AnimateOut(transitionImageInstance);
 
-            // Load the new scene.
+            // Load the new scene
             yield return SceneManager.LoadSceneAsync(sceneName);
 
-            // Fire the event to notify any listeners that the load is complete.
+            // Fire event
             OnSceneLoaded?.Invoke();
 
-            // Run the fade-in animation.
+            // Run the fade-in animation
             yield return effect.AnimateIn(transitionImageInstance);
 
-            // Deactivate the image.
+            // Cleanup
             transitionImageInstance.gameObject.SetActive(false);
+            Destroy(materialInstance); // Clean up the material instance to prevent leaks
+            isTransitioning = false;
         }
     }
 }

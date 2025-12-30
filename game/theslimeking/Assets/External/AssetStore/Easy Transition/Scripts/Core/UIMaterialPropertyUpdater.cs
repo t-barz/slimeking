@@ -5,7 +5,7 @@ namespace PixeLadder.EasyTransition
 
     /// <summary>
     /// A helper component that automatically passes a UI Image's RectTransform size to its material.
-    /// Essential for shaders that need to be aware of the UI element's dimensions.
+    /// Useful for standalone UI elements using custom shaders.
     /// </summary>
     [RequireComponent(typeof(Image))]
     [ExecuteAlways]
@@ -14,56 +14,69 @@ namespace PixeLadder.EasyTransition
         private Image image;
         private RectTransform rectTransform;
         private Material materialInstance;
-
-        // Cache the property ID for efficiency.
-        private static readonly int RectSizeProperty = Shader.PropertyToID("_RectSize");
+        private static readonly int RectSizeID = Shader.PropertyToID("_RectSize");
 
         private void OnEnable()
         {
             image = GetComponent<Image>();
             rectTransform = GetComponent<RectTransform>();
-
-            // Create a unique instance of the material to avoid modifying the shared asset.
-            materialInstance = new Material(image.material);
-            image.material = materialInstance;
-
-            UpdateMaterialProperties();
+            RefreshMaterial();
         }
 
         private void OnRectTransformDimensionsChange()
         {
-            UpdateMaterialProperties();
-        }
-
-        private void Update()
-        {
-            // Fallback for editor updates
-            if (Application.isEditor && !Application.isPlaying)
+            if (enabled && gameObject.activeInHierarchy)
             {
                 UpdateMaterialProperties();
             }
         }
 
+        private void Update()
+        {
+            if (Application.isEditor && !Application.isPlaying)
+            {
+                // Ensure material stays updated in Editor mode without needing a recompile
+                UpdateMaterialProperties();
+            }
+        }
+
+        /// <summary>
+        /// Creates a unique material instance if one doesn't exist and updates properties.
+        /// </summary>
+        public void RefreshMaterial()
+        {
+            if (image == null || image.material == null) return;
+
+            // Don't instantiate if we are already using a custom instance, 
+            // unless the base material changed.
+            if (materialInstance == null || image.material != materialInstance)
+            {
+                materialInstance = new Material(image.material);
+                materialInstance.name = $"{image.material.name} (Instance)";
+                image.material = materialInstance;
+            }
+
+            UpdateMaterialProperties();
+        }
+
         private void UpdateMaterialProperties()
         {
             if (materialInstance == null || rectTransform == null) return;
+
             Vector2 currentSize = rectTransform.rect.size;
-            materialInstance.SetVector(RectSizeProperty, new Vector4(currentSize.x, currentSize.y, 0, 0));
+            materialInstance.SetVector(RectSizeID, new Vector4(currentSize.x, currentSize.y, 0, 0));
         }
 
         private void OnDisable()
         {
-            // Clean up the created material instance to prevent memory leaks in the editor.
             if (materialInstance != null)
             {
                 if (Application.isEditor && !Application.isPlaying)
-                {
                     DestroyImmediate(materialInstance);
-                }
                 else
-                {
                     Destroy(materialInstance);
-                }
+
+                materialInstance = null;
             }
         }
     }
