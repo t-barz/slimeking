@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using SlimeKing.Core;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 using UnityEngine;
 using UnityEngine.Events;
 

@@ -1,5 +1,5 @@
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 using System;
 
 namespace TheSlimeKing.Inventory

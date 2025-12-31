@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 
 namespace SlimeKing.Core.UI
 {

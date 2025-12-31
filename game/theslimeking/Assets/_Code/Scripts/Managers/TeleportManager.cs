@@ -3,7 +3,7 @@ namespace PixeLadder.EasyTransition
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
     using UnityEngine.SceneManagement;
 
     /// <summary>

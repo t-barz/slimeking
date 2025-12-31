@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 using UnityEngine.InputSystem;
 using SlimeKing.UI;
 

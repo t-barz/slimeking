@@ -19,7 +19,7 @@ namespace TheSlimeKing.Inventory
             Debug.Log("═══════════════════════════════════════");
 
             // Encontra todos os ItemPickup na cena
-            var allItems = FindObjectsOfType<SlimeKing.External.SlimeMec.Gameplay.ItemPickup>();
+            var allItems = FindObjectsOfType<SlimeKing.Gameplay.ItemPickup>();
             
             int totalCollected = 0;
             int totalItems = allItems.Length;

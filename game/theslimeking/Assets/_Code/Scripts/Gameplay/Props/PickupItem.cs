@@ -1,7 +1,7 @@
 using UnityEngine;
 using SlimeKing.Core;
 using TheSlimeKing.Inventory;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 
 namespace SlimeKing.Gameplay
 {

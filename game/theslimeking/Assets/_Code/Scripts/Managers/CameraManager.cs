@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 using UnityEngine.Rendering.Universal;
 using Unity.Cinemachine;
 

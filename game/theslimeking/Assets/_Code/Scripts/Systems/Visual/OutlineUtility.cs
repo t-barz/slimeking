@@ -1,5 +1,5 @@
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Visual;
+using SlimeKing.Visual;
 
 namespace SlimeKing.Visual
 {

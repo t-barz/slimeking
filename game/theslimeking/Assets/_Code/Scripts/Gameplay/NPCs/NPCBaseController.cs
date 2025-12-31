@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Linq;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 
 namespace TheSlimeKing.NPCs
 {

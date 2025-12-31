@@ -2,7 +2,7 @@ namespace PixeLadder.EasyTransition
 {
     using System.Collections;
     using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 
     /// <summary>
     /// Componente que detecta colisão do Player e executa teletransporte com transição visual.

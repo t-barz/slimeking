@@ -1,5 +1,5 @@
 using UnityEngine;
-using SlimeKing.External.SlimeMec.Gameplay;
+using SlimeKing.Gameplay;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
