@@ -119,7 +119,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - **Property 16: Null Safety Analysis**
     - **Validates: Requirements 4.1**
 
-  - [ ]* 6.3 Write property test for bounds checking analysis
+  - [ ] 6.3 Write property test for bounds checking analysis
     - **Property 17: Bounds Checking Analysis**
     - **Validates: Requirements 4.2**
 
@@ -129,7 +129,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Check Unity-specific best practices
     - _Requirements: 4.4, 4.5_
 
-  - [ ]* 6.5 Write property test for Unity Undo system validation
+  - [ ] 6.5 Write property test for Unity Undo system validation
     - **Property 20: Unity Undo System Validation**
     - **Validates: Requirements 4.5**
 
@@ -140,15 +140,15 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Check for missing or incorrect using statements
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ]* 7.2 Write property test for manager namespace validation
+  - [ ] 7.2 Write property test for manager namespace validation
     - **Property 21: Manager Namespace Validation**
     - **Validates: Requirements 5.1**
 
-  - [ ]* 7.3 Write property test for gameplay namespace validation
+  - [ ] 7.3 Write property test for gameplay namespace validation
     - **Property 22: Gameplay Namespace Validation**
     - **Validates: Requirements 5.2**
 
-  - [ ]* 7.4 Write property test for UI namespace validation
+  - [ ] 7.4 Write property test for UI namespace validation
     - **Property 23: UI Namespace Validation**
     - **Validates: Requirements 5.3**
 
@@ -159,11 +159,11 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Validate editor tools directory structure
     - _Requirements: 6.1, 6.2, 6.4, 6.5_
 
-  - [ ]* 8.2 Write property test for MenuItem attribute validation
+  - [ ] 8.2 Write property test for MenuItem attribute validation
     - **Property 26: MenuItem Attribute Validation**
     - **Validates: Requirements 6.1**
 
-  - [ ]* 8.3 Write property test for menu category validation
+  - [ ] 8.3 Write property test for menu category validation
     - **Property 27: Menu Category Validation**
     - **Validates: Requirements 6.2**
 
@@ -173,7 +173,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Detect duplicate controllers for same scene
     - _Requirements: 7.1, 7.2, 7.4, 7.5_
 
-  - [ ]* 8.5 Write property test for scene controller naming
+  - [ ] 8.5 Write property test for scene controller naming
     - **Property 31: Scene Controller Naming Validation**
     - **Validates: Requirements 7.1**
 
@@ -193,7 +193,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Maintain reference consistency
     - _Requirements: 8.1_
 
-  - [ ]* 10.3 Write property test for automatic fix application
+  - [ ] 10.3 Write property test for automatic fix application
     - **Property 35: Automatic Fix Application**
     - **Validates: Requirements 8.1**
 
@@ -209,7 +209,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Maintain cross-file references
     - _Requirements: 8.4_
 
-  - [ ]* 10.6 Write property test for namespace refactoring
+  - [ ] 10.6 Write property test for namespace refactoring
     - **Property 38: Namespace Refactoring Completeness**
     - **Validates: Requirements 8.4**
 
@@ -220,7 +220,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Optimize loop performance anti-patterns
     - _Requirements: 8.2_
 
-  - [ ]* 11.2 Write property test for safe performance optimization
+  - [ ] 11.2 Write property test for safe performance optimization
     - **Property 36: Safe Performance Optimization Application**
     - **Validates: Requirements 8.2**
 
@@ -230,7 +230,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Remove empty directories
     - _Requirements: 8.3_
 
-  - [ ]* 11.4 Write property test for directory reorganization
+  - [ ] 11.4 Write property test for directory reorganization
     - **Property 37: Directory Reorganization with Reference Updates**
     - **Validates: Requirements 8.3**
 
@@ -241,7 +241,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Create before/after comparisons
     - _Requirements: 8.5_
 
-  - [ ]* 12.2 Write property test for report completeness
+  - [ ] 12.2 Write property test for report completeness
     - **Property 39: Refactoring Report Completeness**
     - **Validates: Requirements 8.5**
 
@@ -264,7 +264,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Support different project profiles
     - _Requirements: 2.1, 3.1, 4.1_
 
-  - [ ]* 13.3 Write integration tests for full workflow
+  - [ ] 13.3 Write integration tests for full workflow
     - Test end-to-end code review process
     - Validate orchestrator coordinates all components correctly
     - _Requirements: 8.1, 8.5_
@@ -295,7 +295,7 @@ This implementation plan creates a comprehensive code review and refactoring sys
     - Test error handling and edge cases
     - _Requirements: 8.1, 8.5_
 
-  - [ ]* 15.2 Write integration tests for Unity editor
+  - [ ] 15.2 Write integration tests for Unity editor
     - Test editor window functionality
     - Validate menu integration works correctly
     - _Requirements: 6.1, 8.1_
@@ -311,7 +311,6 @@ This implementation plan creates a comprehensive code review and refactoring sys
 
 ## Notes
 
-- Tasks marked with `*` are optional and can be skipped for faster MVP
 - Each task references specific requirements for traceability
 - Checkpoints ensure incremental validation
 - Property tests validate universal correctness properties
