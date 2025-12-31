@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Transição de Morte")]
     [Tooltip("Efeito CircleEffect para transição de morte (vinheta fechando)")]
-    [SerializeField] private PixeLadder.EasyTransition.CircleEffect deathTransitionEffect;
+    [SerializeField] private PixeLadder.EasyTransition.Effects.CircleEffect deathTransitionEffect;
 
     public static PlayerController Instance { get; private set; }
 

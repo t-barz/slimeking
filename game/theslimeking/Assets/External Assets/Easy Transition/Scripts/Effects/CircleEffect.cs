@@ -1,79 +1,50 @@
-using UnityEngine;
-
-namespace PixeLadder.EasyTransition
+namespace PixeLadder.EasyTransition.Effects
 {
-    /// <summary>
-    /// Efeito de transição circular.
-    /// Esta é uma implementação básica para resolver dependências de compilação.
-    /// </summary>
-    [CreateAssetMenu(fileName = "CircleEffect", menuName = "Easy Transition/Circle Effect")]
+    using System.Collections;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    [CreateAssetMenu(fileName = "NewCircleEffect", menuName = "Easy Transition/Circle Effect")]
     public class CircleEffect : TransitionEffect
     {
-        [Header("Circle Settings")]
-        [SerializeField] private Vector2 center = new Vector2(0.5f, 0.5f);
-        [SerializeField] private float maxRadius = 1.5f;
-        [SerializeField] private bool invertEffect = false;
-        
-        /// <summary>
-        /// Centro do efeito circular (0-1 em coordenadas de tela)
-        /// </summary>
-        public Vector2 Center => center;
-        
-        /// <summary>
-        /// Raio máximo do efeito
-        /// </summary>
-        public float MaxRadius => maxRadius;
-        
-        /// <summary>
-        /// Se true, inverte o efeito (fecha ao invés de abrir)
-        /// </summary>
-        public bool InvertEffect => invertEffect;
-        
-        /// <summary>
-        /// Aplica o efeito circular
-        /// </summary>
-        /// <param name="progress">Progresso da transição (0 a 1)</param>
-        public override void ApplyEffect(float progress)
+        public enum AnimationDirection { CenterToEdge, EdgeToCenter }
+
+        [Header("Timing")]
+        [SerializeField, Min(0.1f)] private float duration = 1.0f;
+        [Header("Fade Out Settings")]
+        [SerializeField] private AnimationDirection fadeOutAnimation = AnimationDirection.CenterToEdge;
+        [SerializeField] private bool invertFadeOut = false;
+        [Header("Fade In Settings")]
+        [SerializeField] private AnimationDirection fadeInAnimation = AnimationDirection.EdgeToCenter;
+        [SerializeField] private bool invertFadeIn = false;
+        [Header("Shared Settings")]
+        [Range(0.01f, 1f)]
+        [SerializeField] private float smoothness = 0.1f;
+
+        private static readonly int InvertProperty = Shader.PropertyToID("_Invert");
+        private static readonly int SmoothnessProperty = Shader.PropertyToID("_CircleSmoothness");
+
+        public override void SetEffectProperties(Material materialInstance)
         {
-            // Implementação básica - apenas para resolver compilação
-            float evaluatedProgress = curve.Evaluate(progress);
-            float currentRadius = invertEffect ? maxRadius * (1f - evaluatedProgress) : maxRadius * evaluatedProgress;
-            
-            // Em uma implementação real, isso aplicaria o efeito ao material/shader
-            // Por enquanto, apenas logamos para debug se necessário
-            if (Application.isEditor && progress == 0f)
-            {
-                Debug.Log($"CircleEffect: Starting transition with radius {currentRadius}");
-            }
+            materialInstance.SetFloat(SmoothnessProperty, smoothness);
         }
-        
-        /// <summary>
-        /// Configura as propriedades específicas do efeito circular no material
-        /// </summary>
-        /// <param name="material">Material a ser configurado</param>
-        public override void SetEffectProperties(Material material)
+
+        public override IEnumerator AnimateOut(Image transitionImage)
         {
-            base.SetEffectProperties(material);
-            
-            if (material != null)
-            {
-                // Configura propriedades específicas do efeito circular
-                material.SetVector("_Center", new Vector4(center.x, center.y, 0f, 0f));
-                material.SetFloat("_MaxRadius", maxRadius);
-                material.SetFloat("_InvertEffect", invertEffect ? 1f : 0f);
-            }
+            transitionImage.material.SetFloat(InvertProperty, invertFadeOut ? 1.0f : 0.0f);
+            float startValue = (fadeOutAnimation == AnimationDirection.CenterToEdge) ? 0f : 1f;
+            float endValue = (fadeOutAnimation == AnimationDirection.CenterToEdge) ? 1f : 0f;
+            // This call is now valid.
+            yield return AnimateCutoff(transitionImage.material, startValue, endValue, duration / 2);
         }
-        
-        public override void Initialize()
+
+        public override IEnumerator AnimateIn(Image transitionImage)
         {
-            base.Initialize();
-            // Inicialização específica do efeito circular
-        }
-        
-        public override void Cleanup()
-        {
-            base.Cleanup();
-            // Limpeza específica do efeito circular
+            transitionImage.material.SetFloat(InvertProperty, invertFadeIn ? 1.0f : 0.0f);
+            float startValue = (fadeInAnimation == AnimationDirection.CenterToEdge) ? 0f : 1f;
+            float endValue = (fadeInAnimation == AnimationDirection.CenterToEdge) ? 1f : 0f;
+            // This call is now valid.
+            yield return AnimateCutoff(transitionImage.material, startValue, endValue, duration / 2);
         }
     }
 }

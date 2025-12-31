@@ -1,179 +1,130 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System.Collections;
-
 namespace PixeLadder.EasyTransition
 {
+    using System.Collections;
+    using UnityEngine;
+    using UnityEngine.SceneManagement;
+    using UnityEngine.UI;
+
     /// <summary>
-    /// Gerenciador de transições entre cenas.
-    /// Esta é uma implementação básica para resolver dependências de compilação.
+    /// A singleton manager that controls the entire scene transition process.
     /// </summary>
+    [DisallowMultipleComponent]
     public class SceneTransitioner : MonoBehaviour
     {
-        private static SceneTransitioner instance;
-        
-        [Header("Transition UI")]
-        [SerializeField] private Canvas transitionCanvas;
-        [SerializeField] private Image transitionImageInstance;
-        
-        /// <summary>
-        /// Instância singleton do SceneTransitioner
-        /// </summary>
-        public static SceneTransitioner Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<SceneTransitioner>();
-                    if (instance == null)
-                    {
-                        GameObject go = new GameObject("SceneTransitioner");
-                        instance = go.AddComponent<SceneTransitioner>();
-                        instance.CreateTransitionUI();
-                        DontDestroyOnLoad(go);
-                    }
-                }
-                return instance;
-            }
-        }
-        
+        public static SceneTransitioner Instance;
+
+        [Header("Configuration")]
+        [Tooltip("The screen-covering Image prefab used for transitions.")]
+        [SerializeField] private Image transitionImagePrefab;
+
+        [Tooltip("The default transition effect to use if none is provided in the LoadScene call.")]
+        [SerializeField] private TransitionEffect defaultTransition;
+
+        // --- Private State ---
+        private Image transitionImageInstance;
+        private bool isTransitioning = false;
+
+        // Cache shader property ID for performance
+        private static readonly int RectSizeID = Shader.PropertyToID("_RectSize");
+
+        public static event System.Action OnSceneLoaded;
+
         private void Awake()
         {
-            if (instance == null)
+            if (Instance == null)
             {
-                instance = this;
-                if (transitionImageInstance == null)
-                {
-                    CreateTransitionUI();
-                }
+                Instance = this;
                 DontDestroyOnLoad(gameObject);
+                Initialize();
             }
-            else if (instance != this)
+            else
             {
                 Destroy(gameObject);
             }
         }
-        
-        /// <summary>
-        /// Cria a UI de transição se não existir
-        /// </summary>
-        private void CreateTransitionUI()
+
+        private void Initialize()
         {
-            // Cria o Canvas de transição
+            // Create a dedicated, persistent canvas for the transition UI.
             GameObject canvasGO = new GameObject("TransitionCanvas");
-            canvasGO.transform.SetParent(transform);
-            
-            transitionCanvas = canvasGO.AddComponent<Canvas>();
+            canvasGO.transform.SetParent(this.transform);
+
+            var transitionCanvas = canvasGO.AddComponent<Canvas>();
             transitionCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            transitionCanvas.sortingOrder = 1000; // Sempre no topo
-            
-            CanvasScaler scaler = canvasGO.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            
+            transitionCanvas.sortingOrder = 999;
+
+            canvasGO.AddComponent<CanvasScaler>();
             canvasGO.AddComponent<GraphicRaycaster>();
-            
-            // Cria a imagem de transição
-            GameObject imageGO = new GameObject("TransitionImage");
-            imageGO.transform.SetParent(canvasGO.transform, false);
-            
-            transitionImageInstance = imageGO.AddComponent<Image>();
-            transitionImageInstance.color = Color.black;
-            
-            // Configura para ocupar toda a tela
-            RectTransform rectTransform = transitionImageInstance.rectTransform;
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
-            
-            // Inicia desativada
+
+            transitionImageInstance = Instantiate(transitionImagePrefab, canvasGO.transform);
+
+            // Ensure the image stretches to fill the screen
+            RectTransform rectT = transitionImageInstance.rectTransform;
+            rectT.anchorMin = Vector2.zero;
+            rectT.anchorMax = Vector2.one;
+            rectT.sizeDelta = Vector2.zero;
+            rectT.anchoredPosition = Vector2.zero;
+
             transitionImageInstance.gameObject.SetActive(false);
         }
-        
+
         /// <summary>
-        /// Carrega uma cena com efeito de transição
+        /// The main public method to start a scene transition.
         /// </summary>
-        /// <param name="sceneName">Nome da cena a ser carregada</param>
-        /// <param name="transitionEffect">Efeito de transição (opcional)</param>
-        public void LoadScene(string sceneName, TransitionEffect transitionEffect = null)
+        /// <param name="sceneName">The name of the scene to load.</param>
+        /// <param name="effect">The TransitionEffect ScriptableObject defining the visuals.</param>
+        public void LoadScene(string sceneName, TransitionEffect effect = null)
         {
-            StartCoroutine(LoadSceneCoroutine(sceneName, transitionEffect));
+            if (isTransitioning)
+            {
+                Debug.LogWarning("SceneTransitioner: Transition already in progress.");
+                return;
+            }
+
+            var effectToUse = effect ?? defaultTransition;
+            if (effectToUse == null)
+            {
+                Debug.LogError("SceneTransitioner: No transition effect specified and no default is set.", this);
+                return;
+            }
+
+            StartCoroutine(TransitionRoutine(sceneName, effectToUse));
         }
-        
-        /// <summary>
-        /// Corrotina que executa o carregamento da cena com transição
-        /// </summary>
-        private IEnumerator LoadSceneCoroutine(string sceneName, TransitionEffect transitionEffect)
+
+        private IEnumerator TransitionRoutine(string sceneName, TransitionEffect effect)
         {
-            // Garante que a UI de transição existe
-            if (transitionImageInstance == null)
-            {
-                CreateTransitionUI();
-            }
-            
-            // Se há um efeito de transição, executa fade out
-            if (transitionEffect != null)
-            {
-                transitionEffect.Initialize();
-                transitionImageInstance.gameObject.SetActive(true);
-                
-                // Configura o material se disponível
-                if (transitionEffect.transitionMaterial != null)
-                {
-                    Material materialInstance = new Material(transitionEffect.transitionMaterial);
-                    transitionImageInstance.material = materialInstance;
-                    transitionEffect.SetEffectProperties(materialInstance);
-                }
-                
-                yield return transitionEffect.AnimateOut(transitionImageInstance);
-            }
-            
-            // Carrega a cena
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-            
-            // Espera o carregamento completar
-            while (!asyncLoad.isDone)
-            {
-                yield return null;
-            }
-            
-            // Se há um efeito de transição, executa fade in
-            if (transitionEffect != null)
-            {
-                yield return transitionEffect.AnimateIn(transitionImageInstance);
-                
-                transitionImageInstance.gameObject.SetActive(false);
-                transitionEffect.Cleanup();
-                
-                // Limpa o material instanciado
-                if (transitionImageInstance.material != null)
-                {
-                    DestroyImmediate(transitionImageInstance.material);
-                    transitionImageInstance.material = null;
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Verifica se uma cena existe
-        /// </summary>
-        /// <param name="sceneName">Nome da cena</param>
-        /// <returns>True se a cena existe</returns>
-        public bool SceneExists(string sceneName)
-        {
-            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-            {
-                string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-                string sceneNameFromPath = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-                if (sceneNameFromPath == sceneName)
-                {
-                    return true;
-                }
-            }
-            return false;
+            isTransitioning = true;
+            transitionImageInstance.gameObject.SetActive(true);
+
+            // 1. Create a fresh instance of the material for this specific transition
+            Material materialInstance = new Material(effect.transitionMaterial);
+
+            // 2. CRITICAL FIX: Pass the RectSize (Aspect Ratio) to the shader immediately
+            Rect rect = transitionImageInstance.rectTransform.rect;
+            materialInstance.SetVector(RectSizeID, new Vector4(rect.width, rect.height, 0, 0));
+
+            // 3. Apply custom effect properties
+            effect.SetEffectProperties(materialInstance);
+
+            // 4. Assign the material to the image
+            transitionImageInstance.material = materialInstance;
+
+            // Run the fade-out animation
+            yield return effect.AnimateOut(transitionImageInstance);
+
+            // Load the new scene
+            yield return SceneManager.LoadSceneAsync(sceneName);
+
+            // Fire event
+            OnSceneLoaded?.Invoke();
+
+            // Run the fade-in animation
+            yield return effect.AnimateIn(transitionImageInstance);
+
+            // Cleanup
+            transitionImageInstance.gameObject.SetActive(false);
+            Destroy(materialInstance); // Clean up the material instance to prevent leaks
+            isTransitioning = false;
         }
     }
 }
