@@ -24,7 +24,36 @@
         "Reflection_MethodCall",
         "GameObject_DestroyComponents",
         "GameObject_Modify",
-        "GameObject_Destroy"
+        "GameObject_Destroy",
+        "assets-get-data",
+        "assets-modify",
+        "assets-material-create",
+        "assets-find",
+        "assets-refresh",
+        "scene-open",
+        "scene-get-data",
+        "assets-prefab-instantiate",
+        "scene-save",
+        "editor-application-set-state",
+        "console-get-logs",
+        "script-execute",
+        "editor-application-get-state",
+        "script-read",
+        "script-read",
+        "script-update-or-create",
+        "scene-list-opened",
+        "gameobject-find",
+        "gameobject-component-add",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-get",
+        "gameobject-component-modify"
       ]
     },
     "filesystem": {
@@ -38,7 +67,10 @@
       "autoApprove": [
         "create_directory",
         "read_text_file",
-        "write_file"
+        "write_file",
+        "list_directory",
+        "move_file",
+        "search_files"
       ]
     },
     "git": {
