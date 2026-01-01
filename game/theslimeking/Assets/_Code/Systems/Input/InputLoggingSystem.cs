@@ -9,7 +9,7 @@ namespace SlimeKing.Core
     /// </summary>
     public class InputLoggingSystem : MonoBehaviour
     {
-        [Header("⚙️ Configurações")]
+        [Header("Configuration")]
         [SerializeField] private bool enableLogging = true;
         [SerializeField] private bool logInputType = true;
         [SerializeField] private bool logButtonPresses = true;

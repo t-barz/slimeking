@@ -2,10 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Componente que aplica efeito de fade out e destrói o GameObject após o desaparecimento
-/// </summary>
-public class FadeDestroyEffect : MonoBehaviour
+namespace SlimeKing.UI
+{
+    /// <summary>
+    /// Componente que aplica efeito de fade out e destrói o GameObject após o desaparecimento
+    /// </summary>
+    public class FadeDestroyEffect : MonoBehaviour
 {
     [Header("Fade Configuration")]
     [SerializeField] private float fadeDuration = 1.0f;
@@ -52,7 +54,7 @@ public class FadeDestroyEffect : MonoBehaviour
         {
             if (enableDebugLogs)
             {
-                Debug.LogWarning($"[FadeDestroyEffect] {gameObject.name} - Fade já iniciado ou objeto já destruído");
+                UnityEngine.Debug.LogWarning($"[FadeDestroyEffect] {gameObject.name} - Fade já iniciado ou objeto já destruído");
             }
             return;
         }
@@ -72,7 +74,7 @@ public class FadeDestroyEffect : MonoBehaviour
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Destruição imediata");
+            UnityEngine.Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Destruição imediata");
         }
 
         Destroy(gameObject);
@@ -103,7 +105,7 @@ public class FadeDestroyEffect : MonoBehaviour
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Componentes encontrados: " +
+            UnityEngine.Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Componentes encontrados: " +
                      $"CanvasGroup={_canvasGroup != null}, SpriteRenderer={_spriteRenderer != null}, " +
                      $"Image={_image != null}, Text={_text != null}");
         }
@@ -116,7 +118,7 @@ public class FadeDestroyEffect : MonoBehaviour
     {
         if (enableDebugLogs)
         {
-            Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Iniciando fade out (duração: {fadeDuration}s)");
+            UnityEngine.Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Iniciando fade out (duração: {fadeDuration}s)");
         }
 
         float elapsedTime = 0f;
@@ -141,7 +143,7 @@ public class FadeDestroyEffect : MonoBehaviour
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Fade concluído, aguardando {destroyDelay}s para destruir");
+            UnityEngine.Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Fade concluído, aguardando {destroyDelay}s para destruir");
         }
 
         // Aguarda o delay antes de destruir
@@ -149,7 +151,7 @@ public class FadeDestroyEffect : MonoBehaviour
 
         if (enableDebugLogs)
         {
-            Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Delay concluído, destruindo objeto");
+            UnityEngine.Debug.Log($"[FadeDestroyEffect] {gameObject.name} - Delay concluído, destruindo objeto");
         }
 
         // Marca como destruído e destrói o GameObject
@@ -203,4 +205,5 @@ public class FadeDestroyEffect : MonoBehaviour
     }
 
     #endregion
+    }
 }

@@ -46,7 +46,7 @@ namespace SlimeKing.Visual
         [Tooltip("Cor do texto de informações")]
         [SerializeField] private Color infoTextColor = Color.white;
 
-        [Header("⚙️ Display Options")]
+        [Header("Display Options")]
         [Tooltip("Mostrar apenas quando selecionado")]
         [SerializeField] private bool onlyWhenSelected = false;
 

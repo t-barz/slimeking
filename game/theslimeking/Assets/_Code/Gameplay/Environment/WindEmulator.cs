@@ -11,7 +11,7 @@ namespace SlimeKing.Gameplay
     [SerializeField] private Vector2 shakeIntervalRange = new Vector2(2f, 5f);
     [SerializeField] private bool autoStart = true;
 
-    [Header("🔧 Debug")]
+    [Header("Debug")]
     [SerializeField] private bool enableLogs = false;
 
     // Cached components para performance

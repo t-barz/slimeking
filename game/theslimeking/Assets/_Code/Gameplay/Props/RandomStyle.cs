@@ -21,7 +21,7 @@ namespace SlimeKing.Gameplay
     [Tooltip("Se true, mantém proporção uniforme (X, Y, Z iguais)")]
     [SerializeField] private bool uniformScale = true;
 
-    [Header("🎨 Configurações de Cor")]
+    [Header("Color Configuration")]
     [Tooltip("Se true, randomiza a cor do objeto")]
     [SerializeField] private bool randomizeColor = true;
 
@@ -37,7 +37,7 @@ namespace SlimeKing.Gameplay
     [Tooltip("Variação máxima de cada canal de cor (0-1)")]
     [SerializeField] private float colorVariation = 0.3f;
 
-    [Header("🔧 Opções Avançadas")]
+    [Header("Advanced Options")]
     [Tooltip("Se true, aplica randomização automaticamente no Start()")]
     [SerializeField] private bool applyOnStart = true;
 

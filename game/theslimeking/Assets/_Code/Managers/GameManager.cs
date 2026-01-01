@@ -7,7 +7,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems; // para limpeza de múltiplos EventSystems
 using UnityEngine.Rendering.Universal; // para Light2D (URP 2D)
 
-public class GameManager : ManagerSingleton<GameManager>
+namespace SlimeKing.Core
+{
+    public class GameManager : ManagerSingleton<GameManager>
 {
     [Header("Debug Settings")]
     [SerializeField] private bool enableDebugLogs = true;
@@ -79,7 +81,7 @@ public class GameManager : ManagerSingleton<GameManager>
     {
         if (enableDebugLogs)
         {
-            Debug.Log($"[GameManager] {message}");
+            UnityEngine.Debug.Log($"[GameManager] {message}");
         }
     }
 
@@ -88,7 +90,7 @@ public class GameManager : ManagerSingleton<GameManager>
     /// </summary>
     private void LogWarning(string message)
     {
-        Debug.LogWarning($"[GameManager] {message}");
+        UnityEngine.Debug.LogWarning($"[GameManager] {message}");
     }
 
     /// <summary>
@@ -96,7 +98,7 @@ public class GameManager : ManagerSingleton<GameManager>
     /// </summary>
     private void LogError(string message)
     {
-        Debug.LogError($"[GameManager] {message}");
+        UnityEngine.Debug.LogError($"[GameManager] {message}");
     }
     #endregion
 
@@ -450,4 +452,5 @@ public class GameManager : ManagerSingleton<GameManager>
 
         base.OnDestroy();
     }
+}
 }

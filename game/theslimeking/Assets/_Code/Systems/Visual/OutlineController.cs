@@ -52,7 +52,7 @@ namespace SlimeKing.Visual
         [Tooltip("Velocidade do fade out (alpha/segundo)")]
         [SerializeField, Range(0.1f, 10f)] private float fadeOutSpeed = 2f;
 
-        [Header("🎯 Auto Detection")]
+        [Header("Auto Detection")]
         [Tooltip("Ativa detecção automática do player")]
         [SerializeField] private bool enableAutoDetection = true;
 
@@ -68,7 +68,7 @@ namespace SlimeKing.Visual
         [Tooltip("Frequência de verificação (em segundos)")]
         [SerializeField, Range(0.02f, 0.5f)] private float checkFrequency = 0.1f;
 
-        [Header("🔧 Advanced")]
+        [Header("Advanced")]
         [Tooltip("Inicia com outline ativo")]
         [SerializeField] private bool startWithOutline = false;
 

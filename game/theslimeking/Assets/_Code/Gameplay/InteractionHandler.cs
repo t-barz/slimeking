@@ -27,14 +27,14 @@ namespace SlimeKing.Gameplay
     {
         #region Inspector Configuration
 
-        [Header("🔍 Configurações de Detecção")]
+        [Header("Detection Configuration")]
         [Tooltip("Raio de detecção para objetos interativos")]
         [SerializeField] private float interactionRange = 1.5f;
 
         [Tooltip("Layers que contêm objetos interativos")]
         [SerializeField] private LayerMask interactionLayers = -1;
 
-        [Header("🔧 Debug")]
+        [Header("Debug")]
         [Tooltip("Ativar logs de debug para interações")]
         [SerializeField] private bool enableDebugLogs = true; // Temporariamente true para debug
 
@@ -47,6 +47,10 @@ namespace SlimeKing.Gameplay
 
         private readonly List<IInteractable> _nearbyInteractables = new List<IInteractable>();
         private IInteractable _currentBestInteractable;
+        
+        // OTIMIZAÇÃO: Cache para evitar operações custosas a cada frame
+        private float _lastUpdateTime;
+        private const float UPDATE_INTERVAL = 0.1f; // Atualiza a cada 100ms ao invés de todo frame
 
         #endregion
 
@@ -68,7 +72,12 @@ namespace SlimeKing.Gameplay
 
         private void Update()
         {
-            UpdateNearbyInteractables();
+            // OTIMIZAÇÃO: Só atualiza a cada UPDATE_INTERVAL segundos
+            if (Time.time - _lastUpdateTime >= UPDATE_INTERVAL)
+            {
+                UpdateNearbyInteractables();
+                _lastUpdateTime = Time.time;
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -149,42 +158,44 @@ namespace SlimeKing.Gameplay
         #region Private Methods
 
         /// <summary>
-        /// Atualiza lista de objetos interativos e determina o melhor
+        /// OTIMIZADO: Atualiza lista de objetos interativos e determina o melhor
         /// </summary>
         private void UpdateNearbyInteractables()
         {
-            // Remove objetos nulos ou inválidos
-            int beforeCount = _nearbyInteractables.Count;
-            _nearbyInteractables.RemoveAll(interactable =>
-                interactable == null ||
-                (interactable as MonoBehaviour) == null ||
-                !((MonoBehaviour)interactable).gameObject.activeInHierarchy
-            );
-
-            if (beforeCount != _nearbyInteractables.Count)
+            // OTIMIZAÇÃO: Remove objetos nulos de forma mais eficiente
+            for (int i = _nearbyInteractables.Count - 1; i >= 0; i--)
             {
-                LogDebug($"Removidos {beforeCount - _nearbyInteractables.Count} objetos inválidos. Total: {_nearbyInteractables.Count}");
+                var interactable = _nearbyInteractables[i];
+                if (interactable == null || 
+                    (interactable as MonoBehaviour) == null ||
+                    !((MonoBehaviour)interactable).gameObject.activeInHierarchy)
+                {
+                    _nearbyInteractables.RemoveAt(i);
+                }
             }
 
-            // Filtra apenas objetos que podem ser interagidos
-            var availableInteractables = _nearbyInteractables
-                .Where(interactable => interactable.CanInteract(transform))
-                .ToList();
+            // OTIMIZAÇÃO: Encontra o melhor objeto sem criar listas temporárias
+            IInteractable bestInteractable = null;
+            int highestPriority = int.MinValue;
 
-            if (availableInteractables.Count != _nearbyInteractables.Count && _nearbyInteractables.Count > 0)
+            foreach (var interactable in _nearbyInteractables)
             {
-                LogDebug($"Objetos disponíveis para interação: {availableInteractables.Count}/{_nearbyInteractables.Count}");
+                if (interactable.CanInteract(transform))
+                {
+                    int priority = interactable.GetInteractionPriority();
+                    if (priority > highestPriority)
+                    {
+                        highestPriority = priority;
+                        bestInteractable = interactable;
+                    }
+                }
             }
 
-            // Determina o melhor objeto baseado na prioridade
-            var previousBest = _currentBestInteractable;
-            _currentBestInteractable = availableInteractables
-                .OrderByDescending(interactable => interactable.GetInteractionPriority())
-                .FirstOrDefault();
-
-            if (_currentBestInteractable != previousBest)
+            // Só loga se mudou
+            if (_currentBestInteractable != bestInteractable)
             {
-                LogDebug($"Melhor interação mudou de {previousBest?.GetType().Name} para {_currentBestInteractable?.GetType().Name}");
+                LogDebug($"Melhor interação mudou de {_currentBestInteractable?.GetType().Name} para {bestInteractable?.GetType().Name}");
+                _currentBestInteractable = bestInteractable;
             }
         }
 

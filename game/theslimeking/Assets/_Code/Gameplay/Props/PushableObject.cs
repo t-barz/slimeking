@@ -49,7 +49,7 @@ namespace SlimeKing.Gameplay
 
         #region Inspector Configuration
 
-        [Header("⚙️ Configurações de Movimento")]
+        [Header("Movement Configuration")]
         [Tooltip("Direções possíveis para movimento (selecione múltiplas)")]
         [SerializeField] private PushDirection allowedDirections = PushDirection.North;
 
@@ -73,7 +73,7 @@ namespace SlimeKing.Gameplay
         [Tooltip("Som reproduzido durante o movimento (loop)")]
         [SerializeField] private AudioClip movingSound;
 
-        [Header("🔧 Debug")]
+        [Header("Debug")]
         [Tooltip("Ativar logs de debug para este objeto")]
         [SerializeField] private bool enableDebugLogs = false;
 

@@ -96,6 +96,224 @@ private const string VERSION = "1.0"; // ✅ UPPER_CASE
 - ✅ PascalCase para arquivos de código
 - ✅ kebab-case ou snake_case para documentação
 
+### Nomenclatura de Prefabs
+
+Esta seção define padrões consistentes para nomenclatura de prefabs, eliminando ambiguidades e facilitando navegação no projeto.
+
+#### Regras Gerais
+
+**PascalCase obrigatório**
+- Todos os prefabs devem usar PascalCase sem espaços ou underscores
+- **Razão**: Consistência com nomenclatura de classes C# e melhor legibilidade no Project Window
+- Exemplo: `GameManager.prefab`, não `Game_Manager.prefab` ou `game manager.prefab`
+
+**Sem prefixos redundantes**
+- A estrutura de pastas já categoriza os assets (`Assets/_Prefabs/Items/`, `Assets/_Prefabs/Characters/`)
+- **Não usar**: `item_`, `art_`, `prop_`, `char_`, etc.
+- **Razão**: Evita redundância visual e facilita refatoração/reorganização futura
+- ✅ `Assets/_Prefabs/Items/Apple.prefab`
+- ❌ `Assets/_Prefabs/Items/item_apple.prefab`
+
+**Sufixos semânticos**
+- Use sufixos para indicar **função/tipo técnico**, não categoria de conteúdo
+- Sufixos clarificam propósito em contextos onde o prefab aparece sozinho (Inspector, Search)
+- **Quando usar**: Managers, VFX, Canvas, HUD, NPC, Point, Controller
+- **Quando NÃO usar**: Para indicar que é item/prop (a pasta já faz isso)
+
+**Variantes: descritivas primeiro, letras como último recurso**
+- **Preferir**: Nomes descritivos (`SlimeGreen`, `EnemyElite`, `TreeOak`)
+- **Aceitar**: Letras (A/B/C) ou números (01/02/03) apenas para variações artísticas mínimas
+- **Razão**: Nomes descritivos são auto-documentados; letras exigem memorização
+- ✅ `CrystalRed.prefab`, `CrystalBlue.prefab` (descritivo)
+- 🟡 `TreeOakA.prefab`, `TreeOakB.prefab` (aceitável se visualmente idênticos)
+- ❌ `Crystal1.prefab`, `Crystal2.prefab` (não descritivo)
+
+#### Sufixos Padrão
+
+Sufixos indicam **arquitetura técnica** ou **função no jogo**, não conteúdo visual.
+
+| Sufixo | Quando Usar | Exemplo | Motivo |
+|--------|-------------|---------|--------|
+| `Manager` | Singletons globais persistentes entre cenas | `GameManager`, `AudioManager` | Indica padrão Singleton |
+| `Controller` | Controladores de gameplay localizados | `PlayerController`, `BossController` | Diferencia de Managers |
+| `VFX` | Sistemas de partículas / efeitos visuais | `ExplosionVFX`, `HealVFX` | Clarifica que não é sprite estático |
+| `SFX` | Prefabs de audio com AudioSource | `FootstepSFX`, `AmbientSFX` | Diferencia de clipes de audio puros |
+| `HUD` | Elementos UI overlay (sem Canvas próprio) | `HealthBarHUD`, `MiniMapHUD` | Indica que é UI de jogo |
+| `Canvas` | Canvas UI completos e autônomos | `MainMenuCanvas`, `PauseCanvas` | Diferencia de elementos HUD |
+| `NPC` | Personagens não-jogáveis com IA/diálogo | `VillagerNPC`, `MerchantNPC` | Diferencia de decoração animada |
+| `Point` | Transforms de referência/marcadores | `SpawnPoint`, `TeleportPoint` | Indica GameObject vazio ou marker |
+
+#### Categorias por Pasta
+
+**🎮 Systems & Managers** (`Assets/_Prefabs/`)
+
+Prefabs técnicos que gerenciam sistemas globais do jogo.
+
+- **Nomenclatura**: `[Nome]Manager.prefab` ou `[Sistema].prefab`
+- **Sem espaços**: `CameraManager`, não `Camera Manager`
+- **Razão**: Managers são código, não arte visual
+- **Exemplos**:
+  - ✅ `GameManager.prefab` - Singleton principal do jogo
+  - ✅ `CameraManager.prefab` - Gerenciamento de câmera
+  - ✅ `TeleportManager.prefab` - Sistema de teleporte
+  - ✅ `SceneTransitioner.prefab` - Sistema de transição
+  - ✅ `EventSystem.prefab` - Input System do Unity
+
+**🎭 Characters** (`Assets/_Prefabs/Characters/`)
+
+Personagens jogáveis e inimigos com comportamento/animação.
+
+- **Nomenclatura**: `[Nome][Variante].prefab`
+- **Sem prefixo `art_`**: A pasta já indica que é personagem
+- **Variantes descritivas**: Use cores, tipos ou roles quando aplicável
+- **Exemplos**:
+  - ✅ `PlayerSlime.prefab` - Personagem principal (Player + tipo)
+  - ✅ `BeeWorker.prefab` - Abelha trabalhadora
+  - ✅ `BeeQueen.prefab` - Abelha rainha
+  - ✅ `Gobu.prefab` - Inimigo goblin
+  - ✅ `Butterfly.prefab` - Borboleta
+  - 🟡 `BeeWorkerA.prefab`, `BeeWorkerB.prefab` - Variantes artísticas (aceitável)
+
+**🧙 NPCs** (`Assets/_Prefabs/NPCs/`)
+
+Non-player characters com IA, diálogo ou interação específica.
+
+- **Nomenclatura**: `[Nome]NPC.prefab`
+- **Sufixo obrigatório**: `NPC` diferencia de decoração ou enemies
+- **Razão**: NPCs têm scripts de diálogo/quest; decoração não
+- **Exemplos**:
+  - ✅ `HelpyNPC.prefab` - NPC que dá ajuda
+  - ✅ `RickNPC.prefab` - NPC chamado Rick
+  - ✅ `MerchantNPC.prefab` - NPC vendedor
+  - ❌ `NPC_helpy.prefab` - Prefixo ao invés de sufixo
+
+**✨ FX** (`Assets/_Prefabs/FX/`)
+
+Efeitos visuais usando Particle System ou animação.
+
+- **Nomenclatura**: `[Ação]VFX.prefab`
+- **Sufixo obrigatório**: `VFX` clarifica que não é sprite estático
+- **Numeração**: Use apenas para variações da mesma ação (Attack01, Attack02)
+- **Exemplos**:
+  - ✅ `AbsorbVFX.prefab` - Efeito de absorção
+  - ✅ `Attack01VFX.prefab` - Primeiro ataque visual
+  - ✅ `Hit01VFX.prefab` - Efeito de impacto
+  - ✅ `ExclamationVFX.prefab` - ! animado
+  - ✅ `WindVFX.prefab` - Efeito de vento
+  - ❌ `absorve_vfx.prefab` - snake_case
+  - ❌ `vfx_exclamation.prefab` - Prefixo ao invés de sufixo
+
+**🎒 Items** (`Assets/_Prefabs/Items/`)
+
+Itens coletáveis, consumíveis ou equipáveis.
+
+- **Nomenclatura**: `[Nome][Variante].prefab`
+- **Sem prefixo `item_`**: Pasta já categoriza como item
+- **Variantes descritivas**: Cores, tipos, qualidade (Red, Rare, Large)
+- **Exemplos**:
+  - ✅ `Apple.prefab` - Maçã genérica
+  - ✅ `CrystalRed.prefab` - Cristal vermelho
+  - ✅ `CrystalBlue.prefab` - Cristal azul
+  - ✅ `FireStar.prefab` - Estrela de fogo
+  - ✅ `Mushroom.prefab` - Cogumelo
+  - ✅ `PotionHealth.prefab` - Poção de vida
+  - ❌ `item_apple.prefab` - Prefixo redundante
+  - ❌ `appleA.prefab` - Variante sem significado
+
+**🏗️ Props** (`Assets/_Prefabs/Props/`)
+
+Objetos decorativos ou interativos do cenário.
+
+- **Nomenclatura**: `[Objeto][Especificador].prefab`
+- **Especificador**: Tipo, material, tamanho ou localização
+- **Razão**: Props costumam ter múltiplas variantes visuais
+- **Exemplos**:
+  - ✅ `TreeOak.prefab` - Árvore de carvalho
+  - ✅ `TreePine.prefab` - Árvore de pinheiro
+  - ✅ `RockLarge.prefab` - Pedra grande
+  - ✅ `RockSmall.prefab` - Pedra pequena
+  - ✅ `ChestWooden.prefab` - Baú de madeira
+  - ✅ `TorchWall.prefab` - Tocha de parede
+  - ✅ `BarrelBroken.prefab` - Barril quebrado
+
+**🎨 UI** (`Assets/_Prefabs/UI/`)
+
+Elementos de interface do usuário.
+
+- **Nomenclatura**: Distinguir entre Canvas completo e elementos HUD
+- **Canvas**: Telas completas autônomas → `[Nome]Canvas.prefab`
+- **HUD**: Elementos overlay de gameplay → `[Nome]HUD.prefab`
+- **Razão**: Facilita busca e organização hierárquica
+- **Exemplos**:
+  - ✅ `MainMenuCanvas.prefab` - Menu principal completo
+  - ✅ `PauseCanvas.prefab` - Tela de pausa
+  - ✅ `InventoryCanvasHUD.prefab` - Canvas de inventário overlay
+  - ✅ `HealthBarHUD.prefab` - Barra de vida overlay
+  - ✅ `MiniMapHUD.prefab` - Mini-mapa
+  - ✅ `DialogueBox.prefab` - Caixa de diálogo genérica
+
+**🔧 Debug & Utilities**
+
+Ferramentas de desenvolvimento não usadas em build final.
+
+- **Nomenclatura**: `[Debug] [Nome].prefab` (prefixo com colchetes)
+- **Único caso de prefixo permitido**: Facilita filtro visual no Editor
+- **Razão**: Deve ser óbvio que não é conteúdo de produção
+- **Exemplos**:
+  - ✅ `[Debug] InputLoggingSystem.prefab`
+  - ✅ `[Debug] CollisionVisualizer.prefab`
+  - ✅ `[Debug] PerformanceMonitor.prefab`
+
+#### Guia de Decisão: Variantes
+
+**Quando usar nomes descritivos** (PREFERIR):
+- ✅ Cores: `SlimeRed`, `CrystalBlue`, `MushroomPoisonous`
+- ✅ Tamanhos: `RockSmall`, `TreeLarge`, `ChestMedium`
+- ✅ Materiais: `DoorWooden`, `SwordIron`, `ShieldSteel`
+- ✅ Estados: `ChestOpen`, `ChestClosed`, `BarrelBroken`
+- ✅ Roles: `EnemyBasic`, `EnemyElite`, `EnemyBoss`
+
+**Quando usar letras (A/B/C)** (ACEITÁVEL):
+- 🟡 Variações artísticas sutis sem diferença funcional clara
+- 🟡 Múltiplas versões de mesmo sprite com pequenas mudanças
+- Exemplo: `TreeOakA`, `TreeOakB` (galhos ligeiramente diferentes)
+
+**Quando usar números (01/02/03)** (EVITAR):
+- ⚠️ Apenas para sequências lógicas (Attack01, Attack02, Level01)
+- ❌ NÃO para variantes aleatórias: prefira nomes descritivos
+
+#### ❌ Anti-padrões (Evitar)
+
+**Snake_case e prefixos redundantes**:
+```text
+❌ player_Slime.prefab         → ✅ PlayerSlime.prefab
+❌ item_appleA.prefab          → ✅ Apple.prefab ou AppleRed.prefab
+❌ art_beeB.prefab             → ✅ BeeWorker.prefab ou BeeWorkerB.prefab
+❌ prop_rock_large.prefab      → ✅ RockLarge.prefab
+```
+
+**Prefixos ao invés de sufixos**:
+```text
+❌ vfx_explosion.prefab        → ✅ ExplosionVFX.prefab
+❌ sfx_footstep.prefab         → ✅ FootstepSFX.prefab
+❌ npc_merchant.prefab         → ✅ MerchantNPC.prefab
+```
+
+**Espaços e camelCase**:
+```text
+❌ Camera Manager.prefab       → ✅ CameraManager.prefab
+❌ Main Camera.prefab          → ✅ MainCamera.prefab
+❌ teleportPoint.prefab        → ✅ TeleportPoint.prefab
+❌ healthBar.prefab            → ✅ HealthBarHUD.prefab
+```
+
+**Kebab-case e variantes sem significado**:
+```text
+❌ npc-rick-version2.prefab    → ✅ RickNPC.prefab
+❌ enemy-type-1.prefab         → ✅ EnemyBasic.prefab
+❌ crystal-a-red.prefab        → ✅ CrystalRed.prefab
+```
+
 ---
 
 ## 📝 Documentação

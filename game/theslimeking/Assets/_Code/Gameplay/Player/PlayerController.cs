@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
     #region Inspector Configuration
 
-    [Header("⚙️ Configurações de Movimento")]
+    [Header("Movement Configuration")]
     [Tooltip("Velocidade máxima de movimento do jogador (será sobrescrita pelos atributos se PlayerAttributesHandler estiver presente)")]
     [SerializeField] private float moveSpeed = 5f;
 
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Velocidade de desaceleração ao parar movimento (unidades por segundo)")]
     [SerializeField] private float deceleration = 10f;
 
-    [Header("⚔️ Configurações de Combate")]
+    [Header("Combat Configuration")]
     [Tooltip("Raio de detecção de inimigos para o ataque (em unidades do mundo)")]
     [SerializeField] private float attackRange = 1f;
 
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Offset para posicionamento do objeto de ataque relativo ao transform do jogador")]
     [SerializeField] private Vector2 attackInstantiationOffset = Vector2.zero;
 
-    [Header("🎨 Configurações Visuais")]
+    [Header("Visual Configuration")]
     [Tooltip("Referências aos GameObjects filhos para controle de direção visual")]
     [SerializeField] private GameObject frontObject;
     [SerializeField] private GameObject backObject;
@@ -102,14 +102,14 @@ public class PlayerController : MonoBehaviour
     [Tooltip("AudioClip para som de agachamento/squat")]
     [SerializeField] private AudioClip squatSound;
 
-    [Header("⚔️ Knockback")]
+    [Header("Knockback")]
     [Tooltip("Força do knockback quando ataque é bloqueado")]
     [SerializeField] private float knockbackForce = 3f;
 
     [Tooltip("Duração do knockback em segundos")]
     [SerializeField] private float knockbackDuration = 0.2f;
 
-    [Header("�🔧 Ferramentas de Debug")]
+    [Header("Debug Tools")]
     [Tooltip("Habilita logs detalhados no Console para debug de movimento e ações")]
     [SerializeField] private bool enableLogs = false;
 

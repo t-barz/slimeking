@@ -56,7 +56,7 @@ namespace SlimeKing.Gameplay
 public class BounceHandler : MonoBehaviour
 {
     #region Serialized Fields
-    [Header("⚡ Configurações de Lançamento")]
+    [Header("Launch Configuration")]
     [Tooltip("Força mínima do lançamento")]
     [SerializeField] private float minLaunchForce = 2f;
 
@@ -66,7 +66,7 @@ public class BounceHandler : MonoBehaviour
     [Tooltip("Multiplicador de força vertical (para criar arco de lançamento)")]
     [SerializeField] private float verticalForceMultiplier = 1.2f;
 
-    [Header("🎯 Configurações de Direção")]
+    [Header("Direction Configuration")]
     [Tooltip("Ângulo mínimo de lançamento em graus (0 = direita, 90 = cima)")]
     [SerializeField] private float minAngle = 45f;
 
@@ -99,14 +99,14 @@ public class BounceHandler : MonoBehaviour
     [Tooltip("Velocidade vertical máxima para normalização da sombra")]
     [SerializeField] private float maxSimulatedHeight = 8.0f;
 
-    [Header("⚙️ Configurações Opcionais")]
+    [Header("Optional Configuration")]
     [Tooltip("Se verdadeiro, executa o lançamento automaticamente no Start")]
     [SerializeField] private bool launchOnStart = true;
 
     [Tooltip("Tempo em segundos após o qual o objeto será destruído (0 = nunca)")]
     [SerializeField] private float autoDestroyTime = 0f;
 
-    [Header("🔧 Debug")]
+    [Header("Debug")]
     [Tooltip("Mostra logs de debug no Console")]
     [SerializeField] private bool enableDebugLogs = false;
     #endregion

@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using SlimeKing.Core;
 using System.Collections.Generic;
+using UnityDebug = UnityEngine.Debug;
 
 namespace TheSlimeKing.UI
 {

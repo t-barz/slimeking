@@ -1,16 +1,32 @@
 using UnityEngine;
 
-public class InitialCaveScreenController : MonoBehaviour
+namespace SlimeKing.Controllers
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    /// <summary>
+    /// Controller principal da cena InitialCave.
+    /// Gerencia a inicialização e comportamento específico desta cena.
+    /// </summary>
+    public class InitialCaveScreenController : MonoBehaviour
     {
-        
-    }
+        #region Unity Lifecycle
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void Start()
+        {
+            InitializeScene();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Inicializa a cena InitialCave
+        /// </summary>
+        private void InitializeScene()
+        {
+            // TODO: Implementar lógica específica da cena InitialCave
+        }
+
+        #endregion
     }
 }

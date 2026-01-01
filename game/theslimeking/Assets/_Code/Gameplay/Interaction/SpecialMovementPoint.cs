@@ -33,7 +33,7 @@ namespace SlimeKing.Gameplay
         #endregion
 
         #region Serialized Fields
-        [Header("🎯 Special Movement Settings")]
+        [Header("Special Movement Settings")]
         [Tooltip("Tipo de movimento especial que este ponto representa")]
         [SerializeField] private MovementType movementType = MovementType.Jump;
 

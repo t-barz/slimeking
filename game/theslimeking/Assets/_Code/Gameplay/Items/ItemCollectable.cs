@@ -28,12 +28,12 @@ namespace SlimeKing.Gameplay
         [SerializeField] private float attractionSpeed = 5f;
         [SerializeField] private AnimationCurve attractionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        [Header("⏱️ Delay de Ativação")]
+        [Header("Activation Delay")]
         [SerializeField] private float activationDelay = 0.5f;
         [SerializeField] private bool showDelayFeedback = true;
         [SerializeField] private Color delayTintColor = new Color(1f, 1f, 1f, 0.5f);
 
-        [Header("⚡ Performance")]
+        [Header("Performance")]
         [SerializeField] private bool enableAttraction = true;
         [SerializeField] private float optimizationInterval = 0.1f;
 

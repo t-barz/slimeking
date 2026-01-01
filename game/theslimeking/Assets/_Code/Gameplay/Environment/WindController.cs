@@ -7,7 +7,7 @@ namespace SlimeKing.Gameplay
 {
     #region Inspector Configuration
 
-    [Header("⚙️ Configurações de Movimento")]
+    [Header("Movement Configuration")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private MovementDirection direction = MovementDirection.Right;
 
@@ -19,13 +19,13 @@ namespace SlimeKing.Gameplay
     [Header("🌊 Animação de Shake")]
     [SerializeField] private string shakeTriggerName = "Shake";
 
-    [Header("🎨 Configurações Visuais")]
+    [Header("Visual Configuration")]
     [SerializeField] private bool autoFlip = true;
 
-    [Header("🔧 Debug")]
+    [Header("Debug")]
     [SerializeField] private bool showDebugInfo = false;
 
-    [Header("🗑️ Auto Destruição")]
+    [Header("Auto Destruction")]
     [SerializeField] private float lifeTime = 10f;
     [SerializeField] private bool destroyWhenOffScreen = true;
 

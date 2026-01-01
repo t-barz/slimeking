@@ -27,11 +27,11 @@ namespace SlimeKing.Items
         [Range(0, 10)] public int speedBuff = 0;
         [Range(0f, 300f)] public float buffDuration = 30f;
 
-        [Header("⚙️ Comportamento")]
+        [Header("Behavior")]
         [Range(0.5f, 5f)] public float detectionRadius = 2f;
         [Range(5f, 20f)] public float attractSpeed = 10f;
 
-        [Header("🎨 Efeitos")]
+        [Header("Effects")]
         public GameObject vfxPrefab;
         public AudioClip collectSound;
 

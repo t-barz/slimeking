@@ -1,9 +1,10 @@
-namespace PixeLadder.EasyTransition
-{
-    using System.Collections;
-    using UnityEngine;
+using System.Collections;
+using UnityEngine;
+using PixeLadder.EasyTransition;
 using SlimeKing.Gameplay;
 
+namespace SlimeKing.Gameplay
+{
     /// <summary>
     /// Componente que detecta colisão do Player e executa teletransporte com transição visual.
     /// Utiliza o Easy Transition para criar uma experiência fluida de teletransporte na mesma cena.
@@ -80,16 +81,12 @@ using SlimeKing.Gameplay;
 
             if (triggerCollider == null)
             {
-                Debug.LogError($"TeleportPoint: BoxCollider2D não encontrado em '{gameObject.name}'!", this);
                 enabled = false;
                 return;
             }
 
             // Aplica configurações do trigger
             UpdateTriggerSize();
-
-            if (enableDebugLogs)
-                Debug.Log($"TeleportPoint '{gameObject.name}' inicializado com sucesso.", this);
         }
 
         /// <summary>
@@ -109,21 +106,14 @@ using SlimeKing.Gameplay;
             // Valida se é o Player usando CompareTag (melhor performance)
             if (!other.CompareTag("Player"))
             {
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Objeto '{other.name}' não é Player, ignorando.", this);
                 return;
             }
 
             // Previne múltiplos teletransportes simultâneos
             if (isTeleporting)
             {
-                if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Já está teletransportando, ignorando trigger.", this);
                 return;
             }
-
-            if (enableDebugLogs)
-                Debug.Log($"TeleportPoint: Player detectado, iniciando teletransporte.", this);
 
             // Inicia o processo de teletransporte imediatamente
             StartCoroutine(ExecuteTeleport());
@@ -178,14 +168,10 @@ using SlimeKing.Gameplay;
             if (IsCrossSceneTeleport())
             {
                 // === CROSS-SCENE TELEPORT PATH ===
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Iniciando teletransporte cross-scene para '{destinationSceneName}' na posição {destinationPosition}", this);
 
                 // Valida se TeleportManager existe
                 if (TeleportManager.Instance == null)
                 {
-                    Debug.LogError("TeleportPoint: TeleportManager.Instance não encontrado. " +
-                                  "Adicione o TeleportManager à cena para usar teletransporte cross-scene.", this);
                     isTeleporting = false;
                     yield break;
                 }
@@ -204,15 +190,10 @@ using SlimeKing.Gameplay;
 
                 // Libera flag de teletransporte (TeleportManager gerencia seu próprio lock)
                 isTeleporting = false;
-
-                if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Teletransporte cross-scene delegado ao TeleportManager.", this);
             }
             else
             {
                 // === SAME-SCENE TELEPORT PATH (existing logic unchanged) ===
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Iniciando teletransporte same-scene para {destinationPosition}", this);
 
                 // Cache do Rigidbody2D do Player
                 if (playerRigidbody == null)
@@ -227,9 +208,6 @@ using SlimeKing.Gameplay;
                 if (playerRigidbody != null)
                 {
                     playerRigidbody.linearVelocity = Vector2.zero;
-
-                    if (enableDebugLogs)
-                        Debug.Log("TeleportPoint: Velocidade do Player zerada.", this);
                 }
 
                 // Executa transição visual com callback de reposicionamento
@@ -245,9 +223,6 @@ using SlimeKing.Gameplay;
 
                 // Libera flag de teletransporte
                 isTeleporting = false;
-
-                if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Teletransporte same-scene completo!", this);
             }
         }
 
@@ -259,7 +234,6 @@ using SlimeKing.Gameplay;
         {
             if (PlayerController.Instance == null)
             {
-                Debug.LogError("TeleportPoint: PlayerController.Instance não encontrado durante reposicionamento!", this);
                 return;
             }
 
@@ -273,7 +247,7 @@ using SlimeKing.Gameplay;
                 }
                 else
                 {
-                    Debug.LogWarning("TeleportPoint: Câmera principal não encontrada!", this);
+                    // Câmera não encontrada
                 }
             }
 
@@ -282,25 +256,16 @@ using SlimeKing.Gameplay;
             if (cameraTransform != null)
             {
                 cameraOffset = cameraTransform.position - PlayerController.Instance.transform.position;
-
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Offset da câmera calculado: {cameraOffset}", this);
             }
 
             // Reposiciona o Player
             Vector3 oldPosition = PlayerController.Instance.transform.position;
             PlayerController.Instance.transform.position = destinationPosition;
 
-            if (enableDebugLogs)
-                Debug.Log($"TeleportPoint: Player reposicionado de {oldPosition} para {destinationPosition}", this);
-
             // Garante que a Cinemachine Camera esteja seguindo o Player após reposicionamento
             if (SlimeKing.Core.CameraManager.HasInstance)
             {
                 SlimeKing.Core.CameraManager.Instance.ForceCinemachineSetup();
-
-                if (enableDebugLogs)
-                    Debug.Log("TeleportPoint: Cinemachine Camera configurada via CameraManager.", this);
             }
 
             // Reposiciona a câmera mantendo o offset
@@ -308,9 +273,6 @@ using SlimeKing.Gameplay;
             {
                 Vector3 newCameraPosition = destinationPosition + cameraOffset;
                 cameraTransform.position = newCameraPosition;
-
-                if (enableDebugLogs)
-                    Debug.Log($"TeleportPoint: Câmera reposicionada para {newCameraPosition}", this);
             }
         }
 
@@ -324,21 +286,18 @@ using SlimeKing.Gameplay;
             // Valida se transitionEffect está atribuído
             if (transitionEffect == null)
             {
-                Debug.LogWarning($"TeleportPoint '{gameObject.name}': Efeito de transição não atribuído! Atribua um TransitionEffect (ex: CircleEffect) no Inspector.", this);
                 return false;
             }
 
             // Valida se PlayerController.Instance existe
             if (PlayerController.Instance == null)
             {
-                Debug.LogError($"TeleportPoint '{gameObject.name}': PlayerController.Instance não encontrado na cena! Certifique-se de que o Player está presente.", this);
                 return false;
             }
 
             // Valida se SceneTransitioner.Instance existe
             if (SceneTransitioner.Instance == null)
             {
-                Debug.LogError($"TeleportPoint '{gameObject.name}': SceneTransitioner.Instance não encontrado na cena! Adicione o prefab SceneTransitioner à cena.", this);
                 return false;
             }
 

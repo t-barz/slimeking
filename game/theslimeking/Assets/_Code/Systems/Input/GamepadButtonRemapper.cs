@@ -21,7 +21,7 @@ namespace SlimeKing.Core
             public bool swapNorthWest;  // Troca buttonNorth com buttonWest
         }
 
-        [Header("⚙️ Presets de Layout")]
+        [Header("Layout Presets")]
         [SerializeField] private GamepadLayoutPreset[] layoutPresets = new GamepadLayoutPreset[]
         {
             new GamepadLayoutPreset { name = "Xbox (Padrão)", isEnabled = true, swapEastSouth = false, swapNorthWest = false },
@@ -30,7 +30,7 @@ namespace SlimeKing.Core
             new GamepadLayoutPreset { name = "Genérico Invertido", isEnabled = true, swapEastSouth = true, swapNorthWest = false }
         };
 
-        [Header("🎮 Seleção de Layout")]
+        [Header("Layout Selection")]
         [SerializeField] private int selectedPresetIndex = 0;
 
         private GamepadLayoutPreset _currentLayout;

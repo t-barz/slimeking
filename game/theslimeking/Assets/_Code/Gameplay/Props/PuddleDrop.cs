@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Controla o sistema de gotas que formam poças d'água através de animações.
-/// Dispara triggers "Drop" nos animators dos prefabs de gota e poça em intervalos regulares.
-/// </summary>
-public class PuddleDrop : MonoBehaviour
+namespace SlimeKing.Gameplay.Props
+{
+    /// <summary>
+    /// Controla o sistema de gotas que formam poças d'água através de animações.
+    /// Dispara triggers "Drop" nos animators dos prefabs de gota e poça em intervalos regulares.
+    /// </summary>
+    public class PuddleDrop : MonoBehaviour
 {
     #region Serialized Fields
     [Header("Referências de Prefabs")]
@@ -196,7 +198,7 @@ public class PuddleDrop : MonoBehaviour
     {
         if (enableDebugLogs)
         {
-            Debug.Log($"[PuddleDrop] {message}");
+            UnityEngine.Debug.Log($"[PuddleDrop] {message}");
         }
     }
 
@@ -207,7 +209,7 @@ public class PuddleDrop : MonoBehaviour
     {
         if (enableDebugLogs)
         {
-            Debug.LogWarning($"[PuddleDrop] {message}");
+            UnityEngine.Debug.LogWarning($"[PuddleDrop] {message}");
         }
     }
 
@@ -216,7 +218,8 @@ public class PuddleDrop : MonoBehaviour
     /// </summary>
     private void LogError(string message)
     {
-        Debug.LogError($"[PuddleDrop] {message}");
+        UnityEngine.Debug.LogError($"[PuddleDrop] {message}");
     }
     #endregion
+    }
 }

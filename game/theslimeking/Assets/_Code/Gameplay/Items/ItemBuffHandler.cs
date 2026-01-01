@@ -36,7 +36,7 @@ namespace SlimeKing.Gameplay
         [SerializeField] private int maxBuffs = 10;
         [SerializeField] private bool enableLogs = false;
 
-        [Header("📊 Status (Read-Only)")]
+        [Header("Status (Read-Only)")]
         [SerializeField] private List<BuffData> activeBuffs = new List<BuffData>();
 
         // Cache de performance

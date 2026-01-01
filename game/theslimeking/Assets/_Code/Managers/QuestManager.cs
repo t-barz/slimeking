@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using TheSlimeKing.Inventory;
+using SlimeKing.Core;
+using UnityDebug = UnityEngine.Debug;
 
 namespace TheSlimeKing.Quest
 {
@@ -63,7 +65,7 @@ namespace TheSlimeKing.Quest
             questGiverCache = new Dictionary<string, QuestGiverController>();
             
             if (enableDebugLogs)
-                Debug.Log("[QuestManager] Initialized");
+                UnityDebug.Log("[QuestManager] Initialized");
         }
         #endregion
         
@@ -127,7 +129,7 @@ namespace TheSlimeKing.Quest
         {
             if (quest == null)
             {
-                Debug.LogError("[QuestManager] Tentativa de aceitar quest nula.");
+                UnityDebug.LogError("[QuestManager] Tentativa de aceitar quest nula.");
                 return false;
             }
             
@@ -135,7 +137,7 @@ namespace TheSlimeKing.Quest
             if (!CanAcceptQuest(quest))
             {
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Não é possível aceitar quest '{quest.questName}'.");
+                    UnityDebug.Log($"[QuestManager] Não é possível aceitar quest '{quest.questName}'.");
                 return false;
             }
             
@@ -150,7 +152,7 @@ namespace TheSlimeKing.Quest
             QuestEvents.QuestAccepted(quest);
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] Quest aceita: '{quest.questName}' (ID: {quest.questID})");
+                UnityDebug.Log($"[QuestManager] Quest aceita: '{quest.questName}' (ID: {quest.questID})");
             
             return true;
         }
@@ -170,7 +172,7 @@ namespace TheSlimeKing.Quest
             if (IsQuestActive(quest.questID))
             {
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Quest '{quest.questName}' já está ativa.");
+                    UnityDebug.Log($"[QuestManager] Quest '{quest.questName}' já está ativa.");
                 return false;
             }
             
@@ -178,7 +180,7 @@ namespace TheSlimeKing.Quest
             if (!quest.isRepeatable && IsQuestCompleted(quest.questID))
             {
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Quest '{quest.questName}' já foi completada e não é repetível.");
+                    UnityDebug.Log($"[QuestManager] Quest '{quest.questName}' já foi completada e não é repetível.");
                 return false;
             }
             
@@ -186,7 +188,7 @@ namespace TheSlimeKing.Quest
             if (GameManager.HasInstance && GameManager.Instance.GetReputation() < quest.minimumReputation)
             {
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Reputação insuficiente para quest '{quest.questName}'. Necessário: {quest.minimumReputation}, Atual: {GameManager.Instance.GetReputation()}");
+                    UnityDebug.Log($"[QuestManager] Reputação insuficiente para quest '{quest.questName}'. Necessário: {quest.minimumReputation}, Atual: {GameManager.Instance.GetReputation()}");
                 return false;
             }
             
@@ -198,7 +200,7 @@ namespace TheSlimeKing.Quest
                     if (prerequisite != null && !IsQuestCompleted(prerequisite.questID))
                     {
                         if (enableDebugLogs)
-                            Debug.Log($"[QuestManager] Quest prerequisite '{prerequisite.questName}' não completada.");
+                            UnityDebug.Log($"[QuestManager] Quest prerequisite '{prerequisite.questName}' não completada.");
                         return false;
                     }
                 }
@@ -267,7 +269,7 @@ namespace TheSlimeKing.Quest
                 questGiverCache[giverID] = giver;
                 
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Quest Giver registrado: {giver.gameObject.name}");
+                    UnityDebug.Log($"[QuestManager] Quest Giver registrado: {giver.gameObject.name}");
             }
         }
         
@@ -293,13 +295,13 @@ namespace TheSlimeKing.Quest
             
             if (progress == null)
             {
-                Debug.LogError($"[QuestManager] Quest '{questID}' não encontrada.");
+                UnityDebug.LogError($"[QuestManager] Quest '{questID}' não encontrada.");
                 return false;
             }
             
             if (!progress.isReadyToTurnIn)
             {
-                Debug.LogWarning($"[QuestManager] Quest '{progress.questData.questName}' não está pronta para entrega.");
+                UnityDebug.LogWarning($"[QuestManager] Quest '{progress.questData.questName}' não está pronta para entrega.");
                 return false;
             }
             
@@ -312,7 +314,7 @@ namespace TheSlimeKing.Quest
                 
                 if (!removed)
                 {
-                    Debug.LogError($"[QuestManager] Falha ao remover itens da quest '{questData.questName}'.");
+                    UnityDebug.LogError($"[QuestManager] Falha ao remover itens da quest '{questData.questName}'.");
                     return false;
                 }
             }
@@ -335,7 +337,7 @@ namespace TheSlimeKing.Quest
             QuestEvents.QuestTurnedIn(questID);
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] Quest entregue: '{questData.questName}'");
+                UnityDebug.Log($"[QuestManager] Quest entregue: '{questData.questName}'");
             
             return true;
         }
@@ -378,7 +380,7 @@ namespace TheSlimeKing.Quest
             
             if (progress == null)
             {
-                Debug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para atualizar progresso.");
+                UnityDebug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para atualizar progresso.");
                 return;
             }
             
@@ -395,7 +397,7 @@ namespace TheSlimeKing.Quest
             QuestEvents.QuestProgressChanged(questID, progress.currentProgress, progress.targetProgress);
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] Quest '{progress.questData.questName}' progresso: {progress.currentProgress}/{progress.targetProgress}");
+                UnityDebug.Log($"[QuestManager] Quest '{progress.questData.questName}' progresso: {progress.currentProgress}/{progress.targetProgress}");
             
             // Verifica se completou
             CheckQuestCompletion(progress);
@@ -419,7 +421,7 @@ namespace TheSlimeKing.Quest
                 QuestEvents.QuestReadyToTurnIn(progress.questID);
                 
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Quest '{progress.questData.questName}' pronta para entregar!");
+                    UnityDebug.Log($"[QuestManager] Quest '{progress.questData.questName}' pronta para entregar!");
             }
         }
         
@@ -459,7 +461,7 @@ namespace TheSlimeKing.Quest
             // Valida se há espaço no inventário para recompensas
             if (!ValidateInventorySpace(quest))
             {
-                Debug.LogError($"[QuestManager] Inventário cheio! Não é possível entregar quest '{quest.questName}' sem espaço para recompensas.");
+                UnityDebug.LogError($"[QuestManager] Inventário cheio! Não é possível entregar quest '{quest.questName}' sem espaço para recompensas.");
                 return;
             }
             
@@ -475,11 +477,11 @@ namespace TheSlimeKing.Quest
                         if (added)
                         {
                             if (enableDebugLogs)
-                                Debug.Log($"[QuestManager] Recompensa recebida: {reward.item.itemName} x{reward.quantity}");
+                                UnityDebug.Log($"[QuestManager] Recompensa recebida: {reward.item.itemName} x{reward.quantity}");
                         }
                         else
                         {
-                            Debug.LogWarning($"[QuestManager] Inventário cheio! Não foi possível adicionar recompensa: {reward.item.itemName}");
+                            UnityDebug.LogWarning($"[QuestManager] Inventário cheio! Não foi possível adicionar recompensa: {reward.item.itemName}");
                         }
                     }
                 }
@@ -493,11 +495,11 @@ namespace TheSlimeKing.Quest
                     GameManager.Instance.AddReputation(quest.reputationReward);
                     
                     if (enableDebugLogs)
-                        Debug.Log($"[QuestManager] Reputação recebida: +{quest.reputationReward}");
+                        UnityDebug.Log($"[QuestManager] Reputação recebida: +{quest.reputationReward}");
                 }
                 else
                 {
-                    Debug.LogWarning("[QuestManager] GameManager não encontrado para adicionar reputação.");
+                    UnityDebug.LogWarning("[QuestManager] GameManager não encontrado para adicionar reputação.");
                 }
             }
         }
@@ -511,7 +513,7 @@ namespace TheSlimeKing.Quest
         {
             if (string.IsNullOrEmpty(questID))
             {
-                Debug.LogError("[QuestManager] Quest ID não pode ser nulo ou vazio.");
+                UnityDebug.LogError("[QuestManager] Quest ID não pode ser nulo ou vazio.");
                 return false;
             }
             
@@ -519,7 +521,7 @@ namespace TheSlimeKing.Quest
             if (activeQuestsDict.ContainsKey(questID))
             {
                 if (enableDebugLogs)
-                    Debug.Log($"[QuestManager] Quest ID '{questID}' já está ativa.");
+                    UnityDebug.Log($"[QuestManager] Quest ID '{questID}' já está ativa.");
                 return false;
             }
             
@@ -562,7 +564,7 @@ namespace TheSlimeKing.Quest
             }
             
             if (enableDebugLogs)
-                Debug.LogWarning($"[QuestManager] Quest com ID '{questID}' não encontrada.");
+                UnityDebug.LogWarning($"[QuestManager] Quest com ID '{questID}' não encontrada.");
             
             return null;
         }
@@ -612,7 +614,7 @@ namespace TheSlimeKing.Quest
             
             if (!hasSpace && enableDebugLogs)
             {
-                Debug.LogWarning($"[QuestManager] Inventário não tem espaço suficiente. Necessário: {slotsNeeded}, Disponível: {emptySlots}");
+                UnityDebug.LogWarning($"[QuestManager] Inventário não tem espaço suficiente. Necessário: {slotsNeeded}, Disponível: {emptySlots}");
             }
             
             return hasSpace;
@@ -650,7 +652,7 @@ namespace TheSlimeKing.Quest
             
             if (enableDebugLogs)
             {
-                Debug.Log($"[QuestManager] Salvando dados: {saveData.activeQuests.Count} quests ativas, {saveData.completedQuestIDs.Count} completadas");
+                UnityDebug.Log($"[QuestManager] Salvando dados: {saveData.activeQuests.Count} quests ativas, {saveData.completedQuestIDs.Count} completadas");
             }
             
             return saveData;
@@ -666,14 +668,14 @@ namespace TheSlimeKing.Quest
             if (data == null)
             {
                 if (enableDebugLogs)
-                    Debug.Log("[QuestManager] Nenhum dado de quest para carregar.");
+                    UnityDebug.Log("[QuestManager] Nenhum dado de quest para carregar.");
                 return;
             }
             
             // Tenta fazer cast para QuestSaveData
             if (!(data is QuestSaveData saveData))
             {
-                Debug.LogWarning("[QuestManager] Dados de save não são do tipo QuestSaveData.");
+                UnityDebug.LogWarning("[QuestManager] Dados de save não são do tipo QuestSaveData.");
                 return;
             }
             
@@ -701,7 +703,7 @@ namespace TheSlimeKing.Quest
                     
                     if (questData == null)
                     {
-                        Debug.LogWarning($"[QuestManager] Quest com ID '{progressData.questID}' não encontrada ao carregar save. Pulando...");
+                        UnityDebug.LogWarning($"[QuestManager] Quest com ID '{progressData.questID}' não encontrada ao carregar save. Pulando...");
                         continue;
                     }
                     
@@ -720,7 +722,7 @@ namespace TheSlimeKing.Quest
             
             if (enableDebugLogs)
             {
-                Debug.Log($"[QuestManager] Dados carregados: {activeQuests.Count} quests ativas, {completedQuestIDs.Count} completadas");
+                UnityDebug.Log($"[QuestManager] Dados carregados: {activeQuests.Count} quests ativas, {completedQuestIDs.Count} completadas");
             }
         }
         #endregion
@@ -736,7 +738,7 @@ namespace TheSlimeKing.Quest
             
             if (progress == null)
             {
-                Debug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para forçar completar.");
+                UnityDebug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para forçar completar.");
                 return;
             }
             
@@ -749,7 +751,7 @@ namespace TheSlimeKing.Quest
             QuestEvents.QuestReadyToTurnIn(questID);
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] [DEBUG] Quest '{progress.questData.questName}' forçada a completar.");
+                UnityDebug.Log($"[QuestManager] [DEBUG] Quest '{progress.questData.questName}' forçada a completar.");
         }
         
         /// <summary>
@@ -762,7 +764,7 @@ namespace TheSlimeKing.Quest
             
             if (progress == null)
             {
-                Debug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para resetar.");
+                UnityDebug.LogWarning($"[QuestManager] Quest '{questID}' não encontrada para resetar.");
                 return;
             }
             
@@ -774,7 +776,7 @@ namespace TheSlimeKing.Quest
             QuestEvents.QuestProgressChanged(questID, progress.currentProgress, progress.targetProgress);
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] [DEBUG] Quest '{progress.questData.questName}' resetada.");
+                UnityDebug.Log($"[QuestManager] [DEBUG] Quest '{progress.questData.questName}' resetada.");
         }
         
         /// <summary>
@@ -791,7 +793,7 @@ namespace TheSlimeKing.Quest
             completedQuestIDs.Clear();
             
             if (enableDebugLogs)
-                Debug.Log($"[QuestManager] [DEBUG] Todas as quests limpas. ({activeCount} ativas, {completedCount} completadas)");
+                UnityDebug.Log($"[QuestManager] [DEBUG] Todas as quests limpas. ({activeCount} ativas, {completedCount} completadas)");
         }
         
         /// <summary>
@@ -799,8 +801,8 @@ namespace TheSlimeKing.Quest
         /// </summary>
         public void DebugLogQuestState()
         {
-            Debug.Log("=== QUEST MANAGER STATE ===");
-            Debug.Log($"Active Quests: {activeQuests.Count}");
+            UnityDebug.Log("=== QUEST MANAGER STATE ===");
+            UnityDebug.Log($"Active Quests: {activeQuests.Count}");
             
             foreach (QuestProgress progress in activeQuests)
             {
@@ -808,16 +810,16 @@ namespace TheSlimeKing.Quest
                     continue;
                 
                 string status = progress.isReadyToTurnIn ? "READY" : "IN PROGRESS";
-                Debug.Log($"  - {progress.questData.questName} ({progress.questID}): {progress.currentProgress}/{progress.targetProgress} [{status}]");
+                UnityDebug.Log($"  - {progress.questData.questName} ({progress.questID}): {progress.currentProgress}/{progress.targetProgress} [{status}]");
             }
             
-            Debug.Log($"Completed Quests: {completedQuestIDs.Count}");
+            UnityDebug.Log($"Completed Quests: {completedQuestIDs.Count}");
             foreach (string questID in completedQuestIDs)
             {
-                Debug.Log($"  - {questID}");
+                UnityDebug.Log($"  - {questID}");
             }
             
-            Debug.Log("===========================");
+            UnityDebug.Log("===========================");
         }
         #endregion
         

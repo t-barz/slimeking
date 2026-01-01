@@ -8,7 +8,7 @@ namespace SlimeKing.Gameplay
     /// </summary>
     public class SelfDestruct : MonoBehaviour
 {
-    [Header("⏱️ Configuração Opcional de Delay")]
+    [Header("Optional Delay Configuration")]
     [Tooltip("Tempo em segundos para destruição automática (0 = apenas manual)")]
     [SerializeField] private float autoDestroyDelay = 0f;
 

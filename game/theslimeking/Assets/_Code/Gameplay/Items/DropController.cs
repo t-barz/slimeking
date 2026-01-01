@@ -38,7 +38,7 @@ public class DropController : MonoBehaviour
     [Tooltip("Se verdadeiro, instancia na posição deste objeto. Se falso, instancia na origem")]
     [SerializeField] private bool useCurrentPosition = true;
 
-    [Header("🔧 Debug")]
+    [Header("Debug")]
     [Tooltip("Mostra logs de debug no Console")]
     [SerializeField] private bool enableDebugLogs = false;
     #endregion

@@ -6,25 +6,25 @@ namespace SlimeKing.Gameplay
 {
     public class WindManager : MonoBehaviour
 {
-    [Header("🌪️ Configurações de Vento")]
+    [Header("Wind Configuration")]
     [SerializeField] private GameObject windPrefab;
     [SerializeField] private float windSpawnFrequency = 3f;
 
-    [Header("📦 Outros Objetos")]
+    [Header("Other Objects")]
     [SerializeField] private GameObject[] otherObjectsPrefabs;
     [SerializeField] private float otherObjectsSpawnFrequency = 5f;
 
-    [Header("🎯 Configurações de Área")]
+    [Header("Area Configuration")]
     [SerializeField] private Vector2 spawnAreaCenter = Vector2.zero;
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(10f, 6f);
 
-    [Header("🔧 Opções Avançadas")]
+    [Header("Advanced Options")]
     [SerializeField] private bool autoStart = true;
     [SerializeField] private bool spawnAsChildren = true;
     [SerializeField] private bool showSpawnArea = true;
     [SerializeField] private bool enableLogs = false;
 
-    [Header("⚡ Performance")]
+    [Header("Performance")]
     [SerializeField] private int maxActiveWinds = 5;
     [SerializeField] private float cleanupInterval = 2f;
 

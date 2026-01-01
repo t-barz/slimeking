@@ -16,7 +16,7 @@ namespace SlimeKing.Gameplay
     [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
     public class ItemPickup : MonoBehaviour, IInteractable
     {
-        [Header("🎯 Configuração do Item")]
+        [Header("Item Configuration")]
         [SerializeField] private CollectableItemData itemData;
 
         [Header("💼 Integração com Inventário")]
@@ -26,16 +26,16 @@ namespace SlimeKing.Gameplay
         [Header("🤝 Sistema de Interação")]
         [SerializeField] private float interactionRadius = 2f;
 
-        [Header("🎯 Movimento até Player")]
+        [Header("Movement to Player")]
         [SerializeField] private Vector3 followOffset = new Vector3(0.5f, 0.5f, 0f);
         [SerializeField] private float moveSpeed = 8f;
         [SerializeField] private float arrivalThreshold = 0.1f;
         [SerializeField] private float absorptionDelay = 0.25f;
 
-        [Header("⏱️ Delay de Ativação")]
+        [Header("Activation Delay")]
         [SerializeField] private float activationDelay = 0.1f;
 
-        [Header("⚡ Performance e Debug")]
+        [Header("Performance and Debug")]
         [SerializeField] private float checkInterval = 0.1f;
         [SerializeField] private bool enableDebugLogs = false;
 

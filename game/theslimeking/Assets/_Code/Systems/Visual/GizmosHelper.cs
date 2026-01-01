@@ -8,7 +8,7 @@ namespace SlimeKing.Visual
     /// </summary>
     public class GizmosHelper : MonoBehaviour
     {
-        [Header("🎯 Gizmo Settings")]
+        [Header("Gizmo Settings")]
         [Tooltip("Cor do gizmo")]
         [SerializeField] private Color gizmoColor = Color.green;
 

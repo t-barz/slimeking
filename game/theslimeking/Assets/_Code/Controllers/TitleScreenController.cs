@@ -5,11 +5,13 @@ using UnityEngine.SceneManagement;
 using PixeLadder.EasyTransition;
 using SlimeKing.Core; // acesso ao GameManager
 
-/// <summary>
-/// Controller específico para a tela inicial, gerencia a sequência de apresentação
-/// seguindo o padrão: logo empresa → fundo jogo → logo jogo → elementos menu
-/// </summary>
-public class TitleScreenController : MonoBehaviour
+namespace SlimeKing.Controllers
+{
+    /// <summary>
+    /// Controller específico para a tela inicial, gerencia a sequência de apresentação
+    /// seguindo o padrão: logo empresa → fundo jogo → logo jogo → elementos menu
+    /// </summary>
+    public class TitleScreenController : MonoBehaviour
 {
     #region UI Elements - GameObjects da Cena
     [Header("UI Elements - GameObjects da Cena")]
@@ -912,38 +914,39 @@ public class TitleScreenController : MonoBehaviour
     {
         if (enableDebugLogs)
         {
-            Debug.Log($"[TitleScreenController] {message}");
+            UnityEngine.Debug.Log($"[TitleScreenController] {message}");
         }
     }
 
     #endregion
+
+    #region Enums
+
+    /// <summary>
+    /// Estados da tela inicial
+    /// </summary>
+    public enum TitleScreenState
+    {
+        Initial,
+        CompanyLogo,
+        Transition,
+        GameTitle,
+        MenuReady,
+        TransitionStarted
+    }
+
+    /// <summary>
+    /// Tipos de input suportados
+    /// </summary>
+    public enum InputType
+    {
+        Keyboard,
+        Gamepad,
+        Xbox,
+        PlayStation,
+        Switch
+    }
+
+    #endregion
+    }
 }
-
-#region Enums
-
-/// <summary>
-/// Estados da tela inicial
-/// </summary>
-public enum TitleScreenState
-{
-    Initial,
-    CompanyLogo,
-    Transition,
-    GameTitle,
-    MenuReady,
-    TransitionStarted
-}
-
-/// <summary>
-/// Tipos de input suportados
-/// </summary>
-public enum InputType
-{
-    Keyboard,
-    Gamepad,
-    Xbox,
-    PlayStation,
-    Switch
-}
-
-#endregion

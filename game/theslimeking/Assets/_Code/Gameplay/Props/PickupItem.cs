@@ -13,25 +13,25 @@ namespace SlimeKing.Gameplay
     [RequireComponent(typeof(Collider2D))]
     public class PickupItem : MonoBehaviour, IInteractable
     {
-        [Header("📦 Configurações do Item")]
+        [Header("Item Configuration")]
         [Tooltip("Dados do item a ser coletado")]
         [SerializeField] private ItemData itemData;
 
         [Tooltip("Quantidade do item a ser adicionada ao inventário")]
         [SerializeField] private int quantity = 1;
 
-        [Header("⏸️ Configurações de Pausa")]
+        [Header("Pause Configuration")]
         [Tooltip("Duração da pausa do movimento ao coletar (em segundos)")]
         [SerializeField] private float pauseDuration = 0.5f;
 
-        [Header("🎨 Configurações Visuais")]
+        [Header("Visual Configuration")]
         [Tooltip("Prompt de interação exibido ao jogador")]
         [SerializeField] private string interactionPrompt = "Pressione E para coletar";
 
         [Tooltip("Prioridade de interação (maior = mais prioritário)")]
         [SerializeField] private int interactionPriority = 10;
 
-        [Header("🔧 Debug")]
+        [Header("Debug")]
         [Tooltip("Ativar logs de debug")]
         [SerializeField] private bool enableDebugLogs = false;
 

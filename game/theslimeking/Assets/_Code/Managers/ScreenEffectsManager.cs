@@ -44,7 +44,7 @@ namespace SlimeKing.Gameplay
         #endregion
 
         #region Serialized Fields
-        [Header("🎨 Post-Processing References")]
+        [Header("Post-Processing References")]
         [Tooltip("Global Volume para efeitos de pós-processamento (será encontrado automaticamente se vazio)")]
         [SerializeField] private Volume globalVolume;
 
