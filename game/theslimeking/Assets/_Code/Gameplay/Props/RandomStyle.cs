@@ -3,9 +3,19 @@ using UnityEngine;
 namespace SlimeKing.Gameplay
 {
     /// <summary>
-    /// Componente que aplica variações aleatórias de tamanho e cor ao objeto onde está anexado.
-    /// Útil para criar diversidade visual em objetos spawnados ou elementos decorativos.
+    /// [DEPRECATED] Use SetupVisualEnvironment ao invés desta classe.
+    /// 
+    /// Esta classe foi unificada com SetupVisualEnvironment que oferece:
+    /// - Todas as funcionalidades de RandomStyle
+    /// - Sistema de flags hierárquicas melhor
+    /// - Aplicação em tempo de edição (ExecuteInEditMode)
+    /// - Context menus para rerrolagem de variações individuais
+    /// - Suporte a Renderer genérico (não apenas SpriteRenderer)
+    /// - Melhor controle de cor (paleta, interpolação e tint)
+    /// 
+    /// Componente deprecado será removido na próxima versão.
     /// </summary>
+    [System.Obsolete("RandomStyle está deprecado. Use SetupVisualEnvironment ao invés.", false)]
     public class RandomStyle : MonoBehaviour
 {
     [Header("📏 Configurações de Tamanho")]

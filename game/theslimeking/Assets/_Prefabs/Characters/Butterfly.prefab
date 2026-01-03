@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}
       propertyPath: m_Name
-      value: art_butterFlyA
+      value: Butterfly
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -58,7 +58,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6476719467147667324}
+      addedObject: {fileID: -2568224689129951517}
     - targetCorrespondingSourceObject: {fileID: -3993465597132549372, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2554890114044352233}
@@ -68,7 +68,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -2253911629886400664, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}
   m_PrefabInstance: {fileID: 4472288524795374212}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6476719467147667324
+--- !u!114 &-2568224689129951517
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77,30 +77,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 6820910438373670380}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b64b2d85e06921848a8c98ec571db54f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5031b01e3785307499dffbd3b506e513, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RandomStyle
-  randomizeScale: 1
-  minScale: 0.8
-  maxScale: 1.2
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.SetupVisualCreature
+  applyRandomVariations: 1
+  applyFlipVariations: 0
+  enableFlipX: 1
+  enableFlipY: 0
+  applyScaleVariations: 0
+  enableScaleVariation: 1
+  scaleRange: {x: 0.9, y: 1.1}
   uniformScale: 1
-  randomizeColor: 1
-  possibleColors:
+  applyColorVariations: 0
+  enableColorVariation: 1
+  useColorPalette: 0
+  colorPalette:
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  useColorInterpolation: 1
+  useColorInterpolation: 0
   baseColor: {r: 1, g: 1, b: 1, a: 1}
   colorVariation: 0.3
-  applyOnStart: 1
+  colorTintRange: {r: 0.2, g: 0.2, b: 0.2, a: 0}
   randomizeAlpha: 0
   minAlpha: 0.7
   maxAlpha: 1
-  allowRandomFlipX: 0
-  allowRandomFlipY: 0
-  enableLogs: 0
+  showDebugLogs: 0
+  hasBeenInitialized: 0
 --- !u!1 &8540125088699136384 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3993465597132549372, guid: f34c3503e8c82f3469ac77abb33e0ad5, type: 3}

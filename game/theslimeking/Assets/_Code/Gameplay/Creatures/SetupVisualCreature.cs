@@ -6,17 +6,16 @@ using UnityEditor;
 namespace SlimeKing.Gameplay
 {
     /// <summary>
-    /// Componente que aplica variações visuais aleatórias ao GameObject de forma permanente.
-    /// Todas as mudanças são aplicadas em tempo de edição e persistem durante o jogo.
-    /// Utiliza ExecuteInEditMode para permitir preview no Editor com rerrolagem via Context Menu.
-    /// Unifica funcionalidades de RandomStyle com melhor controle e sistema de flags hierárquicas.
+    /// Componente que aplica variações visuais aleatórias a criaturas de forma permanente.
+    /// Diferente de SetupVisualEnvironment, este componente aplica variações também em Runtime.
+    /// Cada instância de criatura recebe variações únicas baseadas em seu InstanceID.
     /// </summary>
     [ExecuteInEditMode]
-    public class SetupVisualEnvironment : MonoBehaviour
+    public class SetupVisualCreature : MonoBehaviour
     {
         #region Serialized Fields
         [Header("Master Control")]
-        [SerializeField] private bool applyRandomVariations = false;
+        [SerializeField] private bool applyRandomVariations = true;
         [Tooltip("Ativa/desativa todas as variações visuais aleatórias")]
 
         [Header("Flip Settings")]
@@ -83,11 +82,22 @@ namespace SlimeKing.Gameplay
         private bool originalFlipX;
         private bool originalFlipY;
 
-        // Seed baseada na posição para consistência
+        // Seed baseada em InstanceID para consistência
         private int seedValue;
         #endregion
 
         #region Unity Lifecycle
+        private void Awake()
+        {
+            InitializeComponent();
+            
+            // Aplica variações quando a criatura é instanciada (em runtime)
+            if (Application.isPlaying && ShouldApplyVariationsAtRuntime())
+            {
+                ApplyRandomVariations();
+            }
+        }
+
         // ExecuteInEditMode - aplicado também no Editor
         private void OnValidate()
         {
@@ -196,6 +206,37 @@ namespace SlimeKing.Gameplay
         private bool ShouldApplyVariationsAtEditor()
         {
             // No Editor, verifica se alguma flag está ativa
+            bool hasAnyFlagActive = applyRandomVariations || applyFlipVariations || applyScaleVariations || applyColorVariations;
+
+            if (!hasAnyFlagActive)
+            {
+                return false;
+            }
+
+            // Se o master flag estiver ativo, verifica se pelo menos uma sub-flag está ativa
+            if (applyRandomVariations)
+            {
+                bool hasSubFlagActive = applyFlipVariations || applyScaleVariations || applyColorVariations;
+                if (!hasSubFlagActive)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Verifica se as variações devem ser aplicadas em runtime (quando criatura é instanciada).
+        /// </summary>
+        private bool ShouldApplyVariationsAtRuntime()
+        {
+            // Em runtime, verifica se alguma flag está ativa e ainda não foi inicializado
+            if (hasBeenInitialized)
+            {
+                return false;
+            }
+
             bool hasAnyFlagActive = applyRandomVariations || applyFlipVariations || applyScaleVariations || applyColorVariations;
 
             if (!hasAnyFlagActive)
