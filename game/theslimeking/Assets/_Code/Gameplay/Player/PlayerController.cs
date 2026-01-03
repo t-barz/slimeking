@@ -393,10 +393,10 @@ public class PlayerController : MonoBehaviour
         _inputActions.Gameplay.Crouch.canceled += OnCrouchInput;
 
         // Eventos de uso de itens do inventário (slots 1-4)
-        _inputActions.Gameplay.UseItem1.performed += OnUseItem1Input;
-        _inputActions.Gameplay.UseItem2.performed += OnUseItem2Input;
-        _inputActions.Gameplay.UseItem3.performed += OnUseItem3Input;
-        _inputActions.Gameplay.UseItem4.performed += OnUseItem4Input;
+        _inputActions.Gameplay.Skill1.performed += OnSkill1Input;
+        _inputActions.Gameplay.Skill2.performed += OnSkill2Input;
+        _inputActions.Gameplay.Skill3.performed += OnSkill3Input;
+        _inputActions.Gameplay.Skill4.performed += OnSkill4Input;
     }
 
     /// <summary>
@@ -418,10 +418,10 @@ public class PlayerController : MonoBehaviour
         _inputActions.Gameplay.Crouch.canceled -= OnCrouchInput;
 
         // Remove eventos de uso de itens
-        _inputActions.Gameplay.UseItem1.performed -= OnUseItem1Input;
-        _inputActions.Gameplay.UseItem2.performed -= OnUseItem2Input;
-        _inputActions.Gameplay.UseItem3.performed -= OnUseItem3Input;
-        _inputActions.Gameplay.UseItem4.performed -= OnUseItem4Input;
+        _inputActions.Gameplay.Skill1.performed -= OnSkill1Input;
+        _inputActions.Gameplay.Skill2.performed -= OnSkill2Input;
+        _inputActions.Gameplay.Skill3.performed -= OnSkill3Input;
+        _inputActions.Gameplay.Skill4.performed -= OnSkill4Input;
     }
 
     /// <summary>
@@ -858,8 +858,8 @@ public class PlayerController : MonoBehaviour
     /// Usa item do slot 1 do inventário.
     /// Exemplo: Fruta de cura, poção de força, etc.
     /// </summary>
-    /// <param name="context">Contexto de input do UseItem1</param>
-    private void OnUseItem1Input(InputAction.CallbackContext context)
+    /// <param name="context">Contexto de input do Skill1</param>
+    private void OnSkill1Input(InputAction.CallbackContext context)
     {
         UseInventoryItem(1);
     }
@@ -867,8 +867,8 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Usa item do slot 2 do inventário.
     /// </summary>
-    /// <param name="context">Contexto de input do UseItem2</param>
-    private void OnUseItem2Input(InputAction.CallbackContext context)
+    /// <param name="context">Contexto de input do Skill2</param>
+    private void OnSkill2Input(InputAction.CallbackContext context)
     {
         UseInventoryItem(2);
     }
@@ -876,8 +876,8 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Usa item do slot 3 do inventário.
     /// </summary>
-    /// <param name="context">Contexto de input do UseItem3</param>
-    private void OnUseItem3Input(InputAction.CallbackContext context)
+    /// <param name="context">Contexto de input do Skill3</param>
+    private void OnSkill3Input(InputAction.CallbackContext context)
     {
         UseInventoryItem(3);
     }
@@ -885,8 +885,8 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Usa item do slot 4 do inventário.
     /// </summary>
-    /// <param name="context">Contexto de input do UseItem4</param>
-    private void OnUseItem4Input(InputAction.CallbackContext context)
+    /// <param name="context">Contexto de input do Skill4</param>
+    private void OnSkill4Input(InputAction.CallbackContext context)
     {
         UseInventoryItem(4);
     }
@@ -2168,7 +2168,7 @@ public class PlayerController : MonoBehaviour
            • Mouse/Ctrl: Ataque básico
            • E: Interação/Coleta de itens próximos
            • Space: Ataque especial
-           • UseItem1-4: Usar itens dos slots 1-4 do inventário
+           • Skill1-4: Usar itens dos slots 1-4 do inventário
        ✅ Erros de compilação resolvidos
 
     2. SISTEMA DE INTERAÇÕES E COLETA:
@@ -2183,7 +2183,7 @@ public class PlayerController : MonoBehaviour
        - InventorySystem class (gerenciar 4 slots de itens)
        - ItemData ScriptableObject (dados dos itens: nome, efeitos, sprite)
        - UI do inventário (mostrar itens nos slots 1-4)
-       - Sistema de uso de itens do inventário (UseItem1-4)
+       - Sistema de uso de itens do inventário (Skill1-4)
        - Efeitos dos itens (cura, buff de ataque, etc.)
        - Integração com PlayerAttributesHandler
 
@@ -2215,16 +2215,16 @@ public class PlayerController : MonoBehaviour
     🖱️ Mouse Left/Ctrl: Ataque básico
     ⌨️ E: Interação/Coleta (próximo de itens ou elementos interativos)
     ⌨️ Space: Ataque especial (preparado)
-    ⌨️ UseItem1: Usar item do slot 1 do inventário
-    ⌨️ UseItem2: Usar item do slot 2 do inventário  
-    ⌨️ UseItem3: Usar item do slot 3 do inventário
-    ⌨️ UseItem4: Usar item do slot 4 do inventário
+    ⌨️ Skill1: Usar item do slot 1 do inventário
+    ⌨️ Skill2: Usar item do slot 2 do inventário  
+    ⌨️ Skill3: Usar item do slot 3 do inventário
+    ⌨️ Skill4: Usar item do slot 4 do inventário
 
     FLUXO DE GAMEPLAY:
     1. Jogador se aproxima de uma fruta/item coletável
     2. Aparece prompt "Pressione E para coletar"
     3. Jogador pressiona E → item vai para próximo slot livre do inventário
-    4. Jogador pode usar o item pressionando UseItem1-4 conforme o slot
+    4. Jogador pode usar o item pressionando Skill1-4 conforme o slot
     5. Item é consumido e aplica efeito (cura, buff, etc.)
     */
     #endregion

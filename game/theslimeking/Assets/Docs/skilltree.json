@@ -1,0 +1,76 @@
+{
+  "elementos": {
+    "Ar": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Rajada Menor", "descricao": "Libera uma pequena corrente de vento que empurra inimigos próximos.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Fôlego Leve", "descricao": "Aumenta em 5% a velocidade de movimento por 10s.", "pre_requisito": null, "custo": 4},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Lâmina de Vento", "descricao": "Um corte de ar comprimido causa dano à distância.", "pre_requisito": "Rajada Menor", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Asas Brisas", "descricao": "Permite planar lentamente após pulos longos.", "pre_requisito": "Fôlego Leve", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Ciclone Cortante", "descricao": "Cria um pequeno tornado que causa dano contínuo aos inimigos.", "pre_requisito": "Lâmina de Vento", "custo": 20},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Escudo de Ar", "descricao": "Reduz dano físico em 15% por 15s.", "pre_requisito": "Asas Brisas", "custo": 18},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "Tempestade Celeste", "descricao": "Invoca ventos ferozes que atacam todos os inimigos em área.", "pre_requisito": "Ciclone Cortante", "custo": 40},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Domínio dos Céus", "descricao": "Reduz o custo de energia de todas as habilidades de Ar em 20%.", "pre_requisito": "Escudo de Ar", "custo": 35}
+      ]
+    },
+    "Água": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Gota Afiada", "descricao": "Dispara uma gota de alta pressão contra o inimigo.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Brisa Marinha", "descricao": "Cura 5% da vida máxima ao longo de 8s.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Jato de Água", "descricao": "Lança uma corrente d'água que empurra e causa dano.", "pre_requisito": "Gota Afiada", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Resiliência Fluida", "descricao": "Reduz em 10% o tempo de recarga das habilidades.", "pre_requisito": "Brisa Marinha", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Maremoto", "descricao": "Cria ondas em torno do jogador, causando dano em área.", "pre_requisito": "Jato de Água", "custo": 22},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Armadura Líquida", "descricao": "Absorve dano equivalente a 15% da vida máxima.", "pre_requisito": "Resiliência Fluida", "custo": 20},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "Chuva Ancestral", "descricao": "Invoca uma tempestade que causa dano contínuo em toda a arena.", "pre_requisito": "Maremoto", "custo": 45},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Fonte Eterna", "descricao": "Passivamente regenera 1% da vida a cada 3s.", "pre_requisito": "Armadura Líquida", "custo": 38}
+      ]
+    },
+    "Fogo": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Faísca", "descricao": "Cria uma pequena chama que causa dano rápido.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Brasa Viva", "descricao": "Aumenta o ataque em 5% por 10s.", "pre_requisito": null, "custo": 4},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Explosão Ígnea", "descricao": "Lança uma bola de fogo que explode em impacto.", "pre_requisito": "Faísca", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Coração Flamejante", "descricao": "Aumenta o dano de fogo em 10%.", "pre_requisito": "Brasa Viva", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Chuva de Meteoros", "descricao": "Lança múltiplos projéteis flamejantes na área.", "pre_requisito": "Explosão Ígnea", "custo": 22},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Aura Ígnea", "descricao": "Inimigos próximos sofrem dano ígneo contínuo.", "pre_requisito": "Coração Flamejante", "custo": 20},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "Sol Carmesim", "descricao": "Invoca uma bola de plasma que segue inimigos e explode em chamas.", "pre_requisito": "Chuva de Meteoros", "custo": 45},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Espírito da Fênix", "descricao": "Ao cair, revive com 30% da vida uma vez por combate.", "pre_requisito": "Aura Ígnea", "custo": 40}
+      ]
+    },
+    "Terra": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Pedrada", "descricao": "Arremessa uma pequena rocha no inimigo.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Pele Rochosa", "descricao": "Reduz dano físico em 5%.", "pre_requisito": null, "custo": 4},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Coluna de Pedra", "descricao": "Faz brotar uma rocha sob o inimigo, lançando-o ao ar.", "pre_requisito": "Pedrada", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Fortificação", "descricao": "Aumenta defesa em 10% por 15s.", "pre_requisito": "Pele Rochosa", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Terremoto", "descricao": "Causa dano massivo ao chão, afetando todos os inimigos próximos.", "pre_requisito": "Coluna de Pedra", "custo": 25},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Muralha Ancestral", "descricao": "Cria uma barreira que bloqueia ataques.", "pre_requisito": "Fortificação", "custo": 22},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "C coração da Montanha", "descricao": "Golpe devastador que libera rachaduras de energia terrestre.", "pre_requisito": "Terremoto", "custo": 45},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Raiz Imutável", "descricao": "Reduz dano recebido em 25% quando com menos de 30% de vida.", "pre_requisito": "Muralha Ancestral", "custo": 40}
+      ]
+    },
+    "Natureza": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Esporo Tóxico", "descricao": "Lança um projétil venenoso que causa dano ao longo do tempo.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Broto Vital", "descricao": "Restaura lentamente a vida durante 8s.", "pre_requisito": null, "custo": 4},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Chicote de Trepadeira", "descricao": "Golpeia inimigos com vinhas.", "pre_requisito": "Esporo Tóxico", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Crescimento Rápido", "descricao": "Aumenta em 10% a regeneração de vida.", "pre_requisito": "Broto Vital", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Flor Espinhosa", "descricao": "Cria uma planta de espinhos que ataca automaticamente por alguns segundos.", "pre_requisito": "Chicote de Trepadeira", "custo": 20},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Canção da Selva", "descricao": "Melhora ataque e regeneração aliados próximos.", "pre_requisito": "Crescimento Rápido", "custo": 18},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "Guardião Verdejante", "descricao": "Invoca um elemental de planta para lutar temporariamente.", "pre_requisito": "Flor Espinhosa", "custo": 40},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Coração da Floresta", "descricao": "Aumenta permanentemente em 10% a regeneração e defesa.", "pre_requisito": "Canção da Selva", "custo": 35}
+      ]
+    },
+    "Escuridão": {
+      "habilidades": [
+        {"estagio": "Filhote", "tipo": "Ataque", "nome": "Sombra Rasgante", "descricao": "Golpe rápido que aplica ferimento sombrio.", "pre_requisito": null, "custo": 5},
+        {"estagio": "Filhote", "tipo": "Suporte", "nome": "Véu Noturno", "descricao": "Aumenta evasão em 5% por 10s.", "pre_requisito": null, "custo": 4},
+        {"estagio": "Jovem", "tipo": "Ataque", "nome": "Lâminas Sombrias", "descricao": "Projeta adagas de energia obscura que perfuram inimigos.", "pre_requisito": "Sombra Rasgante", "custo": 12},
+        {"estagio": "Jovem", "tipo": "Suporte", "nome": "Abraço da Escuridão", "descricao": "Recupera vida ao causar dano.", "pre_requisito": "Véu Noturno", "custo": 10},
+        {"estagio": "Adulto", "tipo": "Ataque", "nome": "Tormenta Sombria", "descricao": "Explosão de energia escura que causa dano em área.", "pre_requisito": "Lâminas Sombrias", "custo": 22},
+        {"estagio": "Adulto", "tipo": "Suporte", "nome": "Essência Profana", "descricao": "Aumenta o ataque conforme a vida perdida.", "pre_requisito": "Abraço da Escuridão", "custo": 20},
+        {"estagio": "Rei", "tipo": "Ataque", "nome": "Eclipse Total", "descricao": "Cobre o campo em trevas, infligindo dano contínuo a todos os inimigos.", "pre_requisito": "Tormenta Sombria", "custo": 45},
+        {"estagio": "Rei", "tipo": "Suporte", "nome": "Senhor das Sombras", "descricao": "Concede invisibilidade por poucos segundos ao ativar qualquer habilidade.", "pre_requisito": "Essência Profana", "custo": 38}
+      ]
+    }
+  }
+}

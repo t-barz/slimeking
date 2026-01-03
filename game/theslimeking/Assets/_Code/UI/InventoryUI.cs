@@ -142,11 +142,11 @@ namespace SlimeKing.UI
 
             fadeCoroutine = StartCoroutine(FadeIn());
 
-            // Habilitar mapa InventoryNavigation
+            // Habilitar mapa UI
             if (inputActions != null)
             {
-                inputActions.InventoryNavigation.Enable();
-                LogMessage("InventoryNavigation map enabled");
+                inputActions.UI.Enable();
+                LogMessage("UI map enabled");
             }
         }
 
@@ -170,11 +170,11 @@ namespace SlimeKing.UI
             LogMessage("Hiding inventory");
             isOpen = false;
 
-            // Desabilitar mapa InventoryNavigation
+            // Desabilitar mapa UI
             if (inputActions != null)
             {
-                inputActions.InventoryNavigation.Disable();
-                LogMessage("InventoryNavigation map disabled");
+                inputActions.UI.Disable();
+                LogMessage("UI map disabled");
             }
 
             // Para fade anterior se existir
@@ -299,7 +299,7 @@ namespace SlimeKing.UI
         }
 
         /// <summary>
-        /// Habilita o input de navegação do inventário (mapa UI.Navigate) e quick slot assignment.
+        /// Habilita o input de navegação do inventário (mapa UI.MoveSelector) e quick slot assignment.
         /// </summary>
         private void EnableNavigationInput()
         {
@@ -308,22 +308,22 @@ namespace SlimeKing.UI
 
             try
             {
-                inputActions.InventoryNavigation.Navigate.performed += OnNavigateInput;
-                inputActions.InventoryNavigation.SelectItem.performed += OnSubmitInput;
-                inputActions.InventoryNavigation.CloseInventory.performed += OnCancelInput;
+                inputActions.UI.MoveSelector.performed += OnMoveSelectorInput;
+                inputActions.UI.SelectItem.performed += OnSubmitInput;
+                inputActions.UI.Cancel.performed += OnCancelInput;
 
                 // Subscibe aos botões de atribuição rápida
-                inputActions.InventoryNavigation.AddToSlot1.performed += (ctx) => OnAssignToQuickSlot(0);
-                inputActions.InventoryNavigation.AddToSlot2.performed += (ctx) => OnAssignToQuickSlot(1);
-                inputActions.InventoryNavigation.AddToSlot3.performed += (ctx) => OnAssignToQuickSlot(2);
-                inputActions.InventoryNavigation.AddToSlot4.performed += (ctx) => OnAssignToQuickSlot(3);
+                inputActions.UI.AddSlot1.performed += (ctx) => OnAssignToQuickSlot(0);
+                inputActions.UI.AddSlot2.performed += (ctx) => OnAssignToQuickSlot(1);
+                inputActions.UI.AddSlot3.performed += (ctx) => OnAssignToQuickSlot(2);
+                inputActions.UI.AddSlot4.performed += (ctx) => OnAssignToQuickSlot(3);
 
                 isInputSubscribed = true;
                 LogMessage("Navigation input enabled");
             }
             catch (System.Exception ex)
             {
-                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to subscribe to Navigate input: {ex.Message}");
+                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to subscribe to MoveSelector input: {ex.Message}");
             }
         }
 
@@ -337,22 +337,22 @@ namespace SlimeKing.UI
 
             try
             {
-                inputActions.InventoryNavigation.Navigate.performed -= OnNavigateInput;
-                inputActions.InventoryNavigation.SelectItem.performed -= OnSubmitInput;
-                inputActions.InventoryNavigation.CloseInventory.performed -= OnCancelInput;
+                inputActions.UI.MoveSelector.performed -= OnMoveSelectorInput;
+                inputActions.UI.SelectItem.performed -= OnSubmitInput;
+                inputActions.UI.Cancel.performed -= OnCancelInput;
 
                 // Unsubscribe dos botões de atribuição rápida
-                inputActions.InventoryNavigation.AddToSlot1.performed -= (ctx) => OnAssignToQuickSlot(0);
-                inputActions.InventoryNavigation.AddToSlot2.performed -= (ctx) => OnAssignToQuickSlot(1);
-                inputActions.InventoryNavigation.AddToSlot3.performed -= (ctx) => OnAssignToQuickSlot(2);
-                inputActions.InventoryNavigation.AddToSlot4.performed -= (ctx) => OnAssignToQuickSlot(3);
+                inputActions.UI.AddSlot1.performed -= (ctx) => OnAssignToQuickSlot(0);
+                inputActions.UI.AddSlot2.performed -= (ctx) => OnAssignToQuickSlot(1);
+                inputActions.UI.AddSlot3.performed -= (ctx) => OnAssignToQuickSlot(2);
+                inputActions.UI.AddSlot4.performed -= (ctx) => OnAssignToQuickSlot(3);
 
                 isInputSubscribed = false;
                 LogMessage("Navigation input disabled");
             }
             catch (System.Exception ex)
             {
-                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to unsubscribe from Navigate input: {ex.Message}");
+                UnityEngine.Debug.LogWarning($"[InventoryUI] Failed to unsubscribe from MoveSelector input: {ex.Message}");
             }
         }
 
@@ -360,7 +360,7 @@ namespace SlimeKing.UI
         /// Callback para o input de navegação (cima/baixo/esquerda/direita).
         /// Implementa navegação linear (apenas cima/baixo) pulando slots vazios.
         /// </summary>
-        private void OnNavigateInput(InputAction.CallbackContext context)
+        private void OnMoveSelectorInput(InputAction.CallbackContext context)
         {
             if (!isOpen)
                 return;
@@ -369,26 +369,26 @@ namespace SlimeKing.UI
 
             if (direction.y > 0.5f) // Cima
             {
-                NavigateUp();
+                MoveSelectorUp();
             }
             else if (direction.y < -0.5f) // Baixo
             {
-                NavigateDown();
+                MoveSelectorDown();
             }
             else if (direction.x > 0.5f) // Direita
             {
-                NavigateRight();
+                MoveSelectorRight();
             }
             else if (direction.x < -0.5f) // Esquerda
             {
-                NavigateLeft();
+                MoveSelectorLeft();
             }
         }
 
         /// <summary>
         /// Navega para cima (slot anterior).
         /// </summary>
-        private void NavigateUp()
+        private void MoveSelectorUp()
         {
             if (currentSelectedIndex < 0)
             {
@@ -410,7 +410,7 @@ namespace SlimeKing.UI
         /// <summary>
         /// Navega para baixo (próximo slot).
         /// </summary>
-        private void NavigateDown()
+        private void MoveSelectorDown()
         {
             if (currentSelectedIndex < 0)
             {
@@ -432,7 +432,7 @@ namespace SlimeKing.UI
         /// <summary>
         /// Navega para a direita (próximo slot na mesma linha).
         /// </summary>
-        private void NavigateRight()
+        private void MoveSelectorRight()
         {
             if (currentSelectedIndex < 0)
             {
@@ -457,7 +457,7 @@ namespace SlimeKing.UI
         /// <summary>
         /// Navega para a esquerda (slot anterior na mesma linha).
         /// </summary>
-        private void NavigateLeft()
+        private void MoveSelectorLeft()
         {
             if (currentSelectedIndex < 0)
             {

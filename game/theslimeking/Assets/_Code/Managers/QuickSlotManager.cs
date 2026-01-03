@@ -6,7 +6,7 @@ using SlimeKing.Core;
 namespace TheSlimeKing.Inventory
 {
     /// <summary>
-    /// Gerencia os 4 quick slots mapeados aos UseItem1-4 do InputSystem.
+    /// Gerencia os 4 quick slots mapeados aos Skill1-4 do InputSystem.
     /// Detecta input e usa itens atribuídos aos quick slots.
     /// Atualiza a UI dos quick slots no HUD.
     /// </summary>
@@ -48,12 +48,12 @@ namespace TheSlimeKing.Inventory
 
         private void OnEnable()
         {
-            // Habilitar mapa Gameplay e subscrever aos eventos UseItem
+            // Habilitar mapa Gameplay e subscrever aos eventos Skill
             inputActions.Gameplay.Enable();
-            inputActions.Gameplay.UseItem1.performed += OnUseItem1Input;
-            inputActions.Gameplay.UseItem2.performed += OnUseItem2Input;
-            inputActions.Gameplay.UseItem3.performed += OnUseItem3Input;
-            inputActions.Gameplay.UseItem4.performed += OnUseItem4Input;
+            inputActions.Gameplay.Skill1.performed += OnSkill1Input;
+            inputActions.Gameplay.Skill2.performed += OnSkill2Input;
+            inputActions.Gameplay.Skill3.performed += OnSkill3Input;
+            inputActions.Gameplay.Skill4.performed += OnSkill4Input;
 
             // Subscrever ao evento de pause para desabilitar/habilitar quick slots
             if (PauseManager.Instance != null)
@@ -64,11 +64,11 @@ namespace TheSlimeKing.Inventory
 
         private void OnDisable()
         {
-            // Desinscrever dos eventos UseItem
-            inputActions.Gameplay.UseItem1.performed -= OnUseItem1Input;
-            inputActions.Gameplay.UseItem2.performed -= OnUseItem2Input;
-            inputActions.Gameplay.UseItem3.performed -= OnUseItem3Input;
-            inputActions.Gameplay.UseItem4.performed -= OnUseItem4Input;
+            // Desinscrever dos eventos Skill
+            inputActions.Gameplay.Skill1.performed -= OnSkill1Input;
+            inputActions.Gameplay.Skill2.performed -= OnSkill2Input;
+            inputActions.Gameplay.Skill3.performed -= OnSkill3Input;
+            inputActions.Gameplay.Skill4.performed -= OnSkill4Input;
             inputActions.Gameplay.Disable();
 
             // Desinscrever do evento de pause
@@ -92,28 +92,28 @@ namespace TheSlimeKing.Inventory
         #endregion
 
         #region Input Handlers
-        private void OnUseItem1Input(InputAction.CallbackContext context)
+        private void OnSkill1Input(InputAction.CallbackContext context)
         {
             InventoryManager.Instance?.UseQuickSlot(0);
         }
 
-        private void OnUseItem2Input(InputAction.CallbackContext context)
+        private void OnSkill2Input(InputAction.CallbackContext context)
         {
             InventoryManager.Instance?.UseQuickSlot(1);
         }
 
-        private void OnUseItem3Input(InputAction.CallbackContext context)
+        private void OnSkill3Input(InputAction.CallbackContext context)
         {
             InventoryManager.Instance?.UseQuickSlot(2);
         }
 
-        private void OnUseItem4Input(InputAction.CallbackContext context)
+        private void OnSkill4Input(InputAction.CallbackContext context)
         {
             InventoryManager.Instance?.UseQuickSlot(3);
         }
 
         /// <summary>
-        /// Desabilita/habilita os UseItem inputs quando o jogo está pausado/despausado.
+        /// Desabilita/habilita os Skill inputs quando o jogo está pausado/despausado.
         /// Isso previne que os itens sejam usados quando o inventário está aberto.
         /// </summary>
         private void OnPauseStateChanged(bool isPaused)

@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 82b018490575d2f45a4fe0d9f9581e7e
   m_currentHash:
     serializedVersion: 2
-    Hash: 3e7862551c77fca677926ffc1b5bc0f4
+    Hash: 7b90e92c58b835b906e9329808429f5b
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -24,11 +24,11 @@ MonoBehaviour:
   m_InternalBundleIdMode: 1
   m_AssetLoadMode: 0
   m_BundledAssetProviderType:
-    m_AssemblyName: 
-    m_ClassName: 
+    m_AssemblyName: Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_ClassName: UnityEngine.ResourceManagement.ResourceProviders.BundledAssetProvider
   m_AssetBundleProviderType:
-    m_AssemblyName: 
-    m_ClassName: 
+    m_AssemblyName: Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_ClassName: UnityEngine.ResourceManagement.ResourceProviders.AssetBundleProvider
   m_IgnoreUnsupportedFilesInBuild: 0
   m_UniqueBundleIds: 0
   m_EnableJsonCatalog: 0
@@ -60,12 +60,15 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: 543b9e0938ba40843b147f349b573dd4, type: 2}
   - {fileID: 11400000, guid: 700774f6e5e7ab74fb67dc2f1982ad9a, type: 2}
   - {fileID: 11400000, guid: 9007d2a95982789459edd77ef06c5950, type: 2}
   - {fileID: 11400000, guid: 06941ad1b911c5d42a22d433a8c6235b, type: 2}
+  - {fileID: 11400000, guid: 793c2270ae5d3ef4096a83e129382704, type: 2}
   - {fileID: 11400000, guid: c2822ff0d64ff744d806fea28351cf57, type: 2}
   - {fileID: 11400000, guid: 1602c0644686ed44aa0182dddfe73d65, type: 2}
   - {fileID: 11400000, guid: e8c66a8d2aa1b5d43951aabe6041ca06, type: 2}
+  - {fileID: 11400000, guid: f4ceecd388bd6344b9cb2d9a2388b577, type: 2}
   - {fileID: 11400000, guid: 41cde9c37871d444bb2fb70f15821aaa, type: 2}
   - {fileID: 11400000, guid: afb2dfd114a25554bb684fc45c1fc771, type: 2}
   - {fileID: 11400000, guid: 516eaea6f9ce8ec4c9aaea1b0c62e02c, type: 2}
@@ -125,6 +128,10 @@ MonoBehaviour:
     - Locale-nl-NL
     - Locale-pt-BR
     - Locale-ru-RU
+    - Preload
+    - Locale-fr
+    - Locale-ko
+    - Locale-zh
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: dc7236c5a1adbfc4ab1c050ce60eb372, type: 2}

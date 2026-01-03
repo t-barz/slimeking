@@ -8,38 +8,52 @@ using SlimeKing.UI;
 namespace SlimeKing.Core
 {
     /// <summary>
-    /// Gerencia o estado de pause do jogo com suporte a pause stack.
-    /// Controla Time.timeScale, audio ducking, e switching de action maps.
+    /// Manages game pause state with pause stack support.
+    /// Controls Time.timeScale, audio ducking, and action map switching.
     /// 
     /// PAUSE STACK:
-    /// Permite múltiplos sistemas (DialogueManager, PauseMenu) pausarem simultaneamente
-    /// sem conflitos. O jogo só despausa quando todos os sistemas chamarem Resume().
+    /// Allows multiple systems (DialogueManager, PauseMenu) to pause simultaneously
+    /// without conflicts. Game only unpauses when all systems call Resume().
     /// 
     /// AUDIO DUCKING:
-    /// Reduz volume do AudioListener para 0.2f durante pause (ao invés de mutar),
-    /// mantendo feedback sonoro suave.
+    /// Reduces AudioListener volume to 0.2f during pause (instead of muting),
+    /// maintaining smooth audio feedback.
     /// </summary>
     public class PauseManager : ManagerSingleton<PauseManager>
     {
+        #region Constants
+        
+        private const int INITIAL_PAUSE_COUNT = 0;
+        private const int FIRST_PAUSE_THRESHOLD = 1;
+        
+        #endregion
+
         #region Inspector Settings
 
         [Header("Audio Settings")]
-        [Tooltip("Volume do AudioListener quando pausado (ducking)")]
+        [Tooltip("AudioListener volume when paused (ducking)")]
         [SerializeField] private float pausedAudioVolume = 0.2f;
 
-        [Tooltip("Volume do AudioListener quando despausado")]
+        [Tooltip("AudioListener volume when unpaused")]
         [SerializeField] private float resumedAudioVolume = 1.0f;
 
-        [Tooltip("Duração do fade de áudio em segundos")]
+        [Tooltip("Audio fade duration in seconds")]
         [SerializeField] private float audioFadeDuration = 0.5f;
+
+        [Header("UI References")]
+        [Tooltip("Reference to PauseMenu component")]
+        [SerializeField] private PauseMenu pauseMenu;
+
+        [Tooltip("Reference to InventoryUI component")]
+        [SerializeField] private InventoryUI inventoryUI;
 
         #endregion
 
         #region Events
 
         /// <summary>
-        /// Evento disparado quando o estado de pause muda.
-        /// Parâmetro: true se pausado, false se despausado.
+        /// Event fired when pause state changes.
+        /// Parameter: true if paused, false if unpaused.
         /// </summary>
         public static event Action<bool> OnPauseStateChanged;
 
@@ -48,39 +62,29 @@ namespace SlimeKing.Core
         #region Private Fields
 
         /// <summary>
-        /// Contador de referências de pause.
-        /// Incrementa ao pausar, decrementa ao despausar.
-        /// Jogo está pausado quando > 0.
+        /// Pause reference counter.
+        /// Increments on pause, decrements on resume.
+        /// Game is paused when > 0.
         /// </summary>
-        private int pauseRefCount = 0;
+        private int pauseRefCount = INITIAL_PAUSE_COUNT;
 
         /// <summary>
-        /// Referência ao sistema de input do PlayerController.
+        /// Reference to PlayerController input system.
         /// </summary>
         private InputSystem_Actions inputActions;
 
         /// <summary>
-        /// Corrotina ativa de fade de áudio.
+        /// Active audio fade coroutine.
         /// </summary>
         private Coroutine audioFadeCoroutine;
 
         /// <summary>
-        /// Flag indicando se já subscrevemos aos inputs.
+        /// Flag indicating if we've subscribed to inputs.
         /// </summary>
         private bool isInputSubscribed = false;
 
         /// <summary>
-        /// Referência ao PauseMenu.
-        /// </summary>
-        private PauseMenu pauseMenu;
-
-        /// <summary>
-        /// Referência ao InventoryUI.
-        /// </summary>
-        private InventoryUI inventoryUI;
-
-        /// <summary>
-        /// Estado atual da navegação.
+        /// Current navigation state.
         /// </summary>
         private enum NavigationState
         {
@@ -96,79 +100,34 @@ namespace SlimeKing.Core
         #region Properties
 
         /// <summary>
-        /// Retorna true se o jogo está pausado.
+        /// Returns true if game is paused.
         /// </summary>
-        public bool IsPaused => pauseRefCount > 0;
+        public bool IsPaused => pauseRefCount > INITIAL_PAUSE_COUNT;
 
         /// <summary>
-        /// Retorna o valor atual do pause stack counter.
+        /// Returns current pause stack counter value.
         /// </summary>
         public int PauseStackCount => pauseRefCount;
 
         #endregion
 
-        #region Initialization
+        #region Unity Lifecycle
 
         protected override void Initialize()
         {
-            Log("PauseManager initialized");
-
-            // Garante que AudioListener está no volume normal
+            // Ensure AudioListener is at normal volume
             AudioListener.volume = resumedAudioVolume;
 
-            // Encontra referências aos componentes de UI
-            pauseMenu = FindObjectOfType<SlimeKing.UI.PauseMenu>();
-            inventoryUI = FindObjectOfType<SlimeKing.UI.InventoryUI>();
+            // Validate UI references
+            ValidateUIReferences();
 
-            if (pauseMenu == null)
-            {
-                LogWarning("PauseMenu not found in scene!");
-            }
-
-            if (inventoryUI == null)
-            {
-                LogWarning("InventoryUI not found in scene!");
-            }
-
-            // Aguarda um frame para garantir que PlayerController está inicializado
-            StartCoroutine(InitializeInputDelayed());
+            // Initialize input system
+            InitializeInputSystem();
         }
-
-        /// <summary>
-        /// Inicializa input system após PlayerController estar pronto.
-        /// </summary>
-        private IEnumerator InitializeInputDelayed()
-        {
-            yield return null; // Aguarda um frame
-
-            // Tenta obter referência ao input do PlayerController
-            if (PlayerController.Instance != null)
-            {
-                inputActions = PlayerController.Instance.GetInputActions();
-
-                if (inputActions != null)
-                {
-                    SubscribeToInputs();
-                    Log("Input system connected successfully");
-                }
-                else
-                {
-                    LogWarning("Failed to get InputActions from PlayerController");
-                }
-            }
-            else
-            {
-                LogWarning("PlayerController.Instance not found. Menu input will not work.");
-            }
-        }
-
-        #endregion
-
-        #region Unity Lifecycle
 
         private void OnEnable()
         {
-            // Resubscribe se já tínhamos subscrito antes
+            // Resubscribe if we had subscribed before
             if (inputActions != null && !isInputSubscribed)
             {
                 SubscribeToInputs();
@@ -184,11 +143,47 @@ namespace SlimeKing.Core
         {
             UnsubscribeFromInputs();
 
-            // Garante que o jogo não fica pausado ao destruir o manager
+            // Ensure game doesn't stay paused when destroying manager
             if (IsPaused)
             {
-                Time.timeScale = 1f;
-                AudioListener.volume = resumedAudioVolume;
+                ForceUnpause();
+            }
+        }
+
+        #endregion
+
+        #region Initialization
+
+        /// <summary>
+        /// Validates UI component references.
+        /// </summary>
+        private void ValidateUIReferences()
+        {
+            if (pauseMenu == null)
+            {
+                pauseMenu = FindObjectOfType<PauseMenu>();
+            }
+
+            if (inventoryUI == null)
+            {
+                inventoryUI = FindObjectOfType<InventoryUI>();
+            }
+        }
+
+        /// <summary>
+        /// Initializes input system connection.
+        /// </summary>
+        private void InitializeInputSystem()
+        {
+            if (PlayerController.Instance != null)
+            {
+                inputActions = PlayerController.Instance.GetInputActions();
+
+                if (inputActions != null)
+                {
+                    SubscribeToInputs();
+                }
+               
             }
         }
 
@@ -197,125 +192,93 @@ namespace SlimeKing.Core
         #region Input Management
 
         /// <summary>
-        /// Subscreve aos eventos de input.
+        /// Subscribes to input events.
         /// </summary>
         private void SubscribeToInputs()
         {
             if (inputActions == null || isInputSubscribed) return;
 
             // Gameplay inputs
-            inputActions.Gameplay.PauseGame.performed += OnGameplayMenuInput;
-            inputActions.Gameplay.OpenInventory.performed += OnGameplayInventoryInput;
+            inputActions.Gameplay.Pause.performed += OnGameplayMenuInput;
+            inputActions.Gameplay.Inventory.performed += OnGameplayInventoryInput;
 
             // Menu inputs
-            inputActions.Menus.ReturnToGameplay.performed += OnMenuReturnToGameplayInput;
-            inputActions.Menus.Confirm.performed += OnMenuConfirmInput;
+            inputActions.Menu.Back.performed += OnMenuBackInput;
+            inputActions.Menu.Confirm.performed += OnMenuConfirmInput;
 
             // Inventory Navigation inputs
-            inputActions.InventoryNavigation.CloseInventory.performed += OnUICancelInput;
-            inputActions.InventoryNavigation.SelectItem.performed += OnUISubmitInput;
+            inputActions.UI.Cancel.performed += OnUICancelInput;
+            inputActions.UI.SelectItem.performed += OnUISubmitInput;
 
             isInputSubscribed = true;
-            Log("Subscribed to all inputs");
         }
 
         /// <summary>
-        /// Remove subscrição aos eventos de input.
+        /// Unsubscribes from input events.
         /// </summary>
         private void UnsubscribeFromInputs()
         {
             if (inputActions == null || !isInputSubscribed) return;
 
             // Gameplay inputs
-            inputActions.Gameplay.PauseGame.performed -= OnGameplayMenuInput;
-            inputActions.Gameplay.OpenInventory.performed -= OnGameplayInventoryInput;
+            inputActions.Gameplay.Pause.performed -= OnGameplayMenuInput;
+            inputActions.Gameplay.Inventory.performed -= OnGameplayInventoryInput;
 
             // Menu inputs
-            inputActions.Menus.ReturnToGameplay.performed -= OnMenuReturnToGameplayInput;
-            inputActions.Menus.Confirm.performed -= OnMenuConfirmInput;
+            inputActions.Menu.Back.performed -= OnMenuBackInput;
+            inputActions.Menu.Confirm.performed -= OnMenuConfirmInput;
 
             // Inventory Navigation inputs
-            inputActions.InventoryNavigation.CloseInventory.performed -= OnUICancelInput;
-            inputActions.InventoryNavigation.SelectItem.performed -= OnUISubmitInput;
+            inputActions.UI.Cancel.performed -= OnUICancelInput;
+            inputActions.UI.SelectItem.performed -= OnUISubmitInput;
 
             isInputSubscribed = false;
-            Log("Unsubscribed from all inputs");
         }
 
-        /// <summary>
-        /// Callback para Gameplay.Menu (Start/Esc/Tab).
-        /// Gameplay → PauseMenu
-        /// </summary>
+        #endregion
+
+        #region Input Callbacks
+
         private void OnGameplayMenuInput(InputAction.CallbackContext context)
         {
             if (currentState == NavigationState.Gameplay)
             {
-                Log("Gameplay → PauseMenu");
-                TransitionToPauseMenu();
+                ShowUI(UIType.PauseMenu);
             }
         }
 
-        /// <summary>
-        /// Callback para Gameplay.OpenInventory (Select/I/Y).
-        /// Gameplay → Inventory (direto, sem pausar via menu)
-        /// </summary>
         private void OnGameplayInventoryInput(InputAction.CallbackContext context)
         {
             if (currentState == NavigationState.Gameplay)
             {
-                Log("Gameplay → Inventory (direct)");
-                TransitionToInventoryFromGameplay();
+                ShowUI(UIType.Inventory);
             }
         }
 
-        /// <summary>
-        /// Callback para Menus.ReturnToGameplay (Start/Esc).
-        /// PauseMenu → Gameplay ou Inventory → Gameplay (fecha tudo)
-        /// </summary>
-        private void OnMenuReturnToGameplayInput(InputAction.CallbackContext context)
+        private void OnMenuBackInput(InputAction.CallbackContext context)
         {
-            if (currentState == NavigationState.PauseMenu || currentState == NavigationState.Inventory)
+            if (currentState != NavigationState.Gameplay)
             {
-                Log($"{currentState} → Gameplay (ReturnToGameplay button)");
-                TransitionToGameplay();
+                Cancel();
             }
         }
 
-        /// <summary>
-        /// Callback para Menus.Confirm (A/Enter).
-        /// PauseMenu → Inventory (via botão do menu)
-        /// </summary>
         private void OnMenuConfirmInput(InputAction.CallbackContext context)
         {
-            if (currentState == NavigationState.PauseMenu)
-            {
-                // EventSystem do Unity vai disparar os botões selecionados
-                // Este handler é um fallback caso necessário
-                Log("Menus.Confirm pressed (handled by EventSystem/Buttons)");
-            }
+            // Handled by EventSystem/Buttons
         }
 
-        /// <summary>
-        /// Callback para InventoryNavigation.CloseInventory (Select/I).
-        /// Inventory → Gameplay (fecha completamente)
-        /// </summary>
         private void OnUICancelInput(InputAction.CallbackContext context)
         {
             if (currentState == NavigationState.Inventory)
             {
-                Log("Inventory → Gameplay (CloseInventory button)");
-                TransitionToGameplay();
+                Cancel();
             }
         }
 
-        /// <summary>
-        /// Callback para UI.Submit (A/Enter/Space).
-        /// Usado para confirmar seleções no menu.
-        /// </summary>
         private void OnUISubmitInput(InputAction.CallbackContext context)
         {
-            // Submit é tratado pelo EventSystem e pelos botões
-            // Não precisa de lógica adicional aqui
+            // Handled by EventSystem and buttons
         }
 
         #endregion
@@ -323,187 +286,154 @@ namespace SlimeKing.Core
         #region Public Methods
 
         /// <summary>
-        /// Pausa o jogo. Incrementa o pause stack counter.
-        /// Se for a primeira pausa, pausa o jogo efetivamente.
+        /// Pauses the game. Increments pause stack counter.
+        /// If first pause, effectively pauses the game.
         /// </summary>
         public void Pause()
         {
             pauseRefCount++;
 
-            Log($"Pause() called. Stack count: {pauseRefCount}");
-
-            // Só pausa efetivamente na primeira chamada
-            if (pauseRefCount == 1)
+            // Only pause effectively on first call
+            if (pauseRefCount == FIRST_PAUSE_THRESHOLD)
             {
-                PauseGame();
+                ExecutePause();
             }
 
-            // Notifica mudança no stack
+            // Notify stack change
             PauseEvents.InvokePauseStackChanged(pauseRefCount);
         }
 
         /// <summary>
-        /// Despausa o jogo. Decrementa o pause stack counter.
-        /// Se counter chegar a zero, despausa o jogo efetivamente.
+        /// Unpauses the game. Decrements pause stack counter.
+        /// If counter reaches zero, effectively unpauses the game.
         /// </summary>
         public void Resume()
         {
-            if (pauseRefCount <= 0)
+            if (pauseRefCount <= INITIAL_PAUSE_COUNT)
             {
-                LogWarning("Resume() called but game is not paused");
                 return;
             }
 
             pauseRefCount--;
 
-            Log($"Resume() called. Stack count: {pauseRefCount}");
-
-            // Só despausa efetivamente quando stack chega a zero
-            if (pauseRefCount == 0)
+            // Only unpause effectively when stack reaches zero
+            if (pauseRefCount == INITIAL_PAUSE_COUNT)
             {
-                ResumeGame();
+                ExecuteResume();
             }
 
-            // Notifica mudança no stack
+            // Notify stack change
             PauseEvents.InvokePauseStackChanged(pauseRefCount);
         }
 
         /// <summary>
-        /// Callback chamado quando o botão Inventory do PauseMenu é pressionado.
-        /// PauseMenu → Inventory
+        /// Callback for Inventory button press from PauseMenu.
         /// </summary>
         public void OnInventoryButtonPressed()
         {
             if (currentState == NavigationState.PauseMenu)
             {
-                Log("PauseMenu → Inventory (button clicked)");
-                TransitionToInventory();
+                ShowUI(UIType.Inventory);
             }
         }
 
         /// <summary>
-        /// Callback chamado quando o botão Resume do PauseMenu é pressionado.
-        /// PauseMenu → Gameplay
+        /// Callback for Resume button press from PauseMenu.
         /// </summary>
         public void OnResumeButtonPressed()
         {
             if (currentState == NavigationState.PauseMenu)
             {
-                Log("PauseMenu → Gameplay (Resume button)");
-                TransitionToGameplay();
+                Cancel();
             }
         }
 
         #endregion
 
-        #region Navigation Transitions
+        #region Private Methods
 
         /// <summary>
-        /// Transição: Gameplay → PauseMenu
+        /// UI type enumeration for cleaner transitions.
         /// </summary>
-        private void TransitionToPauseMenu()
+        private enum UIType
         {
-            // Pausa o jogo se não estava pausado
+            PauseMenu,
+            Inventory
+        }
+
+        /// <summary>
+        /// Shows specified UI and manages state transitions.
+        /// </summary>
+        private void ShowUI(UIType uiType)
+        {
+            // Pause game if not already paused
             if (!IsPaused)
             {
                 Pause();
             }
 
-            // Oculta inventário se estiver aberto
+            // Hide other UI
+            HideAllUI();
+
+            // Show requested UI and update state
+            switch (uiType)
+            {
+                case UIType.PauseMenu:
+                    if (pauseMenu != null)
+                    {
+                        pauseMenu.Show();
+                    }
+                    currentState = NavigationState.PauseMenu;
+                    break;
+
+                case UIType.Inventory:
+                    if (inventoryUI != null)
+                    {
+                        inventoryUI.Show();
+                    }
+                    currentState = NavigationState.Inventory;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Hides all UI elements.
+        /// </summary>
+        private void HideAllUI()
+        {
+            if (pauseMenu != null && pauseMenu.IsVisible)
+            {
+                pauseMenu.Hide();
+            }
+
             if (inventoryUI != null && inventoryUI.IsOpen)
             {
                 inventoryUI.Hide();
             }
-
-            // Mostra o PauseMenu
-            if (pauseMenu != null)
-            {
-                pauseMenu.Show();
-            }
-
-            currentState = NavigationState.PauseMenu;
         }
 
         /// <summary>
-        /// Transição: Gameplay → Inventory (via botão Select/I/Y)
-        /// Similar a TransitionToInventory, mas rastreada como vindo do Gameplay
+        /// Returns to gameplay, hiding all UI.
         /// </summary>
-        private void TransitionToInventoryFromGameplay()
+        private void Cancel()
         {
-            // Pausa o jogo se não estava pausado
-            if (!IsPaused)
-            {
-                Pause();
-            }
-
-            // Oculta o PauseMenu se estiver aberto
-            if (pauseMenu != null && pauseMenu.IsVisible)
-            {
-                pauseMenu.Hide();
-            }
-
-            // Mostra o Inventory
-            if (inventoryUI != null)
-            {
-                inventoryUI.Show();
-            }
-
-            currentState = NavigationState.Inventory;
-        }
-
-        /// <summary>
-        /// Transição: PauseMenu → Inventory (via botão Confirm do menu)
-        /// </summary>
-        private void TransitionToInventory()
-        {
-            // Pausa o jogo se não estava pausado
-            if (!IsPaused)
-            {
-                Pause();
-            }
-
-            // Oculta o PauseMenu se estiver aberto
-            if (pauseMenu != null && pauseMenu.IsVisible)
-            {
-                pauseMenu.Hide();
-            }
-
-            // Mostra o Inventory
-            if (inventoryUI != null)
-            {
-                inventoryUI.Show();
-            }
-
-            currentState = NavigationState.Inventory;
-        }
-
-        /// <summary>
-        /// Transição: PauseMenu → Gameplay ou Inventory → Gameplay
-        /// Fecha qualquer UI aberta e retorna ao jogo.
-        /// Protegido contra fechar inventário que foi aberto muito recentemente.
-        /// </summary>
-        private void TransitionToGameplay()
-        {
-            // Oculta o PauseMenu se estiver aberto
-            if (pauseMenu != null && pauseMenu.IsVisible)
-            {
-                pauseMenu.Hide();
-            }
-
-            // Oculta o Inventory se estiver aberto
-            // Hide() retorna false se foi aberto muito recentemente, neste caso não transiciona ainda
+            // Hide inventory with recent-open protection
             if (inventoryUI != null && inventoryUI.IsOpen)
             {
                 bool didHide = inventoryUI.Hide();
                 if (!didHide)
                 {
-                    // Inventário foi aberto muito recentemente, aborta a transição
-                    Log("TransitionToGameplay aborted: Inventory was just opened");
                     return;
                 }
             }
 
-            // Despausa o jogo
+            // Hide pause menu
+            if (pauseMenu != null && pauseMenu.IsVisible)
+            {
+                pauseMenu.Hide();
+            }
+
+            // Resume game
             if (IsPaused)
             {
                 Resume();
@@ -512,79 +442,87 @@ namespace SlimeKing.Core
             currentState = NavigationState.Gameplay;
         }
 
-        #endregion
-
-        #region Private Methods
-
         /// <summary>
-        /// Pausa o jogo efetivamente.
+        /// Executes pause operations.
         /// </summary>
-        private void PauseGame()
+        private void ExecutePause()
         {
-            Log("Pausing game");
-            UnityEngine.Debug.LogError($"[PauseManager] PAUSING: Setting Time.timeScale to 0. Currently: {Time.timeScale}");
 
-            // Pausa o tempo do jogo
+            // Pause game time
             Time.timeScale = 0f;
-            UnityEngine.Debug.LogError($"[PauseManager] PAUSED: Time.timeScale is now {Time.timeScale}");
 
-            // Inicia fade de áudio para volume reduzido
+            // Start audio fade to reduced volume
             StartAudioFade(pausedAudioVolume);
 
-            // Switch action maps: disable Gameplay, enable Menus
-            if (inputActions != null)
-            {
-                UnityEngine.Debug.LogError($"[PauseManager] Disabling Gameplay, Enabling Menus");
-                inputActions.Gameplay.Disable();
-                inputActions.Menus.Enable();
-                Log("Gameplay input disabled, Menus input enabled");
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("[PauseManager] inputActions is NULL!");
-            }
+            // Switch action maps: disable Gameplay, enable Menu
+            SwitchToMenuInputs();
 
-            // Dispara eventos
+            // Fire events
             OnPauseStateChanged?.Invoke(true);
             PauseEvents.InvokeGamePaused();
 
-            Log("Game paused");
         }
 
         /// <summary>
-        /// Despausa o jogo efetivamente.
+        /// Executes resume operations.
         /// </summary>
-        private void ResumeGame()
+        private void ExecuteResume()
         {
-            Log("Resuming game");
 
-            // Restaura o tempo do jogo
+            // Restore game time
             Time.timeScale = 1f;
 
-            // Inicia fade de áudio para volume normal
+            // Start audio fade to normal volume
             StartAudioFade(resumedAudioVolume);
 
-            // Switch action maps: enable Gameplay, disable Menus
-            if (inputActions != null)
-            {
-                inputActions.Gameplay.Enable();
-                inputActions.Menus.Disable();
-                Log("Gameplay input enabled, Menus input disabled");
-            }
+            // Switch action maps: enable Gameplay, disable Menu
+            SwitchToGameplayInputs();
 
-            // Dispara eventos
+            // Fire events
             OnPauseStateChanged?.Invoke(false);
             PauseEvents.InvokeGameResumed();
 
-            Log("Game resumed");
         }
 
         /// <summary>
-        /// Inicia fade de áudio para o volume alvo.
+        /// Switches to menu input action maps.
+        /// </summary>
+        private void SwitchToMenuInputs()
+        {
+            if (inputActions != null)
+            {
+                inputActions.Gameplay.Disable();
+                inputActions.Menu.Enable();
+            }
+        }
+
+        /// <summary>
+        /// Switches to gameplay input action maps.
+        /// </summary>
+        private void SwitchToGameplayInputs()
+        {
+            if (inputActions != null)
+            {
+                inputActions.Gameplay.Enable();
+                inputActions.Menu.Disable();
+            }
+        }
+
+        /// <summary>
+        /// Forces unpause without stack management (for cleanup).
+        /// </summary>
+        private void ForceUnpause()
+        {
+            Time.timeScale = 1f;
+            AudioListener.volume = resumedAudioVolume;
+        }
+
+        /// <summary>
+        /// Starts audio fade to target volume.
         /// </summary>
         private void StartAudioFade(float targetVolume)
         {
-            // Para fade anterior se existir
+            // Stop previous fade if exists
             if (audioFadeCoroutine != null)
             {
                 StopCoroutine(audioFadeCoroutine);
@@ -594,8 +532,8 @@ namespace SlimeKing.Core
         }
 
         /// <summary>
-        /// Corrotina que faz fade suave do volume do AudioListener.
-        /// Usa Time.unscaledDeltaTime para funcionar durante pause.
+        /// Coroutine that smoothly fades AudioListener volume.
+        /// Uses Time.unscaledDeltaTime to work during pause.
         /// </summary>
         private IEnumerator FadeAudioListener(float fromVolume, float toVolume, float duration)
         {
@@ -609,11 +547,12 @@ namespace SlimeKing.Core
                 yield return null;
             }
 
-            // Garante que chegue exatamente no valor final
+            // Ensure exact final value
             AudioListener.volume = toVolume;
             audioFadeCoroutine = null;
         }
 
         #endregion
+
     }
 }
