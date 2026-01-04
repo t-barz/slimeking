@@ -59,7 +59,7 @@ Shader "Custom/SpriteOutlineURP"
                 fixed4 texColor = tex2D(_MainTex, i.texcoord);
                 fixed4 result;
                 result.rgb = _OutlineColor.rgb * texColor.a;
-                result.a = texColor.a;
+                result.a = _OutlineColor.a * texColor.a;
                 return result;
             }
             ENDCG

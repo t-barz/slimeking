@@ -6547,7 +6547,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 6338e3b379cfe5d409331c70058eaa7b, type: 3}
+  m_Resource: {fileID: 8300000, guid: 0245bde84ad51c249aa3f96202195711, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.2
   m_Pitch: 1
@@ -14492,7 +14492,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.OutlineController
   detectionRange: 1
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 0.15
+  outlineWidth: 0.1
+  fadeDuration: 0.3
 --- !u!21 &767215276
 Material:
   serializedVersion: 8
@@ -27305,8 +27306,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.OutlineController
   detectionRange: 1
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 0.15
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineWidth: 0.1
+  fadeDuration: 0.3
 --- !u!1 &1311692707
 GameObject:
   m_ObjectHideFlags: 0
