@@ -19,7 +19,7 @@ namespace SlimeKing.Gameplay
     /// • Definir ponto de destino (Transform)
     /// • Outras classes podem consultar via GetMovementType() e GetDestinationPoint()
     /// </summary>
-    public class SpecialMovementPoint : InteractivePointHandler
+    public class SpecialMovementPoint : MonoBehaviour
     {
         #region Enums
         /// <summary>
@@ -58,7 +58,6 @@ namespace SlimeKing.Gameplay
         #region Unity Lifecycle
         protected virtual void Start()
         {
-            InitializeComponents();
             ValidateConfiguration();
             InitializeTriggerCollider();
         }
@@ -80,8 +79,7 @@ namespace SlimeKing.Gameplay
                 _playerInContact = true;
                 _playerCollider = other;
 
-                _currentInputType = DetectCurrentInputType();
-                ShowInteractionButtons();}
+                }
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -91,7 +89,7 @@ namespace SlimeKing.Gameplay
             {
                 _playerInContact = false;
                 _playerCollider = null;
-                HideAllButtons();}
+                }
         }
         #endregion
 
