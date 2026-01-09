@@ -24,6 +24,7 @@ namespace SlimeKing.Gameplay
 /// • Rotaciona objetos de ataque automaticamente baseado na direção atual (Sul = padrão)
 /// • Posiciona objetos de ataque com offset dinâmico baseado na direção
 /// • Fornece sistema extensível para interações e uso de inventário
+/// • Bloqueia movimento durante agachamento (configurável) para mecânica de stealth
 /// 
 /// DEPENDÊNCIAS:
 /// • Rigidbody2D: Para física de movimento
@@ -117,6 +118,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool enableDebugGizmos = true;
 
     [Header("👤 Sistema de Stealth")]
+
     [Tooltip("Tempo em segundos para ativar o stealth após agachar")]
     [SerializeField] private float stealthActivationDelay = 2f;
 
@@ -1093,6 +1095,24 @@ public class PlayerController : MonoBehaviour
 
         // Early exit se estiver executando movimento especial
         if (_isPerformingSpecialMovement) return;
+
+        // Bloqueia movimento enquanto agachado
+        if (_isHiding)
+        {
+            // Define movimento como falso para animator
+            _isMoving = false;
+
+            // Aplica velocidade zero para parar imediatamente
+            _rigidbody.linearVelocity = Vector2.zero;
+
+            // Atualiza animator para mostrar estado parado
+            if (_animator != null)
+            {
+                _animator.SetBool(IsWalking, false);
+            }
+
+            return;
+        }
 
         // Se o jogador estiver atacando e movimento estiver bloqueado
         if (_isAttacking && lockMovementDuringAttack)
