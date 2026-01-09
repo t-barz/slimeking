@@ -50,6 +50,16 @@ namespace SlimeKing.Gameplay
                     _currentInputType = detectedInput;
                     UpdateIndicator();
                 }
+                else if (_currentInputType == InputType.Gamepad && keyboardIndicator != null && keyboardIndicator.activeSelf)
+                {
+                    // Se gamepad está ativo, garante que keyboard fica inativo
+                    keyboardIndicator.SetActive(false);
+                }
+                else if (_currentInputType == InputType.Keyboard && gamepadIndicator != null && gamepadIndicator.activeSelf)
+                {
+                    // Se keyboard está ativo, garante que gamepad fica inativo
+                    gamepadIndicator.SetActive(false);
+                }
             }
         }
 
@@ -76,7 +86,8 @@ namespace SlimeKing.Gameplay
         #region Private Methods
         private InputType DetectCurrentInputType()
         {
-            if (Gamepad.current != null)
+            // Verifica se há qualquer gamepad conectado
+            if (Gamepad.current != null || Gamepad.all.Count > 0)
             {
                 return InputType.Gamepad;
             }
@@ -106,6 +117,13 @@ namespace SlimeKing.Gameplay
             if (_currentActiveIndicator == targetIndicator)
             {
                 return;
+            }
+
+            // Garante que o indicador não-selecionado está desativado
+            GameObject otherIndicator = _currentInputType == InputType.Keyboard ? gamepadIndicator : keyboardIndicator;
+            if (otherIndicator != null && otherIndicator.activeSelf)
+            {
+                otherIndicator.SetActive(false);
             }
 
             if (_fadeCoroutine != null)
@@ -158,13 +176,11 @@ namespace SlimeKing.Gameplay
             if (keyboardIndicator != null)
             {
                 keyboardIndicator.SetActive(false);
-                EnsureCanvasGroup(keyboardIndicator).alpha = 0f;
             }
 
             if (gamepadIndicator != null)
             {
                 gamepadIndicator.SetActive(false);
-                EnsureCanvasGroup(gamepadIndicator).alpha = 0f;
             }
 
             _currentActiveIndicator = null;
@@ -173,19 +189,13 @@ namespace SlimeKing.Gameplay
         private void SetIndicatorAlpha(GameObject indicator, float alpha)
         {
             if (indicator == null) return;
-
-            CanvasGroup canvasGroup = EnsureCanvasGroup(indicator);
-            canvasGroup.alpha = alpha;
+            // Alpha control would go here if needed
         }
 
-        private CanvasGroup EnsureCanvasGroup(GameObject indicator)
+        private CanvasGroup GetCanvasGroup(GameObject indicator)
         {
-            CanvasGroup canvasGroup = indicator.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                canvasGroup = indicator.AddComponent<CanvasGroup>();
-            }
-            return canvasGroup;
+            if (indicator == null) return null;
+            return indicator.GetComponent<CanvasGroup>();
         }
         #endregion
 
@@ -197,7 +207,14 @@ namespace SlimeKing.Gameplay
             _currentActiveIndicator = indicator;
             indicator.SetActive(true);
 
-            CanvasGroup canvasGroup = EnsureCanvasGroup(indicator);
+            CanvasGroup canvasGroup = GetCanvasGroup(indicator);
+            if (canvasGroup == null)
+            {
+                // Se não houver CanvasGroup, apenas ativa o objeto
+                _fadeCoroutine = null;
+                yield break;
+            }
+
             canvasGroup.alpha = 0f;
             float elapsed = 0f;
 
@@ -218,7 +235,16 @@ namespace SlimeKing.Gameplay
         {
             if (indicator == null) yield break;
 
-            CanvasGroup canvasGroup = EnsureCanvasGroup(indicator);
+            CanvasGroup canvasGroup = GetCanvasGroup(indicator);
+            if (canvasGroup == null)
+            {
+                // Se não houver CanvasGroup, apenas desativa o objeto
+                indicator.SetActive(false);
+                _currentActiveIndicator = null;
+                _fadeCoroutine = null;
+                yield break;
+            }
+
             float elapsed = 0f;
 
             while (elapsed < fadeDuration)

@@ -47,6 +47,7 @@ Raiz/
 
 Notas importantes:
 - Não modificar conteúdos em `Assets/External Assets/`.
+- NUNCA adicionar logs à não ser que seja explicitamente solicitado.
 - Editor tools sempre em `Assets/Editor/[ToolName]/` seguindo estrutura modular.
 - Testes devem ser temporários e removidos imediatamente após execução.
 - Todos paths devem ser relativos a `Assets/` nas operações de Editor.
@@ -983,7 +984,7 @@ bool confirmed = EditorUtility.DisplayDialog(
 ## 📊 Debugging
 
 ### Debug Logs Opcionais
-
+Os logs devem sempre ser opcionais e nunca devem ser implementados sem que sejam explicitamente solicitados.
 ```csharp
 private bool enableDebugLogs = false;
 

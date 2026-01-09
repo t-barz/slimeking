@@ -1,0 +1,430 @@
+{
+    "data": {
+        "objectName": "HealthDisplay",
+        "totalChildGameObjects": 1,
+        "enabledGameObjects": 1,
+        "gameObjects": [
+            {
+                "name": "HealthDisplay",
+                "active": true,
+                "layer": "Default",
+                "tag": "Untagged",
+                "position": {
+                    "x": -8.958333969116211,
+                    "y": 5.1041669845581059,
+                    "z": -5.0
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "scale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "components": [
+                    {
+                        "typeName": "RectTransform",
+                        "enabled": true,
+                        "properties": [
+                            {
+                                "name": "rect",
+                                "type": "Rect",
+                                "value": "(x:-50.00, y:-50.00, width:100.00, height:100.00)"
+                            },
+                            {
+                                "name": "anchorMin",
+                                "type": "Vector2",
+                                "value": "(0.00, 1.00)"
+                            },
+                            {
+                                "name": "anchorMax",
+                                "type": "Vector2",
+                                "value": "(0.00, 1.00)"
+                            },
+                            {
+                                "name": "anchoredPosition",
+                                "type": "Vector2",
+                                "value": "(100.00, -50.00)"
+                            },
+                            {
+                                "name": "sizeDelta",
+                                "type": "Vector2",
+                                "value": "(100.00, 100.00)"
+                            },
+                            {
+                                "name": "pivot",
+                                "type": "Vector2",
+                                "value": "(0.50, 0.50)"
+                            },
+                            {
+                                "name": "anchoredPosition3D",
+                                "type": "Vector3",
+                                "value": "(100.00, -50.00, 0.00)"
+                            },
+                            {
+                                "name": "offsetMin",
+                                "type": "Vector2",
+                                "value": "(50.00, -100.00)"
+                            },
+                            {
+                                "name": "offsetMax",
+                                "type": "Vector2",
+                                "value": "(150.00, 0.00)"
+                            },
+                            {
+                                "name": "drivenByObject",
+                                "type": "Object",
+                                "value": "null"
+                            },
+                            {
+                                "name": "sendChildDimensionsChange",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "position",
+                                "type": "Vector3",
+                                "value": "(-8.96, 5.10, -5.00)"
+                            },
+                            {
+                                "name": "eulerAngles",
+                                "type": "Vector3",
+                                "value": "(0.00, 0.00, 0.00)"
+                            },
+                            {
+                                "name": "localEulerAngles",
+                                "type": "Vector3",
+                                "value": "(0.00, 0.00, 0.00)"
+                            },
+                            {
+                                "name": "right",
+                                "type": "Vector3",
+                                "value": "(1.00, 0.00, 0.00)"
+                            },
+                            {
+                                "name": "up",
+                                "type": "Vector3",
+                                "value": "(0.00, 1.00, 0.00)"
+                            },
+                            {
+                                "name": "forward",
+                                "type": "Vector3",
+                                "value": "(0.00, 0.00, 1.00)"
+                            },
+                            {
+                                "name": "rotation",
+                                "type": "Quaternion",
+                                "value": "(0.00000, 0.00000, 0.00000, 1.00000)"
+                            },
+                            {
+                                "name": "parent",
+                                "type": "Transform",
+                                "value": "Canvas (UnityEngine.RectTransform)"
+                            },
+                            {
+                                "name": "worldToLocalMatrix",
+                                "type": "Matrix4x4",
+                                "value": "96.00000\t0.00000\t0.00000\t860.00000\n0.00000\t96.00000\t0.00000\t-490.00000\n0.00000\t0.00000\t96.00000\t480.00000\n0.00000\t0.00000\t0.00000\t1.00000\n"
+                            },
+                            {
+                                "name": "localToWorldMatrix",
+                                "type": "Matrix4x4",
+                                "value": "0.01042\t0.00000\t0.00000\t-8.95833\n0.00000\t0.01042\t0.00000\t5.10417\n0.00000\t0.00000\t0.01042\t-5.00000\n0.00000\t0.00000\t0.00000\t1.00000\n"
+                            },
+                            {
+                                "name": "root",
+                                "type": "Transform",
+                                "value": "Canvas (UnityEngine.RectTransform)"
+                            },
+                            {
+                                "name": "childCount",
+                                "type": "Int32",
+                                "value": "0"
+                            },
+                            {
+                                "name": "lossyScale",
+                                "type": "Vector3",
+                                "value": "(0.01, 0.01, 0.01)"
+                            },
+                            {
+                                "name": "hasChanged",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "hierarchyCapacity",
+                                "type": "Int32",
+                                "value": "77"
+                            },
+                            {
+                                "name": "hierarchyCount",
+                                "type": "Int32",
+                                "value": "77"
+                            },
+                            {
+                                "name": "transform",
+                                "type": "Transform",
+                                "value": "HealthDisplay (UnityEngine.RectTransform)"
+                            },
+                            {
+                                "name": "transformHandle",
+                                "type": "TransformHandle",
+                                "value": "UnityEngine.TransformHandle"
+                            },
+                            {
+                                "name": "gameObject",
+                                "type": "GameObject",
+                                "value": "HealthDisplay (UnityEngine.GameObject)"
+                            },
+                            {
+                                "name": "tag",
+                                "type": "String",
+                                "value": "Untagged"
+                            },
+                            {
+                                "name": "name",
+                                "type": "String",
+                                "value": "HealthDisplay"
+                            },
+                            {
+                                "name": "hideFlags",
+                                "type": "HideFlags",
+                                "value": "None"
+                            }
+                        ]
+                    },
+                    {
+                        "typeName": "HorizontalLayoutGroup",
+                        "enabled": true,
+                        "properties": [
+                            {
+                                "name": "spacing",
+                                "type": "Single",
+                                "value": "-110"
+                            },
+                            {
+                                "name": "childForceExpandWidth",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "childForceExpandHeight",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "childControlWidth",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "childControlHeight",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "childScaleWidth",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "childScaleHeight",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "reverseArrangement",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "padding",
+                                "type": "RectOffset",
+                                "value": "RectOffset (l:0 r:0 t:0 b:0)"
+                            },
+                            {
+                                "name": "childAlignment",
+                                "type": "TextAnchor",
+                                "value": "UpperLeft"
+                            },
+                            {
+                                "name": "minWidth",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "preferredWidth",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "flexibleWidth",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "minHeight",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "preferredHeight",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "flexibleHeight",
+                                "type": "Single",
+                                "value": "0"
+                            },
+                            {
+                                "name": "layoutPriority",
+                                "type": "Int32",
+                                "value": "0"
+                            },
+                            {
+                                "name": "destroyCancellationToken",
+                                "type": "CancellationToken",
+                                "value": "System.Threading.CancellationToken"
+                            },
+                            {
+                                "name": "useGUILayout",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "didStart",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "didAwake",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "runInEditMode",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "enabled",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "isActiveAndEnabled",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "transform",
+                                "type": "Transform",
+                                "value": "HealthDisplay (UnityEngine.RectTransform)"
+                            },
+                            {
+                                "name": "transformHandle",
+                                "type": "TransformHandle",
+                                "value": "UnityEngine.TransformHandle"
+                            },
+                            {
+                                "name": "gameObject",
+                                "type": "GameObject",
+                                "value": "HealthDisplay (UnityEngine.GameObject)"
+                            },
+                            {
+                                "name": "tag",
+                                "type": "String",
+                                "value": "Untagged"
+                            },
+                            {
+                                "name": "name",
+                                "type": "String",
+                                "value": "HealthDisplay"
+                            },
+                            {
+                                "name": "hideFlags",
+                                "type": "HideFlags",
+                                "value": "None"
+                            }
+                        ]
+                    },
+                    {
+                        "typeName": "HealthDisplay",
+                        "enabled": true,
+                        "properties": [
+                            {
+                                "name": "destroyCancellationToken",
+                                "type": "CancellationToken",
+                                "value": "System.Threading.CancellationToken"
+                            },
+                            {
+                                "name": "useGUILayout",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "didStart",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "didAwake",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "runInEditMode",
+                                "type": "Boolean",
+                                "value": "False"
+                            },
+                            {
+                                "name": "enabled",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "isActiveAndEnabled",
+                                "type": "Boolean",
+                                "value": "True"
+                            },
+                            {
+                                "name": "transform",
+                                "type": "Transform",
+                                "value": "HealthDisplay (UnityEngine.RectTransform)"
+                            },
+                            {
+                                "name": "transformHandle",
+                                "type": "TransformHandle",
+                                "value": "UnityEngine.TransformHandle"
+                            },
+                            {
+                                "name": "gameObject",
+                                "type": "GameObject",
+                                "value": "HealthDisplay (UnityEngine.GameObject)"
+                            },
+                            {
+                                "name": "tag",
+                                "type": "String",
+                                "value": "Untagged"
+                            },
+                            {
+                                "name": "name",
+                                "type": "String",
+                                "value": "HealthDisplay"
+                            },
+                            {
+                                "name": "hideFlags",
+                                "type": "HideFlags",
+                                "value": "None"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
