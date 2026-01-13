@@ -2,13 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using SlimeKing.Core;
 
-/// <summary>
-/// Gerencia a visualização de fragmentos de elementos na UI.
-/// Cada tipo de fragmento tem seu próprio prefab e contador.
-/// </summary>
-public class FragmentDisplay : MonoBehaviour
+namespace SlimeKing.UI
 {
+    /// <summary>
+    /// Gerencia a visualização de fragmentos de elementos na UI.
+    /// Cada tipo de fragmento tem seu próprio prefab e contador.
+    /// Conectado ao GameManager para atualizar automaticamente quando cristais são coletados.
+    /// </summary>
+    public class FragmentDisplay : MonoBehaviour
+    {
     #region Fragment Data
     [System.Serializable]
     public class FragmentType
@@ -49,6 +53,89 @@ public class FragmentDisplay : MonoBehaviour
     private void Start()
     {
         InitializeDisplay();
+        ConnectToGameManager();
+    }
+
+    private void OnEnable()
+    {
+        ConnectToGameManager();
+    }
+
+    private void OnDisable()
+    {
+        DisconnectFromGameManager();
+    }
+
+    private void OnDestroy()
+    {
+        DisconnectFromGameManager();
+    }
+    #endregion
+
+    #region GameManager Integration
+    /// <summary>
+    /// Conecta ao GameManager para escutar eventos de cristais
+    /// </summary>
+    private void ConnectToGameManager()
+    {
+        if (GameManager.HasInstance)
+        {
+            GameManager.Instance.OnCrystalCountChanged += HandleCrystalCountChanged;
+            
+            // Sincroniza contadores atuais
+            SyncWithGameManager();
+        }
+    }
+
+    /// <summary>
+    /// Desconecta do GameManager
+    /// </summary>
+    private void DisconnectFromGameManager()
+    {
+        if (GameManager.HasInstance)
+        {
+            GameManager.Instance.OnCrystalCountChanged -= HandleCrystalCountChanged;
+        }
+    }
+
+    /// <summary>
+    /// Sincroniza os contadores com os valores atuais do GameManager
+    /// </summary>
+    private void SyncWithGameManager()
+    {
+        if (!GameManager.HasInstance) return;
+
+        var allCounts = GameManager.Instance.GetAllCrystalCounts();
+        
+        foreach (var kvp in allCounts)
+        {
+            string elementName = kvp.Key.ToString();
+            int count = kvp.Value;
+            
+            var fragmentType = fragmentTypes.Find(f => f.elementName.Equals(elementName, System.StringComparison.OrdinalIgnoreCase));
+            if (fragmentType != null)
+            {
+                fragmentType.count = count;
+                UpdateDisplay(fragmentType);
+            }
+        }
+        
+    }
+
+    /// <summary>
+    /// Handler para eventos de mudança de contagem de cristais do GameManager
+    /// </summary>
+    private void HandleCrystalCountChanged(CrystalType crystalType, int newCount)
+    {
+        string elementName = crystalType.ToString();
+        
+        var fragmentType = fragmentTypes.Find(f => f.elementName.Equals(elementName, System.StringComparison.OrdinalIgnoreCase));
+        
+        if (fragmentType != null)
+        {
+            fragmentType.count = newCount;
+            UpdateDisplay(fragmentType);
+        }
     }
     #endregion
 
@@ -74,7 +161,6 @@ public class FragmentDisplay : MonoBehaviour
         layoutGroup.childForceExpandWidth = false;
         layoutGroup.childForceExpandHeight = false;
 
-        Log("Layout group configured for right-to-left arrangement");
     }
 
     /// <summary>
@@ -84,7 +170,6 @@ public class FragmentDisplay : MonoBehaviour
     {
         CreateFragments();
         UpdateAllDisplays();
-        Log($"Fragment display initialized with {fragmentTypes.Count} fragment types");
     }
 
     /// <summary>
@@ -106,11 +191,6 @@ public class FragmentDisplay : MonoBehaviour
                 // Busca o componente de texto no prefab
                 fragmentType.counterText = fragmentType.instance.GetComponentInChildren<TextMeshProUGUI>();
 
-                if (fragmentType.counterText == null)
-                {
-                    LogWarning($"TextMeshProUGUI not found in {fragmentType.elementName} prefab!");
-                }
-
                 // Inicializa o contador
                 fragmentType.count = 0;
 
@@ -120,7 +200,6 @@ public class FragmentDisplay : MonoBehaviour
                     fragmentType.instance.transform.localScale = Vector3.zero;
                 }
 
-                Log($"Created fragment instance for {fragmentType.elementName}");
             }
         }
 
@@ -160,11 +239,6 @@ public class FragmentDisplay : MonoBehaviour
         {
             fragmentType.count += amount;
             UpdateDisplay(fragmentType);
-            Log($"Added {amount} {elementName} fragments. Total: {fragmentType.count}");
-        }
-        else
-        {
-            LogWarning($"Fragment type '{elementName}' not found!");
         }
     }
 
@@ -179,11 +253,6 @@ public class FragmentDisplay : MonoBehaviour
         {
             fragmentType.count = Mathf.Max(0, fragmentType.count - amount);
             UpdateDisplay(fragmentType);
-            Log($"Removed {amount} {elementName} fragments. Total: {fragmentType.count}");
-        }
-        else
-        {
-            LogWarning($"Fragment type '{elementName}' not found!");
         }
     }
 
@@ -198,11 +267,6 @@ public class FragmentDisplay : MonoBehaviour
         {
             fragmentType.count = Mathf.Max(0, amount);
             UpdateDisplay(fragmentType);
-            Log($"Set {elementName} fragments to {fragmentType.count}");
-        }
-        else
-        {
-            LogWarning($"Fragment type '{elementName}' not found!");
         }
     }
 
@@ -225,7 +289,6 @@ public class FragmentDisplay : MonoBehaviour
             fragmentType.count = 0;
             UpdateDisplay(fragmentType);
         }
-        Log("All fragments reset to 0");
     }
     #endregion
 
@@ -309,30 +372,6 @@ public class FragmentDisplay : MonoBehaviour
     }
     #endregion
 
-    #region Utilities
-    /// <summary>
-    /// Log condicional
-    /// </summary>
-    private void Log(string message)
-    {
-        if (enableDebugLogs)
-        {
-            Debug.Log($"[FragmentDisplay] {message}");
-        }
-    }
-
-    /// <summary>
-    /// Log de aviso condicional
-    /// </summary>
-    private void LogWarning(string message)
-    {
-        if (enableDebugLogs)
-        {
-            Debug.LogWarning($"[FragmentDisplay] {message}");
-        }
-    }
-    #endregion
-
     #region Editor Helper
 #if UNITY_EDITOR
     [ContextMenu("Setup Default Fragments")]
@@ -351,8 +390,8 @@ public class FragmentDisplay : MonoBehaviour
             });
         }
 
-        Debug.Log("Default fragment types created. Assign prefabs in Inspector.");
     }
 #endif
     #endregion
+    }
 }

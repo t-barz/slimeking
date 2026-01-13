@@ -985,18 +985,6 @@ bool confirmed = EditorUtility.DisplayDialog(
 
 ### Debug Logs
 Os logs nunca devem ser implementados sem que sejam explicitamente solicitados.
-Quando solicitados, devem ser implementados da seguinte forma.
-```csharp
-private bool enableDebugLogs = false;
-
-private void DebugLog(string message)
-{
-    if (enableDebugLogs)
-    {
-        Debug.Log($"[{GetType().Name}] {message}");
-    }
-}
-```
 
 ---
 
