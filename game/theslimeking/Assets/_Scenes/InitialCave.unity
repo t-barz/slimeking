@@ -15220,12 +15220,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d17ee074ebbea8499738c6b14f90cd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Performance.PerformanceSetupHelper
-  enablePhysicsOptimization: 1
   enableCullingOptimization: 1
-  optimizationInterval: 1
+  enablePhysicsOptimization: 1
+  enableRenderingOptimization: 1
+  enableAudioOptimization: 1
+  enableAnimationOptimization: 1
+  enableParticleOptimization: 1
+  enableColliderOptimization: 1
+  nearDistance: 10
+  mediumDistance: 20
+  farDistance: 30
   cullingDistance: 20
-  physicsDistance: 15
+  enableFrustumCulling: 1
+  frustumPadding: 5
+  nearUpdateInterval: 0.016
+  mediumUpdateInterval: 0.033
+  farUpdateInterval: 0.1
   showLogs: 1
+  showGizmos: 0
 --- !u!4 &842855839
 Transform:
   m_ObjectHideFlags: 0
@@ -15235,7 +15247,7 @@ Transform:
   m_GameObject: {fileID: 842855837}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.64009, y: 0.80288, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

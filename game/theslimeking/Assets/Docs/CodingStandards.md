@@ -983,8 +983,9 @@ bool confirmed = EditorUtility.DisplayDialog(
 
 ## 📊 Debugging
 
-### Debug Logs Opcionais
-Os logs devem sempre ser opcionais e nunca devem ser implementados sem que sejam explicitamente solicitados.
+### Debug Logs
+Os logs nunca devem ser implementados sem que sejam explicitamente solicitados.
+Quando solicitados, devem ser implementados da seguinte forma.
 ```csharp
 private bool enableDebugLogs = false;
 
@@ -994,6 +995,202 @@ private void DebugLog(string message)
     {
         Debug.Log($"[{GetType().Name}] {message}");
     }
+}
+```
+
+---
+
+## 🎯 Gizmos Opcionais
+
+### Regra Obrigatória
+
+Todos os scripts que representam sistemas, áreas, pontos ou ranges devem implementar Gizmos opcionais para facilitar debug e visualização no Editor.
+
+#### Quando Implementar Gizmos
+
+**✅ SEMPRE implementar em:**
+- **Sistemas com ranges/distâncias** (Performance, AI, Audio)
+- **Pontos de referência** (Spawn points, teleports, waypoints)
+- **Áreas e triggers** (Zonas de detecção, puzzles)
+- **Managers com posicionamento** (Camera bounds, level boundaries)
+- **Componentes com raios** (Detection radius, attack range)
+
+#### Padrão de Implementação
+
+```csharp
+[Header("Debug")]
+[SerializeField] private bool showGizmos = false;
+
+private void OnDrawGizmos()
+{
+    if (!showGizmos) return;
+    
+    // Implementar visualização relevante
+    DrawRangeGizmos();
+    DrawConnectionGizmos();
+    DrawStateGizmos();
+}
+
+private void OnDrawGizmosSelected()
+{
+    if (!showGizmos) return;
+    
+    // Gizmos mais detalhados quando selecionado
+    DrawDetailedGizmos();
+}
+```
+
+#### Cores Semânticas Padrão
+
+```csharp
+// Ranges e distâncias
+Gizmos.color = Color.green;    // Próximo/Ativo/Seguro
+Gizmos.color = Color.yellow;   // Médio/Alerta
+Gizmos.color = Color.orange;   // Distante/Atenção
+Gizmos.color = Color.red;      // Crítico/Perigo/Culling
+
+// Estados
+Gizmos.color = Color.blue;     // Informação/Neutro
+Gizmos.color = Color.cyan;     // Especial/Highlight
+Gizmos.color = Color.magenta;  // Debug/Temporário
+Gizmos.color = Color.white;    // Padrão/Estrutural
+
+// Transparência para sobreposição
+Color transparentRed = new Color(1f, 0f, 0f, 0.3f);
+```
+
+#### Tipos de Gizmos por Categoria
+
+**🎯 Sistemas com Ranges**
+```csharp
+// Performance Optimizer
+Gizmos.DrawWireSphere(transform.position, nearDistance);
+Gizmos.DrawWireSphere(transform.position, farDistance);
+
+// AI Detection
+Gizmos.DrawWireSphere(transform.position, detectionRadius);
+Gizmos.DrawRay(transform.position, transform.forward * viewDistance);
+
+// Audio Manager
+Gizmos.DrawWireSphere(transform.position, maxAudioDistance);
+```
+
+**📍 Pontos e Conexões**
+```csharp
+// Spawn Points
+Gizmos.DrawWireCube(transform.position, Vector3.one);
+Gizmos.DrawRay(transform.position, Vector3.up * 2f);
+
+// Teleport Points
+Gizmos.DrawLine(transform.position, targetTeleport.position);
+Gizmos.DrawWireSphere(transform.position, activationRadius);
+
+// Waypoints
+for (int i = 0; i < waypoints.Length - 1; i++)
+{
+    Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
+}
+```
+
+**🔲 Áreas e Bounds**
+```csharp
+// Trigger Areas
+Gizmos.DrawWireCube(transform.position, triggerSize);
+
+// Camera Bounds
+Gizmos.DrawWireCube(boundsCenter, boundsSize);
+
+// Level Boundaries
+Gizmos.DrawWireCube(levelCenter, levelSize);
+```
+
+#### Exemplos Práticos
+
+**Performance System**
+```csharp
+private void OnDrawGizmos()
+{
+    if (!showGizmos || playerTransform == null) return;
+    
+    Vector3 playerPos = playerTransform.position;
+    
+    Gizmos.color = Color.green;
+    Gizmos.DrawWireSphere(playerPos, nearDistance);
+    
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(playerPos, mediumDistance);
+    
+    Gizmos.color = Color.red;
+    Gizmos.DrawWireSphere(playerPos, cullingDistance);
+}
+```
+
+**AI System**
+```csharp
+private void OnDrawGizmos()
+{
+    if (!showGizmos) return;
+    
+    // Detection radius
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    
+    // View cone
+    Gizmos.color = Color.red;
+    Vector3 leftBoundary = Quaternion.Euler(0, -viewAngle/2, 0) * transform.forward;
+    Vector3 rightBoundary = Quaternion.Euler(0, viewAngle/2, 0) * transform.forward;
+    
+    Gizmos.DrawRay(transform.position, leftBoundary * viewDistance);
+    Gizmos.DrawRay(transform.position, rightBoundary * viewDistance);
+}
+```
+
+**Teleport System**
+```csharp
+private void OnDrawGizmos()
+{
+    if (!showGizmos) return;
+    
+    // Teleport connection
+    if (targetTeleport != null)
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(transform.position, targetTeleport.position);
+    }
+    
+    // Activation area
+    Gizmos.color = Color.blue;
+    Gizmos.DrawWireSphere(transform.position, activationRadius);
+}
+```
+
+#### Boas Práticas
+
+**✅ Fazer:**
+- Sempre usar flag `showGizmos` para controle opcional
+- Usar cores semânticas consistentes
+- Implementar tanto `OnDrawGizmos()` quanto `OnDrawGizmosSelected()`
+- Verificar nulls antes de desenhar
+- Usar `Gizmos.DrawWire*` para formas vazadas (melhor performance)
+
+**❌ Evitar:**
+- Gizmos sempre ativos (impacta performance do Editor)
+- Cores aleatórias sem significado semântico
+- Gizmos muito complexos (usar apenas formas básicas)
+- Desenhar quando componente está desabilitado
+
+#### Validação de Nulls
+
+```csharp
+private void OnDrawGizmos()
+{
+    if (!showGizmos) return;
+    
+    // Sempre verificar nulls
+    if (playerTransform == null) return;
+    if (targetObject == null) return;
+    
+    // Desenhar gizmos...
 }
 ```
 
