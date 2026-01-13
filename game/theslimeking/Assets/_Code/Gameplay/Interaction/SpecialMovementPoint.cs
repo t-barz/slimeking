@@ -46,6 +46,10 @@ namespace SlimeKing.Gameplay
         [Header("🔍 Detection Settings")]
         [Tooltip("Layers que representam o Player para detecção de contato")]
         [SerializeField] private LayerMask playerLayers = 1; // Layer 0 (Default) por padrão
+
+        [Header("Debug")]
+        [Tooltip("Mostrar Gizmos no Editor para visualização do movimento")]
+        [SerializeField] private bool showGizmos = false;
         #endregion
 
         #region Private Variables
@@ -63,11 +67,15 @@ namespace SlimeKing.Gameplay
         }
         protected virtual void OnDrawGizmos()
         {
+            if (!showGizmos) return;
+            
             DrawMovementGizmos();
         }
 
         protected virtual void OnDrawGizmosSelected()
         {
+            if (!showGizmos) return;
+            
             DrawDetailedGizmos();
         }
 
@@ -294,12 +302,12 @@ namespace SlimeKing.Gameplay
         {
             if (destinationPoint == null) return;
 
-            // Cor baseada no tipo de movimento
+            // Cor baseada no tipo de movimento (seguindo padrões semânticos)
             Color gizmoColor = movementType switch
             {
-                MovementType.Jump => Color.green,
-                MovementType.Shrink => Color.blue,
-                _ => Color.white
+                MovementType.Jump => Color.green,    // Verde para Jump (ativo/seguro)
+                MovementType.Shrink => Color.blue,   // Azul para Shrink (informação/neutro)
+                _ => Color.white                     // Branco como padrão
             };
 
             Gizmos.color = gizmoColor;
@@ -313,19 +321,23 @@ namespace SlimeKing.Gameplay
             // Ícone no ponto de origem baseado no tipo
             if (movementType == MovementType.Jump)
             {
-                // Desenha um "^" para jump
-                Gizmos.DrawWireCube(transform.position, Vector3.one * 0.2f);
+                // Desenha um cubo para jump (movimento para cima)
+                Gizmos.DrawWireCube(transform.position, Vector3.one * 0.4f);
             }
             else
             {
-                // Desenha um círculo menor para shrink
-                Gizmos.DrawWireSphere(transform.position, 0.15f);
+                // Desenha um círculo menor para shrink (movimento de encolhimento)
+                Gizmos.DrawWireSphere(transform.position, 0.2f);
             }
 
             // Desenha área de detecção se collider existir
             if (_triggerCollider != null)
             {
-                Gizmos.color = gizmoColor * 0.3f;
+                // Cor transparente para área de trigger
+                Color transparentColor = gizmoColor;
+                transparentColor.a = 0.3f;
+                Gizmos.color = transparentColor;
+                
                 if (_triggerCollider is CircleCollider2D circleCollider)
                 {
                     Gizmos.DrawWireSphere(transform.position, circleCollider.radius);
@@ -344,23 +356,41 @@ namespace SlimeKing.Gameplay
         {
             if (destinationPoint == null) return;
 
-            // Seta indicando direção
+            // Seta indicando direção do movimento
             Vector3 direction = (destinationPoint.position - transform.position).normalized;
             Vector3 arrowStart = transform.position + direction * 0.1f;
             Vector3 arrowEnd = destinationPoint.position - direction * 0.1f;
 
+            // Cor amarela para highlight quando selecionado
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(arrowStart, direction * Vector3.Distance(arrowStart, arrowEnd));
 
-            // Informações de debug
+            // Desenha pontos ao longo do caminho para mostrar trajetória
+            int pathPoints = 5;
+            for (int i = 1; i < pathPoints; i++)
+            {
+                float t = (float)i / pathPoints;
+                Vector3 pathPoint = Vector3.Lerp(transform.position, destinationPoint.position, t);
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(pathPoint, 0.1f);
+            }
+
+            // Status visual do player em contato
+            if (_playerInContact)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(transform.position, 0.5f);
+            }
+
+            // Informações de debug usando Handles (apenas no Editor)
             Vector3 midPoint = (transform.position + destinationPoint.position) * 0.5f;
 
 #if UNITY_EDITOR
             string debugInfo = $"{GetMovementName()}\n" +
-                              $"Distance: {GetDistanceToDestination():F1}\n" +
+                              $"Distance: {GetDistanceToDestination():F1}u\n" +
                               $"Duration: {movementDuration:F1}s\n" +
-                              $"Speed: {GetRequiredSpeed():F1}\n" +
-                              $"Player Contact: {_playerInContact}";
+                              $"Speed: {GetRequiredSpeed():F1}u/s\n" +
+                              $"Player Contact: {(_playerInContact ? "YES" : "NO")}";
 
             UnityEditor.Handles.Label(midPoint, debugInfo);
 #endif
