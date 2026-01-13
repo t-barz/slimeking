@@ -192,6 +192,10 @@ public class PlayerController : MonoBehaviour
     private static readonly int JumpTrigger = Animator.StringToHash("Jump");     // Trigger para animação de Jump
     private static readonly int ShrinkTrigger = Animator.StringToHash("Shrink"); // Trigger para animação de Shrink
 
+    // === OTIMIZAÇÃO DE UPDATE ===
+    // Controle de frequência para operações menos críticas
+    private float _lastStealthUpdate = 0f;
+
     // === CONSTANTES DE CONFIGURAÇÃO ===
     // Valores mágicos extraídos para facilitar manutenção
     private const float MOVEMENT_THRESHOLD = 0.1f;  // Threshold mínimo para considerar movimento
@@ -310,11 +314,18 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Atualização por frame - processa lógica que não depende de física.
     /// Frequência: ~60 FPS (dependente do framerate)
+    /// OTIMIZADO: Reduzida frequência de algumas operações
     /// </summary>
     private void Update()
     {
         UpdateAnimations();
-        UpdateStealthSystem();
+        
+        // OTIMIZAÇÃO: Stealth system atualiza menos frequentemente
+        if (Time.time - _lastStealthUpdate >= 0.1f)
+        {
+            UpdateStealthSystem();
+            _lastStealthUpdate = Time.time;
+        }
     }
 
     /// <summary>

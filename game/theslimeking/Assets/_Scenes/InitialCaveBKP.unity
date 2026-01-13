@@ -15217,15 +15217,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 842855837}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d17ee074ebbea8499738c6b14f90cd4, type: 3}
+  m_Script: {fileID: 11500000, guid: 3792f8af8cc648d4bb1efaa87ab4063b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Performance.PerformanceSetupHelper
-  enablePhysicsOptimization: 1
-  enableCullingOptimization: 1
-  optimizationInterval: 1
-  cullingDistance: 20
-  physicsDistance: 15
-  showLogs: 1
+  autoSetupOnStart: 1
 --- !u!4 &842855839
 Transform:
   m_ObjectHideFlags: 0
