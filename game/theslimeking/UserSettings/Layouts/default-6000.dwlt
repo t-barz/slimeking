@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 989
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 1
-  controlID: 169
+  controlID: 68
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 170
+  controlID: 69
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 112}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 171
+  controlID: 70
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -196,7 +196,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 172
+  controlID: 71
   draggingID: 0
 --- !u!114 &9
 MonoBehaviour:
@@ -1473,9 +1473,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 13.35059, y: 35.074997, z: -0.03590163}
+    m_Target: {x: 10.828793, y: 38.01284, z: -0.032273542}
     speed: 2
-    m_Value: {x: 13.35059, y: 35.074997, z: -0.03590163}
+    m_Value: {x: 10.791981, y: 37.977844, z: -0.030658498}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1525,9 +1525,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 3.6479542
+    m_Target: 3.7505167
     speed: 2
-    m_Value: 3.6479542
+    m_Value: 3.5890112
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1602,12 +1602,18 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs:
-      - m_Data: 71186
+      m_SelectedIDs: []
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
-      - m_Data: -1328
+      - m_Data: -19618
+      - m_Data: -18680
+      - m_Data: -17164
+      - m_Data: -1896
+      - m_Data: 71478
+      - m_Data: 71552
+      - m_Data: 80416
+      - m_Data: 81202
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1985,7 +1991,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/_Prefabs/Items
+    - Assets/_Prefabs/Characters
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1993,25 +1999,31 @@ MonoBehaviour:
     m_ImportLogFlags: 0
     m_FilterByTypeIntersection: 0
   m_ViewMode: 1
-  m_StartGridSize: 64
+  m_StartGridSize: 96
   m_LastFolders:
-  - Assets/_Prefabs/Items
+  - Assets/_Prefabs/Characters
   m_LastFoldersGridSize: 96
   m_LastProjectPath: G:\GameDev\slimeking\game\theslimeking
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
+    scrollPos: {x: 0, y: 95}
     m_SelectedIDs:
-    - m_Data: 75458
+    - m_Data: 75168
     m_LastClickedID:
-      m_Data: 75458
+      m_Data: 75168
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 74322
-    - m_Data: 74484
+    - m_Data: 74780
+    - m_Data: 75138
+    - m_Data: 75144
+    - m_Data: 75228
+    - m_Data: 75230
+    - m_Data: 75232
+    - m_Data: 75542
     - m_Data: 1000000000
+    - m_Data: 2147483647
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2044,7 +2056,7 @@ MonoBehaviour:
       m_Data: 0
     m_ExpandedIDs:
     - m_Data: 0
-    - m_Data: 74322
+    - m_Data: 74780
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2071,11 +2083,11 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs:
-    - m_Data: 71186
-    m_LastClickedInstanceID: 71186
+    m_SelectedInstanceIDs: []
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: []
+    m_ExpandedInstanceIDs:
+    - m_Data: 71182
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2101,8 +2113,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 22}
-    m_GridSize: 64
+    m_ScrollPosition: {x: 0, y: 86}
+    m_GridSize: 96
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 574
 --- !u!114 &24
@@ -2229,7 +2241,7 @@ MonoBehaviour:
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_LastInspectedObjectInstanceID: -1
-  m_LastVerticalScrollValue: 0
+  m_LastVerticalScrollValue: 901
   m_GlobalObjectId: 
   m_InspectorMode: 0
   m_LockTracker:
