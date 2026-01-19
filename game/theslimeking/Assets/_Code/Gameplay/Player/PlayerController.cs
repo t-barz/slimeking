@@ -713,6 +713,12 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">Contexto de input contendo valores do Vector2 de movimento</param>
     private void OnMoveInput(InputAction.CallbackContext context)
     {
+        // Ignora input de movimento enquanto o diálogo estiver ativo
+        if (SlimeKing.Core.DialogueManager.HasInstance && SlimeKing.Core.DialogueManager.Instance.IsDialogueActive)
+        {
+            _moveInput = Vector2.zero;
+            return;
+        }
         // Lê o valor do input (Vector2 normalizado)
         _moveInput = context.ReadValue<Vector2>();
 
@@ -733,6 +739,11 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">Contexto de input do botão de ataque</param>
     private void OnAttackInput(InputAction.CallbackContext context)
     {
+        // Bloqueia ataque enquanto o diálogo estiver ativo
+        if (SlimeKing.Core.DialogueManager.HasInstance && SlimeKing.Core.DialogueManager.Instance.IsDialogueActive)
+        {
+            return;
+        }
 
         // Verifica se pode atacar (não está em cooldown)
         if (_canAttack)
@@ -1106,6 +1117,19 @@ public class PlayerController : MonoBehaviour
         if (!SlimeKing.Core.PauseManager.HasInstance)
         {
             // PauseManager not available
+        }
+
+        // Bloqueia completamente o movimento enquanto um diálogo está ativo
+        if (SlimeKing.Core.DialogueManager.HasInstance && SlimeKing.Core.DialogueManager.Instance.IsDialogueActive)
+        {
+            _moveInput = Vector2.zero;
+            _isMoving = false;
+            _rigidbody.linearVelocity = Vector2.zero;
+            if (_animator != null)
+            {
+                _animator.SetBool(IsWalking, false);
+            }
+            return;
         }
 
         // Early exit se movimento estiver desabilitado (ex: cutscenes, morte, movimento especial, etc.)
