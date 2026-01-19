@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 using SlimeKing.Gameplay;
@@ -6,7 +5,7 @@ using SlimeKing.Gameplay;
 namespace SlimeKing.Core
 {
     /// <summary>
-    /// Global dialogue orchestrator. Coordinates data, localization and the HUD panel.
+    /// Global dialogue orchestrator. Coordinates localization and the HUD panel.
     /// </summary>
     public class DialogueManager : ManagerSingleton<DialogueManager>
     {
@@ -17,21 +16,15 @@ namespace SlimeKing.Core
         [Header("Localization")]
         [SerializeField] private string dialogueTable = "DialogueTexts";
 
-        [Header("Database")] 
-        [SerializeField] private TextAsset dialoguesJson; // Optional: assign to load at startup
-        [SerializeField] private string resourcesJsonPath = "Dialogues/dialogues"; // Resources path without extension
-
         [Header("Pagination")]
-        [SerializeField] private int maxCharactersPerPage = 200;
+        [SerializeField] private int maxCharactersPerPage = 120;
 
-        private readonly DialogueDatabase database = new DialogueDatabase();
         private readonly DialogueState state = new DialogueState();
         #endregion
 
         #region Unity Lifecycle
         protected override void Initialize()
         {
-            LoadDatabase();
             EnsureUIRef();
             state.Reset();
         }
@@ -39,48 +32,24 @@ namespace SlimeKing.Core
 
         #region Public Methods
         /// <summary>
-        /// Start a dialogue by NPC and entry ID (from database).
+        /// Check if a dialogue is currently active.
         /// </summary>
-        public void StartDialogue(string npcId, string dialogueId)
-        {
-            if (string.IsNullOrEmpty(npcId) || string.IsNullOrEmpty(dialogueId)) return;
-            if (!database.TryGetDialogueEntry(dialogueId, out var entry)) return;
-
-            state.Reset();
-            state.isActive = true;
-            state.npcId = npcId;
-            state.currentDialogueId = dialogueId;
-
-            var npcName = GetNPCNameLocalized(npcId);
-            state.npcLocalizedName = npcName;
-
-            var localizedText = GetDialogueTextLocalized(entry.textKey);
-            state.pages = DialoguePageManager.GetPages(localizedText, maxCharactersPerPage);
-            state.currentPageIndex = 0;
-
-            if (ui != null)
-            {
-                ui.Show();
-                ui.SetNPCName(npcName);
-                ui.DisplayText(state.pages[0]);
-                ui.UpdatePageIndicator(1, state.pages.Count);
-            }
-        }
+        public bool IsDialogueActive => state.isActive;
 
         /// <summary>
         /// Start a dialogue by direct localization text key (no database lookup).
-        /// Useful for simple NPC interactions without full DialogueEntry data.
+        /// Key format: "Table/Entry" (e.g., "DialogueTexts/NPC001") or plain entry using dialogueTable.
         /// </summary>
-        public void StartDialogueByTextKey(string npcId, string textKey)
+        public void StartDialogueByTextKey(string npcNameKey, string textKey)
         {
-            if (string.IsNullOrEmpty(npcId) || string.IsNullOrEmpty(textKey)) return;
+            if (string.IsNullOrEmpty(npcNameKey) || string.IsNullOrEmpty(textKey)) return;
 
             state.Reset();
             state.isActive = true;
-            state.npcId = npcId;
-            state.currentDialogueId = textKey; // Use textKey as fallback ID
+            state.npcId = npcNameKey;
+            state.currentDialogueId = textKey;
 
-            var npcName = GetNPCNameLocalized(npcId);
+            var npcName = GetNPCNameLocalized(npcNameKey);
             state.npcLocalizedName = npcName;
 
             var localizedText = GetDialogueTextLocalized(textKey);
@@ -92,7 +61,6 @@ namespace SlimeKing.Core
                 ui.Show();
                 ui.SetNPCName(npcName);
                 ui.DisplayText(state.pages[0]);
-                ui.UpdatePageIndicator(1, state.pages.Count);
             }
         }
 
@@ -114,7 +82,6 @@ namespace SlimeKing.Core
             {
                 var page = state.pages[state.currentPageIndex];
                 ui.DisplayText(page);
-                ui.UpdatePageIndicator(state.currentPageIndex + 1, state.pages.Count);
             }
         }
 
@@ -133,20 +100,6 @@ namespace SlimeKing.Core
         #endregion
 
         #region Private Methods
-        private void LoadDatabase()
-        {
-            if (dialoguesJson != null)
-            {
-                database.LoadFromTextAsset(dialoguesJson);
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(resourcesJsonPath))
-            {
-                database.LoadFromResources(resourcesJsonPath);
-            }
-        }
-
         private void EnsureUIRef()
         {
             // Try existing reference

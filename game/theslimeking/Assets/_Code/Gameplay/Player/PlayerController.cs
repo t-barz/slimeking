@@ -761,6 +761,13 @@ public class PlayerController : MonoBehaviour
     /// <param name="context">Contexto de input da tecla de interação</param>
     private void OnInteractInput(InputAction.CallbackContext context)
     {
+        // PRIORIDADE 0: Diálogo ativo - avança para próxima página
+        if (DialogueManager.HasInstance && DialogueManager.Instance.IsDialogueActive)
+        {
+            DialogueManager.Instance.Advance();
+            return;
+        }
+
         // Verifica se já está executando um movimento especial
         if (_isPerformingSpecialMovement)
         {

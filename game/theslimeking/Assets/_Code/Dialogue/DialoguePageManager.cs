@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SlimeKing.Gameplay
 {
     /// <summary>
-    /// Provides simple pagination utilities for localized dialogue text.
+    /// Provides smart pagination utilities for localized dialogue text.
+    /// Breaks by sentence for better readability, then by word if sentences are too long.
     /// </summary>
     public static class DialoguePageManager
     {
         #region Public Methods
+        /// <summary>
+        /// Paginate text intelligently: by sentence first, then by word if necessary.
+        /// </summary>
         public static List<string> GetPages(string fullText, int maxCharactersPerPage = 300, int maxLinesPerPage = 0, char pageBreak = '|')
         {
             var pages = new List<string>();
@@ -30,55 +34,107 @@ namespace SlimeKing.Gameplay
                 return pages;
             }
 
-            // Naive word-wrapping by character budget.
-            var words = fullText.Split(new[] { ' ' }, StringSplitOptions.None);
-            var sb = new StringBuilder();
-            var lineCount = 0;
-
-            void FlushPage()
+            // Split by sentence (period, exclamation, question mark)
+            var sentences = SplitBySentence(fullText);
+            
+            var currentPage = "";
+            
+            foreach (var sentence in sentences)
             {
-                if (sb.Length > 0)
-                {
-                    pages.Add(sb.ToString().Trim());
-                    sb.Clear();
-                    lineCount = 0;
-                }
-            }
+                var trimmed = sentence.Trim();
+                if (string.IsNullOrEmpty(trimmed)) continue;
 
-            foreach (var w in words)
-            {
-                var next = (sb.Length == 0 ? w : " " + w);
-                if (sb.Length + next.Length > maxCharactersPerPage)
+                // If adding this sentence would exceed limit
+                if (!string.IsNullOrEmpty(currentPage) && (currentPage.Length + trimmed.Length + 1) > maxCharactersPerPage)
                 {
-                    FlushPage();
+                    // Flush current page
+                    pages.Add(currentPage.Trim());
+                    currentPage = "";
                 }
 
-                sb.Append(next);
-
-                if (maxLinesPerPage > 0 && next.Contains("\n"))
+                // If sentence itself is longer than max, break it by word
+                if (trimmed.Length > maxCharactersPerPage && string.IsNullOrEmpty(currentPage))
                 {
-                    lineCount += CountLines(next);
-                    if (lineCount >= maxLinesPerPage)
+                    var sentencePages = SplitSentenceByWord(trimmed, maxCharactersPerPage);
+                    for (int i = 0; i < sentencePages.Count - 1; i++)
                     {
-                        FlushPage();
+                        pages.Add(sentencePages[i]);
                     }
+                    currentPage = sentencePages[sentencePages.Count - 1];
+                }
+                else
+                {
+                    currentPage += (string.IsNullOrEmpty(currentPage) ? trimmed : " " + trimmed);
                 }
             }
 
-            FlushPage();
+            // Add remaining content
+            if (!string.IsNullOrEmpty(currentPage))
+            {
+                pages.Add(currentPage.Trim());
+            }
+
             return pages.Count > 0 ? pages : new List<string> { fullText };
         }
         #endregion
 
         #region Utility Methods
-        private static int CountLines(string s)
+        private static List<string> SplitBySentence(string text)
         {
-            var count = 0;
-            for (int i = 0; i < s.Length; i++)
+            var sentences = new List<string>();
+            // Match sentence ending with . ! or ?
+            var matches = Regex.Matches(text, @"[^.!?]*[.!?]+");
+            
+            if (matches.Count == 0)
             {
-                if (s[i] == '\n') count++;
+                // No sentence terminators found, return whole text
+                sentences.Add(text);
+                return sentences;
             }
-            return Math.Max(1, count);
+
+            foreach (Match match in matches)
+            {
+                sentences.Add(match.Value);
+            }
+
+            // Handle any remaining text after last terminator
+            var lastMatch = matches[matches.Count - 1];
+            var remaining = text.Substring(lastMatch.Index + lastMatch.Length).Trim();
+            if (!string.IsNullOrEmpty(remaining))
+            {
+                sentences.Add(remaining);
+            }
+
+            return sentences;
+        }
+
+        private static List<string> SplitSentenceByWord(string sentence, int maxChars)
+        {
+            var pages = new List<string>();
+            var words = sentence.Split(' ');
+            var currentLine = "";
+
+            foreach (var word in words)
+            {
+                var next = (string.IsNullOrEmpty(currentLine) ? word : " " + word);
+                
+                if (currentLine.Length + next.Length > maxChars && !string.IsNullOrEmpty(currentLine))
+                {
+                    pages.Add(currentLine.Trim());
+                    currentLine = word;
+                }
+                else
+                {
+                    currentLine += next;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLine))
+            {
+                pages.Add(currentLine.Trim());
+            }
+
+            return pages;
         }
         #endregion
     }

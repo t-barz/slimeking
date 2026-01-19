@@ -16,8 +16,7 @@ namespace SlimeKing.Visual
         [SerializeField] private GameObject dialoguePanel;
         [SerializeField] private TMP_Text npcNameText;
         [SerializeField] private TMP_Text dialogueText;
-        [SerializeField] private TMP_Text pageIndicatorText;
-    [SerializeField] private LocalizeStringEvent dialogueLocalizeEvent;
+        [SerializeField] private LocalizeStringEvent dialogueLocalizeEvent;
         [Header("Animation")]
         [SerializeField] private float fadeInOutDuration = 0.15f;
         #endregion
@@ -63,20 +62,6 @@ namespace SlimeKing.Visual
             r.TableReference = tableCollection;
             r.TableEntryReference = entryKey;
             dialogueLocalizeEvent.RefreshString();
-        }
-
-        /// <summary>Update page indicator (e.g., 1/3).</summary>
-        public void UpdatePageIndicator(int current, int total)
-        {
-            if (pageIndicatorText == null) return;
-            if (total <= 1)
-            {
-                pageIndicatorText.text = string.Empty;
-            }
-            else
-            {
-                pageIndicatorText.text = $"{current}/{total}";
-            }
         }
         #endregion
 

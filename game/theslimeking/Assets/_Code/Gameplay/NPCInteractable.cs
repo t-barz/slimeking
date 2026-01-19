@@ -11,8 +11,7 @@ namespace SlimeKing.Gameplay
     {
         #region Fields
         [SerializeField] private string npcNameKey = "NPCs/npc_default"; // Localization key for NPC name (e.g., "NPCs/Tipy")
-        [SerializeField] private string dialogueTextKey; // Direct localization key (e.g., "NPCs/NPC001")
-        [SerializeField] private string dialogueEntryId; // Optional: if using DialogueDatabase entries
+        [SerializeField] private string dialogueTextKey; // Direct localization key (e.g., "DialogueTexts/NPC001")
         #endregion
 
         #region Public Methods
@@ -37,23 +36,11 @@ namespace SlimeKing.Gameplay
                 StartDialogueByTextKey(dialogueTextKey);
             }
         }
-
-        /// <summary>
-        /// Trigger dialogue using database entry (requires DialogueDatabase setup).
-        /// </summary>
-        public void StartDialogueByEntryId(string entryId)
-        {
-            if (DialogueManager.HasInstance)
-            {
-                DialogueManager.Instance.StartDialogue(npcNameKey, entryId);
-            }
-        }
         #endregion
 
         #region Getters
         public string NpcNameKey => npcNameKey;
         public string DialogueTextKey => dialogueTextKey;
-        public string DialogueEntryId => dialogueEntryId;
         #endregion
     }
 }
