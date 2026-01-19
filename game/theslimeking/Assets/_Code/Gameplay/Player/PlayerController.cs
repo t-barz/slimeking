@@ -191,6 +191,9 @@ public class PlayerController : MonoBehaviour
     private static readonly int FacingRight = Animator.StringToHash("FacingRight");
     private static readonly int JumpTrigger = Animator.StringToHash("Jump");     // Trigger para animação de Jump
     private static readonly int ShrinkTrigger = Animator.StringToHash("Shrink"); // Trigger para animação de Shrink
+    private static readonly int IsSleeping = Animator.StringToHash("isSleeping"); // Parâmetro para estados Sleep/Waking
+    private static readonly int SleepState = Animator.StringToHash("Sleep");      // Estado de animação Sleep
+    private static readonly int WakingState = Animator.StringToHash("Waking");    // Estado de animação Waking
 
     // === OTIMIZAÇÃO DE UPDATE ===
     // Controle de frequência para operações menos críticas
@@ -506,7 +509,7 @@ public class PlayerController : MonoBehaviour
         if (_animator == null || _animator.runtimeAnimatorController == null) return;
 
         // Lista de parâmetros que devem existir no Animator Controller
-        string[] requiredBoolParams = { "isWalking", "isHiding", "FacingRight" };
+        string[] requiredBoolParams = { "isWalking", "isHiding", "FacingRight", "isSleeping" };
         string[] requiredTriggerParams = { "Attack01", "Jump", "Shrink" };
 
         // Verifica parâmetros bool
@@ -542,6 +545,19 @@ public class PlayerController : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Verifica se o personagem está em estado Sleep ou Waking.
+    /// Checa o estado atual da animação, não apenas o parâmetro booleano.
+    /// </summary>
+    /// <returns>True se está em Sleep ou Waking</returns>
+    private bool IsInSleepOrWakingState()
+    {
+        if (_animator == null) return false;
+
+        AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+        return stateInfo.shortNameHash == SleepState || stateInfo.shortNameHash == WakingState;
     }
 
     #endregion
@@ -1137,6 +1153,9 @@ public class PlayerController : MonoBehaviour
 
         // Early exit se estiver executando movimento especial
         if (_isPerformingSpecialMovement) return;
+
+        // Early exit se estiver em estado Sleep ou Waking
+        if (IsInSleepOrWakingState()) return;
 
         // Bloqueia movimento enquanto agachado
         if (_isHiding)
