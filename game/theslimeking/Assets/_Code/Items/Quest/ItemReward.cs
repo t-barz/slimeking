@@ -1,5 +1,5 @@
 using UnityEngine;
-using TheSlimeKing.Inventory;
+using SlimeKing.Items;
 
 namespace TheSlimeKing.Quest
 {

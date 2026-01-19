@@ -73,40 +73,12 @@ namespace SlimeKing.Core
         Log("GameManager bootstrap concluído");
     }
 
-    #region Logging
-    /// <summary>
-    /// Log condicional baseado na flag enableDebugLogs
-    /// </summary>
-    private void Log(string message)
-    {
-        if (enableDebugLogs)
+
+        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Start()
         {
-            UnityEngine.Debug.Log($"[GameManager] {message}");
+
         }
-    }
-
-    /// <summary>
-    /// Warning sempre ativo independente da flag
-    /// </summary>
-    private void LogWarning(string message)
-    {
-        UnityEngine.Debug.LogWarning($"[GameManager] {message}");
-    }
-
-    /// <summary>
-    /// Error sempre ativo independente da flag
-    /// </summary>
-    private void LogError(string message)
-    {
-        UnityEngine.Debug.LogError($"[GameManager] {message}");
-    }
-    #endregion
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()

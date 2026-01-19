@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using TheSlimeKing.Inventory;
+using SlimeKing.Items;
 
 namespace TheSlimeKing.Quest
 {

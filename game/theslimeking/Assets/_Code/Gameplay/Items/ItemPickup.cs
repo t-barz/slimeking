@@ -1,7 +1,5 @@
 using UnityEngine;
 using SlimeKing.Items;
-using TheSlimeKing.Inventory;
-using SlimeKing.Gameplay;
 using SlimeKing.Core;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -36,7 +34,6 @@ namespace SlimeKing.Gameplay
         [SerializeField] private float activationDelay = 0.1f;
 
         [Header("Performance and Debug")]
-        [SerializeField] private float checkInterval = 0.1f;
         [SerializeField] private bool enableDebugLogs = false;
 
         // Cache de componentes
@@ -50,7 +47,6 @@ namespace SlimeKing.Gameplay
         private bool _isAbsorbed = false;
         private bool _isWaitingAtDestination = false;
         private float _spawnTime;
-        private float _lastCheck;
         private float _arrivalTime;
 
         // Cache de performance (reutiliza do ItemCollectable)
@@ -301,11 +297,13 @@ namespace SlimeKing.Gameplay
         private bool TryAddToInventory()
         {
             if (inventoryItemData == null)
-            {return true; // Retorna true para não bloquear a coleta visual
+            {
+                return true; // Retorna true para não bloquear a coleta visual
             }
 
             if (InventoryManager.Instance == null)
-            {return true;
+            {
+                return true;
             }
 
             bool success = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
@@ -315,7 +313,8 @@ namespace SlimeKing.Gameplay
                 LogDebug($"'{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity})");
             }
             else
-            {LogDebug($"Inventário cheio! '{inventoryItemData.itemName}' não foi coletado");
+            {
+                LogDebug($"Inventário cheio! '{inventoryItemData.itemName}' não foi coletado");
             }
 
             return success;
@@ -367,8 +366,6 @@ namespace SlimeKing.Gameplay
                 playerController.SetCanMove(false);
                 LogDebug("Movimento do player pausado");
             }
-            else
-            {}
         }
 
         /// <summary>

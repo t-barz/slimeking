@@ -11,7 +11,6 @@ Guia rápido e específico para agentes de IA atuarem produtivamente neste proje
 - `SceneTransitionManager`: oferece transições visuais e ordena canvas de transição (`sortingOrder = 9999`).
 
 ## Convenções e Padrões
-- Namespaces: managers em `SlimeKing.Core`; gameplay em `SlimeKing.Gameplay`; visual em `SlimeKing.Visual`; items em `SlimeKing.Items`. Mantenha namespace consistente ao criar novos managers.
 - Script lifecycle: Inicialização específica em `Initialize()` dos managers; use `protected override void Initialize()` ao adicionar novo manager.
 - Não adicione Logs a menos que seja explicitamente solicitado.
 - Evite referências diretas estáticas fora do padrão Singleton; prefira `GameManager.Instance` somente após checar `GameManager.HasInstance` se houver chance de ausência.

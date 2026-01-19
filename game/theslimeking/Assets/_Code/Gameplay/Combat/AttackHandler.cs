@@ -200,24 +200,8 @@ namespace SlimeKing.Gameplay
 
                 bool damageDealt = false;
 
-                // Verifica se é um NPC (NPCBaseController) PRIMEIRO
-                var npcController = col.GetComponent<TheSlimeKing.NPCs.NPCBaseController>();
-                if (npcController != null)
-                {
-                    npcController.TakeDamage();
-                    damageDealt = true;
-                }
-
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                // Log de debug para investigar tag
-                if (enableDebugLogs && !damageDealt)
-                {
-                    UnityEngine.Debug.Log($"AttackHandler: Objeto '{col.name}' tem tag '{col.tag}', NPCBaseController: {(npcController != null ? "SIM" : "NÃO")}");
-                }
-#endif
-
-                // Verifica se tem a tag "Destructable" ou "Enemy" (só se ainda não causou dano)
-                if (!damageDealt && (col.CompareTag("Destructable") || col.CompareTag("Enemy")))
+                // Verifica se tem a tag "Destructable" ou "Enemy"
+                if (col.CompareTag("Destructable") || col.CompareTag("Enemy"))
                 {
                     // Tenta causar dano em BushDestruct
                     if (!bushCache.TryGetValue(col, out BushDestruct bushDestructable))

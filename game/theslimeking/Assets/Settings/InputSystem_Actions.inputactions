@@ -474,6 +474,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "99fe56c4-81cf-4449-a756-34bde4437052",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -749,6 +758,50 @@
                     "processors": "",
                     "groups": "Xbox;Switch;PlayStation",
                     "action": "AddSlot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Inventory (I) - Keyboard",
+                    "id": "443c388f-0435-408a-bae0-96f3a6c2caac",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Inventory (Tab) - Keyboard",
+                    "id": "c487ea91-e363-4e4e-9973-c58d37434cf8",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1797858c-a572-4426-b81b-78e5aaff3b77",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "69c67604-04bd-4ee5-911b-b6f4f4272c5c",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Xbox;Switch;PlayStation",
+                    "action": "Exit",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -8,9 +8,6 @@ namespace SlimeKing.Core
 {
     public class CameraManager : ManagerSingleton<CameraManager>
     {
-        [Header("Camera Management")]
-        [SerializeField] private bool enableLogs = true;
-
         private Camera _mainCamera;
         private UniversalAdditionalCameraData _mainCameraData;
         private CinemachineCamera _cinemachineCamera;

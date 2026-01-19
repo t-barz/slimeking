@@ -1119,22 +1119,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
-        // Para movimento se o jogo está pausado
-        if (SlimeKing.Core.PauseManager.HasInstance && SlimeKing.Core.PauseManager.Instance.IsPaused)
-        {
-            if (_rigidbody.linearVelocity.magnitude > 0.1f)
-            {
-                // Movement stopped due to pause
-            }
-            _rigidbody.linearVelocity = Vector2.zero;
-            return;
-        }
-
-        if (!SlimeKing.Core.PauseManager.HasInstance)
-        {
-            // PauseManager not available
-        }
-
         // Bloqueia completamente o movimento enquanto um diálogo está ativo
         if (SlimeKing.Core.DialogueManager.HasInstance && SlimeKing.Core.DialogueManager.Instance.IsDialogueActive)
         {

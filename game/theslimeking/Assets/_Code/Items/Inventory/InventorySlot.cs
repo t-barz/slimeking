@@ -1,3 +1,5 @@
+using SlimeKing.Items;
+
 namespace TheSlimeKing.Inventory
 {
     [System.Serializable]

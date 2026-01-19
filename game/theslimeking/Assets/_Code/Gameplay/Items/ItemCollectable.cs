@@ -1,29 +1,20 @@
 using UnityEngine;
-using SlimeKing.Items;
-using TheSlimeKing.Inventory;
 using SlimeKing.Core;
 using SlimeKing.Data;
 
 namespace SlimeKing.Gameplay
 {
     /// <summary>
-    /// Componente otimizado para itens coletáveis.
-    /// Combina atração magnética, coleta automática e aplicação de efeitos.
+    /// Componente exclusivo para fragmentos elementais.
+    /// Garante atração automática e entrega dos cristais ao GameManager.
     /// </summary>
     [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
     public class ItemCollectable : MonoBehaviour
     {
-        [Header("Item Configuration")]
-        [SerializeField] private CollectableItemData itemData;
-
         [Header("Crystal Configuration")]
         [SerializeField] private CrystalElementalData crystalData;
 
-        [Header("Inventory Integration")]
-        [SerializeField] private ItemData inventoryItemData;
-        [SerializeField] private int itemQuantity = 1;
-
-        [Header("🧲 Sistema de Atração")]
+        [Header("Attraction Settings")]
         [SerializeField] private float attractionRadius = 3f;
         [SerializeField] private float attractionSpeed = 5f;
         [SerializeField] private AnimationCurve attractionCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -86,10 +77,7 @@ namespace SlimeKing.Gameplay
 
         private void Update()
         {
-            // Verifica se há dados válidos (prioridade para cristais)
-            bool hasValidData = crystalData != null || itemData != null;
-
-            if (!enableAttraction || !hasValidData)
+            if (!enableAttraction || !HasValidCrystal())
             {
                 return;
             }
@@ -135,23 +123,15 @@ namespace SlimeKing.Gameplay
         /// </summary>
         private void InitializeItem()
         {
-            // Prioridade 1: Cristais (sistema preferido)
-            if (crystalData != null)
+            if (!HasValidCrystal())
             {
-                attractionRadius = crystalData.attractionRadius;
-                attractionSpeed = crystalData.attractionSpeed;
-                activationDelay = crystalData.activationDelay;
+                enableAttraction = false;
                 return;
             }
 
-            // Prioridade 2: Sistema legado
-            if (itemData != null)
-            {
-                // Usa configurações do itemData
-                attractionRadius = itemData.detectionRadius;
-                attractionSpeed = itemData.attractSpeed;
-                return;
-            }
+            attractionRadius = crystalData.attractionRadius;
+            attractionSpeed = crystalData.attractionSpeed;
+            activationDelay = crystalData.activationDelay;
         }
 
         /// <summary>
@@ -161,20 +141,13 @@ namespace SlimeKing.Gameplay
         {
             if (_spriteRenderer == null) return;
 
-            // Determina cor original baseada no tipo de dados (prioridade para cristais)
             if (crystalData != null)
             {
                 _originalColor = crystalData.crystalTint;
-
-                // Aplica sprite do cristal se configurado
                 if (crystalData.crystalSprite != null)
                 {
                     _spriteRenderer.sprite = crystalData.crystalSprite;
                 }
-            }
-            else if (itemData != null)
-            {
-                _originalColor = itemData.itemTint;
             }
             else
             {
@@ -307,7 +280,6 @@ namespace SlimeKing.Gameplay
         /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
-            // Evita múltiplas coletas
             if (_isCollected)
             {
                 return;
@@ -315,142 +287,60 @@ namespace SlimeKing.Gameplay
 
             if (other.CompareTag(PLAYER_TAG))
             {
-                CollectItem(other.gameObject);
+                CollectItem();
             }
         }
 
         /// <summary>
-        /// Coleta o item e aplica seus efeitos.
-        /// Sistema de priorização: crystalData > inventoryItemData > itemData (legado)
+        /// Coleta o cristal e adiciona seu valor ao GameManager.
         /// </summary>
-        public void CollectItem(GameObject collector = null)
+        public void CollectItem()
         {
-            // PROTEÇÃO: Evita múltiplas coletas
             if (_isCollected)
             {
                 return;
             }
 
-            // Marca como coletado imediatamente
+            if (!HasValidCrystal())
+            {
+                Debug.LogWarning($"[{nameof(ItemCollectable)}] Cristal sem dados configurados em '{name}'.", this);
+                return;
+            }
+
             _isCollected = true;
 
-            // Desabilita collider para evitar novas colisões
             if (_collider != null)
             {
                 _collider.enabled = false;
             }
 
-            // PRIORIDADE 1: Cristais Elementais (NÃO vão para inventário)
-            if (crystalData != null)
+            if (!ProcessCrystalCollection())
             {
-                ProcessCrystalCollection();
-                return;
+                RevertCollectionState();
             }
-
-            // PRIORIDADE 2: Itens de Inventário
-            if (inventoryItemData != null)
-            {
-                ProcessInventoryItemCollection();
-                return;
-            }
-
-            // PRIORIDADE 3: Sistema Legado (CollectableItemData)
-            if (itemData != null)
-            {
-                ProcessLegacyItemCollection(collector);
-                return;
-            }
-
-            // Nenhum dado configurado
-            RevertCollectionState();
         }
 
         /// <summary>
         /// Processa coleta de cristal elemental.
-        /// Cristais NÃO são adicionados ao inventário - apenas atualizam contadores no GameManager.
         /// </summary>
-        private void ProcessCrystalCollection()
+        private bool ProcessCrystalCollection()
         {
-            // Validação: GameManager deve existir
-            if (GameManager.Instance == null)
+            if (!HasValidCrystal() || GameManager.Instance == null)
             {
-                RevertCollectionState();
-                return;
+                return false;
             }
 
             try
             {
-                // Adiciona cristal ao contador (NÃO ao inventário)
                 GameManager.Instance.AddCrystal(crystalData.crystalType, crystalData.value);
-
-                // Executa efeitos visuais e sonoros
                 PlayCrystalCollectionEffects();
-
-                // Remove o cristal da cena
                 DestroyItem();
+                return true;
             }
             catch (System.Exception)
             {
-                RevertCollectionState();
+                return false;
             }
-        }
-
-        /// <summary>
-        /// Processa coleta de item de inventário.
-        /// Tenta adicionar ao InventoryManager e trata inventário cheio graciosamente.
-        /// </summary>
-        private void ProcessInventoryItemCollection()
-        {
-            // Validação: InventoryManager deve existir
-            if (InventoryManager.Instance == null)
-            {
-                RevertCollectionState();
-                return;
-            }
-
-            // Tenta adicionar ao inventário
-            bool success = InventoryManager.Instance.AddItem(inventoryItemData, itemQuantity);
-
-            if (!success)
-            {
-                // Inventário cheio - mantém item na cena
-                RevertCollectionState();
-                return;
-            }
-
-            // Sucesso - efeitos e remoção
-            PlayCollectionEffects();
-
-            // Remove o item da cena
-            DestroyItem();
-        }
-
-        /// <summary>
-        /// Processa coleta usando sistema legado (CollectableItemData).
-        /// Mantido para compatibilidade com itens antigos.
-        /// </summary>
-        private void ProcessLegacyItemCollection(GameObject collector)
-        {
-            // Encontra o coletor (player)
-            if (collector == null && _playerTransform != null)
-            {
-                collector = _playerTransform.gameObject;
-            }
-
-            if (collector == null)
-            {
-                RevertCollectionState();
-                return;
-            }
-
-            // Aplica efeitos do item (sistema antigo)
-            ApplyItemEffects(collector);
-
-            // Executa efeitos visuais e sonoros
-            PlayCollectionEffects();
-
-            // Remove o item da cena
-            DestroyItem();
         }
 
         /// <summary>
@@ -469,46 +359,6 @@ namespace SlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Aplica todos os efeitos do item no coletor
-        /// </summary>
-        private void ApplyItemEffects(GameObject collector)
-        {
-            // Aplica cura
-            if (itemData.healAmount > 0)
-            {
-                // TODO: Implementar sistema de vida quando disponível
-            }
-
-            // Cura completa
-            if (itemData.isFullHeal)
-            {
-                // TODO: Implementar cura completa
-            }
-
-            // Aplica experiência
-            if (itemData.xpPoints > 0)
-            {
-                // TODO: Implementar sistema de experiência quando disponível
-            }
-
-            // Aplica skill points
-            if (itemData.skillPoints > 0)
-            {
-                // TODO: Implementar skill points
-            }
-
-            // Aplica buffs
-            if (itemData.HasBuffEffect)
-            {
-                var buffHandler = collector.GetComponent<ItemBuffHandler>();
-                if (buffHandler != null)
-                {
-                    buffHandler.AddBuff(itemData);
-                }
-            }
-        }
-
-        /// <summary>
         /// Executa efeitos visuais e sonoros da coleta de cristais
         /// </summary>
         private void PlayCrystalCollectionEffects()
@@ -516,71 +366,18 @@ namespace SlimeKing.Gameplay
             // Determina posição do efeito (preferencialmente na posição do player)
             Vector3 effectPosition = _playerTransform != null ? _playerTransform.position : transform.position;
 
-            // Efeito de partículas (prioridade para cristal)
-            GameObject vfxPrefab = null;
             if (crystalData != null && crystalData.collectVFX != null)
             {
-                vfxPrefab = crystalData.collectVFX;
-            }
-
-            if (vfxPrefab != null)
-            {
-                var vfx = Instantiate(vfxPrefab, effectPosition, Quaternion.identity);
+                var vfx = Instantiate(crystalData.collectVFX, effectPosition, Quaternion.identity);
                 if (vfx != null)
                 {
                     Destroy(vfx, 2f);
                 }
             }
 
-            // Efeito sonoro (prioridade para cristal)
-            AudioClip collectSound = null;
             if (crystalData != null && crystalData.collectSound != null)
             {
-                collectSound = crystalData.collectSound;
-            }
-
-            if (collectSound != null)
-            {
-                AudioSource.PlayClipAtPoint(collectSound, effectPosition, 1f);
-            }
-        }
-
-        /// <summary>
-        /// Executa efeitos visuais e sonoros da coleta (sistema legado)
-        /// </summary>
-        private void PlayCollectionEffects()
-        {
-            // Determina posição do efeito (preferencialmente na posição do player)
-            Vector3 effectPosition = _playerTransform != null ? _playerTransform.position : transform.position;
-
-            // Efeito de partículas
-            GameObject vfxPrefab = null;
-            if (itemData != null && itemData.vfxPrefab != null)
-            {
-                vfxPrefab = itemData.vfxPrefab;
-            }
-
-            if (vfxPrefab != null)
-            {
-                var vfx = Instantiate(vfxPrefab, effectPosition, Quaternion.identity);
-
-                // Auto-destruição do VFX (protegido para evitar null reference)
-                if (vfx != null)
-                {
-                    Destroy(vfx, 2f);
-                }
-            }
-
-            // Efeito sonoro
-            AudioClip collectSound = null;
-            if (itemData != null && itemData.collectSound != null)
-            {
-                collectSound = itemData.collectSound;
-            }
-
-            if (collectSound != null)
-            {
-                AudioSource.PlayClipAtPoint(collectSound, effectPosition, 1f);
+                AudioSource.PlayClipAtPoint(crystalData.collectSound, effectPosition, 1f);
             }
         }
 
@@ -636,16 +433,6 @@ namespace SlimeKing.Gameplay
         #region Public API
 
         /// <summary>
-        /// Configura dados do item em runtime
-        /// </summary>
-        public void SetItemData(CollectableItemData newItemData)
-        {
-            itemData = newItemData;
-            InitializeItem();
-            SetupVisuals();
-        }
-
-        /// <summary>
         /// Configura dados do cristal em runtime
         /// </summary>
         public void SetCrystalData(CrystalElementalData newCrystalData)
@@ -654,11 +441,6 @@ namespace SlimeKing.Gameplay
             InitializeItem();
             SetupVisuals();
         }
-
-        /// <summary>
-        /// Retorna dados do item
-        /// </summary>
-        public CollectableItemData GetItemData() => itemData;
 
         /// <summary>
         /// Retorna dados do cristal
@@ -766,6 +548,11 @@ namespace SlimeKing.Gameplay
             }
         }
 
+        /// <summary>
+        /// Verifica se existe configuração válida de cristal.
+        /// </summary>
+        private bool HasValidCrystal() => crystalData != null;
+
         #endregion
 
         #region Debug & Gizmos
@@ -775,9 +562,7 @@ namespace SlimeKing.Gameplay
         /// </summary>
         private void OnDrawGizmosSelected()
         {
-            // Verifica se tem dados válidos (prioridade para cristais)
-            bool hasValidData = crystalData != null || itemData != null;
-            if (!hasValidData) return;
+            if (!HasValidCrystal()) return;
 
             // Desenha raio de atração
             Gizmos.color = Color.yellow;
