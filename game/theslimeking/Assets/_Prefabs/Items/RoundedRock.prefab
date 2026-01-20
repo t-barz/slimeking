@@ -80,7 +80,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: a8b7d43c0beef0c4a882f64d25029b1a, type: 3}
       propertyPath: m_Name
-      value: item_RoundedRockA
+      value: RoundedRock
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: a8b7d43c0beef0c4a882f64d25029b1a, type: 3}
       propertyPath: m_SpriteSortPoint
@@ -193,12 +193,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ed7fb861bed378428e296858745dd28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BounceHandler
-  minLaunchForce: 0.5
-  maxLaunchForce: 4
+  minLaunchForce: 0.1
+  maxLaunchForce: 1
   verticalForceMultiplier: 1.5
-  minAngle: 45
-  maxAngle: 135
-  bounceCount: 2
+  minAngle: 0
+  maxAngle: 365
+  bounceCount: 1
   timeToBounce: 0.1
   forceReductionFactor: 0.8
   shadowObject: {fileID: 1787758591116441632, guid: cdd160d51c0348944b5da2332d1f697c, type: 3}
