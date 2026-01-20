@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: 2f7828b7ae5e7594a9b7ca9f0167bf54, type: 3}
       propertyPath: m_Name
-      value: item_MushroomA
+      value: Mushroom
       objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: 2f7828b7ae5e7594a9b7ca9f0167bf54, type: 3}
       propertyPath: m_SpriteSortPoint
@@ -153,8 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad085c0e9cc95fc4183e2ac14c2ff372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.ItemPickup
-  itemData: {fileID: 11400000, guid: 8bdd030014abbfb408750bfbd89d6eb9, type: 2}
-  inventoryItemData: {fileID: 11400000, guid: 67efe11cde2a26d4f9ac0b832411cad7, type: 2}
+  itemData: {fileID: 11400000, guid: 8f354aa7e47a1fe43a79fc61cefcb3bc, type: 2}
+  inventoryItemData: {fileID: 11400000, guid: 2af8396d7841256438c0cca4bf484b2d, type: 2}
   itemQuantity: 1
   interactionRadius: 1
   followOffset: {x: 0, y: 0.2, z: 0}
@@ -162,7 +162,6 @@ MonoBehaviour:
   arrivalThreshold: 0.1
   absorptionDelay: 0.25
   activationDelay: 0.5
-  checkInterval: 0.1
   enableDebugLogs: 0
 --- !u!1001 &6391326453378398040
 PrefabInstance:

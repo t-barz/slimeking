@@ -310,11 +310,11 @@ namespace SlimeKing.Gameplay
 
             if (success)
             {
-                LogDebug($"'{inventoryItemData.itemName}' adicionado ao inventário (x{itemQuantity})");
+                LogDebug($"'{inventoryItemData.GetLocalizedName()}' adicionado ao inventário (x{itemQuantity})");
             }
             else
             {
-                LogDebug($"Inventário cheio! '{inventoryItemData.itemName}' não foi coletado");
+                LogDebug($"Inventário cheio! '{inventoryItemData.GetLocalizedName()}' não foi coletado");
             }
 
             return success;
@@ -446,7 +446,12 @@ namespace SlimeKing.Gameplay
 
         private string GetItemName()
         {
-            return itemData?.itemName ?? inventoryItemData?.itemName ?? "Item";
+            if (itemData != null)
+            {
+                return itemData.itemName;
+            }
+
+            return inventoryItemData != null ? inventoryItemData.GetLocalizedName() : "Item";
         }
 
         private void LogDebug(string message)

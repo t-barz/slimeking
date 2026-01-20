@@ -6,6 +6,7 @@ using SlimeKing.Core;
 using SlimeKing.Items;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SlimeKing.UI
@@ -27,16 +28,13 @@ namespace SlimeKing.UI
 
         [Header("Slot Visuals")]
         [SerializeField] private Sprite defaultIcon;
-        [SerializeField] private TMP_FontAsset quantityFont;
-        [SerializeField] private float quantityFontSize = 28f;
-        [SerializeField] private Color quantityColor = Color.white;
-        [SerializeField] private Vector2 quantityOffset = new Vector2(-12f, 12f);
 
         private readonly List<SlotRuntime> slotViews = new();
         private bool slotsBuilt;
         private bool subscribed;
         private Coroutine waitForManagerCoroutine;
         private ItemData selectedItem;
+        private SlotRuntime focusedSlot;
 
         private static readonly Vector2 StretchPadding = new Vector2(24f, 24f);
 
@@ -130,32 +128,11 @@ namespace SlimeKing.UI
         private void HandleItemAdded(ItemData itemData, int totalQuantity)
         {
             RefreshInventoryContents();
-            ShowDetails(itemData, totalQuantity);
         }
 
         private void HandleItemRemoved(ItemData itemData, int remainingQuantity)
         {
             RefreshInventoryContents();
-
-            if (remainingQuantity > 0)
-            {
-                ShowDetails(itemData, remainingQuantity);
-                return;
-            }
-
-            if (selectedItem == itemData)
-            {
-                var replacement = slotViews.FirstOrDefault(slot => slot.Item != null)?.Item;
-                if (replacement != null)
-                {
-                    int quantity = InventoryManager.HasInstance ? InventoryManager.Instance.GetItemCount(replacement) : 0;
-                    ShowDetails(replacement, quantity);
-                }
-                else
-                {
-                    ShowEmptyDetails();
-                }
-            }
         }
 
         private void RefreshInventoryContents()
@@ -184,7 +161,7 @@ namespace SlimeKing.UI
 
             Dictionary<ItemData, int> allItems = InventoryManager.Instance.GetAllItems();
             var orderedItems = allItems
-                .OrderBy(kvp => kvp.Key.itemName, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(kvp => kvp.Key != null ? kvp.Key.GetLocalizedName() : string.Empty, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
             int totalItems = 0;
@@ -203,7 +180,6 @@ namespace SlimeKing.UI
             }
 
             int index = 0;
-            ItemData firstItem = null;
 
             foreach (ItemData item in flattenedItems)
             {
@@ -213,7 +189,6 @@ namespace SlimeKing.UI
                 }
 
                 slotViews[index].Bind(item);
-                firstItem ??= item;
                 index++;
             }
 
@@ -222,22 +197,123 @@ namespace SlimeKing.UI
                 slotViews[index].Clear();
             }
 
-            if (selectedItem != null && orderedItems.All(pair => pair.Key != selectedItem))
+            bool restoredSelection = TryFocusSelectedItemSlot();
+            if (!restoredSelection)
             {
-                selectedItem = null;
+                FocusFirstAvailableSlotInternal();
+            }
+        }
+
+        public void FocusFirstAvailableSlot()
+        {
+            if (!slotsBuilt)
+            {
+                BuildSlotsIfNeeded();
             }
 
+            FocusFirstAvailableSlotInternal();
+        }
+
+        private void FocusFirstAvailableSlotInternal()
+        {
+            if (!gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            SlotRuntime slot = slotViews.FirstOrDefault(s => s.Item != null);
+            if (slot != null)
+            {
+                slot.Focus();
+                return;
+            }
+
+            ClearFocusedSlot();
+            ClearOwnedSelection();
+            ShowEmptyDetails();
+        }
+
+        private void SetFocusedSlot(SlotRuntime slot)
+        {
+            if (slot == null)
+            {
+                return;
+            }
+
+            if (focusedSlot == slot)
+            {
+                focusedSlot.SetSelectionState(true);
+                return;
+            }
+
+            ClearFocusedSlot();
+
+            focusedSlot = slot;
+            focusedSlot.SetSelectionState(true);
+        }
+
+        private void ClearFocusedSlot()
+        {
+            if (focusedSlot == null)
+            {
+                return;
+            }
+
+            focusedSlot.SetSelectionState(false);
+            focusedSlot = null;
+        }
+
+        private bool TryFocusSelectedItemSlot()
+        {
             if (selectedItem == null)
             {
-                if (firstItem != null)
-                {
-                    ShowDetails(firstItem, InventoryManager.Instance.GetItemCount(firstItem));
-                }
-                else
-                {
-                    ShowEmptyDetails();
-                }
+                return false;
             }
+
+            SlotRuntime slot = slotViews.FirstOrDefault(s => s.Item == selectedItem);
+            if (slot == null)
+            {
+                selectedItem = null;
+                return false;
+            }
+
+            slot.Focus();
+            return true;
+        }
+
+        private void ClearOwnedSelection()
+        {
+            ClearFocusedSlot();
+            EventSystem current = EventSystem.current;
+            if (current == null)
+            {
+                return;
+            }
+
+            GameObject selectedObject = current.currentSelectedGameObject;
+            if (selectedObject == null)
+            {
+                return;
+            }
+
+            if (selectedObject.transform.IsChildOf(transform))
+            {
+                current.SetSelectedGameObject(null);
+            }
+        }
+
+        private void HandleSlotFocused(SlotRuntime slot)
+        {
+            if (slot?.Item == null)
+            {
+                ClearFocusedSlot();
+                ShowEmptyDetails();
+                return;
+            }
+
+            SetFocusedSlot(slot);
+            int quantity = InventoryManager.HasInstance ? InventoryManager.Instance.GetItemCount(slot.Item) : 0;
+            ShowDetails(slot.Item, quantity);
         }
 
         private void ShowDetails(ItemData itemData, int quantity)
@@ -246,7 +322,7 @@ namespace SlimeKing.UI
 
             if (itemNameText != null)
             {
-                itemNameText.text = itemData?.itemName ?? string.Empty;
+                itemNameText.text = itemData?.GetLocalizedName() ?? string.Empty;
             }
 
             if (itemDescriptionText != null)
@@ -264,6 +340,7 @@ namespace SlimeKing.UI
 
         private void ShowEmptyDetails()
         {
+            ClearFocusedSlot();
             selectedItem = null;
 
             if (itemNameText != null)
@@ -318,21 +395,6 @@ namespace SlimeKing.UI
             slotsBuilt = true;
         }
 
-        private TMP_FontAsset ResolveQuantityFont()
-        {
-            if (quantityFont != null)
-            {
-                return quantityFont;
-            }
-
-            if (itemNameText != null)
-            {
-                return itemNameText.font;
-            }
-
-            return TMP_Settings.defaultFontAsset;
-        }
-
         private void ConfigureIconRect(RectTransform slotAnchor, RectTransform iconRect)
         {
             if (slotAnchor == null || iconRect == null)
@@ -352,7 +414,9 @@ namespace SlimeKing.UI
             private readonly InventoryPanelView owner;
             private readonly RectTransform slotAnchor;
             private readonly Image iconImage;
-            private readonly TextMeshProUGUI quantityLabel;
+            private readonly Selectable selectable;
+            private readonly EventTrigger eventTrigger;
+            private readonly Outline selectionOutline;
 
             public ItemData Item { get; private set; }
 
@@ -361,9 +425,19 @@ namespace SlimeKing.UI
                 this.owner = owner;
                 slotAnchor = anchor;
 
+                selectable = EnsureSelectable(anchor);
+                selectionOutline = EnsureSelectionOutline(anchor);
+                if (selectionOutline != null)
+                {
+                    selectionOutline.effectColor = Color.yellow;
+                    selectionOutline.effectDistance = new Vector2(3.5f, -3.5f);
+                    selectionOutline.useGraphicAlpha = false;
+                    selectionOutline.enabled = false;
+                }
+                eventTrigger = anchor.GetComponent<EventTrigger>() ?? anchor.gameObject.AddComponent<EventTrigger>();
                 iconImage = CreateIcon(anchor, owner);
-                quantityLabel = CreateQuantityLabel(anchor, owner);
 
+                RegisterFocusCallbacks();
                 Clear();
             }
 
@@ -372,6 +446,11 @@ namespace SlimeKing.UI
                 Item = itemData;
 
                 owner.ConfigureIconRect(slotAnchor, iconImage.rectTransform);
+
+                if (selectable != null)
+                {
+                    selectable.interactable = itemData != null;
+                }
 
                 if (itemData == null)
                 {
@@ -391,14 +470,138 @@ namespace SlimeKing.UI
                     iconImage.enabled = false;
                 }
 
-                quantityLabel.enabled = false;
             }
 
             public void Clear()
             {
                 Item = null;
                 iconImage.enabled = false;
-                quantityLabel.enabled = false;
+                SetSelectionState(false);
+
+                if (selectable != null)
+                {
+                    selectable.interactable = false;
+                }
+            }
+
+            public void SetSelectionState(bool isSelected)
+            {
+                if (selectionOutline != null)
+                {
+                    selectionOutline.enabled = isSelected;
+                }
+            }
+
+            public void Focus()
+            {
+                if (Item == null)
+                {
+                    return;
+                }
+
+                bool selectionApplied = false;
+
+                if (selectable != null && selectable.IsActive() && selectable.IsInteractable())
+                {
+                    EventSystem current = EventSystem.current;
+                    if (current != null)
+                    {
+                        selectable.Select();
+                        selectionApplied = true;
+                    }
+                }
+
+                if (!selectionApplied)
+                {
+                    owner.HandleSlotFocused(this);
+                }
+            }
+
+            private void RegisterFocusCallbacks()
+            {
+                if (eventTrigger == null)
+                {
+                    return;
+                }
+
+                if (eventTrigger.triggers == null)
+                {
+                    eventTrigger.triggers = new List<EventTrigger.Entry>();
+                }
+
+                RegisterEvent(EventTriggerType.PointerEnter);
+                RegisterEvent(EventTriggerType.Select);
+                RegisterEvent(EventTriggerType.PointerClick);
+            }
+
+            private void RegisterEvent(EventTriggerType eventType)
+            {
+                var entry = new EventTrigger.Entry { eventID = eventType };
+                entry.callback.AddListener(_ => HandleFocusEvent());
+                eventTrigger.triggers.Add(entry);
+            }
+
+            private void HandleFocusEvent()
+            {
+                if (Item == null)
+                {
+                    owner.ShowEmptyDetails();
+                    return;
+                }
+
+                owner.HandleSlotFocused(this);
+            }
+
+            private static Selectable EnsureSelectable(RectTransform anchor)
+            {
+                if (anchor == null)
+                {
+                    return null;
+                }
+
+                Selectable slotSelectable = anchor.GetComponent<Selectable>();
+                if (slotSelectable != null)
+                {
+                    return slotSelectable;
+                }
+
+                Button button = anchor.gameObject.AddComponent<Button>();
+                button.transition = Selectable.Transition.None;
+
+                Image existingImage = anchor.GetComponent<Image>();
+                if (existingImage == null)
+                {
+                    existingImage = anchor.gameObject.AddComponent<Image>();
+                    existingImage.color = Color.clear;
+                }
+
+                button.targetGraphic = existingImage;
+
+                return button;
+            }
+
+            private static Outline EnsureSelectionOutline(RectTransform anchor)
+            {
+                if (anchor == null)
+                {
+                    return null;
+                }
+
+                Graphic graphic = anchor.GetComponent<Graphic>();
+                if (graphic == null)
+                {
+                    Image fallbackImage = anchor.gameObject.AddComponent<Image>();
+                    fallbackImage.color = Color.clear;
+                    graphic = fallbackImage;
+                }
+
+                Outline outline = anchor.GetComponent<Outline>();
+                if (outline == null)
+                {
+                    outline = anchor.gameObject.AddComponent<Outline>();
+                }
+
+                return outline;
             }
 
             private static Image CreateIcon(RectTransform anchor, InventoryPanelView owner)
@@ -415,26 +618,6 @@ namespace SlimeKing.UI
                 return image;
             }
 
-            private static TextMeshProUGUI CreateQuantityLabel(RectTransform anchor, InventoryPanelView owner)
-            {
-                var qtyGO = new GameObject("RuntimeQuantityLabel", typeof(RectTransform), typeof(CanvasRenderer));
-                qtyGO.transform.SetParent(anchor, false);
-
-                RectTransform qtyRect = qtyGO.GetComponent<RectTransform>();
-                qtyRect.anchorMin = qtyRect.anchorMax = new Vector2(1f, 0f);
-                qtyRect.pivot = new Vector2(1f, 0f);
-                qtyRect.anchoredPosition = owner.quantityOffset;
-
-                TextMeshProUGUI label = qtyGO.AddComponent<TextMeshProUGUI>();
-                label.font = owner.ResolveQuantityFont();
-                label.fontSize = owner.quantityFontSize;
-                label.color = owner.quantityColor;
-                label.alignment = TextAlignmentOptions.BottomRight;
-                label.raycastTarget = false;
-                label.text = string.Empty;
-                label.enabled = false;
-                return label;
-            }
         }
     }
 }

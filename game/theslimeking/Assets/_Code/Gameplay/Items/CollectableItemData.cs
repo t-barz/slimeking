@@ -17,8 +17,7 @@ namespace SlimeKing.Items
         [Range(0, 100)] public int healAmount = 0;
         public bool isFullHeal = false;
 
-        [Header("⭐ Experiência (0 = desabilitado)")]
-        [Range(0, 1000)] public int xpPoints = 0;
+        [Header("⭐ Pontos de Habilidade (0 = desabilitado)")]
         [Range(0, 10)] public int skillPoints = 0;
 
         [Header("🚀 Buffs Temporários (0 = desabilitado)")]
@@ -37,7 +36,7 @@ namespace SlimeKing.Items
 
         // Propriedades de performance (calculadas uma vez)
         public bool HasHealEffect => healAmount > 0 || isFullHeal;
-        public bool HasXPEffect => xpPoints > 0 || skillPoints > 0;
+        public bool HasXPEffect => skillPoints > 0;
         public bool HasBuffEffect => attackBuff > 0 || defenseBuff > 0 || speedBuff > 0;
         public bool HasAnyEffect => HasHealEffect || HasXPEffect || HasBuffEffect;
     }

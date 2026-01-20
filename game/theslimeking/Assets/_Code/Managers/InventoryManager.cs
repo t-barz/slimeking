@@ -54,7 +54,7 @@ namespace SlimeKing.Core
             // Verifica se há espaço no inventário
             if (GetTotalSlots() + quantity > maxSlots)
             {
-                Log($"Inventário cheio! Não é possível adicionar {itemData.itemName} (x{quantity})");
+                Log($"Inventário cheio! Não é possível adicionar {itemData.GetLocalizedName()} (x{quantity})");
                 OnInventoryFull?.Invoke();
                 return false;
             }
@@ -69,7 +69,7 @@ namespace SlimeKing.Core
                 inventory[itemData] = quantity;
             }
 
-            Log($"Item adicionado: {itemData.itemName} (x{quantity})");
+            Log($"Item adicionado: {itemData.GetLocalizedName()} (x{quantity})");
             OnItemAdded?.Invoke(itemData, inventory[itemData]);
             return true;
         }
@@ -84,14 +84,14 @@ namespace SlimeKing.Core
         {
             if (itemData == null || !inventory.ContainsKey(itemData))
             {
-                LogWarning($"Item não encontrado no inventário: {itemData?.itemName}");
+                LogWarning($"Item não encontrado no inventário: {itemData?.GetLocalizedName()}");
                 return false;
             }
 
             int currentQuantity = inventory[itemData];
             if (currentQuantity < quantity)
             {
-                LogWarning($"Quantidade insuficiente de {itemData.itemName}");
+                LogWarning($"Quantidade insuficiente de {itemData.GetLocalizedName()}");
                 return false;
             }
 
@@ -106,7 +106,7 @@ namespace SlimeKing.Core
                 inventory[itemData] = remainingQuantity;
             }
 
-            Log($"Item removido: {itemData.itemName} (x{quantity})");
+            Log($"Item removido: {itemData.GetLocalizedName()} (x{quantity})");
             OnItemRemoved?.Invoke(itemData, remainingQuantity);
             return true;
         }

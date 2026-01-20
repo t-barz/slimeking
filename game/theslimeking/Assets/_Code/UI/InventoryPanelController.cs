@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using SlimeKing.Gameplay;
 
@@ -12,6 +13,7 @@ namespace SlimeKing.UI
     {
         [Header("References")]
         [SerializeField] private GameObject inventoryPanel;
+        [SerializeField] private InventoryPanelView inventoryPanelView;
         [SerializeField] private PlayerInput playerInput;
         private InputActionAsset actionAsset;
         private InputAction inventoryAction;
@@ -56,6 +58,7 @@ namespace SlimeKing.UI
 
             playerInput?.SwitchCurrentActionMap("Gameplay");
             RestoreTimeScale();
+            ClearInventorySelection();
 
             if (inventoryPanel != null)
             {
@@ -174,14 +177,13 @@ namespace SlimeKing.UI
         private void OpenInventory()
         {
             ResolveInventoryPanelReference();
-            if (inventoryPanel != null)
-            {
-                inventoryPanel.SetActive(true);
-            }
-            else
+            if (inventoryPanel == null)
             {
                 return;
             }
+
+            inventoryPanel.SetActive(true);
+            inventoryPanelView?.FocusFirstAvailableSlot();
 
             isInventoryOpen = true;
 
@@ -193,6 +195,8 @@ namespace SlimeKing.UI
         {
             ResolveInventoryPanelReference();
             isInventoryOpen = false;
+
+            ClearInventorySelection();
 
             if (inventoryPanel != null)
             {
@@ -226,10 +230,37 @@ namespace SlimeKing.UI
             timeScalePaused = false;
         }
 
+        private void ClearInventorySelection()
+        {
+            EventSystem current = EventSystem.current;
+            if (current == null || inventoryPanel == null)
+            {
+                return;
+            }
+
+            GameObject selectedObject = current.currentSelectedGameObject;
+            if (selectedObject == null)
+            {
+                return;
+            }
+
+            if (selectedObject.transform.IsChildOf(inventoryPanel.transform))
+            {
+                current.SetSelectedGameObject(null);
+            }
+        }
+
         private void ResolveInventoryPanelReference()
         {
+            if (inventoryPanelView != null)
+            {
+                inventoryPanel = inventoryPanelView.gameObject;
+                return;
+            }
+
             if (inventoryPanel != null)
             {
+                CacheInventoryPanelViewIfNeeded();
                 return;
             }
 
@@ -237,6 +268,7 @@ namespace SlimeKing.UI
             if (panelTransform != null)
             {
                 inventoryPanel = panelTransform.gameObject;
+                CacheInventoryPanelViewIfNeeded();
                 return;
             }
 
@@ -244,6 +276,7 @@ namespace SlimeKing.UI
             if (panelView != null)
             {
                 inventoryPanel = panelView.gameObject;
+                inventoryPanelView = panelView;
                 return;
             }
 
@@ -251,7 +284,18 @@ namespace SlimeKing.UI
             if (panelObject != null)
             {
                 inventoryPanel = panelObject;
+                CacheInventoryPanelViewIfNeeded();
             }
+        }
+
+        private void CacheInventoryPanelViewIfNeeded()
+        {
+            if (inventoryPanel == null || inventoryPanelView != null)
+            {
+                return;
+            }
+
+            inventoryPanelView = inventoryPanel.GetComponent<InventoryPanelView>() ?? inventoryPanel.GetComponentInChildren<InventoryPanelView>(true);
         }
     }
 }

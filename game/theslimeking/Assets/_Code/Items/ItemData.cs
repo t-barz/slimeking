@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 namespace SlimeKing.Items
 {
@@ -47,8 +48,8 @@ namespace SlimeKing.Items
     public class ItemData : ScriptableObject
     {
         [Header("Item Identity")]
-        [SerializeField] public string itemName = "New Item";
-        [SerializeField] public string description = "";
+        [SerializeField] public LocalizedString itemName;
+        [SerializeField] public LocalizedString description;
         [SerializeField] public Sprite icon;
 
         [Header("Item Type")]
@@ -79,7 +80,7 @@ namespace SlimeKing.Items
         /// </summary>
         public string GetFullDescription()
         {
-            string full = description;
+            string full = GetLocalizedDescription();
 
             if (HasEffect() && itemEffect != null)
             {
@@ -98,6 +99,22 @@ namespace SlimeKing.Items
             }
 
             return full;
+        }
+
+        /// <summary>
+        /// Retorna o nome do item localizado.
+        /// </summary>
+        public string GetLocalizedName()
+        {
+            return itemName.IsEmpty ? string.Empty : itemName.GetLocalizedString();
+        }
+
+        /// <summary>
+        /// Retorna a descrição localizada do item.
+        /// </summary>
+        public string GetLocalizedDescription()
+        {
+            return description.IsEmpty ? string.Empty : description.GetLocalizedString();
         }
     }
 }
