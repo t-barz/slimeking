@@ -325,20 +325,30 @@ namespace SlimeKing.Gameplay
         /// </summary>
         private bool ProcessCrystalCollection()
         {
-            if (!HasValidCrystal() || GameManager.Instance == null)
+            if (!HasValidCrystal())
             {
+                Debug.LogWarning($"[ItemCollectable] Cristal sem dados válidos em '{name}'");
+                return false;
+            }
+            
+            var gameManager = GameManager.Instance;
+            if (gameManager == null)
+            {
+                Debug.LogError($"[ItemCollectable] GameManager.Instance é null!");
                 return false;
             }
 
             try
             {
-                GameManager.Instance.AddCrystal(crystalData.crystalType, crystalData.value);
+                Debug.Log($"[ItemCollectable] Adicionando cristal {crystalData.crystalType} ao GameManager (instanceID: {gameManager.GetInstanceID()})");
+                gameManager.AddCrystal(crystalData.crystalType, crystalData.value);
                 PlayCrystalCollectionEffects();
                 DestroyItem();
                 return true;
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                Debug.LogError($"[ItemCollectable] Erro ao processar coleta: {ex.Message}");
                 return false;
             }
         }

@@ -343,6 +343,9 @@ namespace SlimeKing.Core
         crystalCounts[crystalType] += amount;
         int newCount = crystalCounts[crystalType];
 
+        // Log sempre ativo para debug
+        Debug.Log($"[GameManager] AddCrystal: {crystalType} +{amount} = {newCount} (instanceID: {GetInstanceID()}, subscribers: {OnCrystalCountChanged?.GetInvocationList()?.Length ?? 0})");
+
         // Dispara eventos
         OnCrystalCollected?.Invoke(crystalType, amount);
         OnCrystalCountChanged?.Invoke(crystalType, newCount);

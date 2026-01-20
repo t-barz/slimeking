@@ -23,7 +23,23 @@ namespace SlimeKing.Core
                 if (_instance == null)
                 {
                     // Tenta encontrar uma instância existente na cena
-                    _instance = FindObjectOfType<T>();
+                    // Usa FindObjectsOfType para encontrar todas as instâncias e pegar a primeira válida
+                    T[] instances = FindObjectsOfType<T>();
+                    
+                    if (instances != null && instances.Length > 0)
+                    {
+                        _instance = instances[0];
+                        
+                        // Se houver mais de uma instância, destroi as duplicatas
+                        if (instances.Length > 1)
+                        {
+                            UnityEngine.Debug.LogWarning($"[{typeof(T).Name}] Múltiplas instâncias encontradas ({instances.Length}). Mantendo apenas a primeira.");
+                            for (int i = 1; i < instances.Length; i++)
+                            {
+                                Destroy(instances[i].gameObject);
+                            }
+                        }
+                    }
                     
                     // Se não encontrou, cria uma nova instância
                     if (_instance == null)

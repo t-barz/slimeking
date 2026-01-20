@@ -53,12 +53,17 @@ namespace SlimeKing.UI
     private void Start()
     {
         InitializeDisplay();
-        ConnectToGameManager();
+        // Usa Invoke para dar tempo ao GameManager de inicializar
+        Invoke(nameof(ConnectToGameManager), 0.1f);
     }
 
     private void OnEnable()
     {
-        ConnectToGameManager();
+        // Reconecta quando habilitado (pode ter sido desabilitado/habilitado)
+        if (Application.isPlaying)
+        {
+            ConnectToGameManager();
+        }
     }
 
     private void OnDisable()
@@ -78,12 +83,30 @@ namespace SlimeKing.UI
     /// </summary>
     private void ConnectToGameManager()
     {
-        if (GameManager.HasInstance)
+        // Usa Instance diretamente para garantir que a instância seja criada/encontrada
+        // Isso evita problemas de ordem de inicialização onde HasInstance retorna false
+        // mas o GameManager ainda não foi inicializado
+        var gameManager = GameManager.Instance;
+        if (gameManager != null)
         {
-            GameManager.Instance.OnCrystalCountChanged += HandleCrystalCountChanged;
+            // Desinscreve primeiro para evitar duplicação de eventos
+            gameManager.OnCrystalCountChanged -= HandleCrystalCountChanged;
+            gameManager.OnCrystalCountChanged += HandleCrystalCountChanged;
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[FragmentDisplay] Conectado ao GameManager (instanceID: {gameManager.GetInstanceID()})");
+            }
             
             // Sincroniza contadores atuais
             SyncWithGameManager();
+        }
+        else
+        {
+            if (enableDebugLogs)
+            {
+                Debug.LogWarning("[FragmentDisplay] GameManager.Instance retornou null!");
+            }
         }
     }
 
@@ -92,6 +115,7 @@ namespace SlimeKing.UI
     /// </summary>
     private void DisconnectFromGameManager()
     {
+        // Usa HasInstance aqui para evitar criar instância durante destruição
         if (GameManager.HasInstance)
         {
             GameManager.Instance.OnCrystalCountChanged -= HandleCrystalCountChanged;
@@ -103,9 +127,10 @@ namespace SlimeKing.UI
     /// </summary>
     private void SyncWithGameManager()
     {
-        if (!GameManager.HasInstance) return;
+        var gameManager = GameManager.Instance;
+        if (gameManager == null) return;
 
-        var allCounts = GameManager.Instance.GetAllCrystalCounts();
+        var allCounts = gameManager.GetAllCrystalCounts();
         
         foreach (var kvp in allCounts)
         {
@@ -129,12 +154,29 @@ namespace SlimeKing.UI
     {
         string elementName = crystalType.ToString();
         
+        if (enableDebugLogs)
+        {
+            Debug.Log($"[FragmentDisplay] HandleCrystalCountChanged: {crystalType} -> {newCount}");
+        }
+        
         var fragmentType = fragmentTypes.Find(f => f.elementName.Equals(elementName, System.StringComparison.OrdinalIgnoreCase));
         
         if (fragmentType != null)
         {
             fragmentType.count = newCount;
             UpdateDisplay(fragmentType);
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[FragmentDisplay] Atualizado display de {elementName} para {newCount}");
+            }
+        }
+        else
+        {
+            if (enableDebugLogs)
+            {
+                Debug.LogWarning($"[FragmentDisplay] Tipo de fragmento não encontrado para: {elementName}");
+            }
         }
     }
     #endregion
