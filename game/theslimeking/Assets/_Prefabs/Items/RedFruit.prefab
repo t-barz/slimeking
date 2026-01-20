@@ -26,11 +26,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.140982
+      value: 4.8188796
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.1039877
+      value: 3.492432
       objectReference: {fileID: 0}
     - target: {fileID: 7878350319992209165, guid: a86f7c2d6a47f884aa090069ed240b7f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -205,8 +205,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad085c0e9cc95fc4183e2ac14c2ff372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeMec.Gameplay.ItemPickup
-  itemData: {fileID: 11400000, guid: a345eea9fb80b5a4d9d571bcf5be2ca4, type: 2}
-  inventoryItemData: {fileID: 11400000, guid: 414160f8cb14b664886922deb16ca879, type: 2}
+  itemData: {fileID: 0}
+  inventoryItemData: {fileID: 0}
   itemQuantity: 1
   interactionRadius: 1
   followOffset: {x: 0, y: 0.25, z: 0}

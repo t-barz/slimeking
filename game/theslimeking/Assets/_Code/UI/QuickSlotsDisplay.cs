@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using SlimeKing.Core;
+using SlimeKing.Items;
 
 /// <summary>
 /// Gerencia a visualização dos 4 Quick Slots na parte inferior central da tela.
@@ -22,6 +24,9 @@ public class QuickSlotsDisplay : MonoBehaviour
     [Header("Layout Settings")]
     [SerializeField] private float spacing = 10f;
     [SerializeField] private float padding = 20f;
+
+    [Header("Icon Settings")]
+    [SerializeField] private Vector2 iconPadding = new Vector2(16f, 16f);
     #endregion
 
     #region Debug
@@ -31,6 +36,8 @@ public class QuickSlotsDisplay : MonoBehaviour
 
     #region Private Variables
     private List<GameObject> quickSlotInstances = new List<GameObject>();
+    private List<Image> slotIconImages = new List<Image>();
+    private bool subscribedToManager;
     #endregion
 
     #region Unity Lifecycle
@@ -42,6 +49,125 @@ public class QuickSlotsDisplay : MonoBehaviour
     private void Start()
     {
         InitializeDisplay();
+        SubscribeToQuickSlotManager();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToQuickSlotManager();
+        RefreshAllSlots();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromQuickSlotManager();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromQuickSlotManager();
+    }
+    #endregion
+
+    #region QuickSlotManager Integration
+    private void SubscribeToQuickSlotManager()
+    {
+        if (subscribedToManager)
+        {
+            return;
+        }
+
+        if (!QuickSlotManager.HasInstance)
+        {
+            StartCoroutine(WaitForQuickSlotManager());
+            return;
+        }
+
+        QuickSlotManager.Instance.OnQuickSlotChanged += HandleQuickSlotChanged;
+        subscribedToManager = true;
+        RefreshAllSlots();
+    }
+
+    private System.Collections.IEnumerator WaitForQuickSlotManager()
+    {
+        while (!QuickSlotManager.HasInstance)
+        {
+            yield return null;
+        }
+
+        if (!subscribedToManager)
+        {
+            QuickSlotManager.Instance.OnQuickSlotChanged += HandleQuickSlotChanged;
+            subscribedToManager = true;
+            RefreshAllSlots();
+        }
+    }
+
+    private void UnsubscribeFromQuickSlotManager()
+    {
+        if (!subscribedToManager)
+        {
+            return;
+        }
+
+        if (QuickSlotManager.HasInstance)
+        {
+            QuickSlotManager.Instance.OnQuickSlotChanged -= HandleQuickSlotChanged;
+        }
+
+        subscribedToManager = false;
+    }
+
+    private void HandleQuickSlotChanged(int slotIndex, ItemData item)
+    {
+        if (slotIndex < 0 || slotIndex >= slotIconImages.Count)
+        {
+            return;
+        }
+
+        UpdateSlotVisual(slotIndex, item);
+    }
+
+    private void RefreshAllSlots()
+    {
+        if (!QuickSlotManager.HasInstance)
+        {
+            return;
+        }
+
+        ItemData[] items = QuickSlotManager.Instance.GetAllQuickSlotItems();
+        for (int i = 0; i < items.Length && i < slotIconImages.Count; i++)
+        {
+            UpdateSlotVisual(i, items[i]);
+        }
+    }
+
+    private void UpdateSlotVisual(int slotIndex, ItemData item)
+    {
+        if (slotIndex < 0 || slotIndex >= slotIconImages.Count)
+        {
+            return;
+        }
+
+        Image iconImage = slotIconImages[slotIndex];
+        if (iconImage == null)
+        {
+            return;
+        }
+
+        if (item != null && item.icon != null)
+        {
+            iconImage.sprite = item.icon;
+            iconImage.preserveAspect = true;
+            iconImage.enabled = true;
+            Log($"Slot {slotIndex + 1} atualizado com {item.GetLocalizedName()}");
+        }
+        else
+        {
+            iconImage.sprite = null;
+            iconImage.enabled = false;
+            Log($"Slot {slotIndex + 1} limpo");
+        }
     }
     #endregion
 
@@ -110,6 +236,9 @@ public class QuickSlotsDisplay : MonoBehaviour
             }
             quickSlotInstances.Add(slotInstance);
 
+            Image iconImage = CreateSlotIcon(slotInstance, i);
+            slotIconImages.Add(iconImage);
+
             Log($"Created quick slot {i + 1}");
         }
 
@@ -117,6 +246,29 @@ public class QuickSlotsDisplay : MonoBehaviour
         {
             StartCoroutine(AnimateSlotsSequentially());
         }
+    }
+
+    /// <summary>
+    /// Cria o ícone interno para exibir o item do slot
+    /// </summary>
+    private Image CreateSlotIcon(GameObject slotInstance, int slotIndex)
+    {
+        GameObject iconGO = new GameObject($"SlotIcon_{slotIndex + 1}", typeof(RectTransform), typeof(CanvasRenderer));
+        iconGO.transform.SetParent(slotInstance.transform, false);
+
+        RectTransform iconRect = iconGO.GetComponent<RectTransform>();
+        iconRect.anchorMin = Vector2.zero;
+        iconRect.anchorMax = Vector2.one;
+        iconRect.pivot = new Vector2(0.5f, 0.5f);
+        iconRect.offsetMin = iconPadding;
+        iconRect.offsetMax = -iconPadding;
+
+        Image iconImage = iconGO.AddComponent<Image>();
+        iconImage.raycastTarget = false;
+        iconImage.preserveAspect = true;
+        iconImage.enabled = false;
+
+        return iconImage;
     }
 
     /// <summary>
@@ -132,6 +284,7 @@ public class QuickSlotsDisplay : MonoBehaviour
             }
         }
         quickSlotInstances.Clear();
+        slotIconImages.Clear();
     }
     #endregion
 
@@ -163,18 +316,29 @@ public class QuickSlotsDisplay : MonoBehaviour
     /// </summary>
     public void SetSlotContent(int slotIndex, Sprite icon, string itemName)
     {
-        GameObject slot = GetQuickSlot(slotIndex);
-        if (slot != null)
+        if (slotIndex < 0 || slotIndex >= slotIconImages.Count)
         {
-            // Procura pela Image no slot
-            Image slotImage = slot.GetComponent<Image>();
-            if (slotImage != null)
-            {
-                slotImage.sprite = icon;
-            }
-
-            Log($"Set slot {slotIndex + 1} to {itemName}");
+            LogWarning($"Quick slot index {slotIndex} is out of range!");
+            return;
         }
+
+        Image iconImage = slotIconImages[slotIndex];
+        if (iconImage != null)
+        {
+            if (icon != null)
+            {
+                iconImage.sprite = icon;
+                iconImage.preserveAspect = true;
+                iconImage.enabled = true;
+            }
+            else
+            {
+                iconImage.sprite = null;
+                iconImage.enabled = false;
+            }
+        }
+
+        Log($"Set slot {slotIndex + 1} to {itemName}");
     }
 
     /// <summary>
@@ -182,17 +346,20 @@ public class QuickSlotsDisplay : MonoBehaviour
     /// </summary>
     public void ClearSlot(int slotIndex)
     {
-        GameObject slot = GetQuickSlot(slotIndex);
-        if (slot != null)
+        if (slotIndex < 0 || slotIndex >= slotIconImages.Count)
         {
-            Image slotImage = slot.GetComponent<Image>();
-            if (slotImage != null)
-            {
-                slotImage.sprite = null;
-            }
-
-            Log($"Cleared slot {slotIndex + 1}");
+            LogWarning($"Quick slot index {slotIndex} is out of range!");
+            return;
         }
+
+        Image iconImage = slotIconImages[slotIndex];
+        if (iconImage != null)
+        {
+            iconImage.sprite = null;
+            iconImage.enabled = false;
+        }
+
+        Log($"Cleared slot {slotIndex + 1}");
     }
 
     /// <summary>
@@ -200,7 +367,7 @@ public class QuickSlotsDisplay : MonoBehaviour
     /// </summary>
     public void ClearAllSlots()
     {
-        for (int i = 0; i < quickSlotInstances.Count; i++)
+        for (int i = 0; i < slotIconImages.Count; i++)
         {
             ClearSlot(i);
         }

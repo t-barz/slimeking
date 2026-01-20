@@ -6,10 +6,10 @@
 ## DIA 1 - QUICKSLOT + INTEGRAÇÃO EM MUNDO (4h)
 
 ### 0:00-1:00 (1h) - Setup UI + Binding com Inventário
-- [ ] Criar prefab QuickSlot (4 slots direcionais: cima, baixo, esq, dir)
-- [ ] Integrar evento `OnInventoryChanged` para atualizar visual dos slots
-- [ ] Testar binding: pegar item → atualizar slot automaticamente
-- [ ] **Commit**: `feat: quickslot ui binding base`
+- [x] Criar prefab QuickSlot (4 slots direcionais: cima, baixo, esq, dir)
+- [x] Integrar evento `OnInventoryChanged` para atualizar visual dos slots
+- [x] Testar binding: pegar item → atualizar slot auitomaticamente
+- [x] **Commit**: `feat: quickslot ui binding base`
 
 ### 1:00-2:00 (1h) - Implementar Uso de Itens
 - [ ] Script `QuickSlotManager`: detectar input direcional

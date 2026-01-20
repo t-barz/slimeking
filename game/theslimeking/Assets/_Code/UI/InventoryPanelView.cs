@@ -7,6 +7,7 @@ using SlimeKing.Items;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace SlimeKing.UI
@@ -29,12 +30,22 @@ namespace SlimeKing.UI
         [Header("Slot Visuals")]
         [SerializeField] private Sprite defaultIcon;
 
+        [Header("Input")]
+        [SerializeField] private PlayerInput playerInput;
+
         private readonly List<SlotRuntime> slotViews = new();
         private bool slotsBuilt;
         private bool subscribed;
         private Coroutine waitForManagerCoroutine;
         private ItemData selectedItem;
         private SlotRuntime focusedSlot;
+        private int focusedSlotIndex = -1;
+
+        private InputAction addSlot1Action;
+        private InputAction addSlot2Action;
+        private InputAction addSlot3Action;
+        private InputAction addSlot4Action;
+        private bool quickSlotActionsSubscribed;
 
         private static readonly Vector2 StretchPadding = new Vector2(24f, 24f);
 
@@ -47,11 +58,13 @@ namespace SlimeKing.UI
         {
             BuildSlotsIfNeeded();
             StartInventorySync();
+            SetupQuickSlotInputs();
         }
 
         private void OnDisable()
         {
             StopInventorySync();
+            UnsubscribeQuickSlotInputs();
         }
 
         private void OnDestroy()
@@ -123,6 +136,120 @@ namespace SlimeKing.UI
             InventoryManager.Instance.OnItemAdded -= HandleItemAdded;
             InventoryManager.Instance.OnItemRemoved -= HandleItemRemoved;
             subscribed = false;
+        }
+
+        private void SetupQuickSlotInputs()
+        {
+            if (quickSlotActionsSubscribed)
+            {
+                return;
+            }
+
+            if (playerInput == null)
+            {
+                playerInput = FindObjectOfType<PlayerInput>();
+            }
+
+            if (playerInput == null || playerInput.actions == null)
+            {
+                return;
+            }
+
+            InputActionAsset actionAsset = playerInput.actions;
+
+            addSlot1Action = actionAsset.FindAction("UI/AddSlot1", throwIfNotFound: false);
+            addSlot2Action = actionAsset.FindAction("UI/AddSlot2", throwIfNotFound: false);
+            addSlot3Action = actionAsset.FindAction("UI/AddSlot3", throwIfNotFound: false);
+            addSlot4Action = actionAsset.FindAction("UI/AddSlot4", throwIfNotFound: false);
+
+            if (addSlot1Action != null)
+            {
+                addSlot1Action.performed += OnAddSlot1;
+            }
+
+            if (addSlot2Action != null)
+            {
+                addSlot2Action.performed += OnAddSlot2;
+            }
+
+            if (addSlot3Action != null)
+            {
+                addSlot3Action.performed += OnAddSlot3;
+            }
+
+            if (addSlot4Action != null)
+            {
+                addSlot4Action.performed += OnAddSlot4;
+            }
+
+            quickSlotActionsSubscribed = true;
+        }
+
+        private void UnsubscribeQuickSlotInputs()
+        {
+            if (!quickSlotActionsSubscribed)
+            {
+                return;
+            }
+
+            if (addSlot1Action != null)
+            {
+                addSlot1Action.performed -= OnAddSlot1;
+            }
+
+            if (addSlot2Action != null)
+            {
+                addSlot2Action.performed -= OnAddSlot2;
+            }
+
+            if (addSlot3Action != null)
+            {
+                addSlot3Action.performed -= OnAddSlot3;
+            }
+
+            if (addSlot4Action != null)
+            {
+                addSlot4Action.performed -= OnAddSlot4;
+            }
+
+            quickSlotActionsSubscribed = false;
+        }
+
+        private void OnAddSlot1(InputAction.CallbackContext ctx)
+        {
+            AssignSelectedItemToQuickSlot(0);
+        }
+
+        private void OnAddSlot2(InputAction.CallbackContext ctx)
+        {
+            AssignSelectedItemToQuickSlot(1);
+        }
+
+        private void OnAddSlot3(InputAction.CallbackContext ctx)
+        {
+            AssignSelectedItemToQuickSlot(2);
+        }
+
+        private void OnAddSlot4(InputAction.CallbackContext ctx)
+        {
+            AssignSelectedItemToQuickSlot(3);
+        }
+
+        private void AssignSelectedItemToQuickSlot(int quickSlotIndex)
+        {
+            if (focusedSlotIndex < 0 || selectedItem == null)
+            {
+                Debug.Log($"[InventoryPanelView] Nenhum item selecionado para atribuir ao QuickSlot {quickSlotIndex + 1}");
+                return;
+            }
+
+            if (!QuickSlotManager.HasInstance)
+            {
+                Debug.LogWarning("[InventoryPanelView] QuickSlotManager não encontrado");
+                return;
+            }
+
+            QuickSlotManager.Instance.SetQuickSlot(quickSlotIndex, focusedSlotIndex, selectedItem);
         }
 
         private void HandleItemAdded(ItemData itemData, int totalQuantity)
@@ -261,6 +388,7 @@ namespace SlimeKing.UI
 
             focusedSlot.SetSelectionState(false);
             focusedSlot = null;
+            focusedSlotIndex = -1;
         }
 
         private bool TryFocusSelectedItemSlot()
@@ -312,6 +440,7 @@ namespace SlimeKing.UI
             }
 
             SetFocusedSlot(slot);
+            focusedSlotIndex = slotViews.IndexOf(slot);
             int quantity = InventoryManager.HasInstance ? InventoryManager.Instance.GetItemCount(slot.Item) : 0;
             ShowDetails(slot.Item, quantity);
         }
