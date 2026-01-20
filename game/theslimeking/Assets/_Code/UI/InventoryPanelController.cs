@@ -24,15 +24,7 @@ namespace SlimeKing.UI
 
         private void Awake()
         {
-            if (inventoryPanel == null)
-            {
-                Transform panelTransform = transform.Find("InventoryPanel");
-                if (panelTransform != null)
-                {
-                    inventoryPanel = panelTransform.gameObject;
-                }
-            }
-
+            ResolveInventoryPanelReference();
             if (inventoryPanel != null)
             {
                 inventoryPanel.SetActive(false);
@@ -181,12 +173,17 @@ namespace SlimeKing.UI
 
         private void OpenInventory()
         {
-            isInventoryOpen = true;
-
+            ResolveInventoryPanelReference();
             if (inventoryPanel != null)
             {
                 inventoryPanel.SetActive(true);
             }
+            else
+            {
+                return;
+            }
+
+            isInventoryOpen = true;
 
             PauseGameTime();
             playerInput?.SwitchCurrentActionMap("UI");
@@ -194,6 +191,7 @@ namespace SlimeKing.UI
 
         private void CloseInventory()
         {
+            ResolveInventoryPanelReference();
             isInventoryOpen = false;
 
             if (inventoryPanel != null)
@@ -226,6 +224,34 @@ namespace SlimeKing.UI
 
             Time.timeScale = previousTimeScale;
             timeScalePaused = false;
+        }
+
+        private void ResolveInventoryPanelReference()
+        {
+            if (inventoryPanel != null)
+            {
+                return;
+            }
+
+            Transform panelTransform = transform.Find("InventoryPanel");
+            if (panelTransform != null)
+            {
+                inventoryPanel = panelTransform.gameObject;
+                return;
+            }
+
+            InventoryPanelView panelView = FindObjectOfType<InventoryPanelView>(true);
+            if (panelView != null)
+            {
+                inventoryPanel = panelView.gameObject;
+                return;
+            }
+
+            GameObject panelObject = GameObject.Find("InventoryPanel");
+            if (panelObject != null)
+            {
+                inventoryPanel = panelObject;
+            }
         }
     }
 }

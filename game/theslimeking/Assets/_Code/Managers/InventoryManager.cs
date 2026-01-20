@@ -12,8 +12,13 @@ namespace SlimeKing.Core
     public class InventoryManager : ManagerSingleton<InventoryManager>
     {
         [Header("Inventory Configuration")]
-        [SerializeField] private int maxSlots = 12;
+        [SerializeField] private int maxSlots = 16;
         [SerializeField] private bool enableDebugLogs = true;
+
+        /// <summary>
+        /// Quantidade total de slots disponíveis no inventário.
+        /// </summary>
+        public int MaxSlots => maxSlots;
 
         // Dicionário de itens: ItemData -> quantidade
         private Dictionary<ItemData, int> inventory = new Dictionary<ItemData, int>();
@@ -83,21 +88,26 @@ namespace SlimeKing.Core
                 return false;
             }
 
-            if (inventory[itemData] < quantity)
+            int currentQuantity = inventory[itemData];
+            if (currentQuantity < quantity)
             {
                 LogWarning($"Quantidade insuficiente de {itemData.itemName}");
                 return false;
             }
 
-            inventory[itemData] -= quantity;
-
-            if (inventory[itemData] <= 0)
+            int remainingQuantity = currentQuantity - quantity;
+            if (remainingQuantity <= 0)
             {
                 inventory.Remove(itemData);
+                remainingQuantity = 0;
+            }
+            else
+            {
+                inventory[itemData] = remainingQuantity;
             }
 
             Log($"Item removido: {itemData.itemName} (x{quantity})");
-            OnItemRemoved?.Invoke(itemData, inventory[itemData]);
+            OnItemRemoved?.Invoke(itemData, remainingQuantity);
             return true;
         }
 
