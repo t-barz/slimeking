@@ -1,7 +1,9 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using SlimeKing.Core;
 using SlimeKing.Items;
+using SlimeKing.Gameplay;
 
 namespace SlimeKing.Core
 {
@@ -22,21 +24,37 @@ namespace SlimeKing.Core
     /// <summary>
     /// Gerencia os 4 Quick Slots do jogador.
     /// Armazena referências aos itens por índice do slot do inventário para diferenciar instâncias do mesmo tipo.
+    /// Também gerencia o uso de itens consumíveis via Skill1-4.
     /// </summary>
     public class QuickSlotManager : ManagerSingleton<QuickSlotManager>
     {
         public const int SlotCount = 4;
+
+        [Header("References")]
+        [SerializeField] private PlayerInput playerInput;
 
         [Header("Debug")]
         [SerializeField] private bool enableDebugLogs = true;
 
         private QuickSlotData[] quickSlots = new QuickSlotData[SlotCount];
 
+        private InputAction skill1Action;
+        private InputAction skill2Action;
+        private InputAction skill3Action;
+        private InputAction skill4Action;
+        private bool actionsSubscribed;
+
         /// <summary>
         /// Evento disparado quando um quickslot é alterado.
         /// Parâmetros: índice do quickslot (0-3), item atribuído (null se removido)
         /// </summary>
         public event Action<int, ItemData> OnQuickSlotChanged;
+
+        /// <summary>
+        /// Evento disparado quando um item é usado de um quickslot.
+        /// Parâmetros: índice do quickslot (0-3), item usado
+        /// </summary>
+        public event Action<int, ItemData> OnQuickSlotUsed;
 
         protected override void Initialize()
         {
@@ -46,6 +64,226 @@ namespace SlimeKing.Core
                 quickSlots[i] = QuickSlotData.Empty;
             }
             Log("QuickSlotManager inicializado");
+        }
+
+        private void OnEnable()
+        {
+            SetupSkillInputs();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeSkillInputs();
+        }
+
+        private void SetupSkillInputs()
+        {
+            if (actionsSubscribed)
+            {
+                return;
+            }
+
+            if (playerInput == null)
+            {
+                playerInput = FindObjectOfType<PlayerInput>();
+            }
+
+            if (playerInput == null || playerInput.actions == null)
+            {
+                return;
+            }
+
+            InputActionAsset actionAsset = playerInput.actions;
+
+            skill1Action = actionAsset.FindAction("Gameplay/Skill1", throwIfNotFound: false);
+            skill2Action = actionAsset.FindAction("Gameplay/Skill2", throwIfNotFound: false);
+            skill3Action = actionAsset.FindAction("Gameplay/Skill3", throwIfNotFound: false);
+            skill4Action = actionAsset.FindAction("Gameplay/Skill4", throwIfNotFound: false);
+
+            if (skill1Action != null)
+            {
+                skill1Action.performed += OnSkill1;
+            }
+
+            if (skill2Action != null)
+            {
+                skill2Action.performed += OnSkill2;
+            }
+
+            if (skill3Action != null)
+            {
+                skill3Action.performed += OnSkill3;
+            }
+
+            if (skill4Action != null)
+            {
+                skill4Action.performed += OnSkill4;
+            }
+
+            actionsSubscribed = true;
+            Log("Skill inputs configurados");
+        }
+
+        private void UnsubscribeSkillInputs()
+        {
+            if (!actionsSubscribed)
+            {
+                return;
+            }
+
+            if (skill1Action != null)
+            {
+                skill1Action.performed -= OnSkill1;
+            }
+
+            if (skill2Action != null)
+            {
+                skill2Action.performed -= OnSkill2;
+            }
+
+            if (skill3Action != null)
+            {
+                skill3Action.performed -= OnSkill3;
+            }
+
+            if (skill4Action != null)
+            {
+                skill4Action.performed -= OnSkill4;
+            }
+
+            actionsSubscribed = false;
+        }
+
+        private void OnSkill1(InputAction.CallbackContext ctx)
+        {
+            UseQuickSlot(0);
+        }
+
+        private void OnSkill2(InputAction.CallbackContext ctx)
+        {
+            UseQuickSlot(1);
+        }
+
+        private void OnSkill3(InputAction.CallbackContext ctx)
+        {
+            UseQuickSlot(2);
+        }
+
+        private void OnSkill4(InputAction.CallbackContext ctx)
+        {
+            UseQuickSlot(3);
+        }
+
+        /// <summary>
+        /// Usa o item no quickslot especificado.
+        /// Se for consumível, aplica efeitos e remove do inventário.
+        /// </summary>
+        private void UseQuickSlot(int quickSlotIndex)
+        {
+            if (!IsValidSlotIndex(quickSlotIndex))
+            {
+                return;
+            }
+
+            QuickSlotData slotData = quickSlots[quickSlotIndex];
+            if (slotData.IsEmpty)
+            {
+                Log($"QuickSlot {quickSlotIndex + 1}: vazio, nada a usar");
+                return;
+            }
+
+            ItemData item = slotData.item;
+
+            // Apenas consumíveis podem ser usados
+            if (item.itemType != ItemType.Consumable)
+            {
+                Log($"QuickSlot {quickSlotIndex + 1}: {item.GetLocalizedName()} não é consumível");
+                return;
+            }
+
+            // Aplica efeitos do item
+            ApplyItemEffects(item);
+
+            // Remove do inventário
+            if (InventoryManager.HasInstance)
+            {
+                InventoryManager.Instance.RemoveItem(item, 1);
+            }
+
+            // Limpa o quickslot
+            quickSlots[quickSlotIndex] = QuickSlotData.Empty;
+
+            Log($"QuickSlot {quickSlotIndex + 1}: {item.GetLocalizedName()} usado e removido");
+
+            OnQuickSlotUsed?.Invoke(quickSlotIndex, item);
+            OnQuickSlotChanged?.Invoke(quickSlotIndex, null);
+        }
+
+        /// <summary>
+        /// Aplica os efeitos de um item consumível ao jogador.
+        /// </summary>
+        private void ApplyItemEffects(ItemData item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            PlayerAttributesHandler player = FindObjectOfType<PlayerAttributesHandler>();
+            if (player == null)
+            {
+                LogWarning("PlayerAttributesHandler não encontrado para aplicar efeitos");
+                return;
+            }
+
+            // Instancia VFX se configurado
+            if (item.consumeVFX != null)
+            {
+                GameObject vfx = Instantiate(item.consumeVFX, player.transform.position, Quaternion.identity, player.transform);
+                Log($"VFX instanciado: {item.consumeVFX.name}");
+            }
+
+            if (!item.HasEffect())
+            {
+                return;
+            }
+
+            ItemEffect effect = item.itemEffect;
+
+            if (effect.healthBonus > 0)
+            {
+                player.Heal(effect.healthBonus);
+                Log($"Curou {effect.healthBonus} HP");
+            }
+            else if (effect.healthBonus < 0)
+            {
+                player.TakeDamage(-effect.healthBonus, true);
+                Log($"Causou {-effect.healthBonus} de dano");
+            }
+
+            if (effect.attackBonus != 0)
+            {
+                player.CurrentAttack += effect.attackBonus;
+                Log($"Ataque modificado em {effect.attackBonus}");
+            }
+
+            if (effect.defenseBonus != 0)
+            {
+                player.CurrentDefense += effect.defenseBonus;
+                Log($"Defesa modificada em {effect.defenseBonus}");
+            }
+
+            if (effect.speedBonus != 0)
+            {
+                player.CurrentSpeed += effect.speedBonus;
+                Log($"Velocidade modificada em {effect.speedBonus}");
+            }
+
+            if (effect.skillPointsBonus != 0)
+            {
+                player.AddSkillPoints(effect.skillPointsBonus);
+                Log($"Pontos de habilidade adicionados: {effect.skillPointsBonus}");
+            }
         }
 
         /// <summary>

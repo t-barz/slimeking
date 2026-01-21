@@ -62,6 +62,8 @@ namespace SlimeKing.Items
         [SerializeField] public bool isOneTime = true;
         [Tooltip("Duração do efeito em segundos (0 = permanente)")]
         [SerializeField] public float effectDuration = 0f;
+        [Tooltip("VFX instanciado sobre o personagem ao consumir o item")]
+        [SerializeField] public GameObject consumeVFX;
 
         [Header("Equipment Settings")]
         [Tooltip("Nome técnico do slot de equipamento (mask, hat, cape, etc)")]

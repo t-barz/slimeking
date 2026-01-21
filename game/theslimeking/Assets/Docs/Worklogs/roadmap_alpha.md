@@ -12,24 +12,24 @@
 - [x] **Commit**: `feat: quickslot ui binding base`
 
 ### 1:00-2:00 (1h) - Implementar Uso de Itens
-- [ ] Script `QuickSlotManager`: detectar input direcional
-- [ ] Chamar `InventoryManager.UseQuickSlot(direction)` com efeito sonoro/visual
-- [ ] Consumíveis: remover do inventário + aplicar healing (existente)
-- [ ] Testar: equipar poção → apertar direcional → vida + drop item
-- [ ] **Commit**: `feat: quickslot item usage with feedback`
+- [x] Script `QuickSlotManager`: detectar input direcional
+- [x] Chamar `InventoryManager.UseQuickSlot(direction)` com efeito sonoro/visual
+- [x] Consumíveis: remover do inventário + aplicar healing (existente)
+- [x] Testar: equipar poção → apertar direcional → vida + drop item
+- [x] **Commit**: `feat: quickslot item usage with feedback`
 
 ### 2:00-3:30 (1.5h) - Teste de Integração + Colisão
-- [ ] Verificar se quickslot funciona enquanto jogador se move
-- [ ] Testar uso de itens em diferentes cenários (perto de inimigos, obstáculos)
-- [ ] Ajustar cooldown/feedback se necessário
-- [ ] Playtest rápido: equipar → usar → verificar efeito
-- [ ] **Commit**: `fix: quickslot integration and feedback tuning`
+- [x] Verificar se quickslot funciona enquanto jogador se move
+- [x] Testar uso de itens em diferentes cenários (perto de inimigos, obstáculos)
+- [x] Ajustar cooldown/feedback se necessário
+- [x] Playtest rápido: equipar → usar → verificar efeito
+- [x] **Commit**: `fix: quickslot integration and feedback tuning`
 
 ### 3:30-4:00 (0.5h) - Build & Commit Final
-- [ ] Build teste do jogo
-- [ ] Verificar logs de erro
-- [ ] Commit final com mensagem clara
-- [ ] **Tag**: `day-1-quickslot-done`
+- [x] Build teste do jogo
+- [x] Verificar logs de erro
+- [x] Commit final com mensagem clara
+- [x] **Tag**: `day-1-quickslot-done`
 
 ---
 

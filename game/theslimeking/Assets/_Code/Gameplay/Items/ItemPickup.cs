@@ -334,12 +334,21 @@ namespace SlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Aplica efeitos do item ao player
+        /// Aplica efeitos do item ao player.
+        /// Consumíveis não aplicam efeitos automaticamente - devem ser usados via QuickSlot.
         /// </summary>
         private void ApplyItemEffects()
         {
             if (itemData?.HasBuffEffect != true || _playerTransform == null)
                 return;
+
+            // Consumíveis não aplicam efeitos automaticamente
+            // Devem ser usados manualmente via QuickSlot
+            if (inventoryItemData != null && inventoryItemData.itemType == ItemType.Consumable)
+            {
+                LogDebug($"Item consumível '{inventoryItemData.GetLocalizedName()}' adicionado ao inventário (use via QuickSlot)");
+                return;
+            }
 
             var buffHandler = _playerTransform.GetComponent<ItemBuffHandler>();
             if (buffHandler != null)
