@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: 53a43757f3306724db0135149f4727e0, type: 3}
       propertyPath: m_Name
-      value: env_brown_rockF
+      value: BrownRockF
       objectReference: {fileID: 0}
     - target: {fileID: -2253911629886400664, guid: 53a43757f3306724db0135149f4727e0, type: 3}
       propertyPath: m_TagString
@@ -162,6 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DropController
   prefabList:
   - {fileID: 1427671403894958163, guid: caad6fda238a75d48aef6b697e23327c, type: 3}
+  - {fileID: 5864117989572817364, guid: 02dd5b6781f2762498bf0e67612ff48e, type: 3}
   minDropCount: 0
   maxDropCount: 1
   useCurrentPosition: 1
@@ -201,9 +202,23 @@ MonoBehaviour:
   enableFlipY: 0
   applyScaleVariations: 1
   enableScaleVariation: 1
-  scaleRange: {x: 0.98, y: 1.02}
-  uniformScale: 1
-  applyColorVariations: 0
+  scaleRange: {x: 0.96, y: 1.04}
+  uniformScale: 0
+  applyColorVariations: 1
   enableColorVariation: 1
+  useColorPalette: 0
+  colorPalette:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  useColorInterpolation: 1
+  baseColor: {r: 1, g: 1, b: 1, a: 1}
+  colorVariation: 0.5
   colorTintRange: {r: 0.2, g: 0.2, b: 0.2, a: 0}
+  randomizeAlpha: 0
+  minAlpha: 0.7
+  maxAlpha: 1
   showDebugLogs: 0
+  hasBeenInitialized: 0
