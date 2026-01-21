@@ -24,8 +24,7 @@ namespace SlimeKing.Visual
         #region Unity Lifecycle
         private void Awake()
         {
-            if (dialoguePanel == null) dialoguePanel = gameObject;
-            HideImmediate();
+            EnsureInitialized();
         }
         #endregion
 
@@ -33,12 +32,14 @@ namespace SlimeKing.Visual
         /// <summary>Show the dialogue panel.</summary>
         public void Show()
         {
+            EnsureInitialized();
             if (dialoguePanel != null) dialoguePanel.SetActive(true);
         }
 
         /// <summary>Hide the dialogue panel.</summary>
         public void Hide()
         {
+            EnsureInitialized();
             if (dialoguePanel != null) dialoguePanel.SetActive(false);
         }
 
@@ -66,9 +67,16 @@ namespace SlimeKing.Visual
         #endregion
 
         #region Private Methods
-        private void HideImmediate()
+        private bool _initialized = false;
+
+        private void EnsureInitialized()
         {
+            if (_initialized) return;
+            
+            if (dialoguePanel == null) dialoguePanel = gameObject;
             if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            
+            _initialized = true;
         }
         #endregion
 

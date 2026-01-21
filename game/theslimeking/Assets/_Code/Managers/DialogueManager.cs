@@ -102,30 +102,52 @@ namespace SlimeKing.Core
         #region Private Methods
         private void EnsureUIRef()
         {
-            // Try existing reference
             if (ui == null)
             {
-                var go = GameObject.Find("GameHUD");
-                if (go != null)
-                {
-                    var panel = go.transform.Find("NPCDialoguePanel");
-                    if (panel != null)
-                    {
-                        ui = panel.GetComponent<SlimeKing.Visual.DialogueUIController>();
-                        if (ui == null)
-                        {
-                            ui = panel.gameObject.AddComponent<SlimeKing.Visual.DialogueUIController>();
-                        }
-                    }
-                }
+                ui = FindDialogueControllerEvenIfInactive();
             }
 
-            // Ensure bindings and hidden state
             if (ui != null)
             {
                 ui.AutoBindIfNull();
-                ui.Hide();
+                // Don't call Hide here - let the controller handle its initial state
             }
+        }
+
+        private SlimeKing.Visual.DialogueUIController FindDialogueControllerEvenIfInactive()
+        {
+            // HUD starts inactive, so search including disabled objects.
+            var controllers = Resources.FindObjectsOfTypeAll<SlimeKing.Visual.DialogueUIController>();
+            foreach (var controller in controllers)
+            {
+                var go = controller.gameObject;
+                if (!go.scene.IsValid() || !go.scene.isLoaded)
+                {
+                    continue;
+                }
+
+                return controller;
+            }
+
+            var hud = GameObject.Find("GameHUD");
+            if (hud == null)
+            {
+                return null;
+            }
+
+            var panel = hud.transform.Find("NPCDialoguePanel");
+            if (panel == null)
+            {
+                return null;
+            }
+
+            var controllerFound = panel.GetComponent<SlimeKing.Visual.DialogueUIController>();
+            if (controllerFound != null)
+            {
+                return controllerFound;
+            }
+
+            return panel.gameObject.AddComponent<SlimeKing.Visual.DialogueUIController>();
         }
 
         private string GetNPCNameLocalized(string npcNameKey)
