@@ -1295,21 +1295,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -1621,15 +1609,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -3881,21 +3862,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -4207,15 +4176,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -6358,21 +6320,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -6684,15 +6634,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -8749,21 +8692,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -9075,15 +9006,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -11139,21 +11063,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -11465,15 +11377,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -13536,21 +13441,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -13862,15 +13755,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
@@ -15958,21 +15844,9 @@ ZWrite On
 				camUp = mul((half3x3)unity_CameraToWorld, half3(0,1,0));
 			#endif
 			float3 localPos = v.vertex.x * camRight + v.vertex.y * camUp;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1);
 		#else
 			float3 localPos = v.vertex.xyz;
-			#if !defined(_STANDARD)
-				#if UNITY_VERSION >= 60000000
-					localPos.xy *= _SpriteFlip.xy;
-				#endif
-			#endif
-
 			v.vertex = float4(localPos, 1.0);
 		#endif
         //-----------------------------------------------------------
@@ -16284,15 +16158,8 @@ ZWrite On
 		if(!d.isFrontFace){
 			flipNormalFactor *= -1.0;
 		}
-		if(_SpriteFlip.z < 0 || _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-		if(_SpriteFlip.z < 0 && _SpriteFlip.w < 0)
-		{
-			flipNormalFactor *= -1.0;
-		}
-
+		
+		flipNormalFactor *= _SpriteFlip.z;
 		o.Normal *= flipNormalFactor;
 		
 		//GLITCH_ON
