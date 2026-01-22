@@ -1,31 +1,31 @@
 fileFormatVersion: 2
-guid: 9a1d43cdcc527f644876df685535a537
+guid: ad92f5ad4f1f1084db08cf7a88344add
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6205329353213722952
-    second: tilesetForest_WSAspr_0
+      213: -1029590535696120742
+    second: skillsF_0
   - first:
-      213: 4828806421745818698
-    second: tilesetForest_WSAspr_1
+      213: -3610281448604363275
+    second: skillsF_1
   - first:
-      213: -3191008762449674304
-    second: tilesetForest_WSAspr_2
+      213: -285934013468814460
+    second: skillsF_2
   - first:
-      213: -4323651165198085409
-    second: tilesetForest_WSAspr_3
+      213: 2812343130616452661
+    second: skillsF_3
   - first:
-      213: -64635404502885663
-    second: tilesetForest_WSAspr_4
+      213: -4706581097867247310
+    second: skillsF_4
   - first:
-      213: -3271903683617535634
-    second: tilesetForest_WSAspr_5
+      213: -6099881090933362780
+    second: skillsF_5
   - first:
-      213: 3644450896689182582
-    second: tilesetForest_WSAspr_6
+      213: 4272134519108769797
+    second: skillsF_6
   - first:
-      213: 168040786829777769
-    second: tilesetForest_WSAspr_7
+      213: 7671236635332794904
+    second: skillsF_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,7 +96,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -106,6 +106,19 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -143,30 +156,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_0
+      name: skillsF_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 99
-        width: 90
-        height: 84
+        x: 18
+        y: 168
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -175,20 +175,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 841cb946b22cd1650800000000000000
-      internalID: 6205329353213722952
+      spriteID: a548abfdcd826b1f0800000000000000
+      internalID: -1029590535696120742
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_1
+      name: skillsF_1
       rect:
         serializedVersion: 2
-        x: 103
-        y: 100
-        width: 82
-        height: 83
+        x: 97
+        y: 168
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,20 +197,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a4cd8414bdd530340800000000000000
-      internalID: 4828806421745818698
+      spriteID: 5f511cc8624b5edc0800000000000000
+      internalID: -3610281448604363275
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_2
+      name: skillsF_2
       rect:
         serializedVersion: 2
-        x: 191
-        y: 0
-        width: 66
-        height: 192
+        x: 173
+        y: 168
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -219,20 +219,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0cf370fef6247b3d0800000000000000
-      internalID: -3191008762449674304
+      spriteID: 4835df99788280cf0800000000000000
+      internalID: -285934013468814460
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_3
+      name: skillsF_3
       rect:
         serializedVersion: 2
-        x: 256
-        y: 95
-        width: 96
-        height: 97
+        x: 18
+        y: 63
+        width: 71
+        height: 68
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -241,20 +241,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fd21aa54c2e4ff3c0800000000000000
-      internalID: -4323651165198085409
+      spriteID: 53657e64d23770720800000000000000
+      internalID: 2812343130616452661
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_4
+      name: skillsF_4
       rect:
         serializedVersion: 2
-        x: 351
-        y: 0
-        width: 129
-        height: 192
+        x: 97
+        y: 94
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -263,20 +263,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1ea11ba217e5a1ff0800000000000000
-      internalID: -64635404502885663
+      spriteID: 2310e039d6ddeaeb0800000000000000
+      internalID: -4706581097867247310
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_5
+      name: skillsF_5
       rect:
         serializedVersion: 2
-        x: 0
-        y: 3
-        width: 89
-        height: 84
+        x: 173
+        y: 94
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -285,20 +285,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e694fae5fecd792d0800000000000000
-      internalID: -3271903683617535634
+      spriteID: 4af6bc2677ed85ba0800000000000000
+      internalID: -6099881090933362780
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_6
+      name: skillsF_6
       rect:
         serializedVersion: 2
-        x: 103
-        y: 4
-        width: 82
-        height: 83
+        x: 97
+        y: 21
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -307,20 +307,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 677338a08c0b39230800000000000000
-      internalID: 3644450896689182582
+      spriteID: 508992cd5bba94b30800000000000000
+      internalID: 4272134519108769797
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tilesetForest_WSAspr_7
+      name: skillsF_7
       rect:
         serializedVersion: 2
-        x: 256
-        y: 0
-        width: 96
-        height: 96
+        x: 173
+        y: 21
+        width: 67
+        height: 66
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -329,8 +329,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 96b14ce8430055200800000000000000
-      internalID: 168040786829777769
+      spriteID: 81a59fc6315b57a60800000000000000
+      internalID: 7671236635332794904
       vertices: []
       indices: 
       edges: []
@@ -349,14 +349,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      tilesetForest_WSAspr_0: 6205329353213722952
-      tilesetForest_WSAspr_1: 4828806421745818698
-      tilesetForest_WSAspr_2: -3191008762449674304
-      tilesetForest_WSAspr_3: -4323651165198085409
-      tilesetForest_WSAspr_4: -64635404502885663
-      tilesetForest_WSAspr_5: -3271903683617535634
-      tilesetForest_WSAspr_6: 3644450896689182582
-      tilesetForest_WSAspr_7: 168040786829777769
+      skillsF_0: -1029590535696120742
+      skillsF_1: -3610281448604363275
+      skillsF_2: -285934013468814460
+      skillsF_3: 2812343130616452661
+      skillsF_4: -4706581097867247310
+      skillsF_5: -6099881090933362780
+      skillsF_6: 4272134519108769797
+      skillsF_7: 7671236635332794904
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
