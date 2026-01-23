@@ -39,7 +39,7 @@ namespace SlimeKing.Gameplay
 
         [Header("Outline Settings")]
         [SerializeField] private OutlineController outlineController;
-        [SerializeField] private bool enableOutlineOnInteraction = true;
+        [SerializeField] private bool enableOutlineOnInteraction = false; // DISABLED FOR PERFORMANCE
         [SerializeField] private Color interactionOutlineColor = Color.cyan;
 
         private SpriteRenderer _keyboardRenderer;
@@ -84,10 +84,11 @@ namespace SlimeKing.Gameplay
             if (keyboardButtons == null) keyboardButtons = transform.Find("keyboard");
             if (gamepadButtons == null) gamepadButtons = transform.Find("gamepad");
 
-            if (outlineController == null)
-            {
-                outlineController = GetComponent<OutlineController>();
-            }
+            // OutlineController disabled for performance optimization
+            // if (outlineController == null)
+            // {
+            //     outlineController = GetComponent<OutlineController>();
+            // }
 
             if (keyboardButtons == null)
             {

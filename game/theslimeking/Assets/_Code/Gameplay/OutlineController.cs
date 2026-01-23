@@ -29,6 +29,11 @@ namespace SlimeKing.Gameplay
         private Transform playerTransform;
         private bool isOutlineActive = false;
         private Coroutine fadeCoroutine;
+        
+        // Performance optimization
+        private float updateInterval = 0.1f; // Update 10x por segundo ao invés de 60x
+        private float nextUpdateTime = 0f;
+        private float cachedDistance = float.MaxValue;
 
         #endregion
 
@@ -36,40 +41,45 @@ namespace SlimeKing.Gameplay
 
         private void Awake()
         {
-            UnityEngine.Debug.LogError($"[OutlineController] AWAKE em {gameObject.name}");
+            // Debug logs removidos para performance
         }
 
         private void OnEnable()
         {
-            UnityEngine.Debug.LogError($"[OutlineController] OnEnable em {gameObject.name}, enabled={enabled}");
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer == null)
             {
-                UnityEngine.Debug.LogError($"[OutlineController] SpriteRenderer NÃO encontrado!");
+                Debug.LogError($"[OutlineController] SpriteRenderer não encontrado em {gameObject.name}!");
                 enabled = false;
                 return;
             }
 
             CreateOutlineSprite();
             FindPlayer();
-            UnityEngine.Debug.Log($"[OutlineController] Inicialização completa, enabled={enabled}");
         }
 
         private void Update()
         {
+            // Cache player reference apenas uma vez
             if (playerTransform == null)
             {
                 FindPlayer();
                 return;
             }
 
+            // Sync flip apenas quando necessário (a cada frame é ok pois é barato)
             SyncFlip();
-            CheckPlayerDistance();
+            
+            // Reduz frequência de checagem de distância para 10x por segundo
+            if (Time.time >= nextUpdateTime)
+            {
+                nextUpdateTime = Time.time + updateInterval;
+                CheckPlayerDistance();
+            }
         }
 
         private void OnDisable()
         {
-            UnityEngine.Debug.LogWarning($"[OutlineController] OnDisable em {gameObject.name}");
             if (fadeCoroutine != null)
             {
                 StopCoroutine(fadeCoroutine);
@@ -114,7 +124,6 @@ namespace SlimeKing.Gameplay
                 initialColor.a = 0f;
                 outlineMaterial.SetColor("_OutlineColor", initialColor);
                 outlineSpriteRenderer.material = outlineMaterial;
-                UnityEngine.Debug.Log($"[Outline] Criado com alpha inicial: {outlineMaterial.GetColor("_OutlineColor").a}");
             }
 
             SyncFlip();
@@ -133,15 +142,13 @@ namespace SlimeKing.Gameplay
 
         private void FindPlayer()
         {
+            // Cache player reference - só busca uma vez
+            if (playerTransform != null) return;
+            
             GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
             if (playerObject != null)
             {
                 playerTransform = playerObject.transform;
-                UnityEngine.Debug.Log($"[Outline] Player encontrado: {playerObject.name}");
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning($"[Outline] Player NÃO encontrado! Tag 'Player' existe?");
             }
         }
 
@@ -150,17 +157,18 @@ namespace SlimeKing.Gameplay
             if (playerTransform == null)
                 return;
 
-            float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-            bool shouldShowOutline = distanceToPlayer <= detectionRange;
+            // Usa distância ao quadrado para evitar sqrt (mais rápido)
+            float sqrDistance = (transform.position - playerTransform.position).sqrMagnitude;
+            float sqrDetectionRange = detectionRange * detectionRange;
+            
+            bool shouldShowOutline = sqrDistance <= sqrDetectionRange;
 
             if (shouldShowOutline && !isOutlineActive)
             {
-                UnityEngine.Debug.Log($"[Outline] Ativando - Distância: {distanceToPlayer:F2}");
                 ActivateOutline();
             }
             else if (!shouldShowOutline && isOutlineActive)
             {
-                UnityEngine.Debug.Log($"[Outline] Desativando - Distância: {distanceToPlayer:F2}");
                 DeactivateOutline();
             }
         }
@@ -203,7 +211,6 @@ namespace SlimeKing.Gameplay
 
             float startAlpha = GetOutlineAlpha();
             float elapsed = 0f;
-            UnityEngine.Debug.Log($"[Outline] Fade iniciado: {startAlpha:F2} -> {targetAlpha:F2}");
 
             while (elapsed < fadeDuration)
             {
@@ -222,7 +229,6 @@ namespace SlimeKing.Gameplay
                 outlineSpriteRenderer.enabled = false;
             }
             
-            UnityEngine.Debug.Log($"[Outline] Fade completo. Alpha final: {GetOutlineAlpha():F2}");
             fadeCoroutine = null;
         }
 
