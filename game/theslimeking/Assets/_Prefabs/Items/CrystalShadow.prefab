@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 3946145986345050301}
   - component: {fileID: 8558684966503738429}
   - component: {fileID: 4481614974989947296}
-  - component: {fileID: 9158984312389284444}
   m_Layer: 0
   m_Name: CrystalShadow
   m_TagString: Untagged
@@ -233,22 +232,6 @@ MonoBehaviour:
   delayTintColor: {r: 1, g: 1, b: 1, a: 1}
   enableAttraction: 1
   optimizationInterval: 0.1
---- !u!114 &9158984312389284444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2154135585455185658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee158225ee1e59f4791627785501d950, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AllIn1SpriteShaderAssembly::AllIn1SpriteShader.AllIn1Shader
-  currentShaderType: 0
-  normalStrength: 5
-  normalSmoothing: 1
-  computingNormal: 0
 --- !u!1 &7921004414005613111
 GameObject:
   m_ObjectHideFlags: 0

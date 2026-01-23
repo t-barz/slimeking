@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 3818143300424551818}
   - component: {fileID: 4010691045645163405}
   - component: {fileID: 8467838717572507349}
-  - component: {fileID: 3971129749434352359}
   m_Layer: 0
   m_Name: CrystalNature
   m_TagString: Untagged
@@ -233,22 +232,6 @@ MonoBehaviour:
   delayTintColor: {r: 1, g: 1, b: 1, a: 1}
   enableAttraction: 1
   optimizationInterval: 0.1
---- !u!114 &3971129749434352359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4725840364202951042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee158225ee1e59f4791627785501d950, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AllIn1SpriteShaderAssembly::AllIn1SpriteShader.AllIn1Shader
-  currentShaderType: 0
-  normalStrength: 5
-  normalSmoothing: 1
-  computingNormal: 0
 --- !u!1 &6941898071393474020
 GameObject:
   m_ObjectHideFlags: 0
