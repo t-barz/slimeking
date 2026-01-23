@@ -17,7 +17,7 @@ namespace SlimeKing.Gameplay
     [SerializeField] private LayerMask windShakersLayerMask = 1 << 6;
 
     [Header("🌊 Animação de Shake")]
-    [SerializeField] private string shakeTriggerName = "Shake";
+    private string shakeTriggerName = "Shake";
 
     [Header("Visual Configuration")]
     [SerializeField] private bool autoFlip = true;
@@ -201,9 +201,6 @@ namespace SlimeKing.Gameplay
         if (animator != null && !string.IsNullOrEmpty(shakeTriggerName))
         {
             animator.SetTrigger(shakeTriggerName);
-
-            if (showDebugInfo)
-            {}
         }
     }
 

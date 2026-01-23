@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8701519962084889161
+--- !u!1 &3134356188874948045
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,44 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8243072826716698575}
-  - component: {fileID: 443340868920251068}
+  - component: {fileID: 5758909592429217982}
+  - component: {fileID: 8554668392500595931}
   m_Layer: 0
-  m_Name: DialogueManager 1
+  m_Name: SaveGameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8243072826716698575
+--- !u!4 &5758909592429217982
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8701519962084889161}
+  m_GameObject: {fileID: 3134356188874948045}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.75423, y: 0.57531, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &443340868920251068
+--- !u!114 &8554668392500595931
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8701519962084889161}
+  m_GameObject: {fileID: 3134356188874948045}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7dd91c7e2588d544bffd59ca2d5057b, type: 3}
+  m_Script: {fileID: 11500000, guid: a62c63e26ee0a5c419b3071720dcbdff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.DialogueManager
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Core.SaveGameManager
   persistBetweenScenes: 1
-  enableLogs: 0
-  ui: {fileID: 0}
-  dialogueTable: DialogueTexts
-  maxCharactersPerPage: 120
+  enableLogs: 1
+  saveFileName: savegame.json
+  useEncryption: 1
+  prettyPrint: 1
+  autoSaveOnInventoryOpen: 1
+  autoLoadOnPauseOpen: 1
+  enableDetailedLogs: 1
