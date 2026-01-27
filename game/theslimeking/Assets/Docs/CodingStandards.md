@@ -856,12 +856,447 @@ Assets/Editor/[ToolName]/
 
 ## ⚡ Performance
 
-### Unity Editor
+### Regras Críticas de Performance
+
+#### 🔴 NUNCA Fazer
+
+**GameObject.Find() e FindObjectOfType() em Loops ou Update()**
+```csharp
+// ❌ CRÍTICO - Extremamente caro
+private void Update() {
+    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    Transform enemy = FindObjectOfType<Enemy>().transform;
+}
+
+// ✅ CORRETO - Cache estático compartilhado
+private static Transform s_cachedPlayerTransform;
+
+private void Awake() {
+    if (s_cachedPlayerTransform == null) {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) {
+            s_cachedPlayerTransform = player.transform;
+        }
+    }
+}
+```
+
+**Múltiplos FindObjectOfType no Start/Awake**
+```csharp
+// ❌ RUIM - Múltiplas buscas caras
+private void Start() {
+    healthDisplay = FindObjectOfType<HealthDisplay>();
+    fragmentDisplay = FindObjectOfType<FragmentDisplay>();
+    quickSlotsDisplay = FindObjectOfType<QuickSlotsDisplay>();
+}
+
+// ✅ BOM - Usar referências serializadas
+[SerializeField] private HealthDisplay healthDisplay;
+[SerializeField] private FragmentDisplay fragmentDisplay;
+[SerializeField] private QuickSlotsDisplay quickSlotsDisplay;
+
+// ✅ ALTERNATIVA - Sistema de registro
+public class UIRegistry : MonoBehaviour {
+    private static Dictionary<Type, Component> registry = new Dictionary<Type, Component>();
+    
+    public static void Register<T>(T component) where T : Component {
+        registry[typeof(T)] = component;
+    }
+    
+    public static T Get<T>() where T : Component {
+        return registry.TryGetValue(typeof(T), out var comp) ? comp as T : null;
+    }
+}
+```
+
+#### 🟡 Otimizações Importantes
+
+**Distance vs sqrMagnitude**
+```csharp
+// ❌ LENTO - Usa raiz quadrada
+float distance = Vector3.Distance(a, b);
+if (distance < range) { }
+
+// ✅ RÁPIDO - Evita raiz quadrada
+float sqrDistance = (a - b).sqrMagnitude;
+if (sqrDistance < range * range) { }
+```
+
+**Update() Otimizado**
+```csharp
+// ❌ RUIM - Operações caras todo frame
+private void Update() {
+    UpdateAnimations();
+    UpdateStealth();
+    UpdateAI();
+    CheckPlayerDistance();
+}
+
+// ✅ BOM - Intervalos escalonados
+private const float STEALTH_UPDATE_INTERVAL = 0.2f;
+private const float AI_UPDATE_INTERVAL = 0.1f;
+private float lastStealthUpdate = 0f;
+private float lastAIUpdate = 0f;
+
+private void Update() {
+    UpdateAnimations(); // Necessário todo frame
+    
+    if (Time.time - lastStealthUpdate >= STEALTH_UPDATE_INTERVAL) {
+        UpdateStealth();
+        lastStealthUpdate = Time.time;
+    }
+    
+    if (Time.time - lastAIUpdate >= AI_UPDATE_INTERVAL) {
+        UpdateAI();
+        lastAIUpdate = Time.time;
+    }
+}
+```
+
+**Animator Culling**
+```csharp
+// ✅ Configurar culling mode em Animators
+private void Start() {
+    Animator animator = GetComponent<Animator>();
+    if (animator != null) {
+        animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+    }
+}
+```
+
+#### 🟢 Object Pooling
+
+**Implementação Básica**
+```csharp
+/// <summary>
+/// Pool genérico para reutilização de GameObjects
+/// </summary>
+public class ObjectPool : MonoBehaviour {
+    [SerializeField] private GameObject prefab;
+    [SerializeField] private int initialSize = 10;
+    
+    private Queue<GameObject> pool = new Queue<GameObject>();
+    
+    private void Start() {
+        for (int i = 0; i < initialSize; i++) {
+            GameObject obj = Instantiate(prefab);
+            obj.SetActive(false);
+            pool.Enqueue(obj);
+        }
+    }
+    
+    public GameObject Get() {
+        if (pool.Count > 0) {
+            GameObject obj = pool.Dequeue();
+            obj.SetActive(true);
+            return obj;
+        }
+        return Instantiate(prefab);
+    }
+    
+    public void Return(GameObject obj) {
+        obj.SetActive(false);
+        pool.Enqueue(obj);
+    }
+}
+```
+
+**Uso com Cristais/VFX**
+```csharp
+// ✅ Usar pooling para objetos frequentemente criados/destruídos
+public class CrystalSpawner : MonoBehaviour {
+    private ObjectPool crystalPool;
+    
+    private void SpawnCrystal(Vector3 position) {
+        GameObject crystal = crystalPool.Get();
+        crystal.transform.position = position;
+    }
+    
+    private void CollectCrystal(GameObject crystal) {
+        // Ao invés de Destroy()
+        crystalPool.Return(crystal);
+    }
+}
+```
+
+#### 🎯 LOD Systems
+
+**Sistema de LOD Consolidado**
+```csharp
+/// <summary>
+/// Sistema de LOD otimizado para objetos distantes
+/// </summary>
+public class UnifiedLODSystem : MonoBehaviour {
+    [Header("LOD Settings")]
+    [SerializeField] private float updateInterval = 0.5f;
+    [SerializeField] private float nearDistance = 15f;
+    [SerializeField] private float mediumDistance = 25f;
+    [SerializeField] private float farDistance = 35f;
+    [SerializeField] private float cullDistance = 50f;
+    
+    [Header("Target Tags")]
+    [SerializeField] private string[] targetTags = new string[] { "Prop", "Enemy", "NPC" };
+    
+    private Camera mainCamera;
+    private List<LODObject> objects = new List<LODObject>();
+    private float nextUpdateTime = 0f;
+    
+    // ✅ Cache de objetos no Start
+    private void Start() {
+        mainCamera = Camera.main;
+        CacheObjects();
+    }
+    
+    private void Update() {
+        if (Time.time < nextUpdateTime) return;
+        nextUpdateTime = Time.time + updateInterval;
+        UpdateLOD();
+    }
+    
+    private void CacheObjects() {
+        foreach (string tag in targetTags) {
+            GameObject[] tagged = GameObject.FindGameObjectsWithTag(tag);
+            foreach (GameObject obj in tagged) {
+                objects.Add(new LODObject(obj));
+            }
+        }
+    }
+    
+    private void UpdateLOD() {
+        Vector3 cameraPos = mainCamera.transform.position;
+        
+        foreach (LODObject obj in objects) {
+            if (obj.gameObject == null) continue;
+            
+            // ✅ Usar sqrMagnitude
+            float sqrDist = (obj.transform.position - cameraPos).sqrMagnitude;
+            LODLevel level = GetLODLevel(sqrDist);
+            
+            if (obj.currentLevel != level) {
+                ApplyLOD(obj, level);
+                obj.currentLevel = level;
+            }
+        }
+    }
+    
+    private LODLevel GetLODLevel(float sqrDistance) {
+        if (sqrDistance > cullDistance * cullDistance) return LODLevel.Culled;
+        if (sqrDistance > farDistance * farDistance) return LODLevel.Far;
+        if (sqrDistance > mediumDistance * mediumDistance) return LODLevel.Medium;
+        return LODLevel.Near;
+    }
+    
+    private void ApplyLOD(LODObject obj, LODLevel level) {
+        switch (level) {
+            case LODLevel.Near:
+                obj.gameObject.SetActive(true);
+                if (obj.animator != null) obj.animator.enabled = true;
+                if (obj.spriteRenderer != null) obj.spriteRenderer.enabled = true;
+                break;
+            case LODLevel.Medium:
+                obj.gameObject.SetActive(true);
+                if (obj.animator != null) obj.animator.enabled = false;
+                if (obj.spriteRenderer != null) obj.spriteRenderer.enabled = true;
+                break;
+            case LODLevel.Far:
+                obj.gameObject.SetActive(true);
+                if (obj.animator != null) obj.animator.enabled = false;
+                if (obj.spriteRenderer != null) obj.spriteRenderer.enabled = false;
+                break;
+            case LODLevel.Culled:
+                obj.gameObject.SetActive(false);
+                break;
+        }
+    }
+    
+    private enum LODLevel { Near, Medium, Far, Culled }
+    
+    private class LODObject {
+        public GameObject gameObject;
+        public Transform transform;
+        public Animator animator;
+        public SpriteRenderer spriteRenderer;
+        public LODLevel currentLevel;
+        
+        public LODObject(GameObject obj) {
+            gameObject = obj;
+            transform = obj.transform;
+            animator = obj.GetComponent<Animator>();
+            spriteRenderer = obj.GetComponent<SpriteRenderer>();
+            currentLevel = LODLevel.Near;
+        }
+    }
+}
+```
+
+#### 📊 Spatial Partitioning
+
+**Grid Espacial para Otimização**
+```csharp
+/// <summary>
+/// Sistema de grid espacial para otimizar buscas de proximidade
+/// </summary>
+public class SpatialGrid<T> where T : Component {
+    private Dictionary<Vector2Int, List<T>> grid = new Dictionary<Vector2Int, List<T>>();
+    private float cellSize;
+    
+    public SpatialGrid(float cellSize) {
+        this.cellSize = cellSize;
+    }
+    
+    public void Add(T obj) {
+        Vector2Int cell = GetCell(obj.transform.position);
+        if (!grid.ContainsKey(cell)) {
+            grid[cell] = new List<T>();
+        }
+        grid[cell].Add(obj);
+    }
+    
+    public List<T> GetNearby(Vector3 position, float radius) {
+        List<T> nearby = new List<T>();
+        Vector2Int centerCell = GetCell(position);
+        int cellRadius = Mathf.CeilToInt(radius / cellSize);
+        
+        for (int x = -cellRadius; x <= cellRadius; x++) {
+            for (int y = -cellRadius; y <= cellRadius; y++) {
+                Vector2Int cell = centerCell + new Vector2Int(x, y);
+                if (grid.TryGetValue(cell, out List<T> objects)) {
+                    nearby.AddRange(objects);
+                }
+            }
+        }
+        
+        return nearby;
+    }
+    
+    private Vector2Int GetCell(Vector3 position) {
+        return new Vector2Int(
+            Mathf.FloorToInt(position.x / cellSize),
+            Mathf.FloorToInt(position.y / cellSize)
+        );
+    }
+}
+```
+
+#### 🔄 Update Escalonado
+
+**Sistema de Update Distribuído**
+```csharp
+/// <summary>
+/// Gerenciador que distribui updates ao longo de múltiplos frames
+/// </summary>
+public class StaggeredUpdateManager : MonoBehaviour {
+    private static StaggeredUpdateManager instance;
+    public static StaggeredUpdateManager Instance => instance;
+    
+    private List<IStaggeredUpdate> objects = new List<IStaggeredUpdate>();
+    private int currentIndex = 0;
+    private int updatesPerFrame = 10;
+    
+    private void Awake() {
+        instance = this;
+    }
+    
+    public void Register(IStaggeredUpdate obj) {
+        if (!objects.Contains(obj)) {
+            objects.Add(obj);
+        }
+    }
+    
+    public void Unregister(IStaggeredUpdate obj) {
+        objects.Remove(obj);
+    }
+    
+    private void Update() {
+        int updated = 0;
+        while (updated < updatesPerFrame && objects.Count > 0) {
+            if (currentIndex >= objects.Count) {
+                currentIndex = 0;
+            }
+            
+            if (currentIndex < objects.Count) {
+                objects[currentIndex].StaggeredUpdate();
+                currentIndex++;
+                updated++;
+            }
+        }
+    }
+}
+
+public interface IStaggeredUpdate {
+    void StaggeredUpdate();
+}
+```
+
+#### 🎮 Trigger-Based vs Polling
+
+**Usar Triggers ao Invés de Distance Checks**
+```csharp
+// ❌ RUIM - Polling constante
+private void Update() {
+    float distance = Vector3.Distance(transform.position, player.position);
+    if (distance < attractionRadius) {
+        StartAttraction();
+    }
+}
+
+// ✅ BOM - Trigger-based
+private void OnTriggerEnter2D(Collider2D other) {
+    if (other.CompareTag("Player")) {
+        StartAttraction();
+    }
+}
+
+// ✅ MELHOR - Trigger com zona de atração
+// Criar um GameObject filho com CircleCollider2D maior
+// Tag: "PlayerAttractionZone"
+```
+
+#### 📦 Component Caching
+
+**Cache de Componentes**
+```csharp
+// ❌ RUIM - GetComponent todo frame
+private void Update() {
+    GetComponent<Rigidbody2D>().velocity = movement;
+    GetComponent<Animator>().SetBool("isMoving", true);
+}
+
+// ✅ BOM - Cache em Awake
+private Rigidbody2D rb;
+private Animator animator;
+
+private void Awake() {
+    rb = GetComponent<Rigidbody2D>();
+    animator = GetComponent<Animator>();
+}
+
+private void Update() {
+    rb.velocity = movement;
+    animator.SetBool("isMoving", true);
+}
+```
+
+#### 🎨 String to Hash (Animator)
+
+**Otimização de Parâmetros do Animator**
+```csharp
+// ❌ LENTO - String lookup todo frame
+animator.SetBool("isWalking", true);
+animator.SetTrigger("Attack");
+
+// ✅ RÁPIDO - Hash calculado uma vez
+private static readonly int IsWalking = Animator.StringToHash("isWalking");
+private static readonly int Attack = Animator.StringToHash("Attack");
+
+animator.SetBool(IsWalking, true);
+animator.SetTrigger(Attack);
+```
+
+### Unity Editor Performance
 
 - ✅ Cachear referências em `OnEnable()`
-- ✅ Usar `sqrMagnitude` ao invés de `Distance()` quando possível
 - ✅ Usar operações batch com Undo
-- ✅ Evitar `Find()`, `FindObjectsOfType()` em loops
 - ✅ Usar `Dictionary` para lookups frequentes
 - ❌ Não usar `Resources.Load()` no Editor
 
@@ -875,6 +1310,21 @@ EditorPrefs.SetFloat("ToolName_BrushRadius", brushRadius);
 string json = JsonUtility.ToJson(data, true);
 File.WriteAllText(path, json);
 ```
+
+### Checklist de Performance
+
+Antes de fazer commit de código novo, verificar:
+
+- [ ] Nenhum `Find()` ou `FindObjectOfType()` em loops ou Update()
+- [ ] Componentes cacheados em Awake/Start
+- [ ] Usar `sqrMagnitude` ao invés de `Distance()` quando possível
+- [ ] Animator parameters usando StringToHash
+- [ ] Updates caros com intervalos (não todo frame)
+- [ ] Animator culling mode configurado
+- [ ] Object pooling para objetos frequentemente criados/destruídos
+- [ ] Triggers ao invés de polling quando possível
+- [ ] LOD system para objetos distantes
+- [ ] Spatial partitioning para buscas de proximidade (se aplicável)
 
 ---
 

@@ -323,8 +323,8 @@ public class PlayerController : MonoBehaviour
     {
         UpdateAnimations();
         
-        // OTIMIZAÇÃO: Stealth system atualiza menos frequentemente
-        if (Time.time - _lastStealthUpdate >= 0.1f)
+        // OTIMIZAÇÃO: Stealth system atualiza menos frequentemente (0.2s ao invés de 0.1s)
+        if (Time.time - _lastStealthUpdate >= 0.2f)
         {
             UpdateStealthSystem();
             _lastStealthUpdate = Time.time;

@@ -265,7 +265,7 @@ namespace SlimeKing.Core
             UnityEngine.Debug.LogWarning($"[CameraManager] {message}");
         }
 
-        // Debug via Inspector
+        // Debug via Inspector (calculado on-demand)
         [System.Serializable]
         private class DebugInfo
         {
@@ -278,7 +278,8 @@ namespace SlimeKing.Core
         [Header("Debug Info (Read Only)")]
         [SerializeField] private DebugInfo debugInfo = new DebugInfo();
 
-        private void Update()
+        // OTIMIZADO: Removido Update() - debug info calculado on-demand via propriedades
+        public void RefreshDebugInfo()
         {
             if (enableLogs)
             {

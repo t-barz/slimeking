@@ -1,12 +1,15 @@
 using UnityEngine;
 using SlimeKing.Core;
 using SlimeKing.Data;
+using SlimeKing.Systems.Core;
 
 namespace SlimeKing.Gameplay
 {
     /// <summary>
     /// Componente exclusivo para fragmentos elementais.
     /// Garante atração automática e entrega dos cristais ao GameManager.
+    /// 
+    /// OTIMIZADO: Usa trigger-based attraction ao invés de distance polling
     /// </summary>
     [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
     public class ItemCollectable : MonoBehaviour
@@ -26,16 +29,15 @@ namespace SlimeKing.Gameplay
 
         [Header("Performance")]
         [SerializeField] private bool enableAttraction = true;
-        [SerializeField] private float optimizationInterval = 0.1f;
 
         // Cache de componentes
         private SpriteRenderer _spriteRenderer;
         private Collider2D _collider;
+        private CircleCollider2D _attractionTrigger;
         private Transform _playerTransform;
 
         // Estados de atração
         private bool _isBeingAttracted = false;
-        private float _lastPlayerCheck = 0f;
         private float _attractionProgress = 0f;
         private Vector3 _startPosition;
 
@@ -49,7 +51,6 @@ namespace SlimeKing.Gameplay
 
         // Cache de performance
         private static readonly string PLAYER_TAG = "Player";
-        private static Transform s_cachedPlayerTransform;
 
         #region Unity Lifecycle
 
@@ -57,6 +58,7 @@ namespace SlimeKing.Gameplay
         {
             CacheComponents();
             InitializeItem();
+            CreateAttractionTrigger();
 
             // Registra tempo de spawn para delay de ativação
             _spawnTime = Time.time;
@@ -64,7 +66,6 @@ namespace SlimeKing.Gameplay
 
         private void Start()
         {
-            FindPlayer();
             SetupVisuals();
 
             // Desabilita collider se BounceHandler existir (será habilitado quando pronto)
@@ -88,13 +89,6 @@ namespace SlimeKing.Gameplay
             // Só processa atração se estiver ativada
             if (!_attractionEnabled) return;
 
-            // Optimization: só procura player em intervalos
-            if (Time.time - _lastPlayerCheck >= optimizationInterval)
-            {
-                CheckPlayerDistance();
-                _lastPlayerCheck = Time.time;
-            }
-
             // Atualiza atração se ativa
             if (_isBeingAttracted && _playerTransform != null)
             {
@@ -116,6 +110,24 @@ namespace SlimeKing.Gameplay
 
             // Configura collider como trigger
             _collider.isTrigger = true;
+        }
+
+        /// <summary>
+        /// Cria trigger de atração automática (OTIMIZADO: trigger-based ao invés de polling)
+        /// </summary>
+        private void CreateAttractionTrigger()
+        {
+            GameObject triggerObj = new GameObject("AttractionTrigger");
+            triggerObj.transform.SetParent(transform);
+            triggerObj.transform.localPosition = Vector3.zero;
+            triggerObj.layer = gameObject.layer;
+
+            _attractionTrigger = triggerObj.AddComponent<CircleCollider2D>();
+            _attractionTrigger.isTrigger = true;
+            _attractionTrigger.radius = attractionRadius;
+
+            // Desabilita trigger até ativação estar pronta
+            _attractionTrigger.enabled = false;
         }
 
         /// <summary>
@@ -159,24 +171,6 @@ namespace SlimeKing.Gameplay
         }
 
         /// <summary>
-        /// Encontra e cacheia referência do player
-        /// </summary>
-        private void FindPlayer()
-        {
-            // Usa cache estático para performance
-            if (s_cachedPlayerTransform == null)
-            {
-                GameObject player = GameObject.FindGameObjectWithTag(PLAYER_TAG);
-                if (player != null)
-                {
-                    s_cachedPlayerTransform = player.transform;
-                }
-            }
-
-            _playerTransform = s_cachedPlayerTransform;
-        }
-
-        /// <summary>
         /// Verifica se o delay de ativação passou e ativa a atração
         /// </summary>
         private void CheckActivationDelay()
@@ -206,6 +200,12 @@ namespace SlimeKing.Gameplay
         {
             _attractionEnabled = true;
 
+            // Ativa trigger de atração
+            if (_attractionTrigger != null)
+            {
+                _attractionTrigger.enabled = true;
+            }
+
             // Restaura cor original se estava usando feedback visual
             if (showDelayFeedback && _spriteRenderer != null)
             {
@@ -215,20 +215,37 @@ namespace SlimeKing.Gameplay
 
         #endregion
 
-        #region Attraction System
+        #region Attraction System (OTIMIZADO: Trigger-based)
 
         /// <summary>
-        /// Verifica distância do player e inicia atração se necessário
+        /// Detecta quando player entra na zona de atração (OTIMIZADO)
         /// </summary>
-        private void CheckPlayerDistance()
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            if (_playerTransform == null || _isBeingAttracted) return;
+            // Ignora se já coletado ou não é o player
+            if (_isCollected || !other.CompareTag(PLAYER_TAG)) return;
 
-            float distanceToPlayer = Vector2.Distance(transform.position, _playerTransform.position);
-
-            if (distanceToPlayer <= attractionRadius)
+            // Se for o trigger de atração
+            if (other == _attractionTrigger || other.transform.parent == transform)
             {
-                StartAttraction();
+                return; // Ignora próprio trigger
+            }
+
+            // Verifica se é coleta direta
+            if (other.GetComponent<Collider2D>() == _collider)
+            {
+                CollectItem();
+                return;
+            }
+
+            // Inicia atração se estiver ativada
+            if (_attractionEnabled && !_isBeingAttracted)
+            {
+                _playerTransform = PlayerCache.PlayerTransform;
+                if (_playerTransform != null)
+                {
+                    StartAttraction();
+                }
             }
         }
 
@@ -274,22 +291,6 @@ namespace SlimeKing.Gameplay
         #endregion
 
         #region Collection System
-
-        /// <summary>
-        /// Detecta colisão com player
-        /// </summary>
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (_isCollected)
-            {
-                return;
-            }
-
-            if (other.CompareTag(PLAYER_TAG))
-            {
-                CollectItem();
-            }
-        }
 
         /// <summary>
         /// Coleta o cristal e adiciona seu valor ao GameManager.
@@ -598,8 +599,11 @@ namespace SlimeKing.Gameplay
         private void EditorForceAttraction()
         {
             if (!Application.isPlaying) return;
-            FindPlayer();
-            StartAttraction();
+            _playerTransform = PlayerCache.PlayerTransform;
+            if (_playerTransform != null)
+            {
+                StartAttraction();
+            }
         }
 
         [ContextMenu("Force Activate Attraction")]

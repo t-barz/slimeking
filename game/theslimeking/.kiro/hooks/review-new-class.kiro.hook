@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Review New Class Standards",
+  "description": "Automatically reviews newly created C# classes to ensure they follow CodingStandards.md documentation and identifies potential performance improvements",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "*.cs"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the newly created C# class file against the CodingStandards.md documentation. Check for:\n\n1. **Coding Standards Compliance**:\n   - Correct namespace usage (TheSlimeKing.{Category})\n   - Proper naming conventions (PascalCase for classes, camelCase for private fields)\n   - Required XML documentation for public classes and methods\n   - Correct class structure with regions (Settings, References, Debug, Private Variables, Unity Lifecycle, etc.)\n   - Use of [SerializeField] private instead of public fields\n   - Proper use of semantic suffixes (Manager, Controller, System, Service, Settings)\n\n2. **Performance Considerations**:\n   - Component references cached in Awake/OnEnable (not in Update)\n   - Use of sqrMagnitude instead of Distance() where applicable\n   - No GameObject.Find() or FindObjectsOfType() in loops\n   - Dictionary usage for frequent lookups\n   - Object pooling opportunities for frequently instantiated objects\n   - Avoiding expensive operations in Update/FixedUpdate\n\n3. **Best Practices**:\n   - No magic numbers (use named constants)\n   - Methods under 50 lines\n   - No commented-out code\n   - Proper error handling\n\nProvide specific, actionable feedback with code examples if improvements are needed. If the class is compliant, confirm it follows standards."
+  }
+}
