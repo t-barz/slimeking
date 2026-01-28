@@ -3,24 +3,17 @@ namespace PixeLadder.EasyTransition
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
-using SlimeKing.Gameplay;
+    using SlimeKing.Gameplay;
+    using SlimeKing.Core;
     using UnityEngine.SceneManagement;
 
     /// <summary>
     /// Gerenciador unificado para teletransporte entre cenas.
     /// Responsável por reprodução de áudio e orquestração de teletransporte cross-scene.
-    /// Implementa padrão Singleton para acesso global.
+    /// Herda de ManagerSingleton para garantir persistência correta entre cenas.
     /// </summary>
-    public class TeleportManager : MonoBehaviour
+    public class TeleportManager : ManagerSingleton<TeleportManager>
     {
-        #region Singleton
-
-        /// <summary>
-        /// Instância singleton do TeleportManager.
-        /// </summary>
-        public static TeleportManager Instance { get; private set; }
-
-        #endregion
 
         #region Serialized Fields
 
@@ -52,31 +45,21 @@ using SlimeKing.Gameplay;
 
         #endregion
 
-        #region Unity Lifecycle
+        #region Initialization
 
         /// <summary>
-        /// Inicializa o singleton e estruturas de dados.
+        /// Inicializa o TeleportManager.
+        /// Chamado automaticamente pela classe base ManagerSingleton.
         /// </summary>
-        private void Awake()
+        protected override void Initialize()
         {
-            // Implementa padrão Singleton
-            if (Instance != null && Instance != this)
-            {
-                Debug.LogWarning($"TeleportManager: Múltiplas instâncias detectadas! Destruindo duplicata em '{gameObject.name}'.", this);
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
             // Valida AudioSource
             if (audioSource == null)
             {
-                Debug.LogWarning("TeleportManager: AudioSource não atribuído. Sons de teletransporte não serão reproduzidos.", this);
+                LogWarning("AudioSource não atribuído. Sons de teletransporte não serão reproduzidos.");
             }
 
-            Debug.Log("TeleportManager: Inicializado com sucesso.", this);
+            Log("Inicializado com sucesso.");
         }
 
         #endregion
@@ -125,21 +108,21 @@ using SlimeKing.Gameplay;
             // Validação 1: Verifica se já existe um teletransporte em progresso
             if (isTeleporting)
             {
-                Debug.LogWarning("TeleportManager: Não é possível iniciar teletransporte - outro teletransporte já está em progresso.");
+                LogWarning("Não é possível iniciar teletransporte - outro teletransporte já está em progresso.");
                 return false;
             }
 
             // Validação 2: Verifica se o nome da cena é válido
             if (string.IsNullOrEmpty(destinationSceneName))
             {
-                Debug.LogError("TeleportManager: Nome da cena de destino está vazio ou nulo. Teletransporte abortado.");
+                LogError("Nome da cena de destino está vazio ou nulo. Teletransporte abortado.");
                 return false;
             }
 
             // Validação 3: Verifica se a cena existe nas Build Settings
             if (!IsSceneInBuildSettings(destinationSceneName))
             {
-                Debug.LogError($"TeleportManager: Cena '{destinationSceneName}' não foi encontrada nas Build Settings. " +
+                LogError($"Cena '{destinationSceneName}' não foi encontrada nas Build Settings. " +
                               $"Adicione a cena em File > Build Settings antes de usar teletransporte cross-scene.");
                 return false;
             }
@@ -148,7 +131,7 @@ using SlimeKing.Gameplay;
             Scene currentScene = SceneManager.GetActiveScene();
             if (currentScene.name == destinationSceneName)
             {
-                Debug.LogWarning($"TeleportManager: Cena de destino '{destinationSceneName}' é a mesma que a cena atual. " +
+                LogWarning($"Cena de destino '{destinationSceneName}' é a mesma que a cena atual. " +
                                 $"Use teletransporte same-scene ao invés de cross-scene.");
                 return false;
             }
@@ -156,14 +139,14 @@ using SlimeKing.Gameplay;
             // Validação 5: Verifica se o TransitionEffect está atribuído
             if (transitionEffect == null)
             {
-                Debug.LogError("TeleportManager: TransitionEffect não está atribuído. Teletransporte abortado.");
+                LogError("TransitionEffect não está atribuído. Teletransporte abortado.");
                 return false;
             }
 
             // Validação 6: Verifica se o PlayerController existe
             if (PlayerController.Instance == null)
             {
-                Debug.LogError("TeleportManager: PlayerController.Instance não encontrado. " +
+                LogError("PlayerController.Instance não encontrado. " +
                               "Certifique-se de que o Player existe na cena.");
                 return false;
             }
@@ -172,7 +155,7 @@ using SlimeKing.Gameplay;
             Rigidbody2D playerRb = PlayerController.Instance.GetComponent<Rigidbody2D>();
             if (playerRb == null)
             {
-                Debug.LogError("TeleportManager: Player não possui Rigidbody2D. " +
+                LogError("Player não possui Rigidbody2D. " +
                               "Componente necessário para teletransporte.");
                 return false;
             }
@@ -180,7 +163,7 @@ using SlimeKing.Gameplay;
             // Validação 8: Verifica se a câmera principal existe
             if (Camera.main == null)
             {
-                Debug.LogWarning("TeleportManager: Camera.main não encontrada. " +
+                LogWarning("Camera.main não encontrada. " +
                                 "Posicionamento da câmera pode não funcionar corretamente.");
                 // Não aborta - câmera é opcional
             }
@@ -188,7 +171,7 @@ using SlimeKing.Gameplay;
             // Log de sucesso se debug está habilitado
             if (enableDebugLogs)
             {
-                Debug.Log($"TeleportManager: Validação bem-sucedida para teletransporte para '{destinationSceneName}'.");
+                Log($"Validação bem-sucedida para teletransporte para '{destinationSceneName}'.");
             }
 
             return true;
@@ -206,50 +189,13 @@ using SlimeKing.Gameplay;
         public void PlayTeleportSound(AudioClip clip)
         {
             // Graceful degradation - não faz nada se clip ou audioSource não estiverem configurados
-            if (clip == null)
+            if (clip == null || audioSource == null)
             {
-                return;
-            }
-
-            if (audioSource == null)
-            {
-                Debug.LogWarning("TeleportManager: AudioSource não configurado. Som não será reproduzido.");
                 return;
             }
 
             // Reproduz som com volume configurado
-            PlaySound(clip, defaultVolume);
-        }
-
-        /// <summary>
-        /// Método privado para reproduzir som com controle de volume.
-        /// </summary>
-        /// <param name="clip">AudioClip a ser reproduzido</param>
-        /// <param name="volumeMultiplier">Multiplicador de volume (0.0 a 1.0)</param>
-        private void PlaySound(AudioClip clip, float volumeMultiplier = 1f)
-        {
-            if (audioSource == null || clip == null)
-            {
-                return;
-            }
-
-            // Calcula volume final baseado nas configurações do jogo
-            float finalVolume = GetGameVolume() * volumeMultiplier;
-
-            // Usa PlayOneShot para não bloquear outros sons
-            audioSource.PlayOneShot(clip, finalVolume);
-        }
-
-        /// <summary>
-        /// Obtém o volume configurado nas configurações do jogo.
-        /// TODO: Integrar com sistema de configurações quando implementado.
-        /// </summary>
-        /// <returns>Volume de 0.0 a 1.0</returns>
-        private float GetGameVolume()
-        {
-            // TODO: Integrar com sistema de configurações do jogo
-            // Por enquanto, retorna volume padrão
-            return defaultVolume;
+            audioSource.PlayOneShot(clip, defaultVolume);
         }
 
         #endregion
@@ -282,14 +228,14 @@ using SlimeKing.Gameplay;
             // Validação completa antes de iniciar
             if (!ValidateCrossSceneTeleport(destinationSceneName, transitionEffect, enableDebugLogs))
             {
-                Debug.LogError("TeleportManager: Validação falhou. Teletransporte abortado.");
+                LogError("Validação falhou. Teletransporte abortado.");
                 return;
             }
 
             // Implementa teleport lock para prevenir teletransportes simultâneos
             if (isTeleporting)
             {
-                Debug.LogWarning("TeleportManager: Teletransporte já em progresso. Ignorando nova solicitação.");
+                LogWarning("Teletransporte já em progresso. Ignorando nova solicitação.");
                 return;
             }
 
@@ -316,13 +262,13 @@ using SlimeKing.Gameplay;
 
                     if (enableDebugLogs)
                     {
-                        Debug.Log("TeleportManager: Velocidade do player zerada.");
+                        Log("Velocidade do player zerada.");
                     }
                 }
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Movimento do player desabilitado.");
+                    Log("Movimento do player desabilitado.");
                 }
             }
 
@@ -358,14 +304,14 @@ using SlimeKing.Gameplay;
                 // Fase 1: Play start sound
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Fase 1 - Reproduzindo som de início...");
+                    Log("Fase 1 - Reproduzindo som de início...");
                 }
                 PlayTeleportSound(startSound);
 
                 // Fase 2: Execute fade out usando TeleportTransitionHelper
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Fase 2 - Executando fade out...");
+                    Log("Fase 2 - Executando fade out...");
                 }
 
                 bool midTransitionExecuted = false;
@@ -379,7 +325,7 @@ using SlimeKing.Gameplay;
                         // Este callback é executado após o fade out, quando a tela está escura
                         if (enableDebugLogs)
                         {
-                            Debug.Log("TeleportManager: Callback mid-transition - Tela escura, iniciando transferência...");
+                            Log("Callback mid-transition - Tela escura, iniciando transferência...");
                         }
 
                         // Inicia carregamento/ativação da cena se necessário
@@ -402,13 +348,13 @@ using SlimeKing.Gameplay;
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Transição visual completa.");
+                    Log("Transição visual completa.");
                 }
 
                 // Fase 3: Play end sound após fade in
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Fase 3 - Reproduzindo som de chegada...");
+                    Log("Fase 3 - Reproduzindo som de chegada...");
                 }
                 PlayTeleportSound(endSound);
 
@@ -416,9 +362,10 @@ using SlimeKing.Gameplay;
                 {
                     Debug.Log($"TeleportManager: Teletransporte para '{destinationSceneName}' concluído com sucesso!");
                 }
-            }
-            finally
-            {
+
+                // Aguarda um frame para garantir que o player foi completamente inicializado na nova cena
+                yield return null;
+                
                 // Reabilita movimento do player
                 if (PlayerController.Instance != null)
                 {
@@ -426,16 +373,23 @@ using SlimeKing.Gameplay;
 
                     if (enableDebugLogs)
                     {
-                        Debug.Log("TeleportManager: Movimento do player reabilitado.");
+                        Log("Movimento do player reabilitado.");
                     }
                 }
-
+                else
+                {
+                    LogError("PlayerController.Instance é null ao tentar reabilitar movimento!");
+                }
+            }
+            finally
+            {
                 // Clear teleport lock no finally block para garantir que sempre será limpo
+                // IMPORTANTE: Não pode ter yield statements no finally block
                 isTeleporting = false;
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: Teleport lock liberado.");
+                    Log("Teleport lock liberado.");
                 }
             }
         }
@@ -469,7 +423,7 @@ using SlimeKing.Gameplay;
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log("TeleportManager: DontDestroyOnLoad aplicado ao Player antes do carregamento.");
+                    Log("DontDestroyOnLoad aplicado ao Player antes do carregamento.");
                 }
             }
 
@@ -500,15 +454,32 @@ using SlimeKing.Gameplay;
                 Debug.Log($"TeleportManager: Total de cenas carregadas: {SceneManager.sceneCount}");
             }
 
-            // Aguarda um frame adicional para garantir que a cena foi inicializada
+            // Aguarda múltiplos frames para garantir que a cena foi completamente inicializada
+            // Isso é necessário porque alguns sistemas podem inicializar no Start() ou OnEnable()
             yield return null;
+            yield return null;
+            yield return new WaitForEndOfFrame();
+
+            // SEMPRE loga antes do reposicionamento para debug
+            Debug.Log($"[TeleportManager] ANTES de RepositionPlayerInNewScene - Posição destino: {destinationPosition}");
+            if (PlayerController.Instance != null)
+            {
+                Debug.Log($"[TeleportManager] Posição atual do player: {PlayerController.Instance.transform.position}");
+            }
 
             // Reposiciona o player na nova cena
-            RepositionPlayerInNewScene(destinationPosition, enableDebugLogs);
+            RepositionPlayerInNewScene(destinationPosition, true); // FORÇA enableDebugLogs = true
+
+            // SEMPRE loga depois do reposicionamento para debug
+            Debug.Log($"[TeleportManager] DEPOIS de RepositionPlayerInNewScene");
+            if (PlayerController.Instance != null)
+            {
+                Debug.Log($"[TeleportManager] Posição final do player: {PlayerController.Instance.transform.position}");
+            }
 
             if (enableDebugLogs)
             {
-                Debug.Log("TeleportManager: Player reposicionado na nova cena.");
+                Log("Player reposicionado na nova cena.");
             }
         }
 
@@ -520,21 +491,30 @@ using SlimeKing.Gameplay;
         {
             if (PlayerController.Instance == null)
             {
-                Debug.LogError("TeleportManager: PlayerController.Instance não encontrado após carregamento da cena!");
+                LogError("PlayerController.Instance não encontrado após carregamento da cena!");
                 return;
             }
 
             GameObject playerObject = PlayerController.Instance.gameObject;
 
-            // Calcula offset da câmera antes de mover o player
-            Vector3 cameraOffset = Vector3.zero;
-            if (Camera.main != null)
+            if (enableDebugLogs)
             {
-                cameraOffset = Camera.main.transform.position - playerObject.transform.position;
+                Log($"Posição atual do player antes do reposicionamento: {playerObject.transform.position}");
+                Log($"Posição de destino configurada: {destinationPosition}");
+            }
 
-                if (enableDebugLogs)
+            // Desabilita temporariamente a Cinemachine para evitar interferência
+            Unity.Cinemachine.CinemachineCamera cinemachine = null;
+            if (SlimeKing.Core.CameraManager.HasInstance)
+            {
+                cinemachine = SlimeKing.Core.CameraManager.Instance.GetCinemachineCamera();
+                if (cinemachine != null)
                 {
-                    Debug.Log($"TeleportManager: Camera offset calculado: {cameraOffset}");
+                    cinemachine.enabled = false;
+                    if (enableDebugLogs)
+                    {
+                        Log("Cinemachine temporariamente desabilitada para reposicionamento.");
+                    }
                 }
             }
 
@@ -543,33 +523,55 @@ using SlimeKing.Gameplay;
 
             if (enableDebugLogs)
             {
-                Debug.Log($"TeleportManager: Player reposicionado para {destinationPosition}.");
+                Log($"Player reposicionado para {destinationPosition}");
+                Log($"Posição real do player após reposicionamento: {playerObject.transform.position}");
             }
 
-            // Garante que a Cinemachine Camera esteja seguindo o Player após reposicionamento
-            if (SlimeKing.Core.CameraManager.HasInstance)
-            {
-                SlimeKing.Core.CameraManager.Instance.ForceCinemachineSetup();
-
-                if (enableDebugLogs)
-                {
-                    Debug.Log("TeleportManager: Cinemachine Camera configurada via CameraManager.");
-                }
-            }
-
-            // Atualiza posição da câmera mantendo o offset
+            // Força a câmera principal a seguir o player imediatamente
             if (Camera.main != null)
             {
-                Camera.main.transform.position = destinationPosition + cameraOffset;
+                // Define a câmera na mesma posição do player (com offset Z para 2D)
+                Vector3 cameraPosition = new Vector3(
+                    destinationPosition.x,
+                    destinationPosition.y,
+                    Camera.main.transform.position.z // Mantém o Z da câmera
+                );
+                Camera.main.transform.position = cameraPosition;
 
                 if (enableDebugLogs)
                 {
-                    Debug.Log($"TeleportManager: Câmera reposicionada para {Camera.main.transform.position}.");
+                    Log($"Câmera reposicionada para {cameraPosition}");
                 }
             }
             else if (enableDebugLogs)
             {
-                Debug.LogWarning("TeleportManager: Camera.main não encontrada. Posição da câmera não atualizada.");
+                LogWarning("Camera.main não encontrada. Posição da câmera não atualizada.");
+            }
+
+            // Reabilita e reconfigura a Cinemachine
+            if (cinemachine != null)
+            {
+                cinemachine.enabled = true;
+                
+                if (SlimeKing.Core.CameraManager.HasInstance)
+                {
+                    SlimeKing.Core.CameraManager.Instance.ForceCinemachineSetup();
+                    
+                    if (enableDebugLogs)
+                    {
+                        Log("Cinemachine reabilitada e reconfigurada.");
+                    }
+                }
+            }
+
+            // Validação final
+            if (enableDebugLogs)
+            {
+                Log($"Posição final do player: {playerObject.transform.position}");
+                if (Camera.main != null)
+                {
+                    Log($"Posição final da câmera: {Camera.main.transform.position}");
+                }
             }
         }
 
@@ -605,14 +607,14 @@ using SlimeKing.Gameplay;
             // Libera recursos não utilizados
             if (enableDebugLogs)
             {
-                Debug.Log("TeleportManager: Liberando recursos não utilizados...");
+                Log("Liberando recursos não utilizados...");
             }
 
             yield return Resources.UnloadUnusedAssets();
 
             if (enableDebugLogs)
             {
-                Debug.Log("TeleportManager: Recursos liberados.");
+                Log("Recursos liberados.");
             }
 
             // Opcional: Força coleta de lixo para limpeza imediata de memória
@@ -621,10 +623,11 @@ using SlimeKing.Gameplay;
             // System.GC.Collect();
             // if (enableDebugLogs)
             // {
-            //     Debug.Log("TeleportManager: Garbage collection executado.");
+            //     Log("Garbage collection executado.");
             // }
         }
 
         #endregion
     }
 }
+

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &840684576206624698
+--- !u!1 &826910526112431557
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,38 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7717244881135505940}
-  - component: {fileID: 3930924226687462509}
-  - component: {fileID: 8762943642734440227}
+  - component: {fileID: 1766546316105656606}
+  - component: {fileID: 1678094225690560183}
+  - component: {fileID: 1518631824875356284}
   m_Layer: 0
-  m_Name: teleportPoint
+  m_Name: teleportPointCrossScenes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7717244881135505940
+--- !u!4 &1766546316105656606
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 840684576206624698}
+  m_GameObject: {fileID: 826910526112431557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 18.97, y: 39.752, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &3930924226687462509
+--- !u!61 &1678094225690560183
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 840684576206624698}
+  m_GameObject: {fileID: 826910526112431557}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -79,19 +79,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8762943642734440227
+--- !u!114 &1518631824875356284
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 840684576206624698}
+  m_GameObject: {fileID: 826910526112431557}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1b6ec95437cb8f4688324077577b160, type: 3}
+  m_Script: {fileID: 11500000, guid: 7c4341ba651209042949defa6b133bf9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.SameSceneTeleportPoint
-  destinationPosition: {x: 14.6, y: 32.9, z: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.CrossSceneTeleportPoint
+  destinationSceneName: InitialForest
+  destinationPosition: {x: 1, y: 1, z: 0}
   transitionEffect: {fileID: 11400000, guid: 7cb3a7472a36ad5468072f6ca7b2d68f, type: 2}
   delayBeforeFadeIn: 1
   teleportStartSound: {fileID: 0}
@@ -101,4 +102,4 @@ MonoBehaviour:
   triggerOffset: {x: 0, y: 0}
   enableDebugLogs: 0
   enableGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 1, a: 1}
+  gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
