@@ -7,32 +7,32 @@ ScriptedImporter:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Attack
-    second: {fileID: 7400000, guid: 320a4f5f71e69014491da4beaa78159b, type: 2}
+    second: {fileID: 7400000, guid: e5966349ed9eb804db644f453f732e31, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Die
-    second: {fileID: 7400000, guid: 5ad0ccba10fd11946ac96a2c293180b5, type: 2}
+    second: {fileID: 7400000, guid: 7bcf28c52bbfb4043bc4d7c20d509e7d, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Hit
-    second: {fileID: 7400000, guid: 18c85ebbfc98421449d5e0bcae589c82, type: 2}
+    second: {fileID: 7400000, guid: 1fe397a01b1171b4d84afbff65b75a90, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Idle
-    second: {fileID: 7400000, guid: 4f930941d1bbb7f46a1c686ed811a5e6, type: 2}
+    second: {fileID: 7400000, guid: 7a05cf7109d31dd4e91d1bd0a74ce4e9, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Unique
-    second: {fileID: 7400000, guid: 87024e1834828f148ac63a6710b74af3, type: 2}
+    second: {fileID: 7400000, guid: d4ee6c6dbbb996c4f8d8fd8579f18f0d, type: 2}
   - first:
       type: UnityEngine:AnimationClip
       assembly: UnityEngine.AnimationModule
       name: Walk
-    second: {fileID: 7400000, guid: 534253454c1f18e408ff918f82934900, type: 2}
+    second: {fileID: 7400000, guid: 1f47da2be2174034b9c4d5f7e2053b8f, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -132,7 +132,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638997511037338624
+  platformSettingsDirtyTick: 639052201778037518
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -4991,6 +4991,18 @@ ScriptedImporter:
     allowsAlphaSplitting: 0
     androidETC2FallbackOverride: 0
   - name: Windows Store Apps
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: Android
     overridden: 0
     ignorePlatformSupport: 0
     maxTextureSize: 16384
