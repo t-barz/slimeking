@@ -231,12 +231,12 @@ public class PlayerController : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            Debug.Log("[PlayerController] Instância duplicada detectada. Destruindo duplicata.");
             Destroy(gameObject);
             return;
         }
+        
         Instance = this;
-        // Faz o Player persistir entre cenas
-        DontDestroyOnLoad(gameObject);
 
         // Obtém componentes obrigatórios
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -279,11 +279,15 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        // Remove todas as subscrições antes de desativar
-        UnsubscribeFromInputEvents();
+        // Verifica se _inputActions foi inicializado antes de desinscrever
+        if (_inputActions != null)
+        {
+            // Remove todas as subscrições antes de desativar
+            UnsubscribeFromInputEvents();
 
-        // Desativa o sistema de input
-        _inputActions.Disable();
+            // Desativa o sistema de input
+            _inputActions.Disable();
+        }
     }
 
     /// <summary>
