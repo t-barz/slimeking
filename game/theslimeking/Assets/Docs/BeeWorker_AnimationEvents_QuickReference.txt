@@ -1,0 +1,51 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                  BeeWorker Animation Events - Quick Reference                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+ATTACK ANIMATION (4 events required):
+┌──────────────────┬─────────────────────┬────────────────────────────────────┐
+│ Frame            │ Method              │ Purpose                            │
+├──────────────────┼─────────────────────┼────────────────────────────────────┤
+│ Start (0)        │ DisableBouncing()   │ Stop idle bounce during attack     │
+│ Damage Frame     │ EnableHitBox()      │ Activate damage hitbox             │
+│ After Damage     │ DisableHitBox()     │ Deactivate damage hitbox           │
+│ End (last)       │ EnableBouncing()    │ Resume idle bounce after attack    │
+└──────────────────┴─────────────────────┴────────────────────────────────────┘
+
+HIT ANIMATION (1 event required):
+┌──────────────────┬─────────────────────┬────────────────────────────────────┐
+│ Frame            │ Method              │ Purpose                            │
+├──────────────────┼─────────────────────┼────────────────────────────────────┤
+│ End (last)       │ EnableBouncing()    │ Resume bounce after damage         │
+└──────────────────┴─────────────────────┴────────────────────────────────────┘
+
+DIE ANIMATION (1 event required):
+┌──────────────────┬─────────────────────┬────────────────────────────────────┐
+│ Frame            │ Method              │ Purpose                            │
+├──────────────────┼─────────────────────┼────────────────────────────────────┤
+│ End (last)       │ OnDeathAnimationComplete() │ Destroy GameObject          │
+└──────────────────┴─────────────────────┴────────────────────────────────────┘
+
+HOW TO ADD ANIMATION EVENTS:
+1. Open Animation window (Window > Animation > Animation)
+2. Select BeeWorker GameObject in Hierarchy
+3. Choose animation clip from dropdown
+4. Click on the frame where you want to add an event
+5. Click "Add Event" button or right-click > Add Animation Event
+6. In Inspector, select the function from the dropdown
+7. Save the Animation Clip
+
+IMPORTANT NOTES:
+• All methods are public and available in BeeWorkerBehaviorController
+• Function names are case-sensitive
+• Events must be on the GameObject with the Animator component
+• Test in Play mode after configuration
+
+VALIDATION:
+✓ Attack: 4 events configured
+✓ Hit: 1 event configured  
+✓ Die: 1 event configured
+✓ All function names spelled correctly
+✓ Tested in Play mode
+
+For detailed instructions, see: Assets/Docs/BeeWorker_AnimationEvents_Setup.md
