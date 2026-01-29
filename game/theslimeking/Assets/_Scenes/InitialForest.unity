@@ -281,68 +281,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1001 &67992604
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 690496401}
-    m_Modifications:
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 24.216486
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.63024133
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9188443859478185840, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_Name
-      value: BeeWorkerA (2)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
---- !u!4 &67992605 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-  m_PrefabInstance: {fileID: 67992604}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &115077779
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,6 +313,43 @@ Transform:
   - {fileID: 190283744}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &123689079
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1200
+  m_Height: 675
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!84 &145561476
 RenderTexture:
   m_ObjectHideFlags: 0
@@ -10447,8 +10422,8 @@ MonoBehaviour:
   uvShader: {fileID: 0}
   jfMaterial: {fileID: 0}
   uvMaterial: {fileID: 0}
-  jfRenderTexture1: {fileID: 890299990}
-  jfRenderTexture2: {fileID: 1718466087}
+  jfRenderTexture1: {fileID: 1032920112}
+  jfRenderTexture2: {fileID: 123689079}
   _mainCamera: {fileID: 282475511}
   genSDF: 0
 --- !u!20 &229754493
@@ -15329,8 +15304,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2117441483}
-  - {fileID: 1490077227}
-  - {fileID: 67992605}
   - {fileID: 807847060}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -15987,43 +15960,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!84 &890299990
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 52
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1 &990726788
 GameObject:
   m_ObjectHideFlags: 0
@@ -16072,6 +16008,43 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!84 &1032920112
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1200
+  m_Height: 675
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &1110966082
 GameObject:
   m_ObjectHideFlags: 0
@@ -16155,68 +16128,6 @@ RenderTexture:
   m_Dimension: 2
   m_VolumeDepth: 1
   m_ShadowSamplingMode: 2
---- !u!1001 &1490077226
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 690496401}
-    m_Modifications:
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 24.817303
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.37166214
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9188443859478185840, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: m_Name
-      value: BeeWorkerA (1)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
---- !u!4 &1490077227 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-  m_PrefabInstance: {fileID: 1490077226}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1553651363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16451,43 +16362,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6677889030310102368, guid: 3a8f2dc5cb1a16e438295bd826f6dc24, type: 3}
   m_PrefabInstance: {fileID: 1637158845}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &1718466087
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 52
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &1723644236
 PrefabInstance:
   m_ObjectHideFlags: 0
