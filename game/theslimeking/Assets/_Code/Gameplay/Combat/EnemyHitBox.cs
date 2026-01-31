@@ -23,6 +23,9 @@ namespace SlimeKing.Gameplay
     {
         #region Settings / Configuration
 
+        [Header("Attack Settings")]
+        [SerializeField] private float attackCooldown = 1.5f;
+
         [Header("Debug")]
         [SerializeField] private bool enableDebugLogs = true;
 
@@ -32,6 +35,7 @@ namespace SlimeKing.Gameplay
 
         private TheSlimeKing.Gameplay.BeeWorkerBehaviorController beeWorkerController;
         private Collider2D hitBoxCollider;
+        private float lastAttackTime = -999f;
 
         #endregion
 
@@ -74,40 +78,70 @@ namespace SlimeKing.Gameplay
             // Verifica se colidiu com o player
             if (other.CompareTag("Player"))
             {
-                if (enableDebugLogs)
-                {
-                    Debug.Log($"[EnemyHitBox] Player detectado! GameObject: {other.gameObject.name}", this);
-                }
-
-                // Obtém o PlayerAttributesHandler
-                var playerAttributes = other.GetComponent<SlimeKing.Gameplay.PlayerAttributesHandler>();
-
-                if (playerAttributes != null && beeWorkerController != null)
-                {
-                    // Obtém o valor de ataque do inimigo
-                    int enemyAttack = beeWorkerController.GetAttackDamage();
-
-                    // Aplica dano ao player
-                    playerAttributes.TakeDamage(enemyAttack, false);
-
-                    if (enableDebugLogs)
-                    {
-                        Debug.Log($"[EnemyHitBox] Dano aplicado ao player: {enemyAttack}", this);
-                    }
-                }
-                else
-                {
-                    if (enableDebugLogs)
-                    {
-                        Debug.LogWarning($"[EnemyHitBox] PlayerAttributesHandler não encontrado no GameObject {other.name} ou beeWorkerController é null", this);
-                    }
-                }
+                TryAttackPlayer(other);
             }
             else
             {
                 if (enableDebugLogs)
                 {
                     Debug.Log($"[EnemyHitBox] Collider não é Player. Tag: {other.tag}", this);
+                }
+            }
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            // Continua tentando atacar enquanto o player estiver no range
+            if (other.CompareTag("Player"))
+            {
+                TryAttackPlayer(other);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Tenta atacar o player, respeitando o cooldown entre ataques.
+        /// </summary>
+        private void TryAttackPlayer(Collider2D playerCollider)
+        {
+            // Verifica cooldown
+            if (Time.time - lastAttackTime < attackCooldown)
+            {
+                return;
+            }
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[EnemyHitBox] Player detectado! GameObject: {playerCollider.gameObject.name}", this);
+            }
+
+            // Obtém o PlayerAttributesHandler
+            var playerAttributes = playerCollider.GetComponent<SlimeKing.Gameplay.PlayerAttributesHandler>();
+
+            if (playerAttributes != null && beeWorkerController != null)
+            {
+                // Obtém o valor de ataque do inimigo
+                int enemyAttack = beeWorkerController.GetAttackDamage();
+
+                // Aplica dano ao player
+                playerAttributes.TakeDamage(enemyAttack, false);
+
+                // Atualiza o tempo do último ataque
+                lastAttackTime = Time.time;
+
+                if (enableDebugLogs)
+                {
+                    Debug.Log($"[EnemyHitBox] Dano aplicado ao player: {enemyAttack}", this);
+                }
+            }
+            else
+            {
+                if (enableDebugLogs)
+                {
+                    Debug.LogWarning($"[EnemyHitBox] PlayerAttributesHandler não encontrado no GameObject {playerCollider.name} ou beeWorkerController é null", this);
                 }
             }
         }

@@ -195,6 +195,12 @@ namespace TheSlimeKing.Gameplay
         /// </summary>
         private void CachePlayerReference()
         {
+            // Re-cache if player reference is null (handles scene reloads)
+            if (s_playerTransform == null)
+            {
+                s_playerCached = false;
+            }
+
             // Only cache once across all instances
             if (!s_playerCached)
             {
@@ -328,6 +334,19 @@ namespace TheSlimeKing.Gameplay
             if (enableDebugLogs)
             {
                 Debug.Log("[BeeWorkerBehaviorController] Bouncing disabled.", this);
+            }
+        }
+
+        /// <summary>
+        /// Resets the attacking state. Called via Animation Event when attack animation completes.
+        /// </summary>
+        public void OnAttackAnimationComplete()
+        {
+            isAttacking = false;
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log("[BeeWorkerBehaviorController] Attack animation complete. Ready for next attack.", this);
             }
         }
 
