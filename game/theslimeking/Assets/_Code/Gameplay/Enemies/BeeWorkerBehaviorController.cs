@@ -651,7 +651,7 @@ namespace TheSlimeKing.Gameplay
             // Check if within attack range
             if (sqrDistanceToPlayer <= sqrAttackRange)
             {
-                // Within attack range - trigger attack
+                // Within attack range - trigger attack ONLY when in range
                 if (!isAttacking)
                 {
                     isAttacking = true;
@@ -669,7 +669,7 @@ namespace TheSlimeKing.Gameplay
             }
             else
             {
-                // Outside attack range - chase player
+                // Outside attack range - chase player instead of attacking
                 isAttacking = false;
                 
                 // Apply movement at moveSpeed * chaseSpeedMultiplier
