@@ -370,6 +370,32 @@ namespace TheSlimeKing.Gameplay
             Destroy(gameObject);
         }
 
+        /// <summary>
+        /// Sets the invulnerability state to true.
+        /// Prevents the BeeWorker from taking damage while invulnerable.
+        /// </summary>
+        public void SetInvulnerable()
+        {
+            isInvulnerable = true;
+            if (enableDebugLogs)
+            {
+                Debug.Log("[BeeWorkerBehaviorController] Invulnerability set to true.", this);
+            }
+        }
+
+        /// <summary>
+        /// Sets the invulnerability state to false.
+        /// Allows the BeeWorker to take damage again.
+        /// </summary>
+        public void SetVulnerable()
+        {
+            isInvulnerable = false;
+            if (enableDebugLogs)
+            {
+                Debug.Log("[BeeWorkerBehaviorController] Invulnerability set to false.", this);
+            }
+        }
+
         #endregion
 
         #region Private Methods

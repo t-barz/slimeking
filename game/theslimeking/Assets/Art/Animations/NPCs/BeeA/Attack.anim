@@ -82,8 +82,41 @@ AnimationClip:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_ClipBindingConstant:
-    genericBindings: []
-    pptrCurveMapping: []
+    genericBindings:
+    - serializedVersion: 2
+      path: 0
+      attribute: 3305885265
+      script: {fileID: 0}
+      typeID: 212
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 0
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    pptrCurveMapping:
+    - {fileID: -5720494490493343116, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 1366341959838737306, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 8437395163184517786, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 8157263515927257405, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 2404241169346233257, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 3187357887434137334, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: -2648099932522576512, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: -2638531353800557081, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: -744436849320015395, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: -58104568842535170, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 8601052252875168100, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 4660111292795635856, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 4461478328989270007, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 3814106409425359048, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
+    - {fileID: 3814106409425359048, guid: 98be5b8eba68bbf4d86027bb3d569860, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -129,4 +162,18 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0
+    functionName: SetInvulnerable
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.1
+    functionName: SetVulnerable
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
