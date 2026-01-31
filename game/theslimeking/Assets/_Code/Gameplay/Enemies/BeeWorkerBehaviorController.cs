@@ -52,7 +52,6 @@ namespace TheSlimeKing.Gameplay
         [SerializeField] private Animator animator;
         [SerializeField] private Collider2D hitBox;
         [SerializeField] private Collider2D hurtBox;
-        [SerializeField] private SlimeKing.Gameplay.DropController dropController;
 
         #endregion
 
@@ -748,22 +747,6 @@ namespace TheSlimeKing.Gameplay
                 // Stop all movement
                 animator.SetBool(IsWalking, false);
                 
-                // Trigger death effect and drop items
-                // Try to get DropController from the same GameObject if not assigned
-                SlimeKing.Gameplay.DropController dropCtrl = dropController;
-                if (dropCtrl == null)
-                {
-                    dropCtrl = GetComponent<SlimeKing.Gameplay.DropController>();
-                }
-                
-                if (dropCtrl != null)
-                {
-                    dropCtrl.DropItemsWithDeathEffect();
-                }
-                else if (enableDebugLogs)
-                {
-                    Debug.LogWarning("[BeeWorkerBehaviorController] DropController not found on this GameObject!", this);
-                }
                 
                 // Disable the BeeWorkerBehaviorController script
                 enabled = false;
