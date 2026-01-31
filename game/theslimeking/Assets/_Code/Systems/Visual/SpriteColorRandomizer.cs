@@ -265,7 +265,7 @@ namespace TheSlimeKing.Systems.Visual
         {
             if (enableDebugLogs)
             {
-                Debug.Log($"[SpriteColorRandomizer] {gameObject.name}: {message}", this);
+                UnityEngine.Debug.Log($"[SpriteColorRandomizer] {gameObject.name}: {message}", this);
             }
         }
         #endregion

@@ -51,7 +51,7 @@ namespace SlimeKing.Systems.Core
             
             if (showDebug)
             {
-                Debug.Log($"[ObjectPool] Pool '{prefab.name}' inicializado com {initialSize} objetos");
+                UnityEngine.Debug.Log($"[ObjectPool] Pool '{prefab.name}' inicializado com {initialSize} objetos");
             }
         }
         
@@ -83,14 +83,14 @@ namespace SlimeKing.Systems.Core
                 obj = CreateNewObject();
                 if (showDebug)
                 {
-                    Debug.Log($"[ObjectPool] Pool '{prefab.name}' expandido. Total: {activeObjects.Count + availableObjects.Count + 1}");
+                    UnityEngine.Debug.Log($"[ObjectPool] Pool '{prefab.name}' expandido. Total: {activeObjects.Count + availableObjects.Count + 1}");
                 }
             }
             else
             {
                 if (showDebug)
                 {
-                    Debug.LogWarning($"[ObjectPool] Pool '{prefab.name}' esgotado! Criando objeto temporário.");
+                    UnityEngine.Debug.LogWarning($"[ObjectPool] Pool '{prefab.name}' esgotado! Criando objeto temporário.");
                 }
                 return Instantiate(prefab);
             }

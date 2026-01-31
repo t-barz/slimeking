@@ -290,7 +290,7 @@ namespace TheSlimeKing.Systems.Visual
         {
             if (enableDebugLogs)
             {
-                Debug.Log($"[TransformScaleRandomizer] {gameObject.name}: {message}", this);
+                UnityEngine.Debug.Log($"[TransformScaleRandomizer] {gameObject.name}: {message}", this);
             }
         }
         #endregion

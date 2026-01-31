@@ -104,7 +104,7 @@ namespace SlimeKing.Systems.Core
                 
                 if (showDebug)
                 {
-                    Debug.Log($"[StaggeredUpdateManager] Registrado: {obj}. Total: {registeredObjects.Count}");
+                    UnityEngine.Debug.Log($"[StaggeredUpdateManager] Registrado: {obj}. Total: {registeredObjects.Count}");
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace SlimeKing.Systems.Core
                 
                 if (showDebug)
                 {
-                    Debug.Log($"[StaggeredUpdateManager] Removido: {obj}. Total: {registeredObjects.Count}");
+                    UnityEngine.Debug.Log($"[StaggeredUpdateManager] Removido: {obj}. Total: {registeredObjects.Count}");
                 }
             }
         }
