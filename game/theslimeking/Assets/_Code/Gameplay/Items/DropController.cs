@@ -38,6 +38,10 @@ public class DropController : MonoBehaviour
     [Tooltip("Se verdadeiro, instancia na posição deste objeto. Se falso, instancia na origem")]
     [SerializeField] private bool useCurrentPosition = true;
 
+    [Header("💀 Efeito de Morte")]
+    [Tooltip("Prefab do efeito que será instanciado quando o inimigo morrer")]
+    [SerializeField] private GameObject deathEffectPrefab;
+
     [Header("Debug")]
     [Tooltip("Mostra logs de debug no Console")]
     [SerializeField] private bool enableDebugLogs = false;
@@ -51,18 +55,55 @@ public class DropController : MonoBehaviour
     /// </summary>
     public void DropItems()
     {
+        DropItemsInternal();
+    }
+
+    /// <summary>
+    /// Instancia o efeito de morte na posição do pivô e faz o drop dos itens.
+    /// Deve ser chamado quando o inimigo for derrotado.
+    /// </summary>
+    public void DropItemsWithDeathEffect()
+    {
+        // Instancia o efeito de morte
+        if (deathEffectPrefab != null)
+        {
+            Vector3 spawnPosition = useCurrentPosition ? transform.position : Vector3.zero;
+            GameObject deathEffect = Instantiate(deathEffectPrefab, spawnPosition, Quaternion.identity);
+
+            if (enableDebugLogs)
+            {
+                UnityEngine.Debug.Log($"DropController: Efeito de morte instanciado na posição {spawnPosition}", this);
+            }
+        }
+        else if (enableDebugLogs)
+        {
+            UnityEngine.Debug.LogWarning("DropController: deathEffectPrefab não foi configurado!", this);
+        }
+
+        // Faz o drop dos itens
+        DropItemsInternal();
+    }
+
+    /// <summary>
+    /// Implementação interna do drop de itens.
+    /// </summary>
+    private void DropItemsInternal()
+    {
         // Validação da lista de prefabs
         if (prefabList == null || prefabList.Length == 0)
-        {return;
+        {
+            return;
         }
 
         // Validação do range
         if (minDropCount < 1)
-        {minDropCount = 1;
+        {
+            minDropCount = 1;
         }
 
         if (maxDropCount < minDropCount)
-        {maxDropCount = minDropCount;
+        {
+            maxDropCount = minDropCount;
         }
 
         // Sorteia quantos objetos serão instanciados
@@ -86,7 +127,8 @@ public class DropController : MonoBehaviour
 
             // Validação do prefab selecionado
             if (selectedPrefab == null)
-            {continue;
+            {
+                continue;
             }
 
             // Instancia o prefab
@@ -94,7 +136,9 @@ public class DropController : MonoBehaviour
 
             // Log de debug para cada item
             if (enableDebugLogs)
-            {}
+            {
+                UnityEngine.Debug.Log($"DropController: Item {i + 1}/{dropCount} instanciado.", this);
+            }
         }
 
         // Log de debug final
@@ -125,6 +169,11 @@ public class DropController : MonoBehaviour
     /// Verifica se a lista de prefabs está válida.
     /// </summary>
     public bool HasValidPrefabs => prefabList != null && prefabList.Length > 0;
+
+    /// <summary>
+    /// Verifica se o efeito de morte está configurado.
+    /// </summary>
+    public bool HasDeathEffect => deathEffectPrefab != null;
     #endregion
 }
 }

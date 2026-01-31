@@ -194,14 +194,21 @@ namespace SlimeKing.Gameplay
                 Collider2D col = colliderCache[i];
                 if (col.gameObject == gameObject) continue; // Ignora o próprio atacante
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                if (enableDebugLogs)
+                {
+                    UnityEngine.Debug.Log($"AttackHandler: Collider detectado: {col.gameObject.name}, Tag: {col.tag}, Layer: {col.gameObject.layer}");
+                }
+#endif
+
                 // Pula se já processou este GameObject
                 if (processedGameObjects.Contains(col.gameObject)) continue;
                 processedGameObjects.Add(col.gameObject);
 
                 bool damageDealt = false;
 
-                // Verifica se tem a tag "Destructable" ou "Enemy"
-                if (col.CompareTag("Destructable") || col.CompareTag("Enemy"))
+                // Verifica se tem a tag "Destructable"
+                if (col.CompareTag("Destructable"))
                 {
                     // Tenta causar dano em BushDestruct
                     if (!bushCache.TryGetValue(col, out BushDestruct bushDestructable))
@@ -238,11 +245,26 @@ namespace SlimeKing.Gameplay
                             damageDealt = true;
                         }
                     }
+                }
+                // Verifica se tem a tag "Enemy" e processa dano em inimigos
+                else if (col.CompareTag("Enemy"))
+                {
+                    // Obtém o valor de ataque do jogador
+                    int playerAttack = GetPlayerAttackValue();
 
-                    // Log de aviso se não encontrou nenhum componente destrutível
-                    if (!damageDealt)
+                    // Tenta encontrar o BeeWorkerBehaviorController no GameObject ou em seus pais
+                    var beeWorker = col.GetComponentInParent<TheSlimeKing.Gameplay.BeeWorkerBehaviorController>();
+                    if (beeWorker != null)
                     {
-                        // No destructible component found
+                        beeWorker.TakeDamageFromPlayer(playerAttack);
+                        damageDealt = true;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                        if (enableDebugLogs)
+                        {
+                            UnityEngine.Debug.Log($"AttackHandler: Dano aplicado ao inimigo {col.gameObject.name} com ataque {playerAttack}");
+                        }
+#endif
                     }
                 }
             }
@@ -264,6 +286,34 @@ namespace SlimeKing.Gameplay
 
             // Retorna tamanho normal para ataques frontais/traseiros
             return attackSize;
+        }
+
+        /// <summary>
+        /// Obtém o valor de ataque do jogador a partir do PlayerAttributesHandler.
+        /// Retorna 1 como valor padrão se não encontrar o componente.
+        /// </summary>
+        /// <returns>Valor de ataque do jogador</returns>
+        private int GetPlayerAttackValue()
+        {
+            // Tenta encontrar o PlayerAttributesHandler no jogador
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                var playerAttributes = player.GetComponent<SlimeKing.Gameplay.PlayerAttributesHandler>();
+                if (playerAttributes != null)
+                {
+                    return playerAttributes.CurrentAttack;
+                }
+            }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (enableDebugLogs)
+            {
+                UnityEngine.Debug.LogWarning("AttackHandler: PlayerAttributesHandler não encontrado. Usando ataque padrão = 1");
+            }
+#endif
+
+            return 1; // Valor padrão se não encontrar
         }
 
         /// <summary>

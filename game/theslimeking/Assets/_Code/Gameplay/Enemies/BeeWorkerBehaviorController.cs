@@ -52,6 +52,7 @@ namespace TheSlimeKing.Gameplay
         [SerializeField] private Animator animator;
         [SerializeField] private Collider2D hitBox;
         [SerializeField] private Collider2D hurtBox;
+        [SerializeField] private SlimeKing.Gameplay.DropController dropController;
 
         #endregion
 
@@ -334,6 +335,38 @@ namespace TheSlimeKing.Gameplay
             if (enableDebugLogs)
             {
                 Debug.Log("[BeeWorkerBehaviorController] Death animation complete. Destroying GameObject.", this);
+            }
+            Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// Receives damage from player attacks.
+        /// Calculates final damage based on player attack value minus enemy defense.
+        /// </summary>
+        /// <param name="playerAttack">The attack value from the player</param>
+        public void TakeDamageFromPlayer(int playerAttack)
+        {
+            // Calculate damage: playerAttack - defense (minimum 1 damage)
+            float calculatedDamage = Mathf.Max(1f, playerAttack - defense);
+
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[BeeWorkerBehaviorController] Receiving player attack: {playerAttack}, Defense: {defense}, Final damage: {calculatedDamage}", this);
+            }
+
+            // Apply the calculated damage
+            TakeDamage(calculatedDamage);
+        }
+
+        /// <summary>
+        /// Destroys the BeeWorker GameObject immediately.
+        /// Can be called from external systems or animation events.
+        /// </summary>
+        public void DestroyBeeWorker()
+        {
+            if (enableDebugLogs)
+            {
+                Debug.Log("[BeeWorkerBehaviorController] BeeWorker destroyed via public method.", this);
             }
             Destroy(gameObject);
         }
@@ -660,24 +693,6 @@ namespace TheSlimeKing.Gameplay
         #region Damage System
 
         /// <summary>
-        /// Called when a collider enters the HurtBox trigger.
-        /// Processes damage from player attacks.
-        /// </summary>
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            // Only process damage from PlayerAttack tagged objects
-            if (other.CompareTag("PlayerAttack"))
-            {
-                // Get damage amount from the attack (default to attackDamage if not specified)
-                float damageAmount = attackDamage;
-                
-                // TODO: Get actual damage from player attack component when implemented
-                
-                TakeDamage(damageAmount);
-            }
-        }
-
-        /// <summary>
         /// Processes damage to the BeeWorker.
         /// Applies knockback, invulnerability, and transitions to Hit or Dead state.
         /// </summary>
@@ -732,6 +747,23 @@ namespace TheSlimeKing.Gameplay
                 
                 // Stop all movement
                 animator.SetBool(IsWalking, false);
+                
+                // Trigger death effect and drop items
+                // Try to get DropController from the same GameObject if not assigned
+                SlimeKing.Gameplay.DropController dropCtrl = dropController;
+                if (dropCtrl == null)
+                {
+                    dropCtrl = GetComponent<SlimeKing.Gameplay.DropController>();
+                }
+                
+                if (dropCtrl != null)
+                {
+                    dropCtrl.DropItemsWithDeathEffect();
+                }
+                else if (enableDebugLogs)
+                {
+                    Debug.LogWarning("[BeeWorkerBehaviorController] DropController not found on this GameObject!", this);
+                }
                 
                 // Disable the BeeWorkerBehaviorController script
                 enabled = false;
