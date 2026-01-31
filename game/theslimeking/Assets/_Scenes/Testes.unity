@@ -551,8 +551,8 @@ MonoBehaviour:
   uvShader: {fileID: 0}
   jfMaterial: {fileID: 0}
   uvMaterial: {fileID: 0}
-  jfRenderTexture1: {fileID: 1474365278}
-  jfRenderTexture2: {fileID: 1616819914}
+  jfRenderTexture1: {fileID: 1160690956}
+  jfRenderTexture2: {fileID: 1797811766}
   _mainCamera: {fileID: 282475511}
   genSDF: 0
 --- !u!20 &229754493
@@ -1368,18 +1368,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 690496401}
     m_Modifications:
-    - target: {fileID: 1633202847141599628, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: deathEffectPrefab
-      value: 
-      objectReference: {fileID: 7980785802674598931, guid: f79e66af63666384a82a758c4236f830, type: 3}
-    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: showGizmos
-      value: 0
+    - target: {fileID: 1393607157640696162, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: m_Radius
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-      propertyPath: dropController
-      value: 
-      objectReference: {fileID: 818440000}
+      propertyPath: showGizmos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: detectionRadius
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
@@ -1450,17 +1450,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
   m_PrefabInstance: {fileID: 818439997}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &818440000 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1633202847141599628, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
-  m_PrefabInstance: {fileID: 818439997}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ea310a0ceb225445975f37a4ebe5c46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlimeKing.Gameplay.DropController
 --- !u!1 &852162308
 GameObject:
   m_ObjectHideFlags: 0
@@ -1768,6 +1757,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &1160690956
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1200
+  m_Height: 675
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1001 &1319946679
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1776,6 +1802,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1867496903}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2140549701}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1585165999}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 929738503}
     - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.181309
@@ -1870,6 +1912,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: patrolPoints.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1867496903}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 929738503}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2140549701}
     - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.261987
@@ -1919,43 +1977,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
---- !u!84 &1474365278
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 52
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &1553651363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2088,6 +2109,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1867496903}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 929738503}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2140549701}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1585165999}
     - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.5908346
@@ -2137,43 +2174,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
---- !u!84 &1616819914
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 1200
-  m_Height: 675
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 52
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &1637158845
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2337,6 +2337,43 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 58ecb1426b56d334fb2c5ea08baa6b7e, type: 3}
+--- !u!84 &1797811766
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 6
+  m_Width: 1200
+  m_Height: 675
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_UseDynamicScaleExplicit: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_EnableRandomWrite: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 0
+    m_WrapV: 0
+    m_WrapW: 0
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1001 &1839136420
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2744,6 +2781,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2140549701}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1585165999}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 929738503}
+    - target: {fileID: 5893364866259807832, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
+      propertyPath: 'patrolPoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1867496903}
     - target: {fileID: 8245549470190055189, guid: e613d3b5d817c9045b9fd12d2e618b90, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.1786175
