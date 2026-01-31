@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using SlimeKing.Gameplay;
 
 /// <summary>
 /// Gerencia a visualização de vidas do personagem na UI.
 /// Usa o HeartPrefab para cada vida (máximo 10, começa com 3).
+/// Conecta-se automaticamente ao PlayerAttributesHandler para atualizar em tempo real.
 /// </summary>
 public class HealthDisplay : MonoBehaviour
 {
@@ -13,6 +15,10 @@ public class HealthDisplay : MonoBehaviour
     [SerializeField] private GameObject heartPrefab;
     [SerializeField] private int maxHearts = 10;
     [SerializeField] private int startingHearts = 3;
+
+    [Header("Player Connection")]
+    [SerializeField] private bool findPlayerAutomatically = true;
+    [SerializeField] private PlayerAttributesHandler targetPlayer;
 
     [Header("Bounce Animation")]
     [SerializeField] private bool enableBounceAnimation = true;
@@ -42,7 +48,27 @@ public class HealthDisplay : MonoBehaviour
     #region Unity Lifecycle
     private void Start()
     {
+        // Tenta encontrar o jogador automaticamente
+        if (findPlayerAutomatically && targetPlayer == null)
+        {
+            FindPlayerComponent();
+        }
+
         InitializeDisplay();
+
+        // Conecta aos eventos do player
+        if (targetPlayer != null)
+        {
+            SubscribeToPlayerEvents();
+            // Atualiza com os valores atuais do player
+            OnPlayerHealthChanged(targetPlayer.CurrentHealthPoints, targetPlayer.MaxHealthPoints);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Remove listeners de eventos
+        UnsubscribeFromPlayerEvents();
     }
     #endregion
 
@@ -228,6 +254,61 @@ public class HealthDisplay : MonoBehaviour
     #endregion
 
     #region Utilities
+    /// <summary>
+    /// Tenta encontrar automaticamente o PlayerAttributesHandler na cena.
+    /// </summary>
+    private void FindPlayerComponent()
+    {
+        PlayerAttributesHandler player = FindFirstObjectByType<PlayerAttributesHandler>();
+
+        if (player != null)
+        {
+            targetPlayer = player;
+            Log($"PlayerAttributesHandler encontrado automaticamente: {player.gameObject.name}");
+        }
+        else
+        {
+            Log("PlayerAttributesHandler não encontrado na cena!");
+        }
+    }
+
+    /// <summary>
+    /// Subscreve aos eventos do PlayerAttributesHandler.
+    /// </summary>
+    private void SubscribeToPlayerEvents()
+    {
+        if (targetPlayer == null) return;
+
+        targetPlayer.OnHealthChanged += OnPlayerHealthChanged;
+        Log("Conectado aos eventos do PlayerAttributesHandler");
+    }
+
+    /// <summary>
+    /// Remove subscrição dos eventos do PlayerAttributesHandler.
+    /// </summary>
+    private void UnsubscribeFromPlayerEvents()
+    {
+        if (targetPlayer == null) return;
+
+        targetPlayer.OnHealthChanged -= OnPlayerHealthChanged;
+    }
+
+    /// <summary>
+    /// Callback para quando a vida do jogador muda.
+    /// </summary>
+    private void OnPlayerHealthChanged(int currentHealth, int maxHealth)
+    {
+        // Verifica se o número máximo de corações mudou
+        if (maxHealth != currentMaxHearts)
+        {
+            currentMaxHearts = maxHealth;
+            CreateHearts(currentMaxHearts);
+        }
+
+        SetCurrentHearts(currentHealth);
+        Log($"Vida do jogador alterada: {currentHealth}/{maxHealth}");
+    }
+
     /// <summary>
     /// Log condicional
     /// </summary>

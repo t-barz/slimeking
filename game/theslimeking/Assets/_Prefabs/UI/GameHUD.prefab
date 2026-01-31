@@ -289,6 +289,8 @@ MonoBehaviour:
   heartPrefab: {fileID: 829893380042407337, guid: 80e2b8fa1b1e3664a84bfecfed7af61e, type: 3}
   maxHearts: 10
   startingHearts: 3
+  findPlayerAutomatically: 1
+  targetPlayer: {fileID: 0}
   enableBounceAnimation: 1
   bounceDuration: 0.5
   delayBeforeFirstHeart: 0
@@ -313,7 +315,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 3
   m_Spacing: -80
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0

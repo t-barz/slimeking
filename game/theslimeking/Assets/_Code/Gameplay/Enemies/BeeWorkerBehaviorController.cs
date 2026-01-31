@@ -19,12 +19,12 @@ namespace TheSlimeKing.Gameplay
 
         [Header("Core Attributes")]
         [SerializeField] private int maxHealth = 3;
-        [SerializeField] private float attackDamage = 10f;
-        [SerializeField] private float defense = 5f;
+        [SerializeField] private float attackDamage = 1f;
+        [SerializeField] private float defense = 0f;
         [SerializeField] private float moveSpeed = 3f;
 
         [Header("Detection")]
-        [SerializeField] private float detectionRadius = 5f;
+        [SerializeField] private float detectionRadius = 2f;
         [SerializeField] private float detectionInterval = 0.2f;
         [SerializeField] private LayerMask playerLayer;
 
@@ -85,7 +85,6 @@ namespace TheSlimeKing.Gameplay
         private static Transform s_playerTransform;
         private static bool s_playerCached = false;
         private float detectionTimer = 0f;
-        private Collider2D[] detectionResults = new Collider2D[1];
         private bool playerDetected = false;
 
         // Patrol
@@ -158,6 +157,12 @@ namespace TheSlimeKing.Gameplay
 
         private void Update()
         {
+            // Debug log to verify Update is being called
+            if (enableDebugLogs && Time.frameCount % 60 == 0) // Log every 60 frames
+            {
+                Debug.Log($"[BeeWorkerBehaviorController] Update running - State: {currentState}, PlayerDetected: {playerDetected}", this);
+            }
+            
             // State machine update - handle current state
             switch (currentState)
             {
@@ -358,6 +363,16 @@ namespace TheSlimeKing.Gameplay
         }
 
         /// <summary>
+        /// Returns the attack damage value of this BeeWorker.
+        /// Used by EnemyHitBox to apply damage to the player.
+        /// </summary>
+        /// <returns>The attack damage value as an integer</returns>
+        public int GetAttackDamage()
+        {
+            return Mathf.RoundToInt(attackDamage);
+        }
+
+        /// <summary>
         /// Destroys the BeeWorker GameObject immediately.
         /// Can be called from external systems or animation events.
         /// </summary>
@@ -521,10 +536,13 @@ namespace TheSlimeKing.Gameplay
         }
         
         /// <summary>
-        /// Checks for player detection using Physics2D.OverlapCircleNonAlloc.
-        /// Uses interval-based detection to reduce physics queries and improve performance.
+        /// Checks for player detection using direct distance calculation.
+        /// Uses interval-based detection to reduce performance overhead.
         /// Respects player stealth mode - player cannot be detected while in stealth.
         /// Uses sqrMagnitude for distance comparisons to avoid expensive square root calculations.
+        /// 
+        /// Note: Uses direct distance check instead of Physics2D.OverlapCircle because
+        /// Kinematic Rigidbody2D objects may not be detected reliably by overlap queries.
         /// </summary>
         private void CheckPlayerDetection()
         {
@@ -545,6 +563,11 @@ namespace TheSlimeKing.Gameplay
             {
                 playerDetected = false;
                 
+                if (enableDebugLogs)
+                {
+                    Debug.LogWarning("[BeeWorkerBehaviorController] Player transform is NULL!", this);
+                }
+                
                 // Attempt to re-cache player reference
                 if (!s_playerCached)
                 {
@@ -554,54 +577,49 @@ namespace TheSlimeKing.Gameplay
                 return;
             }
             
-            // Use NonAlloc physics method to avoid allocations
-            int hitCount = Physics2D.OverlapCircleNonAlloc(
-                transform.position,
-                detectionRadius,
-                detectionResults,
-                playerLayer
-            );
+            // Calculate distance to player using sqrMagnitude (avoids expensive sqrt)
+            Vector2 toPlayer = s_playerTransform.position - transform.position;
+            float sqrDistance = toPlayer.sqrMagnitude;
+            float sqrDetectionRadius = detectionRadius * detectionRadius;
             
-            // Check if player was detected
-            if (hitCount > 0)
+            if (enableDebugLogs && Time.frameCount % 120 == 0) // Log every 120 frames
             {
-                // Verify the detected collider belongs to the player
-                // Use sqrMagnitude for distance comparison (avoids expensive sqrt)
-                Vector2 toPlayer = s_playerTransform.position - transform.position;
-                float sqrDistance = toPlayer.sqrMagnitude;
-                float sqrDetectionRadius = detectionRadius * detectionRadius;
+                float distance = Mathf.Sqrt(sqrDistance);
+                Debug.Log($"[BeeWorkerBehaviorController] Detection check - Distance to player: {distance:F2}, DetectionRadius: {detectionRadius}, PlayerLayer: {playerLayer.value}", this);
+            }
+            
+            // Check if player is within detection radius
+            if (sqrDistance <= sqrDetectionRadius)
+            {
+                // Check if player is in stealth mode
+                bool playerInStealth = false;
                 
-                if (sqrDistance <= sqrDetectionRadius)
+                // Access GameManager to check stealth state
+                if (SlimeKing.Core.GameManager.HasInstance)
                 {
-                    // Check if player is in stealth mode
-                    bool playerInStealth = false;
-                    
-                    // Access GameManager to check stealth state
-                    if (SlimeKing.Core.GameManager.HasInstance)
-                    {
-                        playerInStealth = SlimeKing.Core.GameManager.Instance.IsPlayerInStealth();
-                    }
-                    
-                    // Player is detected only if not in stealth
-                    playerDetected = !playerInStealth;
-                    
-                    if (enableDebugLogs && playerDetected)
-                    {
-                        Debug.Log($"[BeeWorkerBehaviorController] Player detected at distance {Mathf.Sqrt(sqrDistance):F2}", this);
-                    }
-                    else if (enableDebugLogs && playerInStealth)
-                    {
-                        Debug.Log("[BeeWorkerBehaviorController] Player in stealth - not detected", this);
-                    }
+                    playerInStealth = SlimeKing.Core.GameManager.Instance.IsPlayerInStealth();
                 }
-                else
+                
+                // Player is detected only if not in stealth
+                playerDetected = !playerInStealth;
+                
+                if (enableDebugLogs && playerDetected)
                 {
-                    playerDetected = false;
+                    Debug.Log($"[BeeWorkerBehaviorController] ✓ PLAYER DETECTED at distance {Mathf.Sqrt(sqrDistance):F2}", this);
+                }
+                else if (enableDebugLogs && playerInStealth)
+                {
+                    Debug.Log("[BeeWorkerBehaviorController] Player in stealth - not detected", this);
                 }
             }
             else
             {
                 playerDetected = false;
+                
+                if (enableDebugLogs && Time.frameCount % 120 == 0)
+                {
+                    Debug.Log($"[BeeWorkerBehaviorController] Player too far: {Mathf.Sqrt(sqrDistance):F2} > {detectionRadius}", this);
+                }
             }
         }
 
